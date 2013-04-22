@@ -52,7 +52,7 @@ class Scraper(scrapelib.Scraper):
         self.critical = self.logger.critical
 
     def save_object(self, obj):
-        obj_type = obj._schema_name  # XXX: add a _type attribute?
+        obj_type = obj._schema_name
         filename = '{0}_{1}.json'.format(obj_type, obj.uuid)
 
         self.info('save %s %s as %s', obj_type, obj, filename)
@@ -74,7 +74,6 @@ class Scraper(scrapelib.Scraper):
     def scrape_types(self, obj_types):
         if 'person' in obj_types:
             self.scrape_people()
-        # XXX: other types
 
     def scrape_people(self):
         for obj in self.get_people():

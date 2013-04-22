@@ -25,7 +25,6 @@ def main():
 
     # process args
     args = parser.parse_args()
-    #XXX: kernel.update_settings(args)
     subcommands[args.subcommand].handle(args)
 
 if __name__ == '__main__':

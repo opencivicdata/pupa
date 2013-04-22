@@ -6,11 +6,9 @@ from validictory.validator import SchemaValidator
 from bson import ObjectId
 
 
-def makedirs(dname, clean=False):
+def makedirs(dname):
     if not os.path.isdir(dname):
         os.makedirs(dname)
-    elif clean:
-        raise NotImplementedError('XXX')
 
 
 class DatetimeValidator(SchemaValidator):
