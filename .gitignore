@@ -1,0 +1,3 @@
+*.pyc
+scraped_data
+scrape_cache
