@@ -78,7 +78,7 @@ class Command(BaseCommand):
         elif sessions:
             terms = set()
             for sess in sessions:
-                terms.add(org.term_for_session(term))
+                terms.add(org.term_for_session(sess))
             if len(terms) != 1:
                 raise UpdateError('cannot scrape sessions across terms')
             term = terms.pop()

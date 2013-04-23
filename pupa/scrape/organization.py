@@ -21,7 +21,7 @@ class Organization(object):
         for term in self.metadata['terms']:
             if term['name'] == termname:
                 return term
-        raise ValueError('no such term: ' + term)
+        raise ValueError('no such term: ' + termname)
 
     def get_metadata(self):
         raise NotImplementedError('get_metadata method is not implemented')
