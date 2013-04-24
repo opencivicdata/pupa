@@ -51,22 +51,21 @@ class Scraper(scrapelib.Scraper):
         self.critical = self.logger.critical
 
     def save_object(self, obj):
-        obj_type = obj._schema_name
-
-        if obj_type == 'legislator':
-            obj.add_membership(self.jurisdiction.organization)
-            obj_type = 'person'
+        if obj._type == 'legislator':
+            seat_post = self.jurisdiction.get_post_id(district=obj.district,
+                                                      chamber=obj.chamber)
+            obj.add_membership(self.jurisdiction.organization_id,
+                               post_id=seat_post)   #, role='member')
+            party = self.jurisdiction.get_party(obj.party)
+            obj.add_membership(party)
         # XXX: add custom save logic as needed
-        #elif obj_type in ('instrument', ...):
+        #elif obj._type in ('instrument', ...):
 
-        if hasattr(obj, 'finalize'):
-            obj.finalize()
+        filename = '{0}_{1}.json'.format(obj._type, obj._id)
 
-        filename = '{0}_{1}.json'.format(obj_type, obj.uuid)
+        self.info('save %s %s as %s', obj._type, obj, filename)
 
-        self.info('save %s %s as %s', obj_type, obj, filename)
-
-        self.output_names[obj_type].add(filename)
+        self.output_names[obj._type].add(filename)
 
         with open(os.path.join(self.output_dir, filename),
                   'w') as f:

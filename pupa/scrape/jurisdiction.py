@@ -1,9 +1,10 @@
-
+from larvae.organization import Organization
 
 class Jurisdiction(object):
     """ Base class for a jurisdiction """
 
     _metadata = None
+    _party_cache = {}
 
     @property
     def metadata(self):
@@ -22,6 +23,16 @@ class Jurisdiction(object):
             if term['name'] == termname:
                 return term
         raise ValueError('no such term: ' + termname)
+
+    def get_party(self, party_name):
+        if not self._party_cache:
+            for party in self.metadata['parties']:
+                self._party_cache[party['name']] = Organization(party['name'],
+                                                            _id=party['id'])
+        try:
+            return self._party_cache[party_name]
+        except KeyError:
+            raise ValueError('no such party: ' + party_name)
 
     def get_metadata(self):
         raise NotImplementedError('get_metadata method is not implemented')

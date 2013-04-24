@@ -9,6 +9,10 @@ class Example(Jurisdiction):
         return {'name': 'Example',
                 'terms': [{'name': '2013-2014', 'sessions': ['2013']}],
                 'provides': ['person', 'organization', 'membership'],
+                'parties': [{'name': 'Independent', 'id': 'independent'},
+                            {'name': 'Green', 'id': 'green'},
+                            {'name': 'Bull-Moose', 'id': 'bullmoose'}
+                           ],
                 'id': self.organization_id
                }
 
@@ -21,6 +25,7 @@ class Example(Jurisdiction):
 
 
 class Legislator(Person):
+    _type = 'legislator'
     __slots__ = ('district', 'party', 'chamber')
 
     def __init__(self, name, district, party=None, chamber=None, **kwargs):
@@ -34,21 +39,22 @@ class ExamplePersonScraper(Scraper):
 
     def get_people(self):
         tech = Organization('Technology')
-        tech.add_post('chairman-dlkfjdlkfjaslf', 'Chairman', 'chairman')
+        tech.add_post('Chairman', 'chairman')
+        yield tech
 
         p = Legislator('Paul Tagliamonte', district='6', chamber='upper',
-                       party='I')
+                       party='Independent')
         p.add_membership('Finance')
-        p.add_membership('Technology')
-        yield [tech, p]
-
-        p = Legislator('Thom Neale', district='1', chamber='upper', party='G')
-        p.add_membership('Law')
         p.add_membership(tech)
         yield p
 
-        p = Legislator('James Turk', district='2', chamber='lower', party='B')
-        m = p.add_membership(tech, post_id='chairman')
-        m.contact_details.append({'key': 'phone', 'value': '202-558-8723'})
-        p.add_membership('Law')
-        yield p
+        #p = Legislator('Thom Neale', district='1', chamber='upper', party='Green')
+        #p.add_membership('Law')
+        #p.add_membership(tech)
+        #yield p
+
+        #p = Legislator('James Turk', district='2', chamber='lower', party='Bull-Moose')
+        #m = p.add_membership(tech, post_id='chairman')
+        #m.contact_details.append({'key': 'phone', 'value': '202-558-8723'})
+        #p.add_membership('Law')
+        #yield p
