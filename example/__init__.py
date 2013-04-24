@@ -26,13 +26,18 @@ class Example(Jurisdiction):
 
 class Legislator(Person):
     _type = 'legislator'
-    __slots__ = ('district', 'party', 'chamber')
+    __slots__ = ('district', 'party', 'chamber', '_contact_details')
 
     def __init__(self, name, district, party=None, chamber=None, **kwargs):
         super(Legislator, self).__init__(name, **kwargs)
         self.district = district
         self.party = party
         self.chamber = chamber
+        self._contact_details = []
+
+    def add_contact(self, type, value, group):
+        self._contact_details.append({'type': type, 'value': value,
+                                      'group': group})
 
 
 class ExamplePersonScraper(Scraper):

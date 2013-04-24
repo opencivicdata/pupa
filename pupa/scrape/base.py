@@ -52,16 +52,18 @@ class Scraper(scrapelib.Scraper):
 
     def save_object(self, obj):
         if obj._type == 'legislator':
-            #seat_post = self.jurisdiction.get_post_id(district=obj.district,
-            #                                          chamber=obj.chamber)
-            obj.add_membership(self.jurisdiction.organization_id,
-                               district=obj.district, chamber=obj.chamber,
-                               role='member')
+            membership = obj.add_membership(self.jurisdiction.organization_id,
+                                            district=obj.district,
+                                            chamber=obj.chamber,
+                                            role='member')
+            # move Legislator contact details onto the membership we created
+            membership.contact_details = obj._contact_details
+            del obj._contact_details
+
+            # create a party membership
             if obj.party:
                 party = self.jurisdiction.get_party(obj.party)
                 obj.add_membership(party)
-        # XXX: add custom save logic as needed
-        #elif obj._type in ('instrument', ...):
 
         filename = '{0}_{1}.json'.format(obj._type, obj._id)
 
