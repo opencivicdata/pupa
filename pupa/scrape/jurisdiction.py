@@ -1,7 +1,7 @@
 
 
-class Organization(object):
-    """ Base class for organizations """
+class Jurisdiction(object):
+    """ Base class for a jurisdiction """
 
     _metadata = None
 

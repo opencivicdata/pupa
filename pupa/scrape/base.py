@@ -12,14 +12,13 @@ from pupa.core import settings
 class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
 
-    def __init__(self, organization, session,
-                 output_dir, cache_dir=None,
+    def __init__(self, jurisdiction, session, output_dir, cache_dir=None,
                  strict_validation=False, fastmode=False):
 
         super(Scraper, self).__init__(self)
 
         # set options
-        self.organization = organization
+        self.jurisdiction = jurisdiction
         self.session = session
 
         # scrapelib setup
@@ -53,6 +52,16 @@ class Scraper(scrapelib.Scraper):
 
     def save_object(self, obj):
         obj_type = obj._schema_name
+
+        if obj_type == 'legislator':
+            obj.add_membership(self.jurisdiction.organization)
+            obj_type = 'person'
+        # XXX: add custom save logic as needed
+        #elif obj_type in ('instrument', ...):
+
+        if hasattr(obj, 'finalize'):
+            obj.finalize()
+
         filename = '{0}_{1}.json'.format(obj_type, obj.uuid)
 
         self.info('save %s %s as %s', obj_type, obj, filename)
@@ -71,13 +80,21 @@ class Scraper(scrapelib.Scraper):
             if self.strict_validation:
                 raise ve
 
+        # after saving and validating, save subordinate objects
+        for obj in getattr(obj, '_related', []):
+            self.save_object(obj)
+
     def scrape_types(self, obj_types):
         if 'person' in obj_types:
             self.scrape_people()
 
     def scrape_people(self):
         for obj in self.get_people():
-            self.save_object(obj)
+            if hasattr(obj, '__iter__'):
+                for iterobj in obj:
+                    self.save_object(iterobj)
+            else:
+                self.save_object(obj)
 
     def get_people(self):
         raise NotImplementedError(self.__class__.__name__ + ' must provide a '

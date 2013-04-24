@@ -1,2 +1,2 @@
-from .organization import Organization
+from .jurisdiction import Jurisdiction
 from .base import Scraper

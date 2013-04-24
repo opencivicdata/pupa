@@ -61,16 +61,16 @@ class Command(BaseCommand):
                 _debugger.pm()
             sys.excepthook = _tb_info
 
-    def get_org(self, module):
+    def get_org(self, module_name):
         # get the org object
-        module = importlib.import_module(module + '.organization')
+        module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
             if getattr(obj, 'organization_id', None):
                 # instantiate the class
                 return obj()
 
-        raise UpdateError('unable to import Organization subclass from ' +
-                          module + '.organization')
+        raise UpdateError('unable to import Jurisdiction subclass from ' +
+                          module_name)
 
     def get_timespan(self, org, term, sessions):
         if term and sessions:
@@ -104,10 +104,9 @@ class Command(BaseCommand):
         utils.makedirs(cache_dir)
         data_dir = os.path.join(args.datadir, org.metadata['id'])
         utils.makedirs(data_dir)
-        # clear data dirs
-        for obj_type in obj_types:
-            for f in glob.glob('{0}/{1}*.json'.format(data_dir, obj_type)):
-                os.remove(f)
+        # clear json from data dir
+        for f in glob.glob(data_dir + '/*.json'):
+            os.remove(f)
 
         print('term:', term)
         print('sessions:', sessions)
@@ -120,7 +119,7 @@ class Command(BaseCommand):
             for obj_type in obj_types:
                 ScraperCls = org.get_scraper(term, session, obj_type)
                 if not ScraperCls:
-                    raise Exception('no scraper for term={0} session={1}'
+                    raise Exception('no scraper for term={0} session={1} '
                                     'type={2}'.format(term, session, obj_type))
                 session_scrapers[ScraperCls].append(obj_type)
 
