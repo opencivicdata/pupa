@@ -52,12 +52,14 @@ class Scraper(scrapelib.Scraper):
 
     def save_object(self, obj):
         if obj._type == 'legislator':
-            seat_post = self.jurisdiction.get_post_id(district=obj.district,
-                                                      chamber=obj.chamber)
+            #seat_post = self.jurisdiction.get_post_id(district=obj.district,
+            #                                          chamber=obj.chamber)
             obj.add_membership(self.jurisdiction.organization_id,
-                               post_id=seat_post)   #, role='member')
-            party = self.jurisdiction.get_party(obj.party)
-            obj.add_membership(party)
+                               district=obj.district, chamber=obj.chamber,
+                               role='member')
+            if obj.party:
+                party = self.jurisdiction.get_party(obj.party)
+                obj.add_membership(party)
         # XXX: add custom save logic as needed
         #elif obj._type in ('instrument', ...):
 
