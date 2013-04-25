@@ -1,6 +1,24 @@
 import datetime
-from pupa.utils import make_id
 from pupa.core import db
+from .base import update_object, insert_object
+
+
+def import_organization(org):
+    """
+        takes an org dict and imports/updates it in database
+
+        returns 'insert', 'update', 'noop'
+    """
+    spec = {'classification': org['classification'],
+            'name': org['name'],
+            'parent_id': org['parent_id']}
+    db_org = db.organizations.find_one(spec)
+    if db_org:
+        updated = update_object(db_org, org)
+        return 'update' if updated else 'noop'
+    else:
+        insert_object(org)
+        return 'insert'
 
 
 def import_jurisdiction(jurisdiction):
@@ -14,24 +32,28 @@ def import_jurisdiction(jurisdiction):
 
     db.metadata.save(metadata)
 
+    orgs = {'insert': 0, 'update': 0, 'noop': 0}
+
     # create organization
     org = {'_type': 'organization',
            'classification': 'jursidiction',
-           'id': metadata['_id'],
-           'name': metadata['name'],
+           'parent_id': None,
+           'jurisdiction_id': metadata['id'],
+           'name': metadata['name']
           }
     if 'other_names' in metadata:
         org['other_names'] = metadata['other_names']
     if 'parent_id' in metadata:
         org['parent_id'] = metadata['parent_id']
-    db.organizations.save(org)
+
+    result = import_organization(org)
+    orgs[result] += 1
 
     # create parties
     for party in metadata['parties']:
-        if not db.organizations.find({'classification': 'party',
-                                      'name': party['name']}).count():
-            org = {'_type': 'organization',
-                   'classification': 'party',
-                   'name': party['name'],
-                   'id': make_id('organization')}
-            db.organizations.save(org)
+        org = {'_type': 'organization',
+               'classification': 'party',
+               'name': party['name'],
+               'parent_id': None }
+        result = import_organization(org)
+        orgs[result] += 1
