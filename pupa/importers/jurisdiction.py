@@ -1,24 +1,7 @@
 import datetime
 from pupa.core import db
 from .base import update_object, insert_object
-
-
-def import_organization(org):
-    """
-        takes an org dict and imports/updates it in database
-
-        returns 'insert', 'update', 'noop'
-    """
-    spec = {'classification': org['classification'],
-            'name': org['name'],
-            'parent_id': org['parent_id']}
-    db_org = db.organizations.find_one(spec)
-    if db_org:
-        updated = update_object(db_org, org)
-        return 'update' if updated else 'noop'
-    else:
-        insert_object(org)
-        return 'insert'
+from .organizations import import_organization
 
 
 def import_jurisdiction(jurisdiction):

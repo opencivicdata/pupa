@@ -39,27 +39,21 @@ class Legislator(Person):
         self._contact_details.append({'type': type, 'value': value,
                                       'group': group})
 
+    def add_committee_membership(self, com_name):
+        org = Organization(com_name, classification='committee')
+        self.add_membership(org)
+        self._related.append(org)
+
 
 class ExamplePersonScraper(Scraper):
 
     def get_people(self):
-        tech = Organization('Technology')
+        tech = Organization('Technology', classification='committee')
         tech.add_post('Chairman', 'chairman')
         yield tech
 
         p = Legislator('Paul Tagliamonte', district='6', chamber='upper',
                        party='Independent')
-        p.add_membership('Finance')
+        p.add_committee_membership('Finance')
         p.add_membership(tech)
         yield p
-
-        #p = Legislator('Thom Neale', district='1', chamber='upper', party='Green')
-        #p.add_membership('Law')
-        #p.add_membership(tech)
-        #yield p
-
-        #p = Legislator('James Turk', district='2', chamber='lower', party='Bull-Moose')
-        #m = p.add_membership(tech, post_id='chairman')
-        #m.contact_details.append({'key': 'phone', 'value': '202-558-8723'})
-        #p.add_membership('Law')
-        #yield p

@@ -10,6 +10,7 @@ from .base import BaseCommand
 from pupa import utils
 
 from pupa.importers.jurisdiction import import_jurisdiction
+from pupa.importers.organizations import import_organizations
 
 
 class UpdateError(Exception):
@@ -126,6 +127,7 @@ class Command(BaseCommand):
 
     def do_import(self, juris, args):
         import_jurisdiction(juris)
+        import_organizations(juris, args.datadir)
 
     def handle(self, args):
         self.enable_debug(args.debug)
