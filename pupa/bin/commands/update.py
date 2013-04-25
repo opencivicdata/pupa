@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import sys
 import glob
@@ -7,6 +8,8 @@ from collections import defaultdict
 
 from .base import BaseCommand
 from pupa import utils
+
+from pupa.importers.jurisdiction import import_jurisdiction
 
 
 class UpdateError(Exception):
@@ -20,6 +23,10 @@ class Command(BaseCommand):
     def add_args(self):
         # what to scrape
         self.add_argument('module', type=str, help='path to scraper module')
+        for arg in ('scrape', 'import'):
+            self.add_argument('--' + arg, dest='actions',
+                              action='append_const', const=arg,
+                              help='only run {0} step'.format(arg))
         self.add_argument('-s', '--session', action='append', dest='sessions',
                           default=[], help='session(s) to scrape')
         self.add_argument('-t', '--term', dest='term', help='term to scrape')
@@ -61,8 +68,8 @@ class Command(BaseCommand):
                 _debugger.pm()
             sys.excepthook = _tb_info
 
-    def get_org(self, module_name):
-        # get the org object
+    def get_jurisdiction(self, module_name):
+        # get the jurisdiction object
         module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
             if getattr(obj, 'organization_id', None):
@@ -72,59 +79,78 @@ class Command(BaseCommand):
         raise UpdateError('unable to import Jurisdiction subclass from ' +
                           module_name)
 
-    def get_timespan(self, org, term, sessions):
+    def get_timespan(self, juris, term, sessions):
         if term and sessions:
             raise UpdateError('cannot specify both --term and --session')
         elif sessions:
             terms = set()
             for sess in sessions:
-                terms.add(org.term_for_session(sess))
+                terms.add(juris.term_for_session(sess))
             if len(terms) != 1:
                 raise UpdateError('cannot scrape sessions across terms')
             term = terms.pop()
         elif term:
-            sessions = org.get_term_details(term)['sessions']
+            sessions = juris.get_term_details(term)['sessions']
         else:
-            term = org.metadata['terms'][-1]['name']
-            sessions = org.metadata['terms'][-1]['sessions']
+            term = juris.metadata['terms'][-1]['name']
+            sessions = juris.metadata['terms'][-1]['sessions']
 
         return term, sessions
 
-    def handle(self, args):
-        self.enable_debug(args.debug)
-
-        org = self.get_org(args.module)
-
-        # get terms, sessions, and object types
-        term, sessions = self.get_timespan(org, args.term, args.sessions)
-        obj_types = args.obj_types or org.metadata['provides']
-
+    def do_scrape(self, juris, args):
         # make output and cache dirs
-        cache_dir = os.path.join(args.cachedir, org.metadata['id'])
-        utils.makedirs(cache_dir)
-        data_dir = os.path.join(args.datadir, org.metadata['id'])
-        utils.makedirs(data_dir)
+        utils.makedirs(args.cachedir)
+        utils.makedirs(args.datadir)
         # clear json from data dir
-        for f in glob.glob(data_dir + '/*.json'):
+        for f in glob.glob(args.datadir + '/*.json'):
             os.remove(f)
 
-        print('term:', term)
-        print('sessions:', sessions)
-        print('obj_types:', obj_types)
-
         # run scrapers
-        for session in sessions:
+        for session in args.sessions:
             # get mapping of ScraperClass -> obj_types
             session_scrapers = defaultdict(list)
-            for obj_type in obj_types:
-                ScraperCls = org.get_scraper(term, session, obj_type)
+            for obj_type in args.obj_types:
+                ScraperCls = juris.get_scraper(args.term, session, obj_type)
                 if not ScraperCls:
                     raise Exception('no scraper for term={0} session={1} '
-                                    'type={2}'.format(term, session, obj_type))
+                                    'type={2}'.format(args.term, session,
+                                                      obj_type))
                 session_scrapers[ScraperCls].append(obj_type)
 
             # run each scraper once
             for ScraperCls, scraper_obj_types in session_scrapers.iteritems():
-                scraper = ScraperCls(org, session, data_dir, cache_dir,
-                                     args.strict, args.fastmode)
+                scraper = ScraperCls(juris, session, args.datadir,
+                                     args.cachedir, args.strict,
+                                     args.fastmode)
                 scraper.scrape_types(scraper_obj_types)
+
+    def do_import(self, juris, args):
+        import_jurisdiction(juris)
+
+    def handle(self, args):
+        self.enable_debug(args.debug)
+
+        juris = self.get_jurisdiction(args.module)
+
+        # modify args in-place so we can pass them around
+        if not args.actions:
+            args.actions = ('scrape', 'import')
+        args.cache_dir = os.path.join(args.cachedir, juris.metadata['id'])
+        args.data_dir = os.path.join(args.datadir, juris.metadata['id'])
+
+        # terms, sessions, and object types
+        args.term, args.sessions = self.get_timespan(juris, args.term,
+                                                     args.sessions)
+        args.obj_types = args.obj_types or juris.metadata['provides']
+
+        # print the plan
+        print('module:', args.module)
+        print('actions:', ', '.join(args.actions))
+        print('term:', args.term)
+        print('sessions:', ', '.join(args.sessions))
+        print('obj_types:', ', '.join(args.obj_types))
+
+        if 'scrape' in args.actions:
+            self.do_scrape(juris, args)
+        if 'import' in args.actions:
+            self.do_import(juris, args)

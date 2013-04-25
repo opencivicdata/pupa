@@ -1,6 +1,7 @@
 import os
 import time
 import json
+import uuid
 import datetime
 from validictory.validator import SchemaValidator
 from bson import ObjectId
@@ -9,6 +10,10 @@ from bson import ObjectId
 def makedirs(dname):
     if not os.path.isdir(dname):
         os.makedirs(dname)
+
+
+def make_id(type_):
+    return 'ocd-{0}/{1}'.format(type_, uuid.uuid1())
 
 
 class DatetimeValidator(SchemaValidator):
