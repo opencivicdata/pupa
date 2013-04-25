@@ -10,7 +10,8 @@ from .base import BaseCommand
 from pupa import utils
 
 from pupa.importers.jurisdiction import import_jurisdiction
-from pupa.importers.organizations import import_organizations
+from pupa.importers.organizations import OrganizationImporter
+from pupa.importers.people import PersonImporter
 
 
 class UpdateError(Exception):
@@ -126,8 +127,11 @@ class Command(BaseCommand):
                 scraper.scrape_types(scraper_obj_types)
 
     def do_import(self, juris, args):
-        import_jurisdiction(juris)
-        import_organizations(juris, args.datadir)
+        org_importer = OrganizationImporter()
+        person_importer = PersonImporter()
+        import_jurisdiction(org_importer, juris)
+        org_importer.import_from_json(args.datadir)
+        person_importer.import_from_json(args.datadir)
 
     def handle(self, args):
         self.enable_debug(args.debug)

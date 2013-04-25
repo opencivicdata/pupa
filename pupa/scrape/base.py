@@ -9,6 +9,7 @@ from larvae.membership import Membership
 from pupa import utils
 from pupa.core import settings
 
+
 class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
 
@@ -53,7 +54,7 @@ class Scraper(scrapelib.Scraper):
     def save_object(self, obj):
         if obj._type == 'legislator':
             membership = Membership(
-                obj._id, 'jurisdiction:'+self.jurisdiction.organization_id,
+                obj._id, 'jurisdiction:' + self.jurisdiction.organization_id,
                 district=obj.district, chamber=obj.chamber,
                 contact_details=obj._contact_details, role='member')
             # remove placeholder _contact_details
@@ -63,7 +64,7 @@ class Scraper(scrapelib.Scraper):
             # create a party membership
             if obj.party:
                 membership = Membership(obj._id,
-                                        'party:'+obj.party,
+                                        'party:' + obj.party,
                                         role='member')
                 obj._related.append(membership)
 

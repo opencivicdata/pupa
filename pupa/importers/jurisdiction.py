@@ -1,10 +1,8 @@
 import datetime
 from pupa.core import db
-from .base import update_object, insert_object
-from .organizations import import_organization
 
 
-def import_jurisdiction(jurisdiction):
+def import_jurisdiction(org_importer, jurisdiction):
     metadata = jurisdiction.get_metadata()
 
     metadata['_type'] = 'metadata'
@@ -14,8 +12,6 @@ def import_jurisdiction(jurisdiction):
     # XXX: validate metadata
 
     db.metadata.save(metadata)
-
-    orgs = {'insert': 0, 'update': 0, 'noop': 0}
 
     # create organization
     org = {'_type': 'organization',
@@ -29,8 +25,7 @@ def import_jurisdiction(jurisdiction):
     if 'parent_id' in metadata:
         org['parent_id'] = metadata['parent_id']
 
-    result = import_organization(org)
-    orgs[result] += 1
+    org_importer.import_object(org)
 
     # create parties
     for party in metadata['parties']:
@@ -38,5 +33,4 @@ def import_jurisdiction(jurisdiction):
                'classification': 'party',
                'name': party['name'],
                'parent_id': None }
-        result = import_organization(org)
-        orgs[result] += 1
+        org_importer.import_object(org)

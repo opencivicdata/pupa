@@ -1,3 +1,6 @@
+import os
+import glob
+import json
 import uuid
 import datetime
 from pupa.core import db
@@ -60,3 +63,45 @@ def update_object(old, new):
         collection.save(old)
 
     return updated
+
+
+class BaseImporter(object):
+
+    def __init__(self):
+        self.collection = collection_for_type(self._type)
+        self.results = {'insert': 0, 'update': 0, 'noop': 0}
+
+    def import_object(self, obj):
+        spec = self.get_db_spec(obj)
+
+        db_obj = self.collection.find_one(spec)
+
+        if db_obj:
+            updated = update_object(db_obj, obj)
+            self.results['update' if updated else 'noop'] += 1
+        else:
+            insert_object(obj)
+            self.results['insert'] += 1
+
+    def import_from_json(self, datadir):
+        # load all json, mapped by json_id
+        raw_objects = {}
+        for fname in glob.glob(os.path.join(datadir, self._type + '_*.json')):
+            with open(fname) as f:
+                data = json.load(f)
+                json_id = data.pop('_id')
+                raw_objects[json_id] = data
+
+        # map duplicate ids to first occurance of same object
+        duplicates = {}
+        for json_id, obj in raw_objects.items():
+            for json_id2, obj2 in raw_objects.items():
+                if json_id != json_id2 and obj == obj2:
+                    duplicates[json_id2] = json_id
+
+        # now do import, ignoring duplicates
+        for json_id, obj in raw_objects.items():
+            if json_id not in duplicates:
+                self.import_object(obj)
+
+        print self.results
