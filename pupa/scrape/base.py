@@ -90,8 +90,8 @@ class Scraper(scrapelib.Scraper):
         for obj in getattr(obj, '_related', []):
             self.save_object(obj)
 
-    def scrape_types(self, obj_types):
-        if 'person' in obj_types:
+    def scrape_types(self, scraper_types):
+        if 'person' in scraper_types:
             self.scrape_people()
 
     def scrape_people(self):

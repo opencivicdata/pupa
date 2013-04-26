@@ -15,6 +15,9 @@ from pupa.importers.people import PersonImporter
 from pupa.importers.memberships import MembershipImporter
 
 
+ALL_ACTIONS = ('scrape','import','report')
+
+
 class UpdateError(Exception):
     pass
 
@@ -26,15 +29,18 @@ class Command(BaseCommand):
     def add_args(self):
         # what to scrape
         self.add_argument('module', type=str, help='path to scraper module')
-        for arg in ('scrape', 'import'):
+        for arg in ALL_ACTIONS:
             self.add_argument('--' + arg, dest='actions',
                               action='append_const', const=arg,
-                              help='only run {0} step'.format(arg))
+                              help='only run {0} post-scrape step'.format(arg))
+        for arg in ('person', 'bill'):
+            self.add_argument('--' + arg, dest='scrapers',
+                              action='append_const', const=arg,
+                              help='only run {0} scraper'.format(arg))
+
         self.add_argument('-s', '--session', action='append', dest='sessions',
                           default=[], help='session(s) to scrape')
         self.add_argument('-t', '--term', dest='term', help='term to scrape')
-        self.add_argument('-o', '--objects', dest='obj_types', action='append',
-                          default=[], help='object types to scrape')
 
         # debugging
         self.add_argument('--debug', nargs='?', const='pdb', default=None,
@@ -110,22 +116,23 @@ class Command(BaseCommand):
 
         # run scrapers
         for session in args.sessions:
-            # get mapping of ScraperClass -> obj_types
+            # get mapping of ScraperClass -> scrapers
             session_scrapers = defaultdict(list)
-            for obj_type in args.obj_types:
-                ScraperCls = juris.get_scraper(args.term, session, obj_type)
+            for scraper_type in args.scrapers:
+                ScraperCls = juris.get_scraper(args.term, session,
+                                               scraper_type)
                 if not ScraperCls:
                     raise Exception('no scraper for term={0} session={1} '
                                     'type={2}'.format(args.term, session,
-                                                      obj_type))
-                session_scrapers[ScraperCls].append(obj_type)
+                                                      scraper_type))
+                session_scrapers[ScraperCls].append(scraper_type)
 
             # run each scraper once
-            for ScraperCls, scraper_obj_types in session_scrapers.iteritems():
+            for ScraperCls, scraper_types in session_scrapers.iteritems():
                 scraper = ScraperCls(juris, session, args.datadir,
                                      args.cachedir, args.strict,
                                      args.fastmode)
-                scraper.scrape_types(scraper_obj_types)
+                scraper.scrape_types(scraper_types)
 
     def do_import(self, juris, args):
         org_importer = OrganizationImporter(juris.jurisdiction_id)
@@ -145,21 +152,21 @@ class Command(BaseCommand):
 
         # modify args in-place so we can pass them around
         if not args.actions:
-            args.actions = ('scrape', 'import')
+            args.actions = ALL_ACTIONS
         args.cachedir = os.path.join(args.cachedir, juris.jurisdiction_id)
         args.datadir = os.path.join(args.datadir, juris.jurisdiction_id)
 
         # terms, sessions, and object types
         args.term, args.sessions = self.get_timespan(juris, args.term,
                                                      args.sessions)
-        args.obj_types = args.obj_types or juris.metadata['provides']
+        args.scrapers = args.scrapers or juris.metadata['provides']
 
         # print the plan
         print('module:', args.module)
         print('actions:', ', '.join(args.actions))
         print('term:', args.term)
         print('sessions:', ', '.join(args.sessions))
-        print('obj_types:', ', '.join(args.obj_types))
+        print('scrapers:', ', '.join(args.scrapers))
 
         if 'scrape' in args.actions:
             self.do_scrape(juris, args)

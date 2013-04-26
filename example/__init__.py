@@ -9,15 +9,15 @@ class Example(Jurisdiction):
     def get_metadata(self):
         return {'name': 'Example',
                 'terms': [{'name': '2013-2014', 'sessions': ['2013']}],
-                'provides': ['person', 'organization', 'membership'],
+                'provides': ['person'],
                 'parties': [{'name': 'Independent' },
                             {'name': 'Green' },
                             {'name': 'Bull-Moose'}
                            ],
                }
 
-    def get_scraper(self, term, session, obj_type):
-        if obj_type == 'person':
+    def get_scraper(self, term, session, scraper_type):
+        if scraper_type == 'person':
             return ExamplePersonScraper
 
     def get_session_list(self):
@@ -56,5 +56,5 @@ class ExamplePersonScraper(Scraper):
         p = Legislator('Paul Tagliamonte', district='6', chamber='upper',
                        party='Independent')
         p.add_committee_membership('Finance')
-        p.add_membership(tech)
+        p.add_membership(tech, role='chairman')
         yield p
