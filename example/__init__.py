@@ -3,7 +3,7 @@ from larvae.person import Person
 from larvae.organization import Organization
 
 class Example(Jurisdiction):
-    organization_id = 'ex'
+    jurisdiction_id = 'ex'
 
     def get_metadata(self):
         return {'name': 'Example',
@@ -13,7 +13,6 @@ class Example(Jurisdiction):
                             {'name': 'Green', 'id': 'green'},
                             {'name': 'Bull-Moose', 'id': 'bullmoose'}
                            ],
-                'id': self.organization_id
                }
 
     def get_scraper(self, term, session, obj_type):
@@ -25,7 +24,8 @@ class Example(Jurisdiction):
 
 
 class Legislator(Person):
-    _type = 'legislator'
+    _type = 'person'
+    _is_legislator = True
     __slots__ = ('district', 'party', 'chamber', '_contact_details')
 
     def __init__(self, name, district, party=None, chamber=None, **kwargs):

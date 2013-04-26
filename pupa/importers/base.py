@@ -67,7 +67,8 @@ def update_object(old, new):
 
 class BaseImporter(object):
 
-    def __init__(self):
+    def __init__(self, jurisdiction_id):
+        self.jurisdiction_id = jurisdiction_id
         self.collection = collection_for_type(self._type)
         self.results = {'insert': 0, 'update': 0, 'noop': 0}
 
@@ -89,7 +90,10 @@ class BaseImporter(object):
         for fname in glob.glob(os.path.join(datadir, self._type + '_*.json')):
             with open(fname) as f:
                 data = json.load(f)
+                # prepare object from json
+                data['jurisdiction_id'] = self.jurisdiction_id
                 json_id = data.pop('_id')
+                data = self.prepare_object_from_json(data)
                 raw_objects[json_id] = data
 
         # map duplicate ids to first occurance of same object
@@ -105,3 +109,7 @@ class BaseImporter(object):
                 self.import_object(obj)
 
         print self.results
+
+    def prepare_object_from_json(self, obj):
+        # no-op by default
+        return obj

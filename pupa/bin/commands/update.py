@@ -74,7 +74,7 @@ class Command(BaseCommand):
         # get the jurisdiction object
         module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
-            if getattr(obj, 'organization_id', None):
+            if getattr(obj, 'jurisdiction_id', None):
                 # instantiate the class
                 return obj()
 
@@ -127,8 +127,8 @@ class Command(BaseCommand):
                 scraper.scrape_types(scraper_obj_types)
 
     def do_import(self, juris, args):
-        org_importer = OrganizationImporter()
-        person_importer = PersonImporter()
+        org_importer = OrganizationImporter(juris.jurisdiction_id)
+        person_importer = PersonImporter(juris.jurisdiction_id)
         import_jurisdiction(org_importer, juris)
         org_importer.import_from_json(args.datadir)
         person_importer.import_from_json(args.datadir)
@@ -141,8 +141,8 @@ class Command(BaseCommand):
         # modify args in-place so we can pass them around
         if not args.actions:
             args.actions = ('scrape', 'import')
-        args.cache_dir = os.path.join(args.cachedir, juris.metadata['id'])
-        args.data_dir = os.path.join(args.datadir, juris.metadata['id'])
+        args.cachedir = os.path.join(args.cachedir, juris.jurisdiction_id)
+        args.datadir = os.path.join(args.datadir, juris.jurisdiction_id)
 
         # terms, sessions, and object types
         args.term, args.sessions = self.get_timespan(juris, args.term,

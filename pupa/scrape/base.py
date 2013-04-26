@@ -52,9 +52,9 @@ class Scraper(scrapelib.Scraper):
         self.critical = self.logger.critical
 
     def save_object(self, obj):
-        if obj._type == 'legislator':
+        if hasattr(obj, '_is_legislator'):
             membership = Membership(
-                obj._id, 'jurisdiction:' + self.jurisdiction.organization_id,
+                obj._id, 'jurisdiction:' + self.jurisdiction.jurisdiction_id,
                 district=obj.district, chamber=obj.chamber,
                 contact_details=obj._contact_details, role='member')
             # remove placeholder _contact_details

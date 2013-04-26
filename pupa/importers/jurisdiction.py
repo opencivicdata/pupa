@@ -6,7 +6,7 @@ def import_jurisdiction(org_importer, jurisdiction):
     metadata = jurisdiction.get_metadata()
 
     metadata['_type'] = 'metadata'
-    metadata['_id'] = jurisdiction.organization_id
+    metadata['_id'] = jurisdiction.jurisdiction_id
     metadata['latest_update'] = datetime.datetime.utcnow()
 
     # XXX: validate metadata
@@ -17,7 +17,7 @@ def import_jurisdiction(org_importer, jurisdiction):
     org = {'_type': 'organization',
            'classification': 'jursidiction',
            'parent_id': None,
-           'jurisdiction_id': metadata['id'],
+           'jurisdiction_id': jurisdiction.jurisdiction_id,
            'name': metadata['name']
           }
     if 'other_names' in metadata:
