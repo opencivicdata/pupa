@@ -2,6 +2,7 @@ from pupa.scrape import Jurisdiction, Scraper
 from larvae.person import Person
 from larvae.organization import Organization
 
+
 class Example(Jurisdiction):
     jurisdiction_id = 'ex'
 
@@ -9,9 +10,9 @@ class Example(Jurisdiction):
         return {'name': 'Example',
                 'terms': [{'name': '2013-2014', 'sessions': ['2013']}],
                 'provides': ['person', 'organization', 'membership'],
-                'parties': [{'name': 'Independent', 'id': 'independent'},
-                            {'name': 'Green', 'id': 'green'},
-                            {'name': 'Bull-Moose', 'id': 'bullmoose'}
+                'parties': [{'name': 'Independent' },
+                            {'name': 'Green' },
+                            {'name': 'Bull-Moose'}
                            ],
                }
 
@@ -39,9 +40,9 @@ class Legislator(Person):
         self._contact_details.append({'type': type, 'value': value,
                                       'group': group})
 
-    def add_committee_membership(self, com_name):
+    def add_committee_membership(self, com_name, role='member'):
         org = Organization(com_name, classification='committee')
-        self.add_membership(org)
+        self.add_membership(org, role=role)
         self._related.append(org)
 
 

@@ -15,7 +15,7 @@ def import_jurisdiction(org_importer, jurisdiction):
 
     # create organization
     org = {'_type': 'organization',
-           'classification': 'jursidiction',
+           'classification': 'jurisdiction',
            'parent_id': None,
            'jurisdiction_id': jurisdiction.jurisdiction_id,
            'name': metadata['name']

@@ -12,6 +12,7 @@ from pupa import utils
 from pupa.importers.jurisdiction import import_jurisdiction
 from pupa.importers.organizations import OrganizationImporter
 from pupa.importers.people import PersonImporter
+from pupa.importers.memberships import MembershipImporter
 
 
 class UpdateError(Exception):
@@ -129,9 +130,13 @@ class Command(BaseCommand):
     def do_import(self, juris, args):
         org_importer = OrganizationImporter(juris.jurisdiction_id)
         person_importer = PersonImporter(juris.jurisdiction_id)
+        membership_importer = MembershipImporter(juris.jurisdiction_id,
+                                                 person_importer,
+                                                 org_importer)
         import_jurisdiction(org_importer, juris)
         org_importer.import_from_json(args.datadir)
         person_importer.import_from_json(args.datadir)
+        membership_importer.import_from_json(args.datadir)
 
     def handle(self, args):
         self.enable_debug(args.debug)
