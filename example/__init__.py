@@ -49,9 +49,16 @@ class Legislator(Person):
 class ExamplePersonScraper(Scraper):
 
     def get_people(self):
+        # committee
         tech = Organization('Technology', classification='committee')
         tech.add_post('Chairman', 'chairman')
         yield tech
+
+        # subcommittee
+        ecom = Organization('Subcommittee on E-Commerce',
+                            parent=tech,
+                            classification='committee')
+        yield ecom
 
         p = Legislator('Paul Tagliamonte', district='6', chamber='upper',
                        party='Independent')

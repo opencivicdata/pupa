@@ -122,9 +122,20 @@ class BaseImporter(object):
                     duplicates[json_id2] = json_id
 
         # now do import, ignoring duplicates
-        for json_id, obj in raw_objects.items():
-            if json_id not in duplicates:
-                self.json_to_db_id[json_id] = self.import_object(obj)
+        to_import = sorted([(k,v) for k,v in raw_objects.items()
+                            if k not in duplicates],
+                           key=lambda i: i[1].get('parent_id', None))
+
+        for json_id, obj in to_import:
+            # parentless objects come first, should mean they are in
+            # self.json_to_db_id before their children need them so we can
+            # resolve their id
+            # XXX: known issue here if there are sub-subcommittees, it'll
+            # result in an unresolvable id
+            parent_id = obj.get('parent_id')
+            if parent_id:
+                obj['parent_id'] = self.resolve_json_id(parent_id)
+            self.json_to_db_id[json_id] = self.import_object(obj)
 
         print self._type, self.results
 
