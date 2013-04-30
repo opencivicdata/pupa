@@ -14,14 +14,15 @@ class Example(Jurisdiction):
                             {'name': 'Green' },
                             {'name': 'Bull-Moose'}
                            ],
+                'session_details': {'2013': {'_scraped_name': '2013'}},
                }
 
     def get_scraper(self, term, session, scraper_type):
         if scraper_type == 'person':
             return ExamplePersonScraper
 
-    def get_session_list(self):
-        return ['1999', '2000']
+    def scrape_session_list(self):
+        return ['2013']
 
 
 class Legislator(Person):

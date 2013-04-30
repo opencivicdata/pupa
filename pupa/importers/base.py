@@ -122,7 +122,7 @@ class BaseImporter(object):
                     duplicates[json_id2] = json_id
 
         # now do import, ignoring duplicates
-        to_import = sorted([(k,v) for k,v in raw_objects.items()
+        to_import = sorted([(k, v) for k, v in raw_objects.items()
                             if k not in duplicates],
                            key=lambda i: i[1].get('parent_id', None))
 

@@ -15,7 +15,7 @@ from pupa.importers.people import PersonImporter
 from pupa.importers.memberships import MembershipImporter
 
 
-ALL_ACTIONS = ('scrape','import','report')
+ALL_ACTIONS = ('scrape', 'import', 'report')
 
 
 class UpdateError(Exception):
@@ -145,6 +145,41 @@ class Command(BaseCommand):
         person_importer.import_from_json(args.datadir)
         membership_importer.import_from_json(args.datadir)
 
+    def check_session_list(self, juris):
+        metadata = juris.get_metadata()
+        sessions = juris.scrape_session_list()
+
+        all_sessions_in_terms = list(
+            reduce(lambda x, y: x + y,
+                   [x['sessions'] for x in metadata['terms']])
+        )
+        # copy the list to avoid modifying it
+        session_details = list(metadata.get('_ignored_scraped_sessions', []))
+
+        for k, v in metadata['session_details'].iteritems():
+            try:
+                all_sessions_in_terms.remove(k)
+            except ValueError:
+                raise UpdateError('session {0} exists in session_details but '
+                                  'not in a term'.format(k))
+
+            session_details.append(v.get('_scraped_name'))
+
+        if not sessions:
+            raise UpdateError('no sessions from scrape_session_list()')
+
+        if all_sessions_in_terms:
+            raise UpdateError('no session_details for session(s): %r' %
+                              all_sessions_in_terms)
+
+        unaccounted_sessions = []
+        for s in sessions:
+            if s not in session_details:
+                unaccounted_sessions.append(s)
+        if unaccounted_sessions:
+            raise UpdateError('session(s) unaccounted for: %r' %
+                              unaccounted_sessions)
+
     def handle(self, args):
         self.enable_debug(args.debug)
 
@@ -169,6 +204,7 @@ class Command(BaseCommand):
         print('scrapers:', ', '.join(args.scrapers))
 
         if 'scrape' in args.actions:
+            self.check_session_list(juris)
             self.do_scrape(juris, args)
         if 'import' in args.actions:
             self.do_import(juris, args)

@@ -27,5 +27,6 @@ def main():
     args = parser.parse_args()
     subcommands[args.subcommand].handle(args)
 
+
 if __name__ == '__main__':
     main()
