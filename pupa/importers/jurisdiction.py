@@ -1,6 +1,8 @@
+import os
+import json
 import datetime
 from pupa.core import db
-
+from pupa.utils import DatetimeValidator
 
 def import_jurisdiction(org_importer, jurisdiction):
     metadata = jurisdiction.get_metadata()
@@ -9,7 +11,15 @@ def import_jurisdiction(org_importer, jurisdiction):
     metadata['_id'] = jurisdiction.jurisdiction_id
     metadata['latest_update'] = datetime.datetime.utcnow()
 
-    # XXX: validate metadata
+    # validate metadata
+    validator = DatetimeValidator()
+    with open(os.path.join(os.path.dirname(__file__),
+                           '../schemas/metadata.json')) as f:
+        metadata_schema = json.load(f)
+    try:
+        validator.validate(metadata, metadata_schema)
+    except ValueError as ve:
+        raise ve
 
     db.metadata.save(metadata)
 
