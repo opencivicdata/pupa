@@ -2,15 +2,19 @@
  "type": "object",
  "properties": {
    "name": {"type": "string"},
-   "abbreviation": {"type": "string", "pattern": "^[a-z-]+$"},
    "legislature_name": {"type": "string"},
    "legislature_url": {"type": "string"},
-   "lower_chamber_name": {"type": "string"},
-   "upper_chamber_name": {"type": "string"},
-   "lower_chamber_title": {"type": "string"},
-   "upper_chamber_title": {"type": "string"},
-   "lower_chamber_term": {"type": ["integer", "string"]},
-   "upper_chamber_term": {"type": ["integer", "string"]},
+   "chambers": {
+        "additionalProperties": {
+            "properties": {
+                "name": { "required": true, "type": "string" },
+                "title": { "required": true, "type": "string" }
+            },
+            "type": "object"
+        },
+        "required": false,
+        "type": "object"
+   },
    "terms": { "type": "array", "minItems": 1, "items":
      {"type":"object", "properties": {
        "name": {"type": "string"},
