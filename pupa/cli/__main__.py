@@ -6,12 +6,12 @@ logging.basicConfig()
 logger = logging.getLogger('pupa')
 
 COMMAND_MODULES = (
-    'pupa.bin.commands.update',
+    'pupa.cli.commands.update',
 )
 
 
 def main():
-    parser = argparse.ArgumentParser(description='pupa CLI')
+    parser = argparse.ArgumentParser('pupa', description='pupa CLI')
     subparsers = parser.add_subparsers(dest='subcommand')
 
     subcommands = {}
