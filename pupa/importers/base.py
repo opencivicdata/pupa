@@ -124,7 +124,7 @@ class BaseImporter(object):
         # now do import, ignoring duplicates
         to_import = sorted([(k, v) for k, v in raw_objects.items()
                             if k not in duplicates],
-                           key=lambda i: i[1].get('parent_id', None))
+                           key=lambda i: i[1].get('parent_id', 0))
 
         for json_id, obj in to_import:
             # parentless objects come first, should mean they are in
