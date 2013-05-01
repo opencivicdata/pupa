@@ -1,3 +1,5 @@
 *.pyc
 scraped_data
 scrape_cache
+*swp
+*pupa*egg*
