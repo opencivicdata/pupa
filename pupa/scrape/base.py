@@ -14,7 +14,7 @@ class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
 
     def __init__(self, jurisdiction, session, output_dir, cache_dir=None,
-                 strict_validation=False, fastmode=False):
+                 strict_validation=True, fastmode=False):
 
         super(Scraper, self).__init__(self)
 
@@ -35,7 +35,8 @@ class Scraper(scrapelib.Scraper):
 
         # directories
         self.output_dir = output_dir
-        self.cache_storage = scrapelib.FileCache(cache_dir)
+        if cache_dir:
+            self.cache_storage = scrapelib.FileCache(cache_dir)
 
         # validation
         self.strict_validation = strict_validation
@@ -74,8 +75,7 @@ class Scraper(scrapelib.Scraper):
 
         self.output_names[obj._type].add(filename)
 
-        with open(os.path.join(self.output_dir, filename),
-                  'w') as f:
+        with open(os.path.join(self.output_dir, filename), 'w') as f:
             json.dump(obj.as_dict(), f, cls=utils.JSONEncoderPlus)
 
         # validate after writing, allows for inspection on failure
