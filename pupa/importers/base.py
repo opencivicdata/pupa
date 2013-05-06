@@ -102,6 +102,12 @@ class BaseImporter(object):
 
         return _id
 
+    def dedupe_json_id(self, jid):
+        nid = self.duplicates.get(jid, jid)
+        if nid != jid:
+            return self.dedupe_json_id(nid)
+        return jid
+
     def import_from_json(self, datadir):
         # load all json, mapped by json_id
         raw_objects = {}
@@ -116,10 +122,12 @@ class BaseImporter(object):
 
         # map duplicate ids to first occurance of same object
         duplicates = {}
-        for json_id, obj in raw_objects.items():
-            for json_id2, obj2 in raw_objects.items():
+        items = list(raw_objects.items())
+        for i, (json_id, obj) in enumerate(items):
+            for json_id2, obj2 in items[i:]:
                 if json_id != json_id2 and obj == obj2:
                     duplicates[json_id2] = json_id
+        self.duplicates = duplicates
 
         # now do import, ignoring duplicates
         to_import = sorted([(k, v) for k, v in raw_objects.items()
@@ -135,6 +143,7 @@ class BaseImporter(object):
             parent_id = obj.get('parent_id')
             if parent_id:
                 obj['parent_id'] = self.resolve_json_id(parent_id)
+
             self.json_to_db_id[json_id] = self.import_object(obj)
 
         print self._type, self.results
@@ -152,6 +161,8 @@ class BaseImporter(object):
             raises:
                 ValueError if id couldn't be resolved
         """
+        json_id = self.dedupe_json_id(json_id)
+
         # make sure this sort of looks like a UUID
         if len(json_id) != 36:
             raise ValueError('cannot resolve non-uuid: {0}'.format(json_id))
