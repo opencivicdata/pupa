@@ -31,7 +31,7 @@ class BillImporter(BaseImporter):
             if rel_obj:
                 rel['internal_id'] = rel_obj['_id']
             else:
-                self.logger.warning('Unknown companion: {chamber} {session} '
-                                    '{bill_id}'.format(**rel))
+                self.logger.warning('Unknown related bill: {chamber} '
+                                    '{session} {bill_id}'.format(**rel))
 
         return obj
