@@ -10,13 +10,20 @@ from pupa import utils
 from pupa.core import settings
 
 
+
 class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
+
+    class ContinueScraping(Exception):
+        """ indicate that scraping should continue without saving an object """
+        pass
 
     def __init__(self, jurisdiction, session, output_dir, cache_dir=None,
                  strict_validation=True, fastmode=False):
 
         super(Scraper, self).__init__(self)
+
+        self.skipped = 0
 
         # set options
         self.jurisdiction = jurisdiction
@@ -102,7 +109,33 @@ class Scraper(scrapelib.Scraper):
             else:
                 self.save_object(obj)
 
+    def scrape_bills(self):
+        for obj in self.get_bills():
+            if hasattr(obj, '__iter__'):
+                for iterobj in obj:
+                    self.save_object(iterobj)
+            else:
+                self.save_object(obj)
+
+    def get_bills(self):
+        for bill_id, extras in self.get_bill_ids():
+            try:
+                yield self.get_bill(bill_id, **extras)
+            except self.ContinueScraping as exc:
+                self.warning('skipping %s: %r', bill_id, exc)
+                self.skipped += 1
+                continue
+
     def get_people(self):
         raise NotImplementedError(self.__class__.__name__ + ' must provide a '
-                                  'get_people() method or override '
-                                  'scrape_people()')
+                                  'get_people() method')
+
+    def get_bill_ids(self):
+        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
+                                  'get_bill_ids() method or override '
+                                  'get_bills()')
+
+    def get_bill(self, bill_id, **kwargs):
+        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
+                                  'get_bill() method or override '
+                                  'get_bills()')
