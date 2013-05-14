@@ -100,6 +100,8 @@ class Scraper(scrapelib.Scraper):
     def scrape_types(self, scraper_types):
         if 'person' in scraper_types:
             self.scrape_people()
+        if 'bill' in scraper_types:
+            self.scrape_bills()
 
     def scrape_people(self):
         for obj in self.get_people():
