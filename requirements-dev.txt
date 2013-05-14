@@ -2,3 +2,5 @@ pymongo
 validictory
 scrapelib
 nose
+mock
+-e git+https://github.com/opencivicdata/larvae.git#egg=larvae

@@ -15,9 +15,9 @@ class Legislator(Person):
         self.chamber = chamber
         self._contact_details = []
 
-    def add_contact(self, type, value, group):
+    def add_contact(self, type, value, note):
         self._contact_details.append({'type': type, 'value': value,
-                                      'group': group})
+                                      'note': note})
 
     def add_committee_membership(self, com_name, role='member'):
         org = Organization(com_name, classification='committee')
