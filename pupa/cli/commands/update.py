@@ -140,7 +140,7 @@ class Command(BaseCommand):
                 if 'people' in scraper_types:
                     report[session].update(scraper.scrape_people())
                 elif 'bills' in scraper_types:
-                    report[session].update(scrape_bills())
+                    report[session].update(scraper.scrape_bills())
                 elif 'events' in scraper_types:
                     report[session].update(scraper.scrape_events())
                 elif 'votes' in scraper_types:
