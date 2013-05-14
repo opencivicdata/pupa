@@ -13,6 +13,7 @@ from pupa.importers.jurisdiction import import_jurisdiction
 from pupa.importers.organizations import OrganizationImporter
 from pupa.importers.people import PersonImporter
 from pupa.importers.memberships import MembershipImporter
+from pupa.importers.bills import BillImporter
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')
@@ -155,12 +156,16 @@ class Command(BaseCommand):
         membership_importer = MembershipImporter(juris.jurisdiction_id,
                                                  person_importer,
                                                  org_importer)
+        bill_importer = BillImporter(juris.jurisdiction_id)
+
         report = {}
+
         # XXX: jurisdiction into report
         import_jurisdiction(org_importer, juris)
         report.update(org_importer.import_from_json(args.datadir))
         report.update(person_importer.import_from_json(args.datadir))
         report.update(membership_importer.import_from_json(args.datadir))
+        report.update(bill_importer.import_from_json(args.datadir))
 
         return report
 
