@@ -5,6 +5,7 @@ import glob
 import importlib
 import traceback
 from collections import defaultdict
+from functools import reduce
 
 from .base import BaseCommand
 from pupa import utils
@@ -128,7 +129,7 @@ class Command(BaseCommand):
                 session_scrapers[ScraperCls].append(scraper_type)
 
             # run each scraper once
-            for ScraperCls, scraper_types in session_scrapers.iteritems():
+            for ScraperCls, scraper_types in session_scrapers.items():
                 scraper = ScraperCls(juris, session, args.datadir,
                                      args.cachedir, args.strict,
                                      args.fastmode)
@@ -156,7 +157,7 @@ class Command(BaseCommand):
         # copy the list to avoid modifying it
         session_details = list(metadata.get('_ignored_scraped_sessions', []))
 
-        for k, v in metadata['session_details'].iteritems():
+        for k, v in metadata['session_details'].items():
             try:
                 all_sessions_in_terms.remove(k)
             except ValueError:
