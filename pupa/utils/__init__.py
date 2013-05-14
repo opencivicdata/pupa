@@ -3,6 +3,7 @@ import os
 import time
 import json
 import datetime
+import subprocess
 from validictory.validator import SchemaValidator
 from bson import ObjectId
 
@@ -46,3 +47,19 @@ class JSONEncoderPlus(json.JSONEncoder):
             return str(obj)
 
         return super(JSONEncoderPlus, self).default(obj, **kwargs)
+
+
+def convert_pdf(filename, type='xml'):
+    commands = {'text': ['pdftotext', '-layout', filename, '-'],
+                'text-nolayout': ['pdftotext', filename, '-'],
+                'xml': ['pdftohtml', '-xml', '-stdout', filename],
+                'html': ['pdftohtml', '-stdout', filename]}
+    try:
+        pipe = subprocess.Popen(commands[type], stdout=subprocess.PIPE,
+                                close_fds=True).stdout
+    except OSError as e:
+        raise EnvironmentError("error running %s, missing executable? [%s]" %
+                               ' '.join(commands[type]), e)
+    data = pipe.read()
+    pipe.close()
+    return data
