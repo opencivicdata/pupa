@@ -146,7 +146,7 @@ class BaseImporter(object):
 
             self.json_to_db_id[json_id] = self.import_object(obj)
 
-        print self._type, self.results
+        return {self._type: self.results}
 
     def resolve_json_id(self, json_id):
         """

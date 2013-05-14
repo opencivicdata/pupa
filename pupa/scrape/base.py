@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import datetime
 from collections import defaultdict
 
 import scrapelib
@@ -9,6 +10,9 @@ from larvae.membership import Membership
 from pupa import utils
 from pupa.core import settings
 
+
+class ScrapeError(Exception):
+    pass
 
 
 class Scraper(scrapelib.Scraper):
@@ -97,25 +101,39 @@ class Scraper(scrapelib.Scraper):
         for obj in getattr(obj, '_related', []):
             self.save_object(obj)
 
-    def scrape_types(self, scraper_types):
-        if 'person' in scraper_types:
-            self.scrape_people()
+    def _scrape(self, iterable, scrape_type):
+        record = {'objects': defaultdict(int)}
+        self.output_names = defaultdict(set)
+        record['start'] = datetime.datetime.utcnow()
+        for obj in iterable:
+            if hasattr(obj, '__iter__'):
+                for iterobj in obj:
+                    self.save_object(iterobj)
+            else:
+                self.save_object(obj)
+        record['end'] = datetime.datetime.utcnow()
+        if not self.output_names:
+            raise ScrapeError("no objects returned from {0} scrape".format(
+                scrape_type))
+        for _type, nameset in self.output_names.iteritems():
+            record['objects'][_type] += len(nameset)
+
+        return {scrape_type: record}
 
     def scrape_people(self):
-        for obj in self.get_people():
-            if hasattr(obj, '__iter__'):
-                for iterobj in obj:
-                    self.save_object(iterobj)
-            else:
-                self.save_object(obj)
+        return self._scrape(self.get_people(), 'people')
 
     def scrape_bills(self):
-        for obj in self.get_bills():
-            if hasattr(obj, '__iter__'):
-                for iterobj in obj:
-                    self.save_object(iterobj)
-            else:
-                self.save_object(obj)
+        return self._scrape(self.get_bills(), 'bills')
+
+    def scrape_votes(self):
+        return self._scrape(self.get_votes(), 'votes')
+
+    def scrape_events(self):
+        return self._scrape(self.get_events(), 'events')
+
+    def scrape_speeches(self):
+        return self._scrape(self.get_speeches(), 'speeches')
 
     def get_bills(self):
         for bill_id, extras in self.get_bill_ids():
@@ -139,3 +157,15 @@ class Scraper(scrapelib.Scraper):
         raise NotImplementedError(self.__class__.__name__ + ' must provide a '
                                   'get_bill() method or override '
                                   'get_bills()')
+
+    def get_events(self):
+        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
+                                  'get_events() method')
+
+    def get_votes(self):
+        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
+                                  'get_votes() method')
+
+    def get_speeches(self):
+        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
+                                  'get_speeches() method')
