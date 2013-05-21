@@ -79,6 +79,7 @@ class Command(BaseCommand):
             sys.excepthook = _tb_info
 
     def get_jurisdiction(self, module_name):
+        sys.path.insert(0, os.getcwd())
         # get the jurisdiction object
         module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
