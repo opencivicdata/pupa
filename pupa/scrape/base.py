@@ -25,7 +25,7 @@ class Scraper(scrapelib.Scraper):
     def __init__(self, jurisdiction, session, output_dir, cache_dir=None,
                  strict_validation=True, fastmode=False):
 
-        super(Scraper, self).__init__(self)
+        super(Scraper, self).__init__()
 
         self.skipped = 0
 
