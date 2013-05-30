@@ -21,6 +21,8 @@ def collection_for_type(type_):
         return db.memberships
     elif type_ == 'bill':
         return db.bills
+    elif type_ == 'event':
+        return db.events
     else:
         raise ValueError('unknown type: ' + type_)
 
