@@ -63,6 +63,12 @@ class Scraper(scrapelib.Scraper):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
+    def get_current_session(self):
+        j = self.jurisdiction.get_metadata()
+        current_term = j['terms'][0]
+        current_session = current_term['sessions'][-1]
+        return current_session
+
     def save_object(self, obj):
         if hasattr(obj, '_is_legislator'):
             membership = Membership(
