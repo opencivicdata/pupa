@@ -16,24 +16,32 @@ class EventImporter(BaseImporter):
 
     def prepare_object_from_json(self, obj):
 
-        def person(what):
+        def person(obj, what):
             spec = {}
+            spec['session'] = obj['session']
             if 'chamber' in what:
                 spec['chamber'] = what['chamber']
             spec['name'] = what['entity']
             # needs to get the right session (current)
             return spec
 
-        def bill(what):
+        def bill(obj, what):
             spec = {}
+            spec['session'] = obj['session']
+            if 'chamber' in what:
+                spec['chamber'] = what['chamber']
+            spec['bill_id'] = what['entity']
+            # needs to get the right session (current)
+            return spec
+
+        def org(obj, what):
+            spec = {}
+            spec['session'] = obj['session']
             if 'chamber' in what:
                 spec['chamber'] = what['chamber']
             spec['name'] = what['entity']
             # needs to get the right session (current)
             return spec
-
-        def org(what):
-            pass
 
         spec_generators = {
             "person": person,
@@ -47,7 +55,7 @@ class EventImporter(BaseImporter):
         for item in obj['agenda']:
             for entity in item['related_entities']:
                 handler = spec_generators[entity['entity_type']]
-                spec = handler(entity)
+                spec = handler(obj, entity)
                 spec['jurisdiction_id'] = obj['jurisdiction_id']
                 rel_obj = db.events.find_one(spec)
                 if rel_obj:
