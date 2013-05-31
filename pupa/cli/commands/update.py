@@ -15,6 +15,7 @@ from pupa.importers.people import PersonImporter
 from pupa.importers.memberships import MembershipImporter
 from pupa.importers.events import EventImporter
 from pupa.importers.bills import BillImporter
+from pupa.importers.votes import VoteImporter
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')
@@ -158,6 +159,7 @@ class Command(BaseCommand):
                                                  person_importer,
                                                  org_importer)
         bill_importer = BillImporter(juris.jurisdiction_id)
+        vote_importer = VoteImporter(juris.jurisdiction_id)
         event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
@@ -169,6 +171,7 @@ class Command(BaseCommand):
         report.update(membership_importer.import_from_json(args.datadir))
         report.update(bill_importer.import_from_json(args.datadir))
         report.update(event_importer.import_from_json(args.datadir))
+        report.update(vote_importer.import_from_json(args.datadir))
 
         return report
 
