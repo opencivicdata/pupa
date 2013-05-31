@@ -50,7 +50,6 @@ class EventImporter(BaseImporter):
         }
 
         # XXX participants
-        # XXX agenda
 
         for item in obj['agenda']:
             for entity in item['related_entities']:
