@@ -1,4 +1,5 @@
 from .base import BaseImporter
+import pupa.core
 
 
 class VoteImporter(BaseImporter):
@@ -13,4 +14,12 @@ class VoteImporter(BaseImporter):
         return spec
 
     def prepare_object_from_json(self, obj):
+        bill = obj.get('bill', None)
+        if bill:
+            bill_obj = pupa.core.db.bills.find_one({"name": bill['name']})
+            # XXX: use all_names above
+            if bill_obj is None:
+                self.warning("Can't resolve bill `%s'" % (bill['name']))
+            else:
+                bill['id'] = bill_obj['_id']
         return obj
