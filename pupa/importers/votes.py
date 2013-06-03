@@ -22,4 +22,16 @@ class VoteImporter(BaseImporter):
                 self.warning("Can't resolve bill `%s'" % (bill['name']))
             else:
                 bill['id'] = bill_obj['_id']
+
+        for vote in obj['roll_call']:
+            who = vote['person']
+            person_obj = pupa.core.db.people.find_one({
+                "name": who['name'],
+                "chamber": who.get('chamber', None),
+            })
+            if person_obj is None:
+                self.warning("Can't resolve person `%s'" % (who['name']))
+            else:
+                vote['id'] = person
+
         return obj
