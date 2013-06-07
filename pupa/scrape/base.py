@@ -25,7 +25,7 @@ class Scraper(scrapelib.Scraper):
     def __init__(self, jurisdiction, session, output_dir, cache_dir=None,
                  strict_validation=True, fastmode=False):
 
-        super(Scraper, self).__init__(self)
+        super(Scraper, self).__init__()
 
         self.skipped = 0
 
@@ -62,6 +62,12 @@ class Scraper(scrapelib.Scraper):
         self.warning = self.logger.warning
         self.error = self.logger.error
         self.critical = self.logger.critical
+
+    def get_current_session(self):
+        j = self.jurisdiction.get_metadata()
+        current_term = j['terms'][0]
+        current_session = current_term['sessions'][-1]
+        return current_session
 
     def save_object(self, obj):
         if hasattr(obj, '_is_legislator'):

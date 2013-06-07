@@ -2,6 +2,7 @@ import os
 import glob
 import json
 import uuid
+import logging
 import datetime
 from pupa.core import db
 
@@ -21,6 +22,10 @@ def collection_for_type(type_):
         return db.memberships
     elif type_ == 'bill':
         return db.bills
+    elif type_ == 'event':
+        return db.events
+    elif type_ == 'vote':
+        return db.votes
     else:
         raise ValueError('unknown type: ' + type_)
 
@@ -89,6 +94,12 @@ class BaseImporter(object):
         self.collection = collection_for_type(self._type)
         self.results = {'insert': 0, 'update': 0, 'noop': 0}
         self.json_to_db_id = {}
+        self.logger = logging.getLogger("pupa")
+        self.info = self.logger.info
+        self.debug = self.logger.debug
+        self.warning = self.logger.warning
+        self.error = self.logger.error
+        self.critical = self.logger.critical
 
     def import_object(self, obj):
         spec = self.get_db_spec(obj)
