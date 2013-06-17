@@ -8,7 +8,7 @@ class EventImporter(BaseImporter):
     def get_db_spec(self, event):
         spec = {
             "description": event['description'],
-            "start": event['start'],
+            "when": event['when'],
             'jurisdiction_id': event['jurisdiction_id'],
         }
         return spec
