@@ -13,6 +13,7 @@ class BillImporter(BaseImporter):
                }
         if 'chamber' in bill:
             spec['chamber'] = bill['chamber']
+        return spec
 
     def prepare_object_from_json(self, obj):
         obj['bill_id'] = fix_bill_id(obj['bill_id'])

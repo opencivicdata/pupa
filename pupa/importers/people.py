@@ -13,3 +13,4 @@ class PersonImporter(BaseImporter):
             spec['chamber'] = person['chamber']
         if 'district' in person:
             spec['district'] = person['district']
+        return spec
