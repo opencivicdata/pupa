@@ -29,6 +29,20 @@ _hot_cache = {}
 _cache_touched = {}
 
 
+def obj_to_jid(obj):
+    abbr = None
+    if obj.openstates_id:
+        abbr = obj.openstates_id[:2]
+
+    if abbr is None:
+        raise Exception("Can't auto-detect the Jurisdiction ID")
+
+    abbr = abbr.lower()
+    jid = "ocd-jurisdiction/country:us/state:%s" % (abbr)
+    return jid
+
+
+
 def load_hot_cache(state):
     spec = {}
     if state:
@@ -98,6 +112,11 @@ def save_objects(payload):
             if _id is None:
                 entry._id = ocd_id
 
+        if what not in ["people", "memberships"]:
+            jid = obj_to_jid(entry)
+            entry.jurisdiction_id = jid
+
+
         eo = entry.as_dict()
         mongo_id = table.save(eo)
 
@@ -125,6 +144,7 @@ def migrate_legislatures(state):
     for metad in db.metadata.find(spec):
         abbr = metad['abbreviation']
         geoid = "ocd-division/country:us/state:%s" % (abbr)
+
         cow = Organization(metad['legislature_name'],
                            classification="jurisdiction",
                            geography_id=geoid,
