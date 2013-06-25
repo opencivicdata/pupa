@@ -38,7 +38,7 @@ def obj_to_jid(obj):
         raise Exception("Can't auto-detect the Jurisdiction ID")
 
     abbr = abbr.lower()
-    jid = "ocd-jurisdiction/country:us/state:%s" % (abbr)
+    jid = "ocd-jurisdiction/country:us/state:%s/legislature" % (abbr)
     return jid
 
 
@@ -160,6 +160,13 @@ def migrate_legislatures(state):
                          district=post['name'])
 
         save_object(cow)
+        meta = db.metadata.find_one({"_id": cow.openstates_id})
+        if meta is None:
+            raise Exception
+        meta.pop("_id")
+        meta['_id'] = cow.jurisdiction_id
+        nudb.metadata.save(meta, safe=True)
+
 
 
 def lookup_entry_id(collection, openstates_id):
