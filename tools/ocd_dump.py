@@ -96,7 +96,6 @@ def dump_metadata(where):
     with open(path, 'w') as fd:
         #print path
         json.dump(meta, fd, cls=JSONEncoderPlus)
-    raise Exception
 
 
 
