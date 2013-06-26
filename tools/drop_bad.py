@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 from pymongo import Connection
 
+SERVER = "ec2-184-73-58-184.compute-1.amazonaws.com"
+DATABASE = "ocd"
 
-connection = Connection('localhost', 27017)
-db = getattr(connection, 'pupa')
+connection = Connection(SERVER, 27017)
+db = getattr(connection, DATABASE)
 
 
 def purge_org(org):
