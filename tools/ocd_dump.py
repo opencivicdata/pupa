@@ -92,6 +92,17 @@ def dump_metadata(where):
     if meta is None:
         return
 
+    for x in [
+        'latest_json_url', 'latest_csv_url',
+        'latest_json_date', 'latest_csv_date'
+    ]:
+        if x in meta:
+            meta.pop(x)
+
+    for key in meta.keys():
+        if key.startswith("_") and key != "_id":
+            meta.pop(key)
+
     path = "%s/metadata.json" % (meta['_id'])
     with open(path, 'w') as fd:
         #print path
