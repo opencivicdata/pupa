@@ -32,6 +32,6 @@ class VoteImporter(BaseImporter):
             if person_obj is None:
                 self.warning("Can't resolve person `%s'" % (who['name']))
             else:
-                vote['id'] = person
+                vote['id'] = person_obj['_id']
 
         return obj
