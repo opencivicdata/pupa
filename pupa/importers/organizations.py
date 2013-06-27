@@ -8,6 +8,7 @@ class OrganizationImporter(BaseImporter):
     def get_db_spec(self, org):
         spec = {'classification': org['classification'],
                 'name': org['name'],
+                'jurisdiction_id': org['jurisdiction_id'],
                 'parent_id': org.get('parent_id')}
         return spec
 

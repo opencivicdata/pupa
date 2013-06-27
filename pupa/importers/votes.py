@@ -10,6 +10,7 @@ class VoteImporter(BaseImporter):
             "motion": event['motion'],
             "chamber": event['chamber'],
             "date": event['date'],
+            "jurisdiction_id": event['jurisdiction_id'],
         }
         return spec
 

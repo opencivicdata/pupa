@@ -6,11 +6,13 @@ class PersonImporter(BaseImporter):
 
     def get_db_spec(self, person):
         spec = {'$or': [{'name': person['name']},
-                        {'other_names': person['name']}],
-                'jurisdiction_id': person['jurisdiction_id']
-               }
+                        {'other_names': person['name']}],}
+
         if 'chamber' in person:
             spec['chamber'] = person['chamber']
         if 'district' in person:
             spec['district'] = person['district']
+        if 'jurisdiction_id' in person:
+            spec['jurisdiction_id'] = person['jurisdiction_id']
+
         return spec
