@@ -21,7 +21,7 @@ class EventImporter(BaseImporter):
             spec['session'] = obj['session']
             if 'chamber' in what:
                 spec['chamber'] = what['chamber']
-            spec['name'] = what['entity']
+            spec['name'] = what['name']
             # needs to get the right session (current)
             return spec
 
@@ -30,7 +30,7 @@ class EventImporter(BaseImporter):
             spec['session'] = obj['session']
             if 'chamber' in what:
                 spec['chamber'] = what['chamber']
-            spec['bill_id'] = what['entity']
+            spec['bill_id'] = what['name']
             # needs to get the right session (current)
             return spec
 
@@ -39,7 +39,7 @@ class EventImporter(BaseImporter):
             spec['session'] = obj['session']
             if 'chamber' in what:
                 spec['chamber'] = what['chamber']
-            spec['name'] = what['entity']
+            spec['name'] = what['name']
             # needs to get the right session (current)
             return spec
 
@@ -53,13 +53,13 @@ class EventImporter(BaseImporter):
 
         for item in obj['agenda']:
             for entity in item['related_entities']:
-                handler = spec_generators[entity['entity_type']]
+                handler = spec_generators[entity['type']]
                 spec = handler(obj, entity)
                 spec['jurisdiction_id'] = obj['jurisdiction_id']
                 rel_obj = db.events.find_one(spec)
                 if rel_obj:
-                    entity['entity_id'] = rel_obj['_id']
+                    entity['id'] = rel_obj['_id']
                 else:
-                    self.logger.warning('Unknown related entity: {entity} '
-                                        '({entity_type})'.format(**entity))
+                    self.logger.warning('Unknown related entity: {name} '
+                                        '({type})'.format(**entity))
         return obj
