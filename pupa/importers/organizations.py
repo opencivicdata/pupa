@@ -8,8 +8,11 @@ class OrganizationImporter(BaseImporter):
     def get_db_spec(self, org):
         spec = {'classification': org['classification'],
                 'name': org['name'],
-                'jurisdiction_id': org['jurisdiction_id'],
                 'parent_id': org.get('parent_id')}
+
+        if org['classification'] not in ["party",]:  # just party for now
+            spec['jurisdiction_id'] = org['jurisdiction_id']
+
         return spec
 
     def resolve_json_id(self, json_id):
