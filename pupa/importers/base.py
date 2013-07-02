@@ -128,7 +128,8 @@ class BaseImporter(object):
             with open(fname) as f:
                 data = json.load(f)
                 # prepare object from json
-                data['jurisdiction_id'] = self.jurisdiction_id
+                if data['_type'] != 'person':
+                    data['jurisdiction_id'] = self.jurisdiction_id
                 json_id = data.pop('_id')
                 data = self.prepare_object_from_json(data)
                 raw_objects[json_id] = data
