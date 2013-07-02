@@ -1,3 +1,4 @@
+import datetime
 from pupa.core import db
 from .base import BaseImporter
 
@@ -62,4 +63,9 @@ class EventImporter(BaseImporter):
                 else:
                     self.logger.warning('Unknown related entity: {name} '
                                         '({type})'.format(**entity))
+
+        # update time
+        obj['when'] = datetime.datetime.fromtimestamp(obj['when'])
+        # TODO: handle timezones better
+
         return obj
