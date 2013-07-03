@@ -5,7 +5,7 @@ MODULE_ROOT = "scruffy.checkers"
 
 ENABLED_CHECKS = [
     "unattached_people",
-    "missing_metadata",
+    "orgs",
 ]
 
 

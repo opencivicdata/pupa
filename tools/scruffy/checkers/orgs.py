@@ -45,9 +45,7 @@ def check(db):
                         tagname='org-has-malformed-jurisdiction-id-ender',
                         severity='critical')
 
-
         kvp = [f.split(":") for f in uid.split("/")]
-
         if any((len(x) != 2) for x in kvp):
             yield Check(collection='organizations',
                         id=org['_id'],
