@@ -7,6 +7,19 @@ def check(db):
         for check in common_checks(bill, 'bill', 'bills'):
             yield check
 
+        for action in bill['actions']:
+            for entity in action['related_entities']:
+                wid = entity.get('id')
+                if wid:
+                    who = resolve(entity['_type'], wid)
+                    if who is None:
+                        yield Check(collection='bills',
+                                    id=bill['_id'],
+                                    tagname='bad-related-action-entity',
+                                    severity='important',
+                                    data={"id": wid,
+                                          "name": entity['name']})
+
         for sponsor in bill['sponsors']:
             sid = sponsor.get("id")
             if sid:
