@@ -1,13 +1,11 @@
 from .. import Check
+from .common import common_checks
 
 
 def check(db):
     for org in db.organizations.find({"classification": "jurisdiction"}):
-        if org.get('sources', []) != []:
-            yield Check(collection='organizations',
-                        id=org['_id'],
-                        tagname='organization-has-no-sources',
-                        severity='critical')
+        for check in common_checks(org, 'organization', 'organizations'):
+            yield check
 
         jid = org.get('jurisdiction_id')
         if jid is None:
@@ -22,12 +20,6 @@ def check(db):
                         id=org['_id'],
                         tagname='jurisdiction-has-a-parent',
                         severity='important')
-
-        if org['created_at'] > org['updated_at']:
-            yield Check(collection='organizations',
-                        id=org['_id'],
-                        tagname='updated-before-creation',
-                        severity='critical')
 
         meta = db.metadata.find_one({"_id": jid})
         if meta is None:

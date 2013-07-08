@@ -7,6 +7,7 @@ ENABLED_CHECKS = [
     "people",
     "orgs",
     "votes",
+    "events",
 ]
 
 

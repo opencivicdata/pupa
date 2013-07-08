@@ -1,20 +1,12 @@
 from .. import Check
+from .common import common_checks
 from collections import defaultdict
 
 
 def check(db):
     for vote in db.votes.find():
-        if vote['sources'] != []:
-            yield Check(collection='votes',
-                        id=vote['_id'],
-                        tagname='vote-has-no-sources',
-                        severity='critical')
-
-        if vote['_type'] != 'vote':
-            yield Check(collection='votes',
-                        id=vote['_id'],
-                        tagname='vote-has-invalid-_type',
-                        severity='critical')
+        for check in common_checks(vote, 'vote', 'votes'):
+            yield check
 
         org = db.metadata.find_one({
             "_id": vote['jurisdiction_id']
