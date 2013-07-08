@@ -6,8 +6,9 @@ MODULE_ROOT = "scruffy.checkers"
 ENABLED_CHECKS = [
     "people",
     "orgs",
-    "votes",
     "events",
+    "votes",
+    "bills",
 ]
 
 
