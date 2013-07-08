@@ -3,6 +3,12 @@ from .. import Check
 
 def check(db):
     for org in db.organizations.find({"classification": "jurisdiction"}):
+        if org.get('sources', []) != []:
+            yield Check(collection='organizations',
+                        id=org['_id'],
+                        tagname='organization-has-no-sources',
+                        severity='critical')
+
         jid = org.get('jurisdiction_id')
         if jid is None:
             yield Check(collection='organizations',

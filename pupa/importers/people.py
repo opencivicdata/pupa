@@ -11,7 +11,8 @@ class PersonImporter(BaseImporter):
             {'jurisdiction_id': jurisdiction_id}).distinct('person_id')
 
     def prepare_object_from_json(self, obj):
-        obj.pop('party')
+        if 'party' in obj:
+            obj.pop('party')
         return obj
 
     def get_db_spec(self, person):
