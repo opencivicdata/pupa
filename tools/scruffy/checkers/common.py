@@ -26,7 +26,8 @@ def common_checks(obj, singular, plural):
 def resolve(type_, id_):
     collection = {
         "person": db.people,
-        "organization": db.orgnizations
+        "organization": db.orgnizations,
+        "bill": db.bills,
     }[type_]
 
     return collection.find_one({"_id": id_})
