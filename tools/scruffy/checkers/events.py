@@ -7,6 +7,14 @@ def check(db):
         for check in common_checks(event, 'event', 'events'):
             yield check
 
+        if event.get('end'):
+            if event.get('when') > event.get('end'):
+                yield Check(collection='events',
+                            id=event['_id'],
+                            tagname='ends-before-it-starts',
+                            severity='important')
+
+
         for agenda in event['agenda']:
             for entity in agenda['related_entities']:
                 if entity['id']:
