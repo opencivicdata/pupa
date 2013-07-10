@@ -3,6 +3,17 @@ from ..core import db
 
 
 def common_checks(obj, singular, plural):
+
+    if obj.get('jurisdiction_id'):
+        org = db.metadata.find_one({
+            "_id": obj['jurisdiction_id']
+        })
+        if org is None:
+            yield Check(collection=plural,
+                        id=obj['_id'],
+                        tagname='%s-has-invalid-jurisdiction-id' % (singular),
+                        severity='important')
+
     if obj['_type'] != singular:
         yield Check(collection=plural,
                     id=obj['_id'],

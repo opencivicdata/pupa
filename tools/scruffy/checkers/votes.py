@@ -8,15 +8,6 @@ def check(db):
         for check in common_checks(vote, 'vote', 'votes'):
             yield check
 
-        org = db.metadata.find_one({
-            "_id": vote['jurisdiction_id']
-        })
-        if org is None:
-            yield Check(collection='votes',
-                        id=vote['_id'],
-                        tagname='vote-has-invalid-jurisdiction-id',
-                        severity='important')
-
         count = defaultdict(lambda: 0)
         for v in vote['roll_call']:
             count[v['vote_type']] += 1
