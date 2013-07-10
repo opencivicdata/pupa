@@ -34,3 +34,17 @@ for collection, entries in data.items():
                     sponsor['id'] = None
                     print one['_id'], "removed bad sponsor"
             cdb.save(one)
+
+        if datum['tagname'] == 'bad-related-entity':
+            one = cdb.find_one({"_id": datum['id']})
+            if one is None:
+                continue
+
+            bsid = datum['data']['id']
+
+            for item in one['agenda']:
+                for who in item['related_entities']:
+                    if who['id'] == bsid:
+                        who['id'] = None
+                        print one['_id'], "removed bad relation"
+            cdb.save(one)
