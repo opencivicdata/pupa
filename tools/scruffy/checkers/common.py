@@ -21,7 +21,7 @@ def common_checks(obj, singular, plural):
                     severity='critical')
 
     if obj.get('sources', []) == []:
-        yield Check(collection=singular,
+        yield Check(collection=plural,
                     id=obj['_id'],
                     tagname='%s-has-no-sources' % (singular),
                     severity='critical')
