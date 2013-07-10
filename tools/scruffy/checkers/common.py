@@ -11,7 +11,7 @@ def common_checks(obj, singular, plural):
         if org is None:
             yield Check(collection=plural,
                         id=obj['_id'],
-                        tagname='%s-has-invalid-jurisdiction-id' % (singular),
+                        tagname='%s-has-unlinked-jurisdiction-id' % (singular),
                         severity='important')
 
     if obj['_type'] != singular:
