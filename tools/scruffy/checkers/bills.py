@@ -17,8 +17,7 @@ def check(db):
                                     id=bill['_id'],
                                     tagname='bad-related-action-entity',
                                     severity='important',
-                                    data={"id": wid,
-                                          "name": entity['name']})
+                                    data=entity)
 
         for sponsor in bill['sponsors']:
             sid = sponsor.get("id")
