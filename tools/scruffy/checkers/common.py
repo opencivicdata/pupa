@@ -14,7 +14,13 @@ def common_checks(obj, singular, plural):
                         tagname='%s-has-unlinked-jurisdiction-id' % (singular),
                         severity='important')
 
-    if obj['_type'] != singular:
+    if obj.get("_type") is None:
+        yield Check(collection=plural,
+                    id=obj['_id'],
+                    tagname='%s-is-missing-_type' % (singular),
+                    severity='critical')
+
+    elif obj['_type'] != singular:
         yield Check(collection=plural,
                     id=obj['_id'],
                     tagname='%s-has-invalid-_type' % (singular),
