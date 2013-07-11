@@ -27,7 +27,7 @@ for collection, entries in data.items():
             if one is None:
                 continue
 
-            bsid = datum['data']['sponsor-id']
+            bsid = datum['data']['id']
 
             for sponsor in one['sponsors']:
                 if sponsor['id'] == bsid:

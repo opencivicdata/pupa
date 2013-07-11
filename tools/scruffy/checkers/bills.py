@@ -24,9 +24,9 @@ def check(db):
             sid = sponsor.get("id")
             if sid:
                 who = resolve(sponsor['_type'], sid)
-
-                yield Check(collection='bills',
-                            id=bill['_id'],
-                            tagname='bad-sponsor-id',
-                            severity='important',
-                            data={"sponsor-id": sid, "name": sponsor['name']})
+                if who is None:
+                    yield Check(collection='bills',
+                                id=bill['_id'],
+                                tagname='bad-sponsor-id',
+                                severity='important',
+                                data={"id": sid, "name": sponsor['name']})
