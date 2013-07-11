@@ -29,4 +29,4 @@ def check(db):
                                 id=bill['_id'],
                                 tagname='bad-sponsor-id',
                                 severity='important',
-                                data={"id": sid, "name": sponsor['name']})
+                                data=sponsor)
