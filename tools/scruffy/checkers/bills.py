@@ -10,6 +10,15 @@ def check(db):
         for action in bill['actions']:
             for entity in action['related_entities']:
                 wid = entity.get('id')
+
+                if entity['_type'] not in wid:
+                    yield Check(collection='bills',
+                                id=bill['_id'],
+                                tagname='bad-related-action-entity-id-type',
+                                severity='critical',
+                                data=entity)
+
+
                 if wid:
                     who = resolve(entity['_type'], wid)
                     if who is None:
@@ -23,6 +32,14 @@ def check(db):
             sid = sponsor.get("id")
             if sid:
                 who = resolve(sponsor['_type'], sid)
+
+                if sponsor['_type'] not in sid:
+                    yield Check(collection='bills',
+                                id=bill['_id'],
+                                tagname='bad-sponsor-entity-id-type',
+                                severity='critical',
+                                data=sponsor)
+
                 if who is None:
                     yield Check(collection='bills',
                                 id=bill['_id'],
