@@ -34,7 +34,7 @@ def check(db):
             for entity in agenda['related_entities']:
                 if entity['id']:
                     wid = resolve(entity['type'], entity['id'])
-                    if wid is None:
+                    if wid:
                         yield Check(collection='events',
                                     id=event['_id'],
                                     tagname='bad-related-entity',
