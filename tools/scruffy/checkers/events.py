@@ -39,5 +39,4 @@ def check(db):
                                     id=event['_id'],
                                     tagname='bad-related-entity',
                                     severity='important',
-                                    data={"id": wid,
-                                          "name": entity['name']})
+                                    data=entity)
