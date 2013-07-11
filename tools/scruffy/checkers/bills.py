@@ -17,9 +17,7 @@ def check(db):
                                 tagname='bad-related-action-entity-id-type',
                                 severity='critical',
                                 data=entity)
-
-
-                if wid:
+                elif wid:
                     who = resolve(entity['_type'], wid)
                     if who is None:
                         yield Check(collection='bills',
@@ -39,8 +37,7 @@ def check(db):
                                 tagname='bad-sponsor-entity-id-type',
                                 severity='critical',
                                 data=sponsor)
-
-                if who is None:
+                elif who is None:
                     yield Check(collection='bills',
                                 id=bill['_id'],
                                 tagname='bad-sponsor-id',
