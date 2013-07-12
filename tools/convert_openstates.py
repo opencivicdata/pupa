@@ -170,6 +170,9 @@ def migrate_legislatures(state):
 
 
 def lookup_entry_id(collection, openstates_id):
+    if openstates_id is None:
+        return None
+
     hcid = _hot_cache.get(openstates_id, None)
     if hcid:
         return hcid
