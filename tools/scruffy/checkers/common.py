@@ -27,10 +27,11 @@ def common_checks(obj, singular, plural):
                     severity='critical')
 
     if obj.get('sources', []) == []:
-        yield Check(collection=plural,
-                    id=obj['_id'],
-                    tagname='%s-has-no-sources' % (singular),
-                    severity='critical')
+        if not obj.get('classification', None) in ['party']:
+            yield Check(collection=plural,
+                        id=obj['_id'],
+                        tagname='%s-has-no-sources' % (singular),
+                        severity='critical')
 
     if all([x in obj for x in ['created_at', 'updated_at']]):
         if obj['created_at'] > obj['updated_at']:
