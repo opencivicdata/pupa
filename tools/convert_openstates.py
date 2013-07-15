@@ -150,6 +150,7 @@ def migrate_legislatures(state):
                            geography_id=geoid,
                            abbreviation=abbr)
         cow.openstates_id = abbr
+        cow.add_source(metad['legislature_url'])
 
         for post in db.districts.find({"abbr": abbr}):
 
@@ -502,7 +503,9 @@ def migrate_events(state):
         e.openstates_id = entry['_id']
 
         if entry.get('end'):
-            e.end = entry['end']
+            end = entry['end']
+            end = dt.datetime.fromtimestamp(end)
+            e.end = end
 
         for source in entry['sources']:
             e.add_source(url=source['url'])
