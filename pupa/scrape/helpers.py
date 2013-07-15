@@ -22,6 +22,7 @@ class Legislator(Person):
     def add_committee_membership(self, com_name, role='member'):
         org = Organization(com_name, classification='committee')
         self.add_membership(org, role=role)
+        org.sources = self.sources
         self._related.append(org)
 
 
@@ -34,5 +35,6 @@ class Committee(Organization):
         member = Person(name)
         membership = Membership(member._id, self._id, role=role,
                                 **kwargs)
+        member.sources = self.sources
         self._related.append(member)
         self._related.append(membership)
