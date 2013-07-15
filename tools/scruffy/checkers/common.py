@@ -1,5 +1,12 @@
 from .. import Check
 from ..core import db
+import re
+
+atz = "[A-Fa-f0-9]"
+ocd_id_re = "ocd-(\w+)/%s{8}-%s{4}-%s{4}-%s{4}-%s{12}" % (
+    atz, atz, atz, atz, atz
+)
+ocd_id = re.compile(ocd_id_re)
 
 
 def common_checks(obj, singular, plural):
@@ -13,6 +20,20 @@ def common_checks(obj, singular, plural):
                         id=obj['_id'],
                         tagname='%s-has-unlinked-jurisdiction-id' % (singular),
                         severity='important')
+
+    if obj['_id'] is None:
+        yield Check(collection=plural,
+                    id=obj['_id'],
+                    tagname='%s-has-null-_id' % (singular),
+                    severity='critical')
+
+    elif singular not in ['membership']:
+        id_ = str(obj['_id'])  # If we catch an ObjectId
+        if not ocd_id.match(id_):
+            yield Check(collection=plural,
+                        id=obj['_id'],
+                        tagname='%s-has-bad-_id' % (singular),
+                        severity='critical')
 
     if obj.get("_type") is None:
         yield Check(collection=plural,

@@ -1,5 +1,6 @@
 from . import db
 from .checkers import load_checkers
+from pupa.utils import JSONEncoderPlus
 
 from collections import defaultdict
 import json
@@ -13,4 +14,4 @@ for checker in load_checkers():
         report[check['collection']].append(check)
 
 
-print json.dumps(report, indent=4, sort_keys=True)
+print json.dumps(report, indent=4, sort_keys=True, cls=JSONEncoderPlus)

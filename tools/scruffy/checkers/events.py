@@ -1,5 +1,6 @@
 from .. import Check
 from .common import common_checks, resolve
+import datetime
 
 
 def check(db):
@@ -22,7 +23,29 @@ def check(db):
                             tagname='longitude-is-out-of-range',
                             severity='critical')
 
-        if event.get('end'):
+        end = event.get('end')
+        start = event.get('when')
+
+        indt = lambda x: not isinstance(x, datetime.datetime)
+
+        bad_datetime = False
+
+        if indt(end):
+            bad_datetime = True
+            yield Check(collection='events',
+                        id=event['_id'],
+                        tagname='end-is-not-datetime',
+                        severity='important')
+
+        if indt(start):
+            bad_datetime = True
+            yield Check(collection='events',
+                        id=event['_id'],
+                        tagname='start-is-not-datetime',
+                        severity='important')
+
+
+        if not bad_datetime and event.get('end'):
             if event.get('when') > event.get('end'):
                 yield Check(collection='events',
                             id=event['_id'],
