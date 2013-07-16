@@ -10,7 +10,19 @@ def check(db):
 
         location = event['location'].get('coordinates', None)
         if location:
-            lat, lon = (float(location[x]) for x in ('latitude', 'longitude'))
+            try:
+                lat, lon = (float(location[x]) for x in (
+                    'latitude', 'longitude'))
+            except ValueError:
+                for key in ['latitude', 'longitude']:
+                    try:
+                        float(location[key])
+                    except ValueError:
+                        yield Check(collection='events',
+                                    id=event['_id'],
+                                    tagname='%s-is-not-a-float' % (key),
+                                    severity='critical')
+
             if abs(lat) > 90:
                 yield Check(collection='events',
                             id=event['_id'],
