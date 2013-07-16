@@ -22,18 +22,18 @@ def check(db):
                                     id=event['_id'],
                                     tagname='%s-is-not-a-float' % (key),
                                     severity='critical')
+            else:
+                if abs(lat) > 90:
+                    yield Check(collection='events',
+                                id=event['_id'],
+                                tagname='latitude-is-out-of-range',
+                                severity='critical')
 
-            if abs(lat) > 90:
-                yield Check(collection='events',
-                            id=event['_id'],
-                            tagname='latitude-is-out-of-range',
-                            severity='critical')
-
-            if abs(lon) > 180:
-                yield Check(collection='events',
-                            id=event['_id'],
-                            tagname='longitude-is-out-of-range',
-                            severity='critical')
+                if abs(lon) > 180:
+                    yield Check(collection='events',
+                                id=event['_id'],
+                                tagname='longitude-is-out-of-range',
+                                severity='critical')
 
         end = event.get('end')
         start = event.get('when')
