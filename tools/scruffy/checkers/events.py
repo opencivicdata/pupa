@@ -39,15 +39,15 @@ def check(db):
         start = event.get('when')
 
         indt = lambda x: not isinstance(x, datetime.datetime)
-
         bad_datetime = False
 
-        if indt(end):
-            bad_datetime = True
-            yield Check(collection='events',
-                        id=event['_id'],
-                        tagname='end-is-not-datetime',
-                        severity='important')
+        if end:
+            if indt(end):
+                bad_datetime = True
+                yield Check(collection='events',
+                            id=event['_id'],
+                            tagname='end-is-not-datetime',
+                            severity='important')
 
         if indt(start):
             bad_datetime = True
@@ -57,7 +57,7 @@ def check(db):
                         severity='important')
 
 
-        if not bad_datetime and event.get('end'):
+        if end and not bad_datetime:
             if event.get('when') > event.get('end'):
                 yield Check(collection='events',
                             id=event['_id'],
