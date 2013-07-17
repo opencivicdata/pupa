@@ -504,7 +504,11 @@ def migrate_events(state):
 
         if entry.get('end'):
             end = entry['end']
-            end = dt.datetime.fromtimestamp(end)
+            try:
+                end = dt.datetime.fromtimestamp(end)
+            except ValueError:
+                pass
+
             e.end = end
 
         for source in entry['sources']:
