@@ -40,26 +40,35 @@ for collection, entries in data.items():
         def fake_save(obj):
             print " .. would have written %s" % (obj['_id'])
 
+        def fake_remove(obj):
+            print " .. would have removed %s" % (obj['_id'])
+
         cdb.save = fake_save
+        cdb.remove = fake_remove
 
     for datum in entries:
         if datum['tagname'] in fatal_errors:
             cdb.remove(datum['id'], safe=True)
             print datum['id'], "removed"
 
+        indt = lambda x: not isinstance(x, datetime.datetime)
+
         if datum['tagname'] == 'start-is-not-datetime':
             event = cdb.find_one({"_id": datum['id']})
             if event is None:
                 continue
-            event['when'] = datetime.datetime.fromtimestamp(event['when'])
-            cdb.save(event)
+
+            if indt(event['when']):
+                event['when'] = datetime.datetime.fromtimestamp(event['when'])
+                cdb.save(event)
 
         if datum['tagname'] == 'end-is-not-datetime':
             event = cdb.find_one({"_id": datum['id']})
             if event is None:
                 continue
-            event['end'] = datetime.datetime.fromtimestamp(event['end'])
-            cdb.save(event)
+            if indt(event['end']):
+                event['end'] = datetime.datetime.fromtimestamp(event['end'])
+                cdb.save(event)
 
         if datum['tagname'] == 'bad-sponsor-id':
             one = cdb.find_one({"_id": datum['id']})
