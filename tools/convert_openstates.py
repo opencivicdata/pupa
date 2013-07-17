@@ -506,7 +506,7 @@ def migrate_events(state):
             end = entry['end']
             try:
                 end = dt.datetime.fromtimestamp(end)
-            except ValueError:
+            except TypeError:
                 pass
 
             e.end = end
