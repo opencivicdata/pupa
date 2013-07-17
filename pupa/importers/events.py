@@ -66,6 +66,8 @@ class EventImporter(BaseImporter):
 
         # update time
         obj['when'] = datetime.datetime.fromtimestamp(obj['when'])
+        if 'end' in obj and obj['end']:
+            obj['end'] = datetime.datetime.fromtimestamp(obj['end'])
         # TODO: handle timezones better
 
         return obj
