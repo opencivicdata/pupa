@@ -6,6 +6,8 @@ from collections import defaultdict
 import argparse
 import json
 
+import scruffy.core
+
 
 report = defaultdict(list)
 
@@ -22,6 +24,10 @@ args = parser.parse_args()
 connection = Connection(args.server, args.port)
 db = getattr(connection, args.database)
 
+scruffy.core.db = db
+
+#print(u"[scruffy] Scruffy's connected to the real database")
+#print(u"          %s:%s" % (args.server, args.port))
 
 for checker in load_checkers():
     for check in checker(db):

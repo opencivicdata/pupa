@@ -1,4 +1,7 @@
+# ~*~ encoding: utf-8 ~*~
+
 from pymongo import Connection
+from pymongo.errors import ConnectionFailure
 
 SERVER = "localhost"
 DATABASE = "ocd"
@@ -12,4 +15,10 @@ def _update_connection():
     connection = Connection(SERVER, PORT)
     db = getattr(connection, DATABASE)
 
-_update_connection()
+
+try:
+    _update_connection()
+except ConnectionFailure as e:
+    pass
+    #print(u"[scruffy] Scruffy can't connect to the database. Mmmmhum.")
+    #print(u"           ⤷ %s" % (str(e)))
