@@ -175,6 +175,9 @@ class BaseImporter(object):
             raises:
                 ValueError if id couldn't be resolved
         """
+        if not json_id:
+            return None
+
         json_id = self.dedupe_json_id(json_id)
 
         # make sure this sort of looks like a UUID

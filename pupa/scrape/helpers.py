@@ -32,9 +32,7 @@ class Committee(Organization):
         super(Committee, self).__init__(*args, **kwargs)
 
     def add_member(self, name, role='member', **kwargs):
-        member = Person(name)
-        membership = Membership(member._id, self._id, role=role,
+        membership = Membership(None, self._id, role=role,
+                                unmatched_legislator={'name': name},
                                 **kwargs)
-        member.sources = self.sources
-        self._related.append(member)
         self._related.append(membership)
