@@ -33,12 +33,11 @@ def obj_to_jid(obj):
     abbr = None
     if obj._openstates_id:
         abbr = obj._openstates_id[:2]
-
+        abbr = abbr.lower()
+        jid = "ocd-jurisdiction/country:us/state:%s/legislature" % (abbr)
     if abbr is None:
         raise Exception("Can't auto-detect the Jurisdiction ID")
 
-    abbr = abbr.lower()
-    jid = "ocd-jurisdiction/country:us/state:%s/legislature" % (abbr)
     return jid
 
 
@@ -79,9 +78,6 @@ def ocd_namer(obj):
         if ret is not None:
             return ret
 
-    elif obj._type != 'membership':
-        raise Exception  # We need stable IDs
-
     if obj._type == 'membership':
         return None
 
@@ -112,10 +108,9 @@ def save_objects(payload):
             if _id is None:
                 entry._id = ocd_id
 
-        if what not in ["people", "memberships"]:
+        if what != 'people' and getattr(entry, '_openstates_id', None):
             jid = obj_to_jid(entry)
             entry.jurisdiction_id = jid
-
 
         eo = entry.as_dict()
         mongo_id = table.save(eo)
@@ -263,7 +258,6 @@ def create_or_get_party(what):
         return org['_id']
 
     org = Organization(what, classification="party")
-    org._openstates_id = what
 
     save_object(org)
 
