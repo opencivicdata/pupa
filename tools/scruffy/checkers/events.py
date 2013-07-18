@@ -47,14 +47,22 @@ def check(db):
                 yield Check(collection='events',
                             id=event['_id'],
                             tagname='end-is-not-datetime',
-                            severity='important')
+                            severity='important',
+                            data={
+                                "type": type(end),
+                                "value": end,
+                            })
 
         if indt(start):
             bad_datetime = True
             yield Check(collection='events',
                         id=event['_id'],
                         tagname='start-is-not-datetime',
-                        severity='important')
+                        severity='important',
+                        data={
+                            "type": type(end),
+                            "value": end,
+                        })
 
 
         if end and not bad_datetime:
