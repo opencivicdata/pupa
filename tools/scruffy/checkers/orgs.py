@@ -49,3 +49,14 @@ def check(db):
                         id=org['_id'],
                         tagname='org-has-malformed-jurisdiction-id-path',
                         severity='critical')
+
+
+    for org in db.organizations.find({"classification": "party"}):
+        if 'jurisdiction_id' in org and org['jurisdiction_id']:
+            yield Check(collection='organizations',
+                        id=org['_id'],
+                        tagname='party-has-jurisdiction-id',
+                        severity='critical',
+                        data={
+                            "jurisdiction_id": org['jurisdiction_id']
+                        })
