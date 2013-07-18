@@ -31,8 +31,8 @@ _cache_touched = {}
 
 def obj_to_jid(obj):
     abbr = None
-    if obj.openstates_id:
-        abbr = obj.openstates_id[:2]
+    if obj._openstates_id:
+        abbr = obj._openstates_id[:2]
 
     if abbr is None:
         raise Exception("Can't auto-detect the Jurisdiction ID")
@@ -74,8 +74,8 @@ def write_hot_cache(state):
 def ocd_namer(obj):
     # ocd-person/UUID
     # ocd-organization/UUID
-    if hasattr(obj, 'openstates_id'):
-        ret = _hot_cache.get(obj.openstates_id)
+    if hasattr(obj, '_openstates_id'):
+        ret = _hot_cache.get(obj._openstates_id)
         if ret is not None:
             return ret
 
@@ -123,9 +123,9 @@ def save_objects(payload):
         if _id is None and ocd_id is None:
             entry._id = mongo_id
 
-        if hasattr(entry, "openstates_id"):
-            _hot_cache[entry.openstates_id] = entry._id
-            _cache_touched[entry.openstates_id] = True
+        if hasattr(entry, "_openstates_id"):
+            _hot_cache[entry._openstates_id] = entry._id
+            _cache_touched[entry._openstates_id] = True
 
         if QUIET:
             sys.stdout.write(entry._type[0])
@@ -149,7 +149,7 @@ def migrate_legislatures(state):
                            classification="jurisdiction",
                            geography_id=geoid,
                            abbreviation=abbr)
-        cow.openstates_id = abbr
+        cow._openstates_id = abbr
         cow.add_source(metad['legislature_url'])
 
         for post in db.districts.find({"abbr": abbr}):
@@ -161,7 +161,7 @@ def migrate_legislatures(state):
                          district=post['name'])
 
         save_object(cow)
-        meta = db.metadata.find_one({"_id": cow.openstates_id})
+        meta = db.metadata.find_one({"_id": cow._openstates_id})
         if meta is None:
             raise Exception
         meta.pop("_id")
@@ -212,7 +212,9 @@ def migrate_committees(state):
         org = Organization(committee['committee'],
                            classification="committee")
         org.parent_id = lookup_entry_id('organizations', committee['state'])
-        org.openstates_id = committee['_id']
+        org.identifiers = [{'scheme': 'openstates',
+                            'identifier': committee['_id']}]
+        org._openstates_id = committee['_id']
         org.sources = committee['sources']
         # Look into posts; but we can't be sure.
         save_object(org)
@@ -232,7 +234,9 @@ def migrate_committees(state):
             committee['state']
         )
 
-        org.openstates_id = committee['_id']
+        org.identifiers = [{'scheme': 'openstates',
+                           'identifier': committee['_id']}]
+        org._openstates_id = committee['_id']
         org.sources = committee['sources']
         # Look into posts; but we can't be sure.
         save_object(org)
@@ -259,7 +263,7 @@ def create_or_get_party(what):
         return org['_id']
 
     org = Organization(what, classification="party")
-    org.openstates_id = what
+    org._openstates_id = what
 
     save_object(org)
 
@@ -275,7 +279,9 @@ def migrate_people(state):
         spec["state"] = state
     for entry in db.legislators.find(spec):
         who = Person(entry['full_name'])
-        who.openstates_id = entry['_id']
+        who.identifiers = [{'scheme': 'openstates',
+                           'identifier': entry['_id']}]
+        who._openstates_id = entry['_id']
 
         for k, v in {
             "photo_url": "image",
@@ -351,7 +357,9 @@ def migrate_bills(state):
                  title=bill['title'],
                  type=bill['type'])
 
-        b.openstates_id = bill['_id']
+        b.identifiers = [{'scheme': 'openstates',
+                         'identifier': bill['_id']}]
+        b._openstates_id = bill['_id']
 
         for source in bill['sources']:
             b.add_source(source['url'], note='old-source')
@@ -465,7 +473,9 @@ def migrate_votes(state):
             no_count=entry['no_count'],
             other_count=entry['other_count'],
             chamber=entry['chamber'])
-        v.openstates_id = entry['_id']
+        v.identifiers = [{'scheme': 'openstates',
+                         'identifier': entry['_id']}]
+        v._openstates_id = entry['_id']
 
 
         for source in entry['sources']:
@@ -500,7 +510,9 @@ def migrate_events(state):
             location=entry['location'],
             session=entry['session'],
         )
-        e.openstates_id = entry['_id']
+        e.identifiers = [{'scheme': 'openstates',
+                         'identifier': entry['_id']}]
+        e._openstates_id = entry['_id']
 
         if entry.get('end'):
             end = entry['end']
