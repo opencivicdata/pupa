@@ -8,4 +8,5 @@ for orga in db.organizations.find({"classification": "committee"}):
         "organization_id": orga['_id'],
         "end_date": None
     }).count()
-    print memberships, orga['jurisdiction_id'], orga['name']
+
+    print memberships, orga['jurisdiction_id'], orga['name'].encode('utf-8')
