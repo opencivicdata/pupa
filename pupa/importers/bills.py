@@ -16,7 +16,7 @@ class BillImporter(BaseImporter):
         return spec
 
     def prepare_object_from_json(self, obj):
-        obj['bill_id'] = fix_bill_id(obj['bill_id'])
+        obj['name'] = fix_bill_id(obj['name'])
         if 'alternate_bill_ids' in obj:
             obj['alternate_bill_ids'] = [fix_bill_id(bid) for bid in
                                          obj['alternate_bill_ids']]
