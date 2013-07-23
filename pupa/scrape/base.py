@@ -121,7 +121,7 @@ class Scraper(scrapelib.Scraper):
         if not self.output_names:
             raise ScrapeError("no objects returned from {0} scrape".format(
                 scrape_type))
-        for _type, nameset in self.output_names.iteritems():
+        for _type, nameset in self.output_names.items():
             record['objects'][_type] += len(nameset)
 
         return {scrape_type: record}

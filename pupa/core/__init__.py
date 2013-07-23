@@ -20,7 +20,7 @@ class Settings(object):
 
     def update(self, module):
         if isinstance(module, dict):
-            for setting, val in module.iteritems():
+            for setting, val in module.items():
                 if setting.isupper() and val is not None:
                     setattr(self, setting, val)
         else:
