@@ -9,7 +9,7 @@ class BillImporter(BaseImporter):
     def get_db_spec(self, bill):
         spec = {'jurisdiction_id': bill['jurisdiction_id'],
                 'session': bill['session'],
-                'bill_id': bill['bill_id'],
+                'name': bill['name'],
                }
         if 'chamber' in bill:
             spec['chamber'] = bill['chamber']
