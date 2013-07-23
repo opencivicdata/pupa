@@ -14,6 +14,9 @@ from pupa.importers.jurisdiction import import_jurisdiction
 from pupa.importers.organizations import OrganizationImporter
 from pupa.importers.people import PersonImporter
 from pupa.importers.memberships import MembershipImporter
+from pupa.importers.events import EventImporter
+from pupa.importers.bills import BillImporter
+from pupa.importers.votes import VoteImporter
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')
@@ -34,10 +37,10 @@ class Command(BaseCommand):
             self.add_argument('--' + arg, dest='actions',
                               action='append_const', const=arg,
                               help='only run {0} post-scrape step'.format(arg))
-        for arg in ('person', 'bill'):
+        for arg in ('people', 'bills', 'events', 'votes', 'speeches'):
             self.add_argument('--' + arg, dest='scrapers',
                               action='append_const', const=arg,
-                              help='only run {0} scraper'.format(arg))
+                              help='run {0} scraper'.format(arg))
 
         self.add_argument('-s', '--session', action='append', dest='sessions',
                           default=[], help='session(s) to scrape')
@@ -115,6 +118,8 @@ class Command(BaseCommand):
         for f in glob.glob(args.datadir + '/*.json'):
             os.remove(f)
 
+        report = {}
+
         # run scrapers
         for session in args.sessions:
             # get mapping of ScraperClass -> scrapers
@@ -128,12 +133,25 @@ class Command(BaseCommand):
                                                       scraper_type))
                 session_scrapers[ScraperCls].append(scraper_type)
 
+            report[session] = {}
+
             # run each scraper once
             for ScraperCls, scraper_types in session_scrapers.items():
                 scraper = ScraperCls(juris, session, args.datadir,
                                      args.cachedir, args.strict,
                                      args.fastmode)
-                scraper.scrape_types(scraper_types)
+                if 'people' in scraper_types:
+                    report[session].update(scraper.scrape_people())
+                elif 'bills' in scraper_types:
+                    report[session].update(scraper.scrape_bills())
+                elif 'events' in scraper_types:
+                    report[session].update(scraper.scrape_events())
+                elif 'votes' in scraper_types:
+                    report[session].update(scraper.scrape_votes())
+                elif 'speeches' in scraper_types:
+                    report[session].update(scraper.scrape_speeches())
+
+        return report
 
     def do_import(self, juris, args):
         org_importer = OrganizationImporter(juris.jurisdiction_id)
@@ -141,10 +159,22 @@ class Command(BaseCommand):
         membership_importer = MembershipImporter(juris.jurisdiction_id,
                                                  person_importer,
                                                  org_importer)
+        bill_importer = BillImporter(juris.jurisdiction_id)
+        vote_importer = VoteImporter(juris.jurisdiction_id)
+        event_importer = EventImporter(juris.jurisdiction_id)
+
+        report = {}
+
+        # XXX: jurisdiction into report
         import_jurisdiction(org_importer, juris)
-        org_importer.import_from_json(args.datadir)
-        person_importer.import_from_json(args.datadir)
-        membership_importer.import_from_json(args.datadir)
+        report.update(org_importer.import_from_json(args.datadir))
+        report.update(person_importer.import_from_json(args.datadir))
+        report.update(membership_importer.import_from_json(args.datadir))
+        report.update(bill_importer.import_from_json(args.datadir))
+        report.update(event_importer.import_from_json(args.datadir))
+        report.update(vote_importer.import_from_json(args.datadir))
+
+        return report
 
     def check_session_list(self, juris):
         metadata = juris.get_metadata()
@@ -203,9 +233,18 @@ class Command(BaseCommand):
         print('term:', args.term)
         print('sessions:', ', '.join(args.sessions))
         print('scrapers:', ', '.join(args.scrapers))
+        plan = {'module': args.module, 'actions': args.actions,
+                'term': args.term, 'sessions': args.sessions,
+                'scrapers': args.scrapers}
 
+        report = {'plan': plan}
         if 'scrape' in args.actions:
             self.check_session_list(juris)
-            self.do_scrape(juris, args)
+            report['scrape'] = self.do_scrape(juris, args)
         if 'import' in args.actions:
-            self.do_import(juris, args)
+            report['import'] = self.do_import(juris, args)
+
+        report['success'] = True
+
+        # XXX: save report instead of printing
+        print(report)

@@ -22,6 +22,7 @@ class Legislator(Person):
     def add_committee_membership(self, com_name, role='member'):
         org = Organization(com_name, classification='committee')
         self.add_membership(org, role=role)
+        org.sources = self.sources
         self._related.append(org)
 
 
@@ -31,8 +32,7 @@ class Committee(Organization):
         super(Committee, self).__init__(*args, **kwargs)
 
     def add_member(self, name, role='member', **kwargs):
-        member = Person(name)
-        membership = Membership(member._id, self._id, role=role,
+        membership = Membership(None, self._id, role=role,
+                                unmatched_legislator={'name': name},
                                 **kwargs)
-        self._related.append(member)
         self._related.append(membership)

@@ -12,7 +12,7 @@ class Example(Jurisdiction):
                 'terms': [{'name': '2013-2014', 'sessions': ['2013'],
                            'start_year': 2013, 'end_year': 2014
                           }],
-                'provides': ['person'],
+                'provides': ['people'],
                 'parties': [{'name': 'Independent' },
                             {'name': 'Green' },
                             {'name': 'Bull-Moose'}
@@ -22,7 +22,7 @@ class Example(Jurisdiction):
                }
 
     def get_scraper(self, term, session, scraper_type):
-        if scraper_type == 'person':
+        if scraper_type == 'people':
             return ExamplePersonScraper
 
     def scrape_session_list(self):

@@ -2,6 +2,7 @@ import os
 import glob
 import json
 import uuid
+import logging
 import datetime
 from pupa.core import db
 
@@ -19,6 +20,12 @@ def collection_for_type(type_):
         return db.organizations
     elif type_ == 'membership':
         return db.memberships
+    elif type_ == 'bill':
+        return db.bills
+    elif type_ == 'event':
+        return db.events
+    elif type_ == 'vote':
+        return db.votes
     else:
         raise ValueError('unknown type: ' + type_)
 
@@ -87,6 +94,12 @@ class BaseImporter(object):
         self.collection = collection_for_type(self._type)
         self.results = {'insert': 0, 'update': 0, 'noop': 0}
         self.json_to_db_id = {}
+        self.logger = logging.getLogger("pupa")
+        self.info = self.logger.info
+        self.debug = self.logger.debug
+        self.warning = self.logger.warning
+        self.error = self.logger.error
+        self.critical = self.logger.critical
 
     def import_object(self, obj):
         spec = self.get_db_spec(obj)
@@ -115,7 +128,8 @@ class BaseImporter(object):
             with open(fname) as f:
                 data = json.load(f)
                 # prepare object from json
-                data['jurisdiction_id'] = self.jurisdiction_id
+                if data['_type'] != 'person':
+                    data['jurisdiction_id'] = self.jurisdiction_id
                 json_id = data.pop('_id')
                 data = self.prepare_object_from_json(data)
                 raw_objects[json_id] = data
@@ -146,7 +160,7 @@ class BaseImporter(object):
 
             self.json_to_db_id[json_id] = self.import_object(obj)
 
-        print(self._type, self.results)
+        return {self._type: self.results}
 
     def resolve_json_id(self, json_id):
         """
@@ -161,6 +175,9 @@ class BaseImporter(object):
             raises:
                 ValueError if id couldn't be resolved
         """
+        if not json_id:
+            return None
+
         json_id = self.dedupe_json_id(json_id)
 
         # make sure this sort of looks like a UUID
