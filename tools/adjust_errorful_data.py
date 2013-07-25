@@ -70,6 +70,9 @@ for collection, entries in data.items():
                 event['end'] = datetime.datetime.fromtimestamp(event['end'])
                 cdb.save(event)
 
+        if datum['tagname'] == 'membership-without-any-relation':
+            cdb.remove(datum['id'], safe=True)
+
         if datum['tagname'] == 'bad-sponsor-id':
             one = cdb.find_one({"_id": datum['id']})
             if one is None:
