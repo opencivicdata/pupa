@@ -30,14 +30,6 @@ def check(db):
                         tagname='jurisdiction-has-a-parent',
                         severity='important')
 
-        meta = db.metadata.find_one({"_id": jid})
-        if meta is None:
-            yield Check(collection='organizations',
-                        id=org['_id'],
-                        tagname='org-has-no-metadata',
-                        severity='critical')
-            continue
-
         prefix, uid = jid.split("/", 1)
         uid, what = uid.rsplit("/", 1)
         if prefix != 'ocd-jurisdiction':
