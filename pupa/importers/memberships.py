@@ -16,6 +16,10 @@ class MembershipImporter(BaseImporter):
                 # if this is a historical role, only update historical roles
                 'end_date': membership.get('end_date')
                }
+
+        if 'unmatched_legislator' in membership:
+            spec['unmatched_legislator'] = membership['unmatched_legislator']
+
         return spec
 
     def prepare_object_from_json(self, obj):
