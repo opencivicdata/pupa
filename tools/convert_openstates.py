@@ -211,6 +211,8 @@ def migrate_committees(state):
                             'identifier': committee['_id']}]
         org._openstates_id = committee['_id']
         org.sources = committee['sources']
+        org.created_at = committee['created_at']
+        org.updated_at = committee['updated_at']
         # Look into posts; but we can't be sure.
         save_object(org)
         attach_members(committee, org)
@@ -276,6 +278,8 @@ def migrate_people(state):
         who.identifiers = [{'scheme': 'openstates',
                            'identifier': entry['_id']}]
         who._openstates_id = entry['_id']
+        who.created_at = entry['created_at']
+        who.updated_at = entry['updated_at']
 
         for k, v in {
             "photo_url": "image",
@@ -292,7 +296,7 @@ def migrate_people(state):
             who.add_link(home, "Homepage")
 
         blacklist = ["photo_url", "chamber", "district", "url",
-                     "roles", "offices", "updated_at", "created_at",
+                     "roles", "offices",
                      "party", "state", "_locked_fields", "sources",
                      "active", "old_roles"]
 
@@ -349,7 +353,10 @@ def migrate_bills(state):
         b = Bill(name=bill['bill_id'],
                  session=bill['session'],
                  title=bill['title'],
-                 type=bill['type'])
+                 type=bill['type'],
+                 created_at=bill['created_at'],
+                 updated_at=bill['updated_at'],
+                )
 
         b.identifiers = [{'scheme': 'openstates',
                          'identifier': bill['_id']}]
@@ -466,7 +473,10 @@ def migrate_votes(state):
             yes_count=entry['yes_count'],
             no_count=entry['no_count'],
             other_count=entry['other_count'],
-            chamber=entry['chamber'])
+            chamber=entry['chamber'],
+            #created_at=entry['created_at'],
+            #updated_at=entry['updated_at'],
+        )
         v.identifiers = [{'scheme': 'openstates',
                          'identifier': entry['_id']}]
         v._openstates_id = entry['_id']
@@ -503,6 +513,8 @@ def migrate_events(state):
             when=entry['when'],
             location=entry['location'],
             session=entry['session'],
+            updated_at=entry['updated_at'],
+            created_at=entry['created_at']
         )
         e.identifiers = [{'scheme': 'openstates',
                          'identifier': entry['_id']}]
