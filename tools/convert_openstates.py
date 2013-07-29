@@ -161,6 +161,11 @@ def migrate_legislatures(state):
             raise Exception
         meta.pop("_id")
         meta['_id'] = cow.jurisdiction_id
+
+        for badtag in ["latest_json_url", "latest_json_date",
+                       "latest_csv_url", "latest_csv_date",]:
+            meta.pop(badtag)
+
         nudb.metadata.save(meta, safe=True)
 
 
