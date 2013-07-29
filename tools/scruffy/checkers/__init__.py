@@ -4,6 +4,7 @@ import importlib
 MODULE_ROOT = "scruffy.checkers"
 
 ENABLED_CHECKS = [
+    "meta",
     "people",
     "orgs",
     "events",
