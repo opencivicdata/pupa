@@ -139,24 +139,27 @@ def migrate_legislatures(state):
     for metad in db.metadata.find(spec):
         abbr = metad['abbreviation']
         geoid = "ocd-division/country:us/state:%s" % (abbr)
+        for chamber in metad['chambers']:
+            cn = metad['chambers'][chamber]['name']
+            cow = Organization("%s, %s" % (metad['legislature_name'], cn),
+                               classification="jurisdiction",
+                               chamber=chamber,
+                               geography_id=geoid,
+                               abbreviation=abbr)
+            cow._openstates_id = "%s-%s" % (abbr, cn)
+            cow.add_source(metad['legislature_url'])
 
-        cow = Organization(metad['legislature_name'],
-                           classification="jurisdiction",
-                           geography_id=geoid,
-                           abbreviation=abbr)
-        cow._openstates_id = abbr
-        cow.add_source(metad['legislature_url'])
+            for post in db.districts.find({"abbr": abbr}):
 
-        for post in db.districts.find({"abbr": abbr}):
+                cow.add_post(label="Member",
+                             role="member",
+                             num_seats=post['num_seats'],
+                             chamber=post['chamber'],
+                             district=post['name'])
 
-            cow.add_post(label="Member",
-                         role="member",
-                         num_seats=post['num_seats'],
-                         chamber=post['chamber'],
-                         district=post['name'])
+            save_object(cow)
 
-        save_object(cow)
-        meta = db.metadata.find_one({"_id": cow._openstates_id})
+        meta = db.metadata.find_one({"_id": cow.abbreviation})
         if meta is None:
             raise Exception
         meta.pop("_id")
@@ -211,6 +214,7 @@ def migrate_committees(state):
         # we can latch onto down below.
         org = Organization(committee['committee'],
                            classification="committee")
+        org.chamber = committee['chamber']
         org.parent_id = lookup_entry_id('organizations', committee['state'])
         org.identifiers = [{'scheme': 'openstates',
                             'identifier': committee['_id']}]
@@ -240,6 +244,7 @@ def migrate_committees(state):
                            'identifier': committee['_id']}]
         org._openstates_id = committee['_id']
         org.sources = committee['sources']
+        org.chamber = committee['chamber']
         # Look into posts; but we can't be sure.
         save_object(org)
         attach_members(committee, org)
