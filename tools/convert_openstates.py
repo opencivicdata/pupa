@@ -7,8 +7,10 @@ from larvae.event import Event
 from larvae.vote import Vote
 from larvae.bill import Bill
 
+from collections import defaultdict
 from pymongo import Connection
 import datetime as dt
+import operator
 import uuid
 import sys
 
@@ -112,6 +114,7 @@ def save_objects(payload):
             jid = obj_to_jid(entry)
             entry.jurisdiction_id = jid
 
+        entry.add_meta_software('openstates')
         eo = entry.as_dict()
         mongo_id = table.save(eo)
 
@@ -146,7 +149,7 @@ def migrate_legislatures(state):
                                chamber=chamber,
                                geography_id=geoid,
                                abbreviation=abbr)
-            cow._openstates_id = "%s-%s" % (abbr, cn)
+            cow._openstates_id = "%s-%s" % (abbr, chamber)
             cow.add_source(metad['legislature_url'])
 
             for post in db.districts.find({"abbr": abbr}):
@@ -315,40 +318,47 @@ def migrate_people(state):
                 continue
             who.extras[key] = value
 
-        legislature = lookup_entry_id('organizations', entry['state'])
-        if legislature is None:
-            raise Exception("Someone's in the void.")
+        chamber = entry.get('chamber')
+        legislature = None
+        if chamber:
+            legislature = lookup_entry_id('organizations', "%s-%s" % (
+                entry['state'],
+                chamber,
+            ))
+
+            if legislature is None:
+                raise Exception("Someone's in the void.")
 
         save_object(who)  # gives who an id, btw.
 
         party = entry.get('party', None)
-
         nudb.memberships.remove({"person_id": who._id}, safe=True)
 
         if party:
             m = Membership(who._id, create_or_get_party(entry['party']))
             save_object(m)
 
-        m = Membership(who._id, legislature)
+        if legislature:
+            m = Membership(who._id, legislature)
 
-        chamber, district = (entry.get(x, None)
-                             for x in ['chamber', 'district'])
+            chamber, district = (entry.get(x, None)
+                                 for x in ['chamber', 'district'])
 
-        if chamber:
-            m.chamber = chamber
+            if chamber:
+                m.chamber = chamber
 
-        if district:
-            m.district = district
+            if district:
+                m.district = district
 
-        for office in entry.get('offices', []):
-            note = office['name']
-            for key, value in office.items():
-                if not value or key in ["name", "type"]:
-                    continue
+            for office in entry.get('offices', []):
+                note = office['name']
+                for key, value in office.items():
+                    if not value or key in ["name", "type"]:
+                        continue
 
-                m.add_contact_detail(type=key, value=value, note=note)
+                    m.add_contact_detail(type=key, value=value, note=note)
 
-        save_object(m)
+            save_object(m)
 
 
 def migrate_bills(state):
