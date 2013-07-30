@@ -34,12 +34,18 @@ _cache_touched = {}
 def obj_to_jid(obj):
     abbr = None
     if obj._openstates_id:
-        abbr = obj._openstates_id[:2]
-        abbr = abbr.lower()
-        jid = "ocd-jurisdiction/country:us/state:%s/legislature" % (abbr)
-    if abbr is None:
+        jid = openstates_to_jid(obj._openstates_id)
+
+    if jid is None:
         raise Exception("Can't auto-detect the Jurisdiction ID")
 
+    return jid
+
+
+def openstates_to_jid(osid):
+    abbr = osid[:2]
+    abbr = abbr.lower()
+    jid = "ocd-jurisdiction/country:us/state:%s/legislature" % (abbr)
     return jid
 
 
@@ -391,7 +397,18 @@ def migrate_people(state):
                 end_year = term['end_year']
 
                 if 'committee' in role:
-                    pass  # Committee handling
+                    jid = _hot_cache.get(role['committee_id'])
+                    if jid is None:
+                        continue
+
+                    m = Membership(who._id, jid,
+                                   start_date=str(start_year),
+                                   end_date=str(end_year))
+
+                    if "position" in role:
+                        m.role = role['position']
+
+                    save_object(m)
 
                 if 'district' in role:
                     oid = "{state}-{chamber}".format(**role)
