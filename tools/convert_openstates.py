@@ -397,29 +397,27 @@ def migrate_people(state):
                 end_year = term['end_year']
 
                 if 'committee' in role:
-                    jid = _hot_cache.get(role['committee_id'])
-                    if jid is None:
-                        continue
+                    cid = role.get('committee_id')
+                    if cid:
+                        jid = _hot_cache.get(cid)
+                        if jid:
+                            m = Membership(who._id, jid,
+                                           start_date=str(start_year),
+                                           end_date=str(end_year))
 
-                    m = Membership(who._id, jid,
-                                   start_date=str(start_year),
-                                   end_date=str(end_year))
+                            if "position" in role:
+                                m.role = role['position']
 
-                    if "position" in role:
-                        m.role = role['position']
-
-                    save_object(m)
+                            save_object(m)
 
                 if 'district' in role:
                     oid = "{state}-{chamber}".format(**role)
                     leg = nudb.organizations.find_one({"_openstates_id": oid})
-                    if leg is None:
-                        continue
-
-                    m = Membership(who._id, leg['_id'],
-                                   start_date=str(start_year),
-                                   end_date=str(end_year))
-                    save_object(m)
+                    if leg:
+                        m = Membership(who._id, leg['_id'],
+                                       start_date=str(start_year),
+                                       end_date=str(end_year))
+                        save_object(m)
 
 
 def migrate_bills(state):
