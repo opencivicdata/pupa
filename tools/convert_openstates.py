@@ -327,6 +327,9 @@ def migrate_people(state):
             who.extras[key] = value
 
         chamber = entry.get('chamber')
+        if chamber == "joint":
+            continue
+
         legislature = None
         if chamber:
             legislature = lookup_entry_id('organizations', "%s-%s" % (
@@ -335,6 +338,7 @@ def migrate_people(state):
             ))
 
             if legislature is None:
+                print chamber, entry['state'], entry['_id']
                 raise Exception("Someone's in the void.")
 
         save_object(who)  # gives who an id, btw.
@@ -367,6 +371,24 @@ def migrate_people(state):
                     m.add_contact_detail(type=key, value=value, note=note)
 
             save_object(m)
+
+        for session in entry.get('old_roles', []):
+            roles = entry['old_roles'][session]
+            meta = nudb.metadata.find_one({"_id": obj_to_jid(who)})
+            term = None
+
+            for role in roles:
+                term = role['term']
+                t = None
+                for to in meta['terms']:
+                    if term == to['name']:
+                        term = to
+                        break
+                else:
+                    raise Exception("No term found?")
+
+                start_year = term['start_year']
+                end_year = term['end_year']
 
 
 def migrate_bills(state):
