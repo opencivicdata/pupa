@@ -390,6 +390,20 @@ def migrate_people(state):
                 start_year = term['start_year']
                 end_year = term['end_year']
 
+                if 'committee' in role:
+                    pass  # Committee handling
+
+                if 'district' in role:
+                    oid = "{state}-{chamber}".format(**role)
+                    leg = nudb.organizations.find_one({"_openstates_id": oid})
+                    if leg is None:
+                        continue
+
+                    m = Membership(who._id, leg['_id'],
+                                   start_date=str(start_year),
+                                   end_date=str(end_year))
+                    save_object(m)
+
 
 def migrate_bills(state):
     #bills = db.bills.find({"actions.related_entities": {"$exists": True,
