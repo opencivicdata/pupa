@@ -79,6 +79,14 @@ def ocd_namer(obj):
         ret = _hot_cache.get(obj._openstates_id)
         if ret is not None:
             return ret
+        # OK. Let's try a last-ditch.
+        what = type_tables[type(obj)]
+        dbobj = getattr(nudb, what).find_one({
+            "_openstates_id": obj._openstates_id
+        })
+        if dbobj:
+            _hot_cache[dbobj['_openstates_id']] = dbobj['_id']
+            return dbobj['_id']
 
     if obj._type == 'membership':
         return None
@@ -147,7 +155,7 @@ def migrate_legislatures(state):
             cow = Organization("%s, %s" % (metad['legislature_name'], cn),
                                classification="jurisdiction",
                                chamber=chamber,
-                               geography_id=geoid,
+                               division_id=geoid,
                                abbreviation=abbr)
             cow._openstates_id = "%s-%s" % (abbr, chamber)
             cow.add_source(metad['legislature_url'])

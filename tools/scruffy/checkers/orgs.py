@@ -15,14 +15,18 @@ def check(db):
                         severity='critical')
             continue
 
-        if db.organizations.find({
+        jorgs = list(db.organizations.find({
             "classification": "jurisdiction",
             "jurisdiction_id": org['jurisdiction_id']
-        }).count() != 1:
+        }))
+        if len(jorgs) != 1 and len(set([x['chamber']
+                                        for x in jorgs])) != len(jorgs):
             yield Check(collection='organizations',
                         id=org['_id'],
-                        tagname='jurisdiction_id-has-two-jurisdiction-orgs',
-                        severity='critical')
+                        tagname='jurisdiction_id-has-duped-orgs-by-chamber',
+                        severity='critical',
+                        data=[[x['chamber'], x['_id']] for x in jorgs
+                               if x['chamber'] == org['chamber']])
 
         if org.get('parent_id'):
             yield Check(collection='organizations',
