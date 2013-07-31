@@ -7,6 +7,7 @@ logger = logging.getLogger('pupa')
 
 COMMAND_MODULES = (
     'pupa.cli.commands.update',
+    'pupa.cli.commands.ensure_indexes',
 )
 
 
