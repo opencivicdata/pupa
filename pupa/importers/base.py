@@ -101,10 +101,19 @@ class BaseImporter(object):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
+    def preimport_hook(self, db_obj, obj):
+        """
+        The preimport_hook allows the importer to modify the object before
+        it gets imported. This is sometimes needed to ensure some data won't
+        get lost (see people.py)
+        """
+        pass
+
     def import_object(self, obj):
         spec = self.get_db_spec(obj)
 
         db_obj = self.collection.find_one(spec)
+        self.preimport_hook(db_obj, obj)
 
         if db_obj:
             _id, updated = update_object(db_obj, obj)

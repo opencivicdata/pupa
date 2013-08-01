@@ -18,34 +18,24 @@ class MembershipImporter(BaseImporter):
                 'end_date': membership.get('end_date')
                }
 
-        if 'unmatched_legislator' in membership:
+        if ('unmatched_legislator' in membership and
+                membership['unmatched_legislator']):
+
             spec['unmatched_legislator'] = membership['unmatched_legislator']
 
-        return spec
-
-    def prepare_object_from_json(self, obj):
-        org_json_id = obj['organization_id']
-        obj['organization_id'] = self.org_importer.resolve_json_id(org_json_id)
-        person_json_id = obj['person_id']
-        obj['person_id'] = self.person_importer.resolve_json_id(person_json_id)
-        return obj
-
-    def import_object(self, obj):
-        spec = self.get_db_spec(obj)
-
-        if 'unmatched_legislator' in obj and obj['unmatched_legislator']:
             # Let's get all the people in our jurisdiction, firstly.
-            people = db.memberships.find({
-                "jurisdiction_id": obj['jurisdiction_id']
+            people_ids = db.memberships.find({
+                "jurisdiction_id": membership['jurisdiction_id']
             }).distinct('person_id')  # Everyone in the Jurisdiction
-            if None in people:
-                people.remove(None)
+            if None in people_ids:
+                people_ids.remove(None)
             # Right, now we have a list of all known people in the
             # jurisdiction.
 
-            unmatched_name = obj['unmatched_legislator']['name']
+            unmatched_name = membership['unmatched_legislator']['name']
+
             people = db.people.find({
-                "_id": {"$in": people},
+                "_id": {"$in": people_ids},
                 "$or": [
                     { "name": unmatched_name },
                     { "other_names": unmatched_name },
@@ -59,9 +49,9 @@ class MembershipImporter(BaseImporter):
                 person = people[0]
                 #   + update membership with this person's details (if it's
                 #     not there already)
-                obj['person_id'] = person['_id']
-                obj.pop('unmatched_legislator')
-                spec = self.get_db_spec(obj)
+                membership['person_id'] = person['_id']
+                membership.pop('unmatched_legislator')
+                spec = self.get_db_spec(membership)
             else:
                 pspec = spec.copy()
                 pspec['person_id'] = {"$in": people.distinct("_id")}
@@ -75,14 +65,11 @@ class MembershipImporter(BaseImporter):
                 # unmatched ID
 
                 spec = {"$or": [pspec, uspec]}
+        return spec
 
-
-        db_obj = self.collection.find_one(spec)
-        if db_obj:
-            _id, updated = update_object(db_obj, obj)
-            self.results['update' if updated else 'noop'] += 1
-        else:
-            _id = insert_object(obj)
-            self.results['insert'] += 1
-
-        return _id
+    def prepare_object_from_json(self, obj):
+        org_json_id = obj['organization_id']
+        obj['organization_id'] = self.org_importer.resolve_json_id(org_json_id)
+        person_json_id = obj['person_id']
+        obj['person_id'] = self.person_importer.resolve_json_id(person_json_id)
+        return obj

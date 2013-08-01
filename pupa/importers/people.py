@@ -1,4 +1,4 @@
-from .base import BaseImporter, db
+from .base import BaseImporter, db, update_object, insert_object
 
 
 class PersonImporter(BaseImporter):
@@ -27,3 +27,20 @@ class PersonImporter(BaseImporter):
             spec['district'] = person['district']
 
         return spec
+
+    def preimport_hook(self, db_obj, obj):
+        """
+        This pre-import hook runs on a person to ensure that the other_name
+        field is merged, since it may have entries in the database already.
+
+        Currently we only merge other_names.
+        """
+
+        MERGE_FIELDS = ["other_names"]
+
+        if db_obj:
+            for field in MERGE_FIELDS:
+                if field in db_obj and field in obj:
+                    for entry in db_obj[field]:
+                        if entry not in obj[field]:
+                            obj[field].append(entry)
