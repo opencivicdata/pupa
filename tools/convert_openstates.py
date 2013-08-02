@@ -34,12 +34,18 @@ _cache_touched = {}
 def obj_to_jid(obj):
     abbr = None
     if obj._openstates_id:
-        abbr = obj._openstates_id[:2]
-        abbr = abbr.lower()
-        jid = "ocd-jurisdiction/country:us/state:%s/legislature" % (abbr)
-    if abbr is None:
+        jid = openstates_to_jid(obj._openstates_id)
+
+    if jid is None:
         raise Exception("Can't auto-detect the Jurisdiction ID")
 
+    return jid
+
+
+def openstates_to_jid(osid):
+    abbr = osid[:2]
+    abbr = abbr.lower()
+    jid = "ocd-jurisdiction/country:us/state:%s/legislature" % (abbr)
     return jid
 
 
@@ -327,6 +333,9 @@ def migrate_people(state):
             who.extras[key] = value
 
         chamber = entry.get('chamber')
+        if chamber == "joint":
+            continue
+
         legislature = None
         if chamber:
             legislature = lookup_entry_id('organizations', "%s-%s" % (
@@ -335,6 +344,7 @@ def migrate_people(state):
             ))
 
             if legislature is None:
+                print chamber, entry['state'], entry['_id']
                 raise Exception("Someone's in the void.")
 
         save_object(who)  # gives who an id, btw.
@@ -367,6 +377,47 @@ def migrate_people(state):
                     m.add_contact_detail(type=key, value=value, note=note)
 
             save_object(m)
+
+        for session in entry.get('old_roles', []):
+            roles = entry['old_roles'][session]
+            meta = nudb.metadata.find_one({"_id": obj_to_jid(who)})
+            term = None
+
+            for role in roles:
+                term = role['term']
+                t = None
+                for to in meta['terms']:
+                    if term == to['name']:
+                        term = to
+                        break
+                else:
+                    raise Exception("No term found?")
+
+                start_year = term['start_year']
+                end_year = term['end_year']
+
+                if 'committee' in role:
+                    cid = role.get('committee_id')
+                    if cid:
+                        jid = _hot_cache.get(cid)
+                        if jid:
+                            m = Membership(who._id, jid,
+                                           start_date=str(start_year),
+                                           end_date=str(end_year))
+
+                            if "position" in role:
+                                m.role = role['position']
+
+                            save_object(m)
+
+                if 'district' in role:
+                    oid = "{state}-{chamber}".format(**role)
+                    leg = nudb.organizations.find_one({"_openstates_id": oid})
+                    if leg:
+                        m = Membership(who._id, leg['_id'],
+                                       start_date=str(start_year),
+                                       end_date=str(end_year))
+                        save_object(m)
 
 
 def migrate_bills(state):
