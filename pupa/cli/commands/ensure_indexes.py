@@ -1,4 +1,5 @@
 from __future__ import print_function
+import itertools
 from pupa.core import db
 from .base import BaseCommand
 from pymongo import ASCENDING, DESCENDING
@@ -18,38 +19,62 @@ class Command(BaseCommand):
             'metadata': [
                 [('name', ASCENDING)]
             ],
-            'organizations': [
-                [('classification', ASCENDING), ('created_at', DESCENDING) ],
-                [('jurisdiction_id', ASCENDING), ('created_at', DESCENDING) ],
-                [('parent_id', ASCENDING), ('created_at', DESCENDING) ],
-                [('division_id', ASCENDING), ('created_at', DESCENDING) ],
-                [('identifiers.scheme', ASCENDING),
-                 ('identifiers.identifier', ASCENDING),
-                 ('created_at', DESCENDING) ],
-                [('created_at', DESCENDING) ],
-            ],
-            'people': [
-                #[('division_id', ASCENDING), ('created_at', DESCENDING) ],
-                [('identifiers.scheme', ASCENDING),
-                 ('identifiers.identifier', ASCENDING),
-                 ('created_at', DESCENDING) ],
-                [('updated_at', DESCENDING) ],
-                [('created_at', DESCENDING) ],
-            ],
+            'organizations': [ ],
+            'people': [ ],
             'memberships': [
+                # get all members for an org
                 [('organization_id', ASCENDING), ('end_date', ASCENDING)],
+                # get all memberships for a person
                 [('person_id', ASCENDING), ('end_date', ASCENDING)],
             ],
+            'bills': [ ],
+            'events': [ ],
+            'votes': [ ],
+        }
+        api_indexes = {
+            'organizations': [
+                ['jurisdiction_id'],
+                ['classification'],
+                ['parent_id'],
+                ['division_id'],
+                ['identifiers.scheme', 'identifiers.identifier'],
+                [],
+            ],
+            'people': [
+                ['identifiers.scheme', 'identifiers.identifier'],
+                [],
+            ],
             'bills': [
-                [('created_at', DESCENDING) ],
+                ['jurisdiction_id'],
+                ['identifiers.scheme', 'identifiers.identifier'],
+                [],
             ],
             'events': [
-                [('created_at', DESCENDING) ],
+                ['jurisdiction_id'],
+                ['participants.id'],
+                ['agenda.related_entities.id'],
+                [],
             ],
             'votes': [
-                [('created_at', DESCENDING) ],
+                ['jurisdiction_id'],
+                ['session'],
+                ['bill.id'],
             ],
         }
+
+        for _type, indexes in api_indexes.items():
+            for fields in indexes:
+                real_index = zip(fields, itertools.repeat(ASCENDING))
+                all_indexes[_type].append(real_index +
+                                          [('created_at', DESCENDING)])
+                all_indexes[_type].append(real_index +
+                                          [('updated_at', DESCENDING)])
+                if _type == 'events':
+                    all_indexes[_type].append(real_index +
+                                              [('when', DESCENDING)])
+                if _type == 'date':
+                    all_indexes[_type].append(real_index +
+                                              [('date', DESCENDING)])
 
         collections = args.collections or all_indexes.keys()
 
