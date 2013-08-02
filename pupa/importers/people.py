@@ -18,8 +18,7 @@ class PersonImporter(BaseImporter):
     def get_db_spec(self, person):
         spec = {'$or': [{'name': person['name']},
                         {'other_names': person['name']}],
-                '_id': {'$in': self.person_ids}
-               }
+                '_id': {'$in': self.person_ids}}
 
         if 'chamber' in person:
             spec['chamber'] = person['chamber']

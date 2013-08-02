@@ -2,6 +2,26 @@ from .base import BaseImporter, update_object, insert_object
 from pupa.core import db
 
 
+def people_by_jurisdiction(jurisdiction_id):
+    """ Find all people by a jurisdiction """
+    people_ids = db.memberships.find({
+        "jurisdiction_id": jurisdiction_id,
+    }).distinct('person_id')
+    if None in people_ids:
+        people_ids.remove(None)
+    return people_ids
+
+
+def people_by_name(name, people_ids=None):
+    """ Find all people by their name. Optional people_ids _id constraint """
+    spec = {"$or": [{ "name": name }, { "other_names": name }]}
+    if people_ids is not None:
+        # This isn't a raw if conditional, since you could pass
+        # an empty list.
+        spec["_id"] = {"$in": people_ids}
+    return db.people.find(spec)
+
+
 class MembershipImporter(BaseImporter):
     _type = 'membership'
 
@@ -24,23 +44,12 @@ class MembershipImporter(BaseImporter):
             spec['unmatched_legislator'] = membership['unmatched_legislator']
 
             # Let's get all the people in our jurisdiction, firstly.
-            people_ids = db.memberships.find({
-                "jurisdiction_id": membership['jurisdiction_id']
-            }).distinct('person_id')  # Everyone in the Jurisdiction
-            if None in people_ids:
-                people_ids.remove(None)
+            people_ids = people_by_jurisdiction(membership['jurisdiction_id'])
             # Right, now we have a list of all known people in the
             # jurisdiction.
 
             unmatched_name = membership['unmatched_legislator']['name']
-
-            people = db.people.find({
-                "_id": {"$in": people_ids},
-                "$or": [
-                    { "name": unmatched_name },
-                    { "other_names": unmatched_name },
-                ]
-            })
+            people = people_by_name(unmatched_name, people_ids=people_ids)
             # Now we've got all the people that have this name in the
             # jurisdiction
 
