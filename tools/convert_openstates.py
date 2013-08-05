@@ -358,7 +358,8 @@ def migrate_people(state):
             save_object(m)
 
         if legislature:
-            m = Membership(who._id, legislature)
+            m = Membership(who._id, legislature,
+                           chamber=chamber)
 
             chamber, district = (entry.get(x, None)
                                  for x in ['chamber', 'district'])
