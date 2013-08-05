@@ -437,6 +437,7 @@ def migrate_bills(state):
         b = Bill(name=bill['bill_id'],
                  session=bill['session'],
                  title=bill['title'],
+                 chamber=bill['chamber'],
                  type=bill['type'],
                  created_at=bill['created_at'],
                  updated_at=bill['updated_at'],
