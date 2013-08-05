@@ -218,7 +218,8 @@ def migrate_committees(state):
             osid = member.get('leg_id', None)
             person_id = lookup_entry_id('people', osid)
             if person_id:
-                m = Membership(person_id, org._id)
+                m = Membership(person_id, org._id,
+                               role=member['role'])
                 save_object(m)
 
     spec = {"subcommittee": None}
