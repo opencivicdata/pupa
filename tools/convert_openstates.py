@@ -599,7 +599,8 @@ def migrate_events(state):
             location=entry['location'],
             session=entry['session'],
             updated_at=entry['updated_at'],
-            created_at=entry['created_at']
+            created_at=entry['created_at'],
+            type=entry['type'],
         )
         e.identifiers = [{'scheme': 'openstates',
                          'identifier': entry['_id']}]
