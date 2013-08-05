@@ -405,7 +405,9 @@ def migrate_people(state):
                         if jid:
                             m = Membership(who._id, jid,
                                            start_date=str(start_year),
-                                           end_date=str(end_year))
+                                           end_date=str(end_year),
+                                           chamber=role['chamber'],
+                                           role=role['position'])
 
                             if "position" in role:
                                 m.role = role['position']
@@ -418,7 +420,8 @@ def migrate_people(state):
                     if leg:
                         m = Membership(who._id, leg['_id'],
                                        start_date=str(start_year),
-                                       end_date=str(end_year))
+                                       end_date=str(end_year),
+                                       chamber=role['chamber'])
                         save_object(m)
 
 
