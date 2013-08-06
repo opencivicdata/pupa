@@ -459,6 +459,16 @@ def migrate_bills(state):
                          'identifier': bill['_id']}]
         b._openstates_id = bill['_id']
 
+        blacklist = ["bill_id", "session", "title", "chamber", "type",
+                     "created_at", "updated_at", "sponsors", "actions",
+                     "versions", "sources", "state", "action_dates",
+                     "level", "country"]
+
+        for key, value in bill.items():
+            if key in blacklist or not value or key.startswith("_"):
+                continue
+            b.extras[key] = value
+
         for source in bill['sources']:
             b.add_source(source['url'], note='old-source')
 
@@ -475,16 +485,12 @@ def migrate_bills(state):
             if mime:
                 kwargs['mimetype'] = mime
 
-            # kwargs['_oyster'] = {
-            #     "internal_document_id": version.get("_internal_document_id"),
-            #     "id": version.get("_oyster_id"),
-            #     "version_id": version.get("_version_id"),
-            # }
-
             b.add_version_link(name=version['name'],
                                url=version['url'],
-                               on_duplicate='ignore',  # Some old OS entries
-                               # are not so good about this.
+                               on_duplicate='ignore',
+                               document_id=version['doc_id'],
+                               # ^^^ Some old OS entries are not so
+                               # good about this.
                                **kwargs)
 
         for subject in bill.get('subjects', []):
@@ -645,6 +651,7 @@ def migrate_events(state):
 
         for document in entry.get('documents', []):
             e.add_document(name=document.get('name'),
+                           document_id=document['doc_id'],
                            url=document['url'])
 
         agenda = None
