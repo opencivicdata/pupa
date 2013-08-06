@@ -422,8 +422,7 @@ def migrate_people(state):
                             m = Membership(who._id, jid,
                                            start_date=str(start_year),
                                            end_date=str(end_year),
-                                           chamber=role['chamber'],
-                                           role=role['position'])
+                                           chamber=role['chamber'])
 
                             if "position" in role:
                                 m.role = role['position']
