@@ -218,7 +218,8 @@ def migrate_committees(state):
             osid = member.get('leg_id', None)
             person_id = lookup_entry_id('people', osid)
             if person_id:
-                m = Membership(person_id, org._id)
+                m = Membership(person_id, org._id,
+                               role=member['role'])
                 save_object(m)
 
     spec = {"subcommittee": None}
@@ -357,7 +358,8 @@ def migrate_people(state):
             save_object(m)
 
         if legislature:
-            m = Membership(who._id, legislature)
+            m = Membership(who._id, legislature,
+                           chamber=chamber)
 
             chamber, district = (entry.get(x, None)
                                  for x in ['chamber', 'district'])
@@ -403,7 +405,9 @@ def migrate_people(state):
                         if jid:
                             m = Membership(who._id, jid,
                                            start_date=str(start_year),
-                                           end_date=str(end_year))
+                                           end_date=str(end_year),
+                                           chamber=role['chamber'],
+                                           role=role['position'])
 
                             if "position" in role:
                                 m.role = role['position']
@@ -416,7 +420,8 @@ def migrate_people(state):
                     if leg:
                         m = Membership(who._id, leg['_id'],
                                        start_date=str(start_year),
-                                       end_date=str(end_year))
+                                       end_date=str(end_year),
+                                       chamber=role['chamber'])
                         save_object(m)
 
 
@@ -432,6 +437,7 @@ def migrate_bills(state):
         b = Bill(name=bill['bill_id'],
                  session=bill['session'],
                  title=bill['title'],
+                 chamber=bill['chamber'],
                  type=bill['type'],
                  created_at=bill['created_at'],
                  updated_at=bill['updated_at'],
@@ -593,7 +599,8 @@ def migrate_events(state):
             location=entry['location'],
             session=entry['session'],
             updated_at=entry['updated_at'],
-            created_at=entry['created_at']
+            created_at=entry['created_at'],
+            type=entry['type'],
         )
         e.identifiers = [{'scheme': 'openstates',
                          'identifier': entry['_id']}]
