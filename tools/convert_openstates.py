@@ -441,8 +441,6 @@ def migrate_people(state):
 
 
 def migrate_bills(state):
-    #bills = db.bills.find({"actions.related_entities": {"$exists": True,
-    #                                                    "$ne": []}})
     spec = {}
     if state:
         spec['state'] = state
@@ -473,7 +471,7 @@ def migrate_bills(state):
 
         for version in bill['versions']:
             kwargs = {}
-            mime = version.get("mimetype", None)
+            mime = version.get("mimetype", version.get("+mimetype"))
             if mime:
                 kwargs['mimetype'] = mime
 
