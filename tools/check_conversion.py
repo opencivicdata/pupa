@@ -3,6 +3,7 @@ import re
 import pprint
 from uuid import uuid4
 from hashlib import md5
+from inspect import getmembers, ismethod
 from collections import defaultdict, deque, Counter
 
 from pymongo import MongoClient
@@ -29,6 +30,13 @@ class Converted(object):
 
     def new_values(self):
         return set(TypeVisitor().visit(self.new))
+
+    def run_checks(self):
+        '''Run any specific checks defined on this collections subclass.
+        '''
+        for name, method in getmembers(self, ismethod):
+            if name.startswith('check_'):
+                method()
 
     def count_missing_keys(self, counter, ids):
         '''Compare the new and old documents. For an values in the old doc
@@ -139,6 +147,27 @@ class ConvertedBills(Converted):
     - country --> jurisdiction_id
     -
     '''
+    def check_all_ids(self):
+        '''Make sure _all_ids gets correctly copied.
+        '''
+        identifiers = list(self.new['identifiers'])
+        for _id in self.old['_all_ids']:
+            for data in identifiers:
+                if data == dict(identifier=_id, scheme='openstates'):
+                    identifiers.remove(data)
+        assert identifiers == []
+
+
+class ConvertedVote(Converted):
+    '''
+    Possibly legitimate:
+    - chamber:
+    -
+
+    False negatives:
+
+    '''
+
 
 #---------------------------------------------------------------
 # Visitor plumbing.
