@@ -436,6 +436,7 @@ def migrate_people(state):
                         m = Membership(who._id, leg['_id'],
                                        start_date=str(start_year),
                                        end_date=str(end_year),
+                                       district=role['district'],
                                        chamber=role['chamber'])
                         save_object(m)
 
