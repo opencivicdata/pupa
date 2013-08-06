@@ -211,15 +211,27 @@ def lookup_entry_id(collection, openstates_id):
     return id_
 
 
+def get_current_term(jid):
+    meta = nudb.metadata.find_one({"_id": jid})
+    term = meta['terms'][-1]
+    return term
+
+
 def migrate_committees(state):
 
     def attach_members(committee, org):
+        term = get_current_term(obj_to_jid(org))
         for member in committee['members']:
             osid = member.get('leg_id', None)
             person_id = lookup_entry_id('people', osid)
             if person_id:
                 m = Membership(person_id, org._id,
-                               role=member['role'])
+                               role=member['role'],
+                               # term=term['name'],
+                               start_date=str(term['start_year']))
+                # We can assume there's no end_year because it's a current
+                # member of the committee. If they left the committee, we don't
+                # know about it yet :)
                 save_object(m)
 
     spec = {"subcommittee": None}
@@ -302,6 +314,8 @@ def migrate_people(state):
     if state:
         spec["state"] = state
     for entry in db.legislators.find(spec):
+        jurisdiction_id = openstates_to_jid(entry['_id'])
+
         who = Person(entry['full_name'])
         who.identifiers = [{'scheme': 'openstates',
                            'identifier': entry['_id']}]
@@ -358,8 +372,10 @@ def migrate_people(state):
             save_object(m)
 
         if legislature:
+            term = get_current_term(jurisdiction_id)
             m = Membership(who._id, legislature,
-                           chamber=chamber)
+                           chamber=chamber,
+                           start_date=str(term['start_year']))
 
             chamber, district = (entry.get(x, None)
                                  for x in ['chamber', 'district'])
