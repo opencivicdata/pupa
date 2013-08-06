@@ -655,7 +655,20 @@ def migrate_events(state):
             agenda.add_bill(bill=bid, id=hcid)
 
         for who in entry.get('participants', []):
-            if who.get('participant_type') is None:
+            participant_type = who.get('participant_type', 'committee')
+            # I've gone through the backlog of OpenStates data, they are
+            # all committees of some sort.
+
+            who_chamber = who.get('chamber')
+            if who_chamber is None:
+                for chamber in ["_chamber", "+chamber"]:
+                    f = who.get(chamber)
+                    if f:
+                        who_chamber = f
+                        break
+
+            if who_chamber is None:
+                # Freak of nature ...
                 continue
 
             hcid = _hot_cache.get(who.get('id', None), None)
@@ -666,10 +679,10 @@ def migrate_events(state):
                     "committee": "organization",
                     "legislator": "person",
                     "person": "person",
-                }[who['participant_type']],
+                }[participant_type],
                 id=hcid,
                 note=who['type'],
-                chamber=who['chamber'])
+                chamber=who_chamber)
 
         e.validate()
         save_object(e)
@@ -681,8 +694,8 @@ SEQUENCE = [
     # XXX: WILL IGNORE STATE, DON'T ENABLE ME.
     #drop_existing_data,  # Not needed if we load the cache
     #
-    migrate_legislatures,
-    migrate_people,  # depends on legislatures
+    #migrate_legislatures,
+    #migrate_people,  # depends on legislatures
     #
     # XXX: migrate_people needs to be called for migrate_committees, for two
     #      reasons:
@@ -691,10 +704,10 @@ SEQUENCE = [
     #   - migrating people drops memberships, which means it'd avoid
     #     dupes.
     #
-    migrate_committees,  # depends on people
-    migrate_bills,
+    #migrate_committees,  # depends on people
+    #migrate_bills,
     migrate_events,
-    migrate_votes,
+    #migrate_votes,
     write_hot_cache,
 ]
 
