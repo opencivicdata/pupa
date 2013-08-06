@@ -694,8 +694,8 @@ SEQUENCE = [
     # XXX: WILL IGNORE STATE, DON'T ENABLE ME.
     #drop_existing_data,  # Not needed if we load the cache
     #
-    #migrate_legislatures,
-    #migrate_people,  # depends on legislatures
+    migrate_legislatures,
+    migrate_people,  # depends on legislatures
     #
     # XXX: migrate_people needs to be called for migrate_committees, for two
     #      reasons:
@@ -704,10 +704,10 @@ SEQUENCE = [
     #   - migrating people drops memberships, which means it'd avoid
     #     dupes.
     #
-    #migrate_committees,  # depends on people
-    #migrate_bills,
+    migrate_committees,  # depends on people
+    migrate_bills,
     migrate_events,
-    #migrate_votes,
+    migrate_votes,
     write_hot_cache,
 ]
 
