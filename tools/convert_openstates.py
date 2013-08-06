@@ -338,8 +338,7 @@ def migrate_people(state):
             who.add_link(home, "Homepage")
 
         blacklist = ["photo_url", "chamber", "district", "url",
-                     "roles", "offices",
-                     "party", "state", "_locked_fields", "sources",
+                     "roles", "offices", "party", "state", "sources",
                      "active", "old_roles"]
 
         for key, value in entry.items():
@@ -456,8 +455,7 @@ def migrate_bills(state):
                  chamber=bill['chamber'],
                  type=bill['type'],
                  created_at=bill['created_at'],
-                 updated_at=bill['updated_at'],
-                )
+                 updated_at=bill['updated_at'])
 
         b.identifiers = [{'scheme': 'openstates',
                          'identifier': bill['_id']}]
@@ -470,6 +468,8 @@ def migrate_bills(state):
             b.add_document_link(name=document['name'], url=document['url'],
                                 on_duplicate='ignore')  # Old docs are bad
             # about this
+
+        b.add_extra('action_dates', bill['action_dates'])
 
         for version in bill['versions']:
             kwargs = {}
