@@ -475,6 +475,12 @@ def migrate_bills(state):
             if mime:
                 kwargs['mimetype'] = mime
 
+            # kwargs['_oyster'] = {
+            #     "internal_document_id": version.get("_internal_document_id"),
+            #     "id": version.get("_oyster_id"),
+            #     "version_id": version.get("_version_id"),
+            # }
+
             b.add_version_link(name=version['name'],
                                url=version['url'],
                                on_duplicate='ignore',  # Some old OS entries
@@ -530,23 +536,22 @@ def migrate_bills(state):
                 type_ = 'organizations'
                 sponsor_id = sponsor.get('committee_id', None)
 
+            kwargs = {}
             if sponsor_id:
                 objid = lookup_entry_id(type_, sponsor_id)
                 etype = {"people": "person",
                          "organizations": "organization"}[type_]
 
-                kwargs = {}
                 if objid is not None:
                     kwargs['entity_id'] = objid
 
-                b.add_sponsor(
-                    name=sponsor['name'],
-                    sponsorship_type=sponsor['type'],
-                    entity_type=etype,
-                    primary=sponsor['type'] == 'primary',
-                    chamber=sponsor.get('chamber', None),
-                    **kwargs
-                )
+            b.add_sponsor(
+                name=sponsor['name'],
+                sponsorship_type=sponsor['type'],
+                entity_type=etype,
+                primary=sponsor['type'] == 'primary',
+                chamber=sponsor.get('chamber', None),
+                **kwargs)
 
         b.validate()
         save_object(b)
