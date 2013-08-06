@@ -498,6 +498,9 @@ def migrate_bills(state):
                     }[rentry['type']]
 
                     nid = rentry['id'] = lookup_entry_id(type_, rentry['id'])
+                    if nid:
+                        if "ocd" not in nid:
+                            raise Exception("Non-OCD id")
 
                     rentry['_type'] = {
                         "committee": "organization",
