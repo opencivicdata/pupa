@@ -102,7 +102,7 @@ class ConvertedPerson(Converted):
         self.old = old_openstates.legislators.find_one(openstates_id)
 
 
-class ConvertedEvents(Converted):
+class ConvertedEvent(Converted):
     '''This class isn't actually used--just documenting results here.
 
     Possibly legitimate:
@@ -130,9 +130,8 @@ class ConvertedEvents(Converted):
     - country --> jurisdiction_id
     '''
 
-class ConvertedBills(Converted):
-    '''Class not actually used--just for documenting results.
-
+class ConvertedBill(Converted):
+    '''
     Possibly legitimate:
     - chamber: very small percentage are 'None'; see ('ocd-bill/98652a36-fac2-11e2-a853-f0def1bd785e', 'IAB00003060')
     -
@@ -324,8 +323,15 @@ if __name__ == '__main__':
 
     collections = sys.argv[1:] or ('bills', 'events', 'people', 'votes')
 
+    class_map = dict(
+        bills=ConvertedBill,
+        events=ConvertedEvent,
+        votes=ConvertedVote)
+
     # Bills and events----------------------------------------------------
     for collection_name in set(collections) - set(['people']):
+
+        cls = class_map[collection_name]
 
         if collection_name not in collections:
             continue
@@ -334,8 +340,9 @@ if __name__ == '__main__':
         ids = result[collection_name]['ids']
 
         for doc in getattr(new, collection_name).find():#.limit(10000):
-            bill = Converted(doc, collection_name)
+            bill = cls(doc, collection_name)
             bill.count_missing_keys(counter, ids)
+            bill.run_checks()
 
     # Legislators ---------------------------------------------------------
     if 'people' in collections:
