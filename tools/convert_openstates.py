@@ -322,6 +322,8 @@ def migrate_people(state):
         who._openstates_id = entry['_id']
         who.created_at = entry['created_at']
         who.updated_at = entry['updated_at']
+        if who.name != entry['_scraped_name']:
+            who.add_name(entry['_scraped_name'])
 
         for k, v in {
             "photo_url": "image",
@@ -550,6 +552,10 @@ def migrate_bills(state):
 
                 if objid is not None:
                     kwargs['entity_id'] = objid
+
+            #if sponsor.get('official_type'):
+            #    kwargs['official_type'] = sponsor['official_type']
+            # Not needed???
 
             b.add_sponsor(
                 name=sponsor['name'],
