@@ -167,12 +167,13 @@ def migrate_legislatures(state):
             cow.add_source(metad['legislature_url'])
 
             for post in db.districts.find({"abbr": abbr}):
+                if post['chamber'] != chamber:
+                    continue
 
                 cow.add_post(label="Member",
                              role="member",
                              num_seats=post['num_seats'],
-                             chamber=post['chamber'],
-                             district=post['name'])
+                             id=post['name'])
 
             save_object(cow)
 
@@ -385,7 +386,7 @@ def migrate_people(state):
                 m.chamber = chamber
 
             if district:
-                m.district = district
+                m.post_id = district
 
             for office in entry.get('offices', []):
                 note = office['name']
@@ -437,7 +438,7 @@ def migrate_people(state):
                         m = Membership(who._id, leg['_id'],
                                        start_date=str(start_year),
                                        end_date=str(end_year),
-                                       district=role['district'],
+                                       post_id=role['district'],
                                        chamber=role['chamber'])
                         save_object(m)
 
