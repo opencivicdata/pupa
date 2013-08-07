@@ -483,8 +483,7 @@ def migrate_bills(state):
                 name=document['name'],
                 url=document['url'],
                 document_id=document['doc_id'],
-                on_duplicate='ignore')  # Old docs are bad
-            # about this
+                on_duplicate='ignore')  # Old docs are bad about this
 
         b.add_extra('action_dates', bill['action_dates'])
 
