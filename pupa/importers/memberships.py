@@ -65,6 +65,9 @@ class MembershipImporter(BaseImporter):
                 # if this is a historical role, only update historical roles
                 'end_date': membership.get('end_date')}
 
+        if 'post_id' in membership and membership['post_id']:
+            spec['post_id'] = membership['post_id']
+
         if ('unmatched_legislator' in membership and
                 membership['unmatched_legislator']):
 

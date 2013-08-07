@@ -73,7 +73,7 @@ class Scraper(scrapelib.Scraper):
         if hasattr(obj, '_is_legislator'):
             membership = Membership(
                 obj._id, 'jurisdiction:' + self.jurisdiction.jurisdiction_id,
-                district=obj.district, chamber=obj.chamber,
+                post_id=obj.post_id, chamber=obj.chamber,
                 contact_details=obj._contact_details, role='member')
             # remove placeholder _contact_details
             del obj._contact_details
