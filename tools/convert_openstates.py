@@ -464,12 +464,16 @@ def migrate_bills(state):
         blacklist = ["bill_id", "session", "title", "chamber", "type",
                      "created_at", "updated_at", "sponsors", "actions",
                      "versions", "sources", "state", "action_dates",
-                     "level", "country"]
+                     "documents", "level", "country", "alternate_titles"]
 
         for key, value in bill.items():
             if key in blacklist or not value or key.startswith("_"):
                 continue
             b.extras[key] = value
+
+        if 'alternate_titles' in bill:
+            b.other_titles = [{"title": x, "note": None}
+                              for x in bill['alternate_titles']]
 
         for source in bill['sources']:
             b.add_source(source['url'], note='old-source')
