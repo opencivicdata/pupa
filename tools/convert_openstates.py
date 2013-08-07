@@ -553,11 +553,12 @@ def migrate_bills(state):
             kwargs = {}
             if sponsor_id:
                 objid = lookup_entry_id(type_, sponsor_id)
-                etype = {"people": "person",
-                         "organizations": "organization"}[type_]
 
                 if objid is not None:
                     kwargs['entity_id'] = objid
+
+            etype = {"people": "person",
+                     "organizations": "organization"}[type_]
 
             #if sponsor.get('official_type'):
             #    kwargs['official_type'] = sponsor['official_type']
