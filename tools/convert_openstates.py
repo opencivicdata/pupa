@@ -475,8 +475,11 @@ def migrate_bills(state):
             b.add_source(source['url'], note='old-source')
 
         for document in bill['documents']:
-            b.add_document_link(name=document['name'], url=document['url'],
-                                on_duplicate='ignore')  # Old docs are bad
+            b.add_document_link(
+                name=document['name'],
+                url=document['url'],
+                document_id=document['doc_id'],
+                on_duplicate='ignore')  # Old docs are bad
             # about this
 
         b.add_extra('action_dates', bill['action_dates'])
