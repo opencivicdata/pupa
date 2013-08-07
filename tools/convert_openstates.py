@@ -621,7 +621,18 @@ def migrate_votes(state):
 
         hcid = _hot_cache.get(entry['bill_id'], None)
         bid = hcid
-        v.add_bill(name=entry['bill_id'], id=bid)
+
+        # The bill_id coming off the entry is an ugly OpenStates bigID.
+        # We need to actually get the bill and use that for this. This
+        # results in kinda a silly slowdown. Perhaps we can cache titles.
+
+        bill_id = entry['bill_id']  # as fallback.
+        if bid:
+            dbill = nudb.bills.find_one({"_id": bid})
+            if dbill:
+                bill_id = dbill['name']
+
+        v.add_bill(name=bill_id, id=bid, chamber=entry['chamber'])
 
         save_object(v)
 
