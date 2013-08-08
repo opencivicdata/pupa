@@ -610,7 +610,7 @@ def migrate_votes(state):
 
 
         for source in entry['sources']:
-            v.add_source(url=source['url'])
+            v.add_source(**source)
 
         if v.sources == []:
             continue  # emit warning
