@@ -98,7 +98,20 @@ class MembershipImporter(BaseImporter):
 
                 person = db.people.find_one({"_id": membership['person_id']})
                 if person is None:
-                    raise Exception("Something went very very wrong")
+                    # Um. OK. This membership is linked to a ghost-person.
+                    print("Warning: %s is linked to an UNKNOWN PERSON" % (
+                        membership['_id']
+                    ))
+                    # The proper behavior here isn't clear. Rather than let
+                    # unclean data into the DB, I'm going to break the import
+                    # process.
+                    raise Exception(
+                        """
+                        Bad membership link that got matched. This is likely an
+                        internal bug. Please look at this *CAREFULLY* to work
+                        out proper behavior
+                        """
+                    )
 
                 uspec = spec.copy()
                 uspec['person_id'] = None
