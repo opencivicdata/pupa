@@ -65,6 +65,13 @@ class MembershipImporter(BaseImporter):
                 # if this is a historical role, only update historical roles
                 'end_date': membership.get('end_date')}
 
+        if 'post_id' in membership and membership['post_id']:
+            # The reason for adding this in a conditional is that
+            # we may not always know the post in the scraper, but we shouldn't
+            # make a mess with membership that have been attached to a post
+            # manually. If we know it in the scraper, it better be in the DB!
+            spec['post_id'] = membership['post_id']
+
         if ('unmatched_legislator' in membership and
                 membership['unmatched_legislator']):
 
