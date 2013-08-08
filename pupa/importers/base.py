@@ -121,7 +121,6 @@ class BaseImporter(object):
         else:
             _id = insert_object(obj)
             self.results['insert'] += 1
-
         return _id
 
     def dedupe_json_id(self, jid):

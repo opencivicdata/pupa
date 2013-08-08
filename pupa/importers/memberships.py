@@ -1,4 +1,4 @@
-from .base import BaseImporter, update_object, insert_object
+from .base import BaseImporter
 from pupa.core import db
 
 
@@ -65,9 +65,6 @@ class MembershipImporter(BaseImporter):
                 # if this is a historical role, only update historical roles
                 'end_date': membership.get('end_date')}
 
-        if 'post_id' in membership and membership['post_id']:
-            spec['post_id'] = membership['post_id']
-
         if ('unmatched_legislator' in membership and
                 membership['unmatched_legislator']):
 
@@ -92,8 +89,15 @@ class MembershipImporter(BaseImporter):
                 pspec = spec.copy()
                 pspec['person_id'] = membership['person_id']
 
+                person = db.people.find_one({"_id": membership['person_id']})
+                if person is None:
+                    raise Exception("Something went very very wrong")
+
                 uspec = spec.copy()
                 uspec['person_id'] = None
+                uspec['unmatched_legislator.name'] = {
+                    "$in": person['other_names'] + [person['name']]
+                }
                 spec = {"$or": [pspec, uspec]}
                 return spec
 
@@ -110,6 +114,7 @@ class MembershipImporter(BaseImporter):
             # Or we don't, and we need to find a membership with an
             # unmatched ID
             spec = {"$or": [pspec, uspec]}
+
         return spec
 
     def prepare_object_from_json(self, obj):
