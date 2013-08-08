@@ -591,7 +591,11 @@ def migrate_votes(state):
         if entry.get('type') is None:
             continue
 
+        org_id = entry.get('committee_id')
+        ocdid = _hot_cache.get(org_id)
+
         v = Vote(
+            organization_id=ocdid,
             motion=entry['motion'],
             session=entry['session'],
             date=when,
