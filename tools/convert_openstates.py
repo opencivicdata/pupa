@@ -502,8 +502,9 @@ def migrate_bills(state):
             b.extras[key] = value
 
         if 'summary' in bill and bill['summary']:
+            # OpenStates only has one at most. let's just convert it
+            # blind.
             b.add_summary('summary', bill['summary'])
-
 
         if 'alternate_titles' in bill:
             b.other_titles = [{"title": x, "note": None}
