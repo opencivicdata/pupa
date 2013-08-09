@@ -803,10 +803,10 @@ SEQUENCE = [
     #   - migrating people drops memberships, which means it'd avoid
     #     dupes.
     #
-    #migrate_committees,  # depends on people
-    #migrate_bills,
+    migrate_committees,  # depends on people
+    migrate_bills,
     migrate_events,
-    #migrate_votes,
+    migrate_votes,
     write_hot_cache,
 ]
 
