@@ -515,6 +515,7 @@ def migrate_bills(state):
 
         for document in bill['documents']:
             b.add_document_link(
+                mimetype=document.get('mimetype'),
                 name=document['name'],
                 url=document['url'],
                 document_id=document['doc_id'],
