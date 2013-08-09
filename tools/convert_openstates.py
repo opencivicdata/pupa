@@ -493,12 +493,17 @@ def migrate_bills(state):
         blacklist = ["bill_id", "session", "title", "chamber", "type",
                      "created_at", "updated_at", "sponsors", "actions",
                      "versions", "sources", "state", "action_dates",
-                     "documents", "level", "country", "alternate_titles"]
+                     "documents", "level", "country", "alternate_titles",
+                     "summary"]
 
         for key, value in bill.items():
             if key in blacklist or not value or key.startswith("_"):
                 continue
             b.extras[key] = value
+
+        if 'summary' in bill and bill['summary']:
+            b.add_summary('summary', bill['summary'])
+
 
         if 'alternate_titles' in bill:
             b.other_titles = [{"title": x, "note": None}
