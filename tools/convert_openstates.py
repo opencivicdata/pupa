@@ -237,6 +237,16 @@ def migrate_committees(state):
                 # know about it yet :)
                 save_object(m)
 
+                if m.role != 'member':
+                    # In addition to being the (chair|vice-chair),
+                    # they should also be noted as a member.
+                    m = Membership(person_id, org._id,
+                                   role='member',
+                                   chamber=org.chamber,
+                                   start_date=str(term['start_year']))
+                    m.add_extra('term', term['name'])
+                    save_object(m)
+
     spec = {"subcommittee": None}
 
     if state:
@@ -425,6 +435,7 @@ def migrate_people(state):
                         jid = _hot_cache.get(cid)
                         if jid:
                             m = Membership(who._id, jid,
+                                           role='member',
                                            start_date=str(start_year),
                                            end_date=str(end_year),
                                            chamber=role['chamber'])
@@ -434,6 +445,18 @@ def migrate_people(state):
                                 m.role = role['position']
 
                             save_object(m)
+
+                            if m.role != 'member':
+                                # In addition to being the (chair|vice-chair),
+                                # they should also be noted as a member.
+                                m = Membership(who._id,
+                                               jid,
+                                               role='member',
+                                               start_date=str(start_year),
+                                               end_date=str(end_year),
+                                               chamber=role['chamber'])
+                                m.add_extra('term', term['name'])
+                                save_object(m)
 
                 if 'district' in role:
                     oid = "{state}-{chamber}".format(**role)
