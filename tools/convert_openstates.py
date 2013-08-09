@@ -231,6 +231,7 @@ def migrate_committees(state):
                                chamber=org.chamber,
                                # term=term['name'],
                                start_date=str(term['start_year']))
+                m.add_extra('term', term['name'])
                 # We can assume there's no end_year because it's a current
                 # member of the committee. If they left the committee, we don't
                 # know about it yet :)
@@ -379,6 +380,7 @@ def migrate_people(state):
             m = Membership(who._id, legislature,
                            chamber=chamber,
                            start_date=str(term['start_year']))
+            m.add_extra('term', term['name'])
 
             chamber, district = (entry.get(x, None)
                                  for x in ['chamber', 'district'])
@@ -426,6 +428,7 @@ def migrate_people(state):
                                            start_date=str(start_year),
                                            end_date=str(end_year),
                                            chamber=role['chamber'])
+                            m.add_extra('term', term['name'])
 
                             if "position" in role:
                                 m.role = role['position']
@@ -441,6 +444,7 @@ def migrate_people(state):
                                        end_date=str(end_year),
                                        post_id=role['district'],
                                        chamber=role['chamber'])
+                        m.add_extra('term', term['name'])
                         save_object(m)
 
 
