@@ -697,6 +697,27 @@ def migrate_events(state):
         e.identifiers = [{'scheme': 'openstates',
                          'identifier': entry['_id']}]
         e._openstates_id = entry['_id']
+        link = entry.get('link', entry.get("+link"))
+        if link:
+            e.add_link(link, 'link')
+
+        blacklist = ["description", "when", "location", "session",
+                     "updated_at", "created_at", "end", "sources",
+                     "documents", "related_bills", "state", "+link",
+                     "link", "level", "participants", "country",
+                     "type",]
+
+        e.status = entry.get('status')
+        typos = {
+            "canceled": "cancelled"
+        }
+        if e.status in typos:
+            e.status = typos[e.status]
+
+        for key, value in entry.items():
+            if key in blacklist or not value or key.startswith("_"):
+                continue
+            e.extras[key] = value
 
         if entry.get('end'):
             end = entry['end']
@@ -782,10 +803,10 @@ SEQUENCE = [
     #   - migrating people drops memberships, which means it'd avoid
     #     dupes.
     #
-    migrate_committees,  # depends on people
-    migrate_bills,
+    #migrate_committees,  # depends on people
+    #migrate_bills,
     migrate_events,
-    migrate_votes,
+    #migrate_votes,
     write_hot_cache,
 ]
 
