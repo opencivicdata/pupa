@@ -630,6 +630,7 @@ def migrate_votes(state):
         ocdid = _hot_cache.get(org_id)
 
         v = Vote(
+            organization=entry.get('committee'),
             organization_id=ocdid,
             motion=entry['motion'],
             session=entry['session'],
