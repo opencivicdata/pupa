@@ -1,32 +1,7 @@
 from .base import BaseImporter
+from .utils import (people_by_jurisdiction, people_by_name,
+                    people_by_jurisdiction_and_name)
 from pupa.core import db
-
-
-def people_by_jurisdiction(jurisdiction_id):
-    """ Find all people by a jurisdiction """
-    people_ids = db.memberships.find({
-        "jurisdiction_id": jurisdiction_id,
-    }).distinct('person_id')
-
-    if None in people_ids:
-        people_ids.remove(None)
-    return people_ids
-
-
-def people_by_name(name, people_ids=None):
-    """ Find all people by their name. Optional people_ids _id constraint """
-    spec = {"$or": [{ "name": name }, { "other_names": name }]}
-    if people_ids is not None:
-        # This isn't a raw if conditional, since you could pass
-        # an empty list.
-        spec["_id"] = {"$in": people_ids}
-    return db.people.find(spec)
-
-
-def people_by_jurisdiction_and_name(jurisdiction_id, name):
-    people_ids = people_by_jurisdiction(jurisdiction_id)
-    people = people_by_name(name, people_ids=people_ids)
-    return people
 
 
 def match_membership(membership, people=None):
