@@ -35,6 +35,7 @@ class VoteImporter(BaseImporter):
         for vote in obj['roll_call']:
             who = vote['person']
             people = people_by_jurisdiction_and_name(
+                obj['jurisdiction_id'],
                 who['name'],
                 chamber=who.get('chamber')
             )
@@ -51,7 +52,8 @@ class VoteImporter(BaseImporter):
 
         if org and not org_id:  # OK. We have an org that needs matching.
             orgs = orgs_by_jurisdiction_and_name(
-                obj['jurisdiction_id']
+                obj['jurisdiction_id'],
+                org,
             )  # get all matching orgs.
 
             if orgs.count() == 1:
