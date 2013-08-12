@@ -64,4 +64,4 @@ def people_by_jurisdiction_and_name(jurisdiction_id, name, **kwargs):
 def orgs_by_jurisdiction_and_name(jurisdiction_id, name, **kwargs):
     org_ids = orgs_by_jurisdiction(jurisdiction_id)
     orgs = orgs_by_name(name, org_ids=org_ids, **kwargs)
-    return people
+    return orgs
