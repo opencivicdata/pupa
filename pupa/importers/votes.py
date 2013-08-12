@@ -39,7 +39,8 @@ class VoteImporter(BaseImporter):
                 self.warning("Can't resolve person `%s'" % (who['name']))
             else:
                 person_json_id = person_obj['person_id']
-                if person_json_id:
+                if (person_json_id and
+                        not person_json_id.startswith("ocd-person")):
                     vote['id'] = self.person_importer.resolve_json_id(
                         person_json_id)
 
