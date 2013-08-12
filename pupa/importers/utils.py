@@ -23,12 +23,13 @@ def orgs_by_jurisdiction(jurisdiction_id):
     return org_ids
 
 
-def people_by_name(name, people_ids=None):
+def people_by_name(name, people_ids=None, **kwargs):
     """ Find all people by their name. Optional people_ids _id constraint """
-    spec = {"$or": [
+    spec = kwargs.copy()
+    spec.update({"$or": [
         { "name": name },
         { "other_names.name": name }
-    ]}
+    ]})
     if people_ids is not None:
 
         # This isn't a raw if conditional, since you could pass
@@ -37,14 +38,15 @@ def people_by_name(name, people_ids=None):
     return db.people.find(spec)
 
 
-def orgs_by_name(name, org_ids=None):
+def orgs_by_name(name, org_ids=None, **kwargs):
     """ Find all orgs their name. Optional org_ids _id constraint """
+    spec = kwargs.copy()
 
-    spec = {"$or": [
+    spec.update({"$or": [
         { "name": name },
         { "other_names.name": name },
         { "identifiers.identifier": name },
-    ]}
+    ]})
 
     if org_ids is not None:
         # This isn't a raw if conditional, since you could pass
@@ -53,13 +55,13 @@ def orgs_by_name(name, org_ids=None):
     return db.organizations.find(spec)
 
 
-def people_by_jurisdiction_and_name(jurisdiction_id, name):
+def people_by_jurisdiction_and_name(jurisdiction_id, name, **kwargs):
     people_ids = people_by_jurisdiction(jurisdiction_id)
-    people = people_by_name(name, people_ids=people_ids)
+    people = people_by_name(name, people_ids=people_ids, **kwargs)
     return people
 
 
-def orgs_by_jurisdiction_and_name(jurisdiction_id, name):
+def orgs_by_jurisdiction_and_name(jurisdiction_id, name, **kwargs):
     org_ids = orgs_by_jurisdiction(jurisdiction_id)
-    orgs = orgs_by_name(name, org_ids=org_ids)
+    orgs = orgs_by_name(name, org_ids=org_ids, **kwargs)
     return people
