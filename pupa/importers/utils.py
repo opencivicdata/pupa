@@ -25,8 +25,12 @@ def orgs_by_jurisdiction(jurisdiction_id):
 
 def people_by_name(name, people_ids=None):
     """ Find all people by their name. Optional people_ids _id constraint """
-    spec = {"$or": [{ "name": name }, { "other_names.name": name }]}
+    spec = {"$or": [
+        { "name": name },
+        { "other_names.name": name }
+    ]}
     if people_ids is not None:
+
         # This isn't a raw if conditional, since you could pass
         # an empty list.
         spec["_id"] = {"$in": people_ids}
@@ -52,4 +56,10 @@ def orgs_by_name(name, org_ids=None):
 def people_by_jurisdiction_and_name(jurisdiction_id, name):
     people_ids = people_by_jurisdiction(jurisdiction_id)
     people = people_by_name(name, people_ids=people_ids)
+    return people
+
+
+def orgs_by_jurisdiction_and_name(jurisdiction_id, name):
+    org_ids = orgs_by_jurisdiction(jurisdiction_id)
+    orgs = orgs_by_name(name, org_ids=org_ids)
     return people

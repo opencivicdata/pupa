@@ -70,6 +70,7 @@ class MembershipImporter(BaseImporter):
                 #### This will find anyone who has our ID *OR* has a None.
                 pspec = spec.copy()
                 pspec['person_id'] = membership['person_id']
+                # print("MATCHED", unmatched_name)
 
                 person = db.people.find_one({"_id": membership['person_id']})
                 if person is None:
@@ -91,7 +92,9 @@ class MembershipImporter(BaseImporter):
                 uspec = spec.copy()
                 uspec['person_id'] = None
                 uspec['unmatched_legislator.name'] = {
-                    "$in": person['other_names'] + [person['name']]
+                    "$in": [
+                        x['name'] for x in person['other_names']
+                    ] + [person['name']]
                 }
                 spec = {"$or": [pspec, uspec]}
                 return spec
