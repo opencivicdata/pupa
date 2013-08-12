@@ -5,6 +5,11 @@ import pupa.core
 class VoteImporter(BaseImporter):
     _type = 'vote'
 
+    def __init__(self, jurisdiction_id, person_importer, org_importer):
+        super(VoteImporter, self).__init__(jurisdiction_id)
+        self.person_importer = person_importer
+        self.org_importer = org_importer
+
     def get_db_spec(self, event):
         spec = {
             "motion": event['motion'],
@@ -33,6 +38,13 @@ class VoteImporter(BaseImporter):
             if person_obj is None:
                 self.warning("Can't resolve person `%s'" % (who['name']))
             else:
-                vote['id'] = person_obj['_id']
+                person_json_id = person_obj['person_id']
+                if person_json_id:
+                    vote['id'] = self.person_importer.resolve_json_id(
+                        person_json_id)
 
+        org_json_id = obj['organization_id']
+        if org_json_id:
+            obj['organization_id'] = self.org_importer.resolve_json_id(
+                org_json_id)
         return obj

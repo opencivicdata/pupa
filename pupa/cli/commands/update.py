@@ -156,11 +156,17 @@ class Command(BaseCommand):
     def do_import(self, juris, args):
         org_importer = OrganizationImporter(juris.jurisdiction_id)
         person_importer = PersonImporter(juris.jurisdiction_id)
+
         membership_importer = MembershipImporter(juris.jurisdiction_id,
                                                  person_importer,
                                                  org_importer)
+
         bill_importer = BillImporter(juris.jurisdiction_id)
-        vote_importer = VoteImporter(juris.jurisdiction_id)
+
+        vote_importer = VoteImporter(juris.jurisdiction_id,
+                                     person_importer,
+                                     org_importer)
+
         event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
