@@ -63,7 +63,7 @@ class VoteImporter(BaseImporter):
                 self.warning("can't match `%s'" % (org))
 
         elif org_id:  # We have a sort of org ID
-            if org:  # If we have the ID but no the name (odd...)
+            if org is None:  # If we have the ID but no the name (odd...)
                 raise ValueError("Someone set an org_id without an org name.")
 
             org_json_id = obj['organization_id']  # scrape-time match?
