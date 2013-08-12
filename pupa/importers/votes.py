@@ -1,3 +1,6 @@
+from .utils import (people_by_jurisdiction_and_name,
+                    orgs_by_jurisdiction_and_name)
+
 from .base import BaseImporter
 import pupa.core
 
@@ -31,38 +34,38 @@ class VoteImporter(BaseImporter):
 
         for vote in obj['roll_call']:
             who = vote['person']
-            person_obj = pupa.core.db.people.find_one({
-                "name": who['name'],
-                "chamber": who.get('chamber', None),
-            })
-            if person_obj is None:
-                self.warning("Can't resolve person `%s'" % (who['name']))
-            else:
-                person_json_id = person_obj['person_id']
-                if (person_json_id and
-                        not person_json_id.startswith("ocd-person")):
-                    vote['id'] = self.person_importer.resolve_json_id(
-                        person_json_id)
+            people = people_by_jurisdiction_and_name(
+                who['name'],
+                chamber=who.get('chamber')
+            )
+
+            if people.count() != 1:
+                self.warning("can't match `%s'" % (who['name']))
+                continue  # can't match
+
+            person_obj = people[0]
+            vote['id'] = person_obj['_id']
 
         org = obj.get('organization')
-        if org:
-            org_id = obj.get('organization_id')
-            if org_id is None:
-                # OK. Let's see if we can match this.
+        org_id = obj.get('organization_id')
 
-                orgs = pupa.core.db.organizations.find({
-                    "jurisdiction_id": obj['jurisdiction_id'],
-                    "name": org,
-                })
+        if org and not org_id:  # OK. We have an org that needs matching.
+            orgs = orgs_by_jurisdiction_and_name(
+                obj['jurisdiction_id']
+            )  # get all matching orgs.
 
-                if orgs.count() != 1:
-                    self.warning("Can't track down org `%s'" % (org))
-                else:
-                    orga = orgs[0]
-                    obj['organization_id'] = orga['_id']
+            if orgs.count() == 1:
+                org_obj = orgs[0]  # Let's get the only result.
+                obj['organization_id'] = org_obj['_id']
+            else:
+                self.warning("can't match `%s'" % (org))
 
-        org_json_id = obj['organization_id']
-        if org_json_id and not org_json_id.startswith("ocd-organization"):
-            obj['organization_id'] = self.org_importer.resolve_json_id(
-                org_json_id)
+        elif org_id:  # We have a sort of org ID
+            if org:  # If we have the ID but no the name (odd...)
+                raise ValueError("Someone set an org_id without an org name.")
+
+            org_json_id = obj['organization_id']  # scrape-time match?
+            if org_json_id and not org_json_id.startswith("ocd-organization"):
+                obj['organization_id'] = self.org_importer.resolve_json_id(
+                    org_json_id)  # resolve it.
         return obj
