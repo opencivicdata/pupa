@@ -43,8 +43,25 @@ class VoteImporter(BaseImporter):
                     vote['id'] = self.person_importer.resolve_json_id(
                         person_json_id)
 
+        org = obj.get('organization')
+        if org:
+            org_id = obj.get('organization_id')
+            if org_id is None:
+                # OK. Let's see if we can match this.
+
+                orgs = pupa.core.db.organizations.find({
+                    "jurisdiction_id": obj['jurisdiction_id'],
+                    "name": org,
+                })
+
+                if orgs.count() != 1:
+                    self.warning("Can't track down org `%s'" % (org))
+                else:
+                    orga = orgs[0]
+                    obj['organization_id'] = orga['_id']
+
         org_json_id = obj['organization_id']
-        if org_json_id:
+        if org_json_id and not org_json_id.startswith("ocd-organization"):
             obj['organization_id'] = self.org_importer.resolve_json_id(
                 org_json_id)
         return obj
