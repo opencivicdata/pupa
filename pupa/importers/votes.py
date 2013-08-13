@@ -1,5 +1,6 @@
 from .utils import (people_by_jurisdiction_and_name,
-                    orgs_by_jurisdiction_and_name)
+                    orgs_by_jurisdiction_and_name,
+                    bills_by_jurisdiction_and_name)
 
 from .base import BaseImporter
 import pupa.core
@@ -25,11 +26,14 @@ class VoteImporter(BaseImporter):
     def prepare_object_from_json(self, obj):
         bill = obj.get('bill', None)
         if bill:
-            bill_obj = pupa.core.db.bills.find_one({"name": bill['name']})
-            # XXX: use all_names above
-            if bill_obj is None:
+            bills = bills_by_jurisdiction_and_name(
+                obj['jurisdiction_id'],
+                bill['name'],
+            )
+            if bills.count() != 1:
                 self.warning("Can't resolve bill `%s'" % (bill['name']))
             else:
+                bill_obj = bills[0]
                 bill['id'] = bill_obj['_id']
 
         for vote in obj['roll_call']:

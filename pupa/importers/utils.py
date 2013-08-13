@@ -1,26 +1,29 @@
 from pupa.core import db
 
 
+def collection_by_jurisdiction(jurisdiction_id, collection, field):
+    """ Find all things in a jurisdiction """
+    ids = getattr(db, collection).find({
+        "jurisdiction_id": jurisdiction_id,
+    }).distinct(field)
+    if None in ids:
+        ids.remove(None)
+    return ids
+
+
 def people_by_jurisdiction(jurisdiction_id):
     """ Find all people by a jurisdiction """
-    people_ids = db.memberships.find({
-        "jurisdiction_id": jurisdiction_id,
-    }).distinct('person_id')
-
-    if None in people_ids:
-        people_ids.remove(None)
-    return people_ids
+    return collection_by_jurisdiction(jurisdiction_id, 'people', 'person_id')
 
 
 def orgs_by_jurisdiction(jurisdiction_id):
     """ Find all orgs by a jurisdiction """
-    org_ids = db.organizations.find({
-        "jurisdiction_id": jurisdiction_id,
-    }).distinct('_id')
+    return collection_by_jurisdiction(jurisdiction_id, 'organizations', '_id')
 
-    if None in org_ids:
-        org_ids.remove(None)
-    return org_ids
+
+def bills_by_jurisdiction(jurisdiction_id):
+    """ Find all bills by a jurisdiction """
+    return collection_by_jurisdiction(jurisdiction_id, 'bills', '_id')
 
 
 def people_by_name(name, people_ids=None, **kwargs):
@@ -31,10 +34,23 @@ def people_by_name(name, people_ids=None, **kwargs):
         { "other_names.name": name }
     ]})
     if people_ids is not None:
-
         # This isn't a raw if conditional, since you could pass
         # an empty list.
         spec["_id"] = {"$in": people_ids}
+    return db.people.find(spec)
+
+
+def bills_by_name(name, bill_ids=None, **kwargs):
+    """ Find all bills by their name. Optional bill_ids _id constraint """
+    spec = kwargs.copy()
+    spec.update({"$or": [
+        { "name": name },
+        { "alternate_titles.title": name },
+    ]})
+    if bill_ids is not None:
+        # This isn't a raw if conditional, since you could pass
+        # an empty list.
+        spec["_id"] = {"$in": bill_ids}
     return db.people.find(spec)
 
 
@@ -65,3 +81,9 @@ def orgs_by_jurisdiction_and_name(jurisdiction_id, name, **kwargs):
     org_ids = orgs_by_jurisdiction(jurisdiction_id)
     orgs = orgs_by_name(name, org_ids=org_ids, **kwargs)
     return orgs
+
+
+def bills_by_jurisdiction_and_name(jurisdiction_id, name, **kwargs):
+    bill_ids = bills_by_jurisdiction(jurisdiction_id)
+    bills = bills_by_name(name, bill_ids=bill_ids, **kwargs)
+    return bills
