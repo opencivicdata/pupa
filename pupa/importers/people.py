@@ -1,4 +1,4 @@
-from .base import BaseImporter, db, update_object, insert_object
+from .base import BaseImporter, db
 
 
 class PersonImporter(BaseImporter):

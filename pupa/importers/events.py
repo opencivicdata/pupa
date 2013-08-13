@@ -14,7 +14,6 @@ class EventImporter(BaseImporter):
         }
         return spec
 
-
     def prepare_object_from_json(self, obj):
 
         def person(obj, what):

@@ -4,6 +4,7 @@ from pupa.core import db
 from .base import BaseCommand
 from pymongo import ASCENDING, DESCENDING
 
+
 class Command(BaseCommand):
     name = 'ensure-indexes'
     help = '''make mongodb indexes'''
@@ -19,17 +20,17 @@ class Command(BaseCommand):
             'metadata': [
                 [('name', ASCENDING)]
             ],
-            'organizations': [ ],
-            'people': [ ],
+            'organizations': [],
+            'people': [],
             'memberships': [
                 # get all members for an org
                 [('organization_id', ASCENDING), ('end_date', ASCENDING)],
                 # get all memberships for a person
                 [('person_id', ASCENDING), ('end_date', ASCENDING)],
             ],
-            'bills': [ ],
-            'events': [ ],
-            'votes': [ ],
+            'bills': [],
+            'events': [],
+            'votes': [],
         }
         api_indexes = {
             'organizations': [

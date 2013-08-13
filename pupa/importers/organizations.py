@@ -10,7 +10,7 @@ class OrganizationImporter(BaseImporter):
                 'name': org['name'],
                 'parent_id': org.get('parent_id')}
 
-        if org['classification'] not in ["party",]:  # just party for now
+        if org['classification'] not in ("party", ):  # just party for now
             spec['jurisdiction_id'] = org['jurisdiction_id']
 
         return spec

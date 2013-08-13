@@ -3,7 +3,6 @@ from .utils import (people_by_jurisdiction_and_name,
                     bills_by_jurisdiction_and_name)
 
 from .base import BaseImporter
-import pupa.core
 
 
 class VoteImporter(BaseImporter):
