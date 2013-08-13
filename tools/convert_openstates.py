@@ -352,12 +352,17 @@ def migrate_people(state):
         if home:
             who.add_link(home, "Homepage")
 
+        vsid = entry.get('votesmart_id')
+        if vsid:
+            who.add_identifier(vsid, 'votesmart-id')
+
         blacklist = ["photo_url", "chamber", "district", "url",
                      "roles", "offices", "party", "state", "sources",
-                     "active", "old_roles"]
+                     "active", "old_roles", "_locked_fields",
+                     "votesmart_id", "_scraped_name", "_all_ids"]
 
         for key, value in entry.items():
-            if key in blacklist or not value or key.startswith("_"):
+            if key in blacklist or not value:  # or key.startswith("_"):
                 continue
             who.extras[key] = value
 
@@ -494,7 +499,7 @@ def migrate_bills(state):
                      "created_at", "updated_at", "sponsors", "actions",
                      "versions", "sources", "state", "action_dates",
                      "documents", "level", "country", "alternate_titles",
-                     "summary"]
+                     "_all_ids", "summary"]
 
         for key, value in bill.items():
             if key in blacklist or not value or key.startswith("_"):
@@ -511,7 +516,7 @@ def migrate_bills(state):
                               for x in bill['alternate_titles']]
 
         for source in bill['sources']:
-            b.add_source(source['url'], note='old-source')
+            b.add_source(source['url'], note='OpenStates source')
 
         for document in bill['documents']:
             b.add_document_link(
@@ -706,7 +711,7 @@ def migrate_events(state):
                      "updated_at", "created_at", "end", "sources",
                      "documents", "related_bills", "state", "+link",
                      "link", "level", "participants", "country",
-                     "type",]
+                     "_all_ids", "type",]
 
         e.status = entry.get('status')
         typos = {
