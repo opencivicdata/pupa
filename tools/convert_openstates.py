@@ -159,7 +159,7 @@ def migrate_legislatures(state):
         for chamber in metad['chambers']:
             cn = metad['chambers'][chamber]['name']
             cow = Organization("%s, %s" % (metad['legislature_name'], cn),
-                               classification="jurisdiction",
+                               classification="legislature",
                                chamber=chamber,
                                division_id=geoid,
                                abbreviation=abbr)
@@ -355,6 +355,10 @@ def migrate_people(state):
         vsid = entry.get('votesmart_id')
         if vsid:
             who.add_identifier(vsid, 'votesmart-id')
+
+        tdid = entry.get('transparencydata_id')
+        if tdid:
+            who.add_identifier(tdid, 'transparencydata-id')
 
         blacklist = ["photo_url", "chamber", "district", "url",
                      "roles", "offices", "party", "state", "sources",

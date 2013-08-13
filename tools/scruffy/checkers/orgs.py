@@ -3,7 +3,7 @@ from .common import common_checks
 
 
 def check(db):
-    for org in db.organizations.find({"classification": "jurisdiction"}):
+    for org in db.organizations.find({"classification": "legislature"}):
         for check in common_checks(org, 'organization', 'organizations'):
             yield check
 
@@ -16,7 +16,7 @@ def check(db):
             continue
 
         jorgs = list(db.organizations.find({
-            "classification": "jurisdiction",
+            "classification": "legislature",
             "jurisdiction_id": org['jurisdiction_id']
         }))
         if len(jorgs) != 1 and len(set([x['chamber']
