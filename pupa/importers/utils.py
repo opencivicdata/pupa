@@ -13,7 +13,11 @@ def collection_by_jurisdiction(jurisdiction_id, collection, field):
 
 def people_by_jurisdiction(jurisdiction_id):
     """ Find all people by a jurisdiction """
-    return collection_by_jurisdiction(jurisdiction_id, 'people', 'person_id')
+    return collection_by_jurisdiction(
+        jurisdiction_id,
+        'memberships',
+        'person_id'
+    )
 
 
 def orgs_by_jurisdiction(jurisdiction_id):
