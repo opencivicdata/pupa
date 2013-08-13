@@ -410,6 +410,12 @@ def migrate_people(state):
             if district:
                 m.post_id = district
 
+            for key in ['email', 'fax', 'phone']:
+                if key in entry and entry[key]:
+                    m.add_contact_detail(type=key,
+                                         value=entry[key],
+                                         note=key)
+
             for office in entry.get('offices', []):
                 note = office['name']
                 for key, value in office.items():
