@@ -362,8 +362,11 @@ def migrate_people(state):
 
         blacklist = ["photo_url", "chamber", "district", "url",
                      "roles", "offices", "party", "state", "sources",
-                     "active", "old_roles", "_locked_fields",
-                     "votesmart_id", "_scraped_name", "_all_ids"]
+                     "active", "old_roles", "_locked_fields", "created_at",
+                     "updated_at", "transparencydata_id", "votesmart_id",
+                     "leg_id", "email", "phone", "fax", "_scraped_name",
+                     "_id", "_all_ids", "full_name",]
+        # The above is a list of keys we move over by hand later.
 
         for key, value in entry.items():
             if key in blacklist or not value:  # or key.startswith("_"):
@@ -421,7 +424,6 @@ def migrate_people(state):
                 for key, value in office.items():
                     if not value or key in ["name", "type"]:
                         continue
-
                     m.add_contact_detail(type=key, value=value, note=note)
 
             save_object(m)
