@@ -6,8 +6,8 @@ from collections import defaultdict
 
 import scrapelib
 
-from larvae.membership import Membership
 from pupa import utils
+from pupa.models.membership import Membership
 from pupa.core import settings
 
 

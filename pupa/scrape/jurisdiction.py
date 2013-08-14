@@ -1,4 +1,4 @@
-from larvae.organization import Organization
+from pupa.models.organization import Organization
 
 
 class Jurisdiction(object):

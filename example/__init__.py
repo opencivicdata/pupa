@@ -1,5 +1,5 @@
 from pupa.scrape import Jurisdiction, Scraper, Legislator
-from larvae.organization import Organization
+from pupa.models.organization import Organization
 
 
 class Example(Jurisdiction):

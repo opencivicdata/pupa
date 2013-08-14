@@ -2,7 +2,7 @@ import os
 import json
 import datetime
 from pupa.core import db
-from larvae.utils import DatetimeValidator
+from pupa.models.utils import DatetimeValidator
 
 
 def import_jurisdiction(org_importer, jurisdiction):
