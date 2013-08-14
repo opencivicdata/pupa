@@ -495,7 +495,17 @@ def migrate_bills(state):
 
     bills = db.bills.find(spec)
     for bill in bills:
+
+        ocdid = _hot_cache.get('{state}-{chamber}'.format(**bill))
+        org = nudb.organizations.find_one({"_id": ocdid})
+        org_name = org['name']
+        if not org or not org_name or not ocdid:
+            raise Exception("""Can't look up chamber this legislative
+                            instrument was introduced into.""")
+
         b = Bill(name=bill['bill_id'],
+                 organization=org_name,
+                 organization_id=ocdid,
                  session=bill['session'],
                  title=bill['title'],
                  chamber=bill['chamber'],
