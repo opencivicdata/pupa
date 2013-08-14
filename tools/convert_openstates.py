@@ -362,8 +362,11 @@ def migrate_people(state):
 
         blacklist = ["photo_url", "chamber", "district", "url",
                      "roles", "offices", "party", "state", "sources",
-                     "active", "old_roles", "_locked_fields",
-                     "votesmart_id", "_scraped_name", "_all_ids"]
+                     "active", "old_roles", "_locked_fields", "created_at",
+                     "updated_at", "transparencydata_id", "votesmart_id",
+                     "leg_id", "email", "phone", "fax", "_scraped_name",
+                     "_id", "_all_ids", "full_name",]
+        # The above is a list of keys we move over by hand later.
 
         for key, value in entry.items():
             if key in blacklist or not value:  # or key.startswith("_"):
@@ -421,7 +424,6 @@ def migrate_people(state):
                 for key, value in office.items():
                     if not value or key in ["name", "type"]:
                         continue
-
                     m.add_contact_detail(type=key, value=value, note=note)
 
             save_object(m)
@@ -493,7 +495,17 @@ def migrate_bills(state):
 
     bills = db.bills.find(spec)
     for bill in bills:
+
+        ocdid = _hot_cache.get('{state}-{chamber}'.format(**bill))
+        org = nudb.organizations.find_one({"_id": ocdid})
+        org_name = org['name']
+        if not org or not org_name or not ocdid:
+            raise Exception("""Can't look up chamber this legislative
+                            instrument was introduced into.""")
+
         b = Bill(name=bill['bill_id'],
+                 organization=org_name,
+                 organization_id=ocdid,
                  session=bill['session'],
                  title=bill['title'],
                  chamber=bill['chamber'],
@@ -509,12 +521,16 @@ def migrate_bills(state):
                      "created_at", "updated_at", "sponsors", "actions",
                      "versions", "sources", "state", "action_dates",
                      "documents", "level", "country", "alternate_titles",
-                     "_all_ids", "summary"]
+                     "subjects", "_id", "type", "_type", "_term", "_all_ids",
+                     "summary"]
 
         for key, value in bill.items():
-            if key in blacklist or not value or key.startswith("_"):
+            if key in blacklist or not value:  # or key.startswith("_"):
                 continue
             b.extras[key] = value
+
+        for subject in bill.get('subjects', []):
+            b.add_subject(subject)
 
         if 'summary' in bill and bill['summary']:
             # OpenStates only has one at most. let's just convert it
@@ -641,11 +657,24 @@ def migrate_votes(state):
         if entry.get('type') is None:
             continue
 
-        org_id = entry.get('committee_id')
-        ocdid = _hot_cache.get(org_id)
+        org_name = entry.get('committee')
+        if org_name:
+            # There's a committee tied to this vote.
+            org_id = entry.get('committee_id')
+            ocdid = _hot_cache.get(org_id)
+        else:
+            # OK. We don't have a committee. We should have a chamber.
+            # Let's fallback on the COW.
+            ocdid = _hot_cache.get('{state}-{chamber}'.format(**entry))
+            org = nudb.organizations.find_one({"_id": ocdid})
+            if ocdid is None or org is None:
+                raise Exception("""Can't look up the legislature? Something
+                                 went wrong internally. The cache might be
+                                 wrong for some reason. Look into this.""")
+            org_name = org['name']
 
         v = Vote(
-            organization=entry.get('committee'),
+            organization=org_name,
             organization_id=ocdid,
             motion=entry['motion'],
             session=entry['session'],
@@ -713,6 +742,9 @@ def migrate_events(state):
         e.identifiers = [{'scheme': 'openstates',
                          'identifier': entry['_id']}]
         e._openstates_id = entry['_id']
+        if entry.get('+location_url'):
+            e.add_location_url(entry['+location_url'])
+
         link = entry.get('link', entry.get("+link"))
         if link:
             e.add_link(link, 'link')
@@ -752,8 +784,14 @@ def migrate_events(state):
 
         for document in entry.get('documents', []):
             e.add_document(name=document.get('name'),
-                           document_id=document['doc_id'],
-                           url=document['url'])
+                           document_id=document.get('doc_id'),
+                           url=document['url'],
+                           mimetype=document.get(
+                               "mimetype", document.get(
+                                   "+mimetype",
+                                   "application/octet-stream")))
+            # Try to add the mimetype. If it fails, fall back to a generic
+            # undeclared application/octet-stream.
 
         agenda = None
         for bill in entry.get('related_bills', []):
