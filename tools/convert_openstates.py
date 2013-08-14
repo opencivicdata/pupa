@@ -521,12 +521,16 @@ def migrate_bills(state):
                      "created_at", "updated_at", "sponsors", "actions",
                      "versions", "sources", "state", "action_dates",
                      "documents", "level", "country", "alternate_titles",
-                     "_all_ids", "summary"]
+                     "subjects", "_id", "type", "_type", "_term", "_all_ids",
+                     "summary"]
 
         for key, value in bill.items():
-            if key in blacklist or not value or key.startswith("_"):
+            if key in blacklist or not value:  # or key.startswith("_"):
                 continue
             b.extras[key] = value
+
+        for subject in bill.get('subjects', []):
+            b.add_subject(subject)
 
         if 'summary' in bill and bill['summary']:
             # OpenStates only has one at most. let's just convert it
