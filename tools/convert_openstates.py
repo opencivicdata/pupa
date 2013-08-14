@@ -715,6 +715,9 @@ def migrate_events(state):
         e.identifiers = [{'scheme': 'openstates',
                          'identifier': entry['_id']}]
         e._openstates_id = entry['_id']
+        if entry.get('+location_url'):
+            e.add_location_url(entry['+location_url'])
+
         link = entry.get('link', entry.get("+link"))
         if link:
             e.add_link(link, 'link')
