@@ -754,8 +754,14 @@ def migrate_events(state):
 
         for document in entry.get('documents', []):
             e.add_document(name=document.get('name'),
-                           document_id=document['doc_id'],
-                           url=document['url'])
+                           document_id=document.get('doc_id'),
+                           url=document['url'],
+                           mimetype=document.get(
+                               "mimetype", document.get(
+                                   "+mimetype",
+                                   "application/octet-stream")))
+            # Try to add the mimetype. If it fails, fall back to a generic
+            # undeclared application/octet-stream.
 
         agenda = None
         for bill in entry.get('related_bills', []):
