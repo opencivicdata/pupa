@@ -643,11 +643,24 @@ def migrate_votes(state):
         if entry.get('type') is None:
             continue
 
-        org_id = entry.get('committee_id')
-        ocdid = _hot_cache.get(org_id)
+        org_name = entry.get('committee')
+        if org_name:
+            # There's a committee tied to this vote.
+            org_id = entry.get('committee_id')
+            ocdid = _hot_cache.get(org_id)
+        else:
+            # OK. We don't have a committee. We should have a chamber.
+            # Let's fallback on the COW.
+            ocdid = _hot_cache.get('{state}-{chamber}'.format(**entry))
+            org = nudb.organizations.find_one({"_id": ocdid})
+            if ocdid is None or org is None:
+                raise Exception("""Can't look up the legislature? Something
+                                 went wrong internally. The cache might be
+                                 wrong for some reason. Look into this.""")
+            org_name = org['name']
 
         v = Vote(
-            organization=entry.get('committee'),
+            organization=org_name,
             organization_id=ocdid,
             motion=entry['motion'],
             session=entry['session'],
