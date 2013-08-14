@@ -1,4 +1,5 @@
 from ..person import Person
+from nose.tools import raises
 from validictory import ValidationError
 
 
@@ -8,11 +9,12 @@ def test_basic_invalid_person():
     bob.add_source(url='foo')
     bob.validate()
 
-    try:
-        bob.name = None
-        assert not bob.validate()
-    except ValidationError:
-        pass
+    bob.name = None
+
+    @raises(ValidationError)
+    def _():
+        bob.validate()
+    _()
 
 
 def test_str():

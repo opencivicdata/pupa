@@ -116,6 +116,9 @@ schema = {
                     "type": ["string", "null"],
                 },
 
+                # * **url** - URL of the location, if applicable.
+                "url": {"required": False, "type": "string"},
+
                 # * **coordinates** - coordinates where this event will take
                 # place. If the location hasn't (or isn't) geolocated or
                 # geocodable, than this should be set to null.
@@ -147,9 +150,12 @@ schema = {
                     # * **note** - name of the document. Something like
                     # "Fiscal Report" or "John Smith's Slides".
                     "name": {"type": "string"},
-                    # * **url** - URL where the content may be found.
-                    "url": {"type": "string"}
 
+                    # * **url** - URL where the content may be found.
+                    "url": {"type": "string"},
+
+                    # * **mimetype** - Mimetype of the document.
+                    "mimetype": {"type": "string"},
                 },
                 "type": "object"
             },

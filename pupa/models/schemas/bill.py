@@ -22,6 +22,14 @@ schema = {
         # **_type** - All objects must have a _type field set to bill.
         "_type": {"enum": ["bill"], "type": "string"},
 
+        # **organization** - name of the Legislative body that this instrument
+        # was introduced into.
+        "organization": {"type": ["string", "null"]},
+
+        # **organization_id** - ID of the Legislative body that this instrument
+        # was introduced into.
+        "organization_id": {"type": ["string", "null"]},
+
         # **session** - Associated with one of jurisdiction's sessions
         "session": {"type": "string"},
 

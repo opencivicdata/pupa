@@ -56,7 +56,7 @@ class EventAgendaItem(dict):
 
 class Event(BaseModel):
     """
-    Details for an event
+    Details for an event in .format
     """
     _type = "event"
     _schema = schema
@@ -100,6 +100,9 @@ class Event(BaseModel):
             "longitude": lon
         }
 
+    def add_location_url(self, url):
+        self.location['url'] = url
+
     def add_source(self, url, note=None):
         info = {"url": url, "note": note}
         self.sources.append(info)
@@ -108,11 +111,14 @@ class Event(BaseModel):
         info = {"url": url, "note": note}
         self.links.append(info)
 
-    def add_document(self, name, url):
-        self.documents.append({
+    def add_document(self, name, url, mimetype, **kwargs):
+        data = kwargs.copy()
+        data.update({
             "name": name,
-            "url": url
+            "url": url,
+            "mimetype": mimetype,
         })
+        self.documents.append(data)
 
     def add_person(self, name, note='participant', chamber=None, id=None):
         return self.add_participant(

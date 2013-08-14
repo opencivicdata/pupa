@@ -1,5 +1,6 @@
 from ..organization import Organization
 from validictory import ValidationError
+from nose.tools import raises
 
 
 def test_basic_invalid_organization():
@@ -9,10 +10,11 @@ def test_basic_invalid_organization():
     orga.validate()
 
     orga.name = None
-    try:
-        assert "Garbage test compare" == orga.validate()
-    except ValidationError:
-        pass
+
+    @raises(ValidationError)
+    def _():
+        orga.validate()
+    _()
 
 
 def test_add_post():
@@ -26,10 +28,11 @@ def test_add_post():
     assert orga.posts[0]['role'] == "Chef"
     assert orga.posts[0]['label'] == "Human Readable Name"
 
-    try:
-        assert "Garbage" == orga.add_identifier("id10t", foo="bar")
-    except TypeError:
-        pass
+
+    @raises(TypeError)
+    def _():
+        orga.add_identifier("id10t", foo="bar")
+    _()
 
     orga.add_identifier("id10t")
     orga.add_identifier("l0l", scheme="kruft")

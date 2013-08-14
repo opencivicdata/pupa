@@ -70,7 +70,8 @@ def test_add_bill():
 def test_add_document():
     e = event_obj()
     assert e.documents == []
-    e.add_document(name='hello', url='http://example.com')
+    e.add_document(name='hello', url='http://example.com',
+                   mimetype="text/html")
     assert len(e.documents) == 1
     o = e.documents[0]
     assert o['name'] == 'hello'

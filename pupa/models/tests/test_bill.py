@@ -1,4 +1,5 @@
 from ..bill import Bill
+from nose.tools import raises
 from validictory import ValidationError
 
 
@@ -6,20 +7,19 @@ def toy_bill():
     b = Bill(name="HB 2017",
              session="2012A",
              title="A bill for an act to raise the cookie budget by 200%",
+             organization="Foo Senate",
              type="bill")
     b.add_source("http://uri.example.com/", note="foo")
     b.validate()
     return b
 
 
+@raises(ValidationError)
 def test_basic_invalid_bill():
     """ Test that we can create an invalid bill, and validation will fail """
     b = toy_bill()
     b.name = None
-    try:
-        assert ("Big Garbage String") == b.validate()
-    except ValidationError:
-        pass
+    b.validate()
 
 
 def test_verify_actions():
@@ -62,10 +62,11 @@ def test_verify_documents():
                         date="2013-04",
                         url=None,
                         mimetype='foo')
-    try:
-        assert ("This shouldn't happen") == b.validate()
-    except ValidationError:
-        pass
+
+    @raises(ValidationError)
+    def bval():
+        b.validate()
+    bval()
 
 
 def test_verify_sponsors():

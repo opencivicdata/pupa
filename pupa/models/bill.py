@@ -25,9 +25,9 @@ class Bill(BaseModel):
                  'related_bills', 'name', 'chamber', 'documents', 'session',
                  'sources', 'sponsors', 'summaries', 'subject', 'title',
                  '_openstates_id', 'type', 'versions', 'jurisdiction_id',
-                 'identifiers')
+                 'organization', 'organization_id', 'identifiers')
 
-    def __init__(self, name, session, title, type=None, **kwargs):
+    def __init__(self, name, session, title, organization, type=None, **kwargs):
         super(Bill, self).__init__()
 
         self.name = name
@@ -35,6 +35,7 @@ class Bill(BaseModel):
         self.title = title
         self.chamber = None
         self.type = _cleanup_list(type, ['bill'])
+        self.organization = organization
 
         self.actions = []
         self.other_names = []
