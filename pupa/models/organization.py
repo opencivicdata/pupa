@@ -16,8 +16,9 @@ class Organization(BaseModel):
                    'start_date', 'chamber', 'division_id',
                    'num_seats')
 
-    _type = "organization"
+    _type = 'organization'
     _schema = schema
+    _collection = 'organizations'
 
     def __init__(self, name, **kwargs):
         """

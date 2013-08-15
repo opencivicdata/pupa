@@ -1,5 +1,6 @@
 import uuid
 from .utils import DatetimeValidator
+from pupa.core import db
 
 
 class BaseModel(object):
@@ -23,6 +24,8 @@ class BaseModel(object):
         self.sources = []
         self._meta = {}
 
+    # scraping helpers
+
     def add_extra(self, key, value):
         self.extras[key] = value
 
@@ -32,23 +35,13 @@ class BaseModel(object):
     def add_meta_software(self, name):
         self.add_meta('software', name)
 
-    @classmethod
-    def from_mongo(cls, db_obj):
-        db_obj = db_obj.copy()
-        _type = db_obj.pop('_type')
+    def add_source(self, url, note=None, **kwargs):
+        """ Add a source URL from which data was collected """
+        new = kwargs.copy()
+        new.update({'url': url, 'note': note})
+        self.sources.append(new)
 
-        # hack to get location set correctly since constructor mangles it
-        if _type == 'event':
-            location = db_obj.pop('location')
-            db_obj['location'] = None
-
-        newobj = cls(**db_obj)
-
-        # set correct location object after creation
-        if _type == 'event':
-            newobj.location = location
-
-        return newobj
+    # validation
 
     def validate(self, schema=None):
         """
@@ -68,6 +61,26 @@ class BaseModel(object):
         validator = DatetimeValidator(required_by_default=False)
         validator.validate(self.as_dict(), schema)
 
+    # from/to dict
+
+    @classmethod
+    def from_dict(cls, db_obj):
+        db_obj = db_obj.copy()
+        _type = db_obj.pop('_type')
+
+        # hack to get location set correctly since constructor mangles it
+        if _type == 'event':
+            location = db_obj.pop('location')
+            db_obj['location'] = None
+
+        newobj = cls(**db_obj)
+
+        # set correct location object after creation
+        if _type == 'event':
+            newobj.location = location
+
+        return newobj
+
     def as_dict(self):
         d = {}
         all_slots = set(self.__slots__)
@@ -81,8 +94,6 @@ class BaseModel(object):
         d['_type'] = self._type
         return d
 
-    def add_source(self, url, note=None, **kwargs):
-        """ Add a source URL from which data was collected """
-        new = kwargs.copy()
-        new.update({'url': url, 'note': note})
-        self.sources.append(new)
+    # database stuff
+    def save(self):
+        db[self._collection].save(self.as_dict())

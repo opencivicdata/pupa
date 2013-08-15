@@ -7,8 +7,9 @@ class Membership(BaseModel):
     A single popolo encoded Membership.
     """
 
-    _type = "membership"
+    _type = 'membership'
     _schema = schema
+    _collection = 'memberships'
     __slots__ = ("organization_id", "person_id", "post_id", "role",
                  "start_date", "end_date", "contact_details", "chamber",
                  'jurisdiction_id', 'unmatched_legislator')

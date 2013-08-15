@@ -19,8 +19,9 @@ class Bill(BaseModel):
     A single OpenCivic bill.
     """
 
-    _type = "bill"
+    _type = 'bill'
     _schema = schema
+    _collection = 'bills'
     __slots__ = ('actions', 'other_names', 'other_titles',
                  'related_bills', 'name', 'chamber', 'documents', 'session',
                  'sources', 'sponsors', 'summaries', 'subject', 'title',

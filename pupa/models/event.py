@@ -58,8 +58,9 @@ class Event(BaseModel):
     """
     Details for an event in .format
     """
-    _type = "event"
+    _type = 'event'
     _schema = schema
+    _collection = 'events'
     __slots__ = ("when", "all_day", "name", "description", "documents",
                  "end", "links", "location", "participants",
                  "agenda", "sources", "status", "type", 'session',

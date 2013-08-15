@@ -5,8 +5,9 @@ from .schemas.vote import schema
 class Vote(BaseModel):
     """
     """
-    _type = "vote"
+    _type = 'vote'
     _schema = schema
+    _collection = 'votes'
     __slots__ = ("session", "chamber", "date", "motion", "type", "passed",
                  "organization", "organization_id", "bill", "vote_counts",
                  "roll_call", "sources", '_openstates_id', 'jurisdiction_id',
