@@ -1,17 +1,19 @@
-from .base import BaseImporter
 from pupa.core import db
+from pupa.models import Organization
+from .base import BaseImporter
 
 
 class OrganizationImporter(BaseImporter):
     _type = 'organization'
+    _model_class = Organization
 
     def get_db_spec(self, org):
-        spec = {'classification': org['classification'],
-                'name': org['name'],
-                'parent_id': org.get('parent_id')}
+        spec = {'classification': org.classification,
+                'name': org.name,
+                'parent_id': org.parent_id}
 
-        if org['classification'] not in ("party", ):  # just party for now
-            spec['jurisdiction_id'] = org['jurisdiction_id']
+        if org.classification not in ("party", ):  # just party for now
+            spec['jurisdiction_id'] = org.jurisdiction_id
 
         return spec
 

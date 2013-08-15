@@ -1,12 +1,13 @@
+from pupa.models import Vote
 from .utils import (people_by_jurisdiction_and_name,
                     orgs_by_jurisdiction_and_name,
                     bills_by_jurisdiction_and_name)
-
 from .base import BaseImporter
 
 
 class VoteImporter(BaseImporter):
     _type = 'vote'
+    _model_class = Vote
 
     def __init__(self, jurisdiction_id, person_importer, org_importer):
         super(VoteImporter, self).__init__(jurisdiction_id)

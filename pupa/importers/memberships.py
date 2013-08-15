@@ -1,13 +1,12 @@
 from .base import BaseImporter
 from .utils import (people_by_jurisdiction, people_by_name,
                     people_by_jurisdiction_and_name)
+from pupa.models import Membership
 from pupa.core import db
 
 
 def match_membership(membership, people=None):
-    if ('unmatched_legislator' in membership
-            and membership['unmatched_legislator']):
-
+    if membership.unmatched_legislator:
         if people is None:
             unmatched_name = membership['unmatched_legislator']['name']
             people = people_by_jurisdiction_and_name(
@@ -27,6 +26,7 @@ def match_membership(membership, people=None):
 
 class MembershipImporter(BaseImporter):
     _type = 'membership'
+    _model_class = Membership
 
     def __init__(self, jurisdiction_id, person_importer, org_importer):
         super(MembershipImporter, self).__init__(jurisdiction_id)
@@ -34,29 +34,24 @@ class MembershipImporter(BaseImporter):
         self.org_importer = org_importer
 
     def get_db_spec(self, membership):
-        spec = {'organization_id': membership['organization_id'],
-                'person_id': membership['person_id'],
-                'role': membership['role'],
+        spec = {'organization_id': membership.organization_id,
+                'person_id': membership.person_id,
+                'role': membership.role,
                 # if this is a historical role, only update historical roles
-                'end_date': membership.get('end_date')}
+                'end_date': membership.end_date}
 
-        if 'post_id' in membership and membership['post_id']:
+        if membership.post_id:
             # The reason for adding this in a conditional is that
             # we may not always know the post in the scraper, but we shouldn't
             # make a mess with membership that have been attached to a post
             # manually. If we know it in the scraper, it better be in the DB!
-            spec['post_id'] = membership['post_id']
+            spec['post_id'] = membership.post_id
 
-        if ('unmatched_legislator' in membership and
-                membership['unmatched_legislator']):
+        if membership.unmatched_legislator:
+            spec['unmatched_legislator'] = membership.unmatched_legislator
+            unmatched_name = membership.unmatched_legislator['name']
 
-            spec['unmatched_legislator'] = membership['unmatched_legislator']
-            unmatched_name = membership['unmatched_legislator']['name']
-
-            people = people_by_jurisdiction_and_name(
-                membership['jurisdiction_id'],
-                unmatched_name,
-            )
+            people = people_by_jurisdiction_and_name(membership.jurisdiction_id, unmatched_name)
 
             matched, membership = match_membership(membership, people=people)
 
@@ -69,15 +64,12 @@ class MembershipImporter(BaseImporter):
 
                 #### This will find anyone who has our ID *OR* has a None.
                 pspec = spec.copy()
-                pspec['person_id'] = membership['person_id']
-                # print("MATCHED", unmatched_name)
+                pspec['person_id'] = membership.person_id
 
-                person = db.people.find_one({"_id": membership['person_id']})
+                person = db.people.find_one({"_id": membership.person_id})
                 if person is None:
                     # Um. OK. This membership is linked to a ghost-person.
-                    print("Warning: %s is linked to an UNKNOWN PERSON" % (
-                        membership['_id']
-                    ))
+                    print("Warning: %s is linked to an UNKNOWN PERSON" % membership['_id'])
                     # The proper behavior here isn't clear. Rather than let
                     # unclean data into the DB, I'm going to break the import
                     # process.

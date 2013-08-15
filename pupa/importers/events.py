@@ -1,10 +1,12 @@
 import datetime
 from pupa.core import db
+from pupa.models import Event
 from .base import BaseImporter
 
 
 class EventImporter(BaseImporter):
     _type = 'event'
+    _model_class = Event
 
     def get_db_spec(self, event):
         spec = {

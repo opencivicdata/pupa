@@ -1,8 +1,10 @@
+from pupa.models import Person
 from .base import BaseImporter, db
 
 
 class PersonImporter(BaseImporter):
     _type = 'person'
+    _model_class = Person
 
     def __init__(self, jurisdiction_id):
         super(PersonImporter, self).__init__(jurisdiction_id)
@@ -16,31 +18,13 @@ class PersonImporter(BaseImporter):
         return obj
 
     def get_db_spec(self, person):
-        spec = {'$or': [{'name': person['name']},
-                        {'other_names': person['name']}],
+        spec = {'$or': [{'name': person.name},
+                        {'other_names': person.name}],
                 '_id': {'$in': self.person_ids}}
 
-        if 'chamber' in person:
-            spec['chamber'] = person['chamber']
-
-        if 'post_id' in person:
-            spec['post_id'] = person['post_id']
+        if person.chamber:
+            spec['chamber'] = person.chamber
+        if person.post_id:
+            spec['post_id'] = person.post_id
 
         return spec
-
-    def preimport_hook(self, db_obj, obj):
-        """
-        This pre-import hook runs on a person to ensure that the other_name
-        field is merged, since it may have entries in the database already.
-
-        Currently we only merge other_names.
-        """
-
-        MERGE_FIELDS = ["other_names"]
-
-        if db_obj:
-            for field in MERGE_FIELDS:
-                if field in db_obj and field in obj:
-                    for entry in db_obj[field]:
-                        if entry not in obj[field]:
-                            obj[field].append(entry)

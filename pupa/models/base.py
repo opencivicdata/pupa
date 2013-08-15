@@ -97,3 +97,15 @@ class BaseModel(object):
     # database stuff
     def save(self):
         db[self._collection].save(self.as_dict())
+
+
+    # operators
+
+    def __eq__(self, other):
+        """ equality requires all fields to be equal except for the _id """
+        sd = self.as_dict()
+        od = other.as_dict()
+        sd.pop('_id')
+        od.pop('_id')
+        return sd == od
+
