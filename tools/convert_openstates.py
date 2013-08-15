@@ -372,8 +372,9 @@ def migrate_people(state):
         for key, value in entry.items():
             if key in blacklist or not value:  # or key.startswith("_"):
                 continue
-            print key
             who.extras[key] = value
+
+        who.add_meta('locked_fields', entry.get('_locked_fields', []))
 
         chamber = entry.get('chamber')
         if chamber == "joint":
