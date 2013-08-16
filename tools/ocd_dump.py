@@ -12,7 +12,7 @@ parser.add_argument('jurisdiction', type=str, help='jurisdiction_id to dump',
 parser.add_argument('--server', type=str, help='Mongo Server',
                     default="localhost")
 parser.add_argument('--database', type=str, help='Mongo Database',
-                    default="larvae")
+                    default="opencivicdata")
 parser.add_argument('--port', type=int, help='Mongo Server Port',
                     default=27017)
 parser.add_argument('--output', type=str, help='Output Directory',

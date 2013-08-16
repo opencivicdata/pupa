@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 
-from larvae.organization import Organization
-from larvae.membership import Membership
-from larvae.person import Person
-from larvae.event import Event
-from larvae.vote import Vote
-from larvae.bill import Bill
+from pupa.models import Organization, Membership, Person, Event, Vote, Bill
 
 from collections import defaultdict
 from pymongo import Connection
