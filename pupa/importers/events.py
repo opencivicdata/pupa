@@ -10,9 +10,9 @@ class EventImporter(BaseImporter):
 
     def get_db_spec(self, event):
         spec = {
-            "description": event['description'],
-            "when": event['when'],
-            'jurisdiction_id': event['jurisdiction_id'],
+            "description": event.description,
+            "when": event.when,
+            'jurisdiction_id': event.jurisdiction_id,
         }
         return spec
 
@@ -20,7 +20,7 @@ class EventImporter(BaseImporter):
 
         def person(obj, what):
             spec = {}
-            spec['session'] = obj['session']
+            spec['session'] = obj.session
             if 'chamber' in what:
                 spec['chamber'] = what['chamber']
             spec['name'] = what['name']
@@ -57,7 +57,7 @@ class EventImporter(BaseImporter):
             for entity in item['related_entities']:
                 handler = spec_generators[entity['type']]
                 spec = handler(obj, entity)
-                spec['jurisdiction_id'] = obj['jurisdiction_id']
+                spec['jurisdiction_id'] = obj.jurisdiction_id
                 rel_obj = db.events.find_one(spec)
                 if rel_obj:
                     entity['id'] = rel_obj['_id']
@@ -67,7 +67,7 @@ class EventImporter(BaseImporter):
 
         # update time
         obj['when'] = datetime.datetime.fromtimestamp(obj['when'])
-        if 'end' in obj and obj['end']:
+        if obj.get('end'):
             obj['end'] = datetime.datetime.fromtimestamp(obj['end'])
         # TODO: handle timezones better
 
