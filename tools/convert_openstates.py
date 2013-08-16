@@ -886,7 +886,7 @@ if __name__ == "__main__":
     parser.add_argument('--ocd-server', type=str, help='OCD Mongo Server',
                         default="localhost")
     parser.add_argument('--ocd-database', type=str, help='OCD Mongo Database',
-                        default="larvae")
+                        default="opencivicdata")
     parser.add_argument('--ocd-port', type=int, help='OCD Mongo Server Port',
                         default=27017)
 
