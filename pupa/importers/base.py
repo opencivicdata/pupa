@@ -56,7 +56,6 @@ def update_object(old, new):
             continue
 
         if getattr(old, key) != value:
-            print 'changed', key, 'from', old, 'to', value
             setattr(old, key, value)
             updated = True
 
