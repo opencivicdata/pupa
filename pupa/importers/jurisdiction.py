@@ -4,6 +4,7 @@ import datetime
 from pupa.core import db
 from pupa.models import Organization
 from pupa.models.utils import DatetimeValidator
+from pupa.models.schemas.metadata import schema as metadata_schema
 
 
 def import_jurisdiction(org_importer, jurisdiction):
@@ -15,9 +16,6 @@ def import_jurisdiction(org_importer, jurisdiction):
 
     # validate metadata
     validator = DatetimeValidator()
-    with open(os.path.join(os.path.dirname(__file__),
-                           '../schemas/metadata.json')) as f:
-        metadata_schema = json.load(f)
     try:
         validator.validate(metadata, metadata_schema)
     except ValueError as ve:
