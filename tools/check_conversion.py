@@ -156,6 +156,9 @@ class ConvertedBill(Converted):
                     identifiers.remove(data)
         assert identifiers == []
 
+    def check_chamber(self):
+        assert self.new['chamber'] == self.old['chamber']
+
 
 class ConvertedVote(Converted):
     '''
