@@ -19,8 +19,8 @@ schema = {
     "terms": { "type": "array", "minItems": 1, "items":
       {"type":"object", "properties": {
         "name": {"type": "string"},
-        "start_year": {"type": "integer", "minimum": 1900, "maximum": 2020},
-        "end_year": {"type": "integer", "minimum": 1900, "maximum": 2030},
+        "start_year": {"type": "integer", "minimum": 1000, "maximum": 2020},
+        "end_year": {"type": "integer", "minimum": 1000, "maximum": 2030},
         "sessions": {"type": "array", "minItems": 1, "items": {"type": "string"}}
       }}},
     "session_details": { "type": "object",
