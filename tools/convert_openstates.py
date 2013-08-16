@@ -365,13 +365,16 @@ def migrate_people(state):
                      "active", "old_roles", "_locked_fields", "created_at",
                      "updated_at", "transparencydata_id", "votesmart_id",
                      "leg_id", "email", "phone", "fax", "_scraped_name",
-                     "_id", "_all_ids", "full_name",]
+                     "_id", "_all_ids", "full_name", "country", "level",
+                     "office_address", "suffixes", "_type"]
         # The above is a list of keys we move over by hand later.
 
         for key, value in entry.items():
             if key in blacklist or not value:  # or key.startswith("_"):
                 continue
             who.extras[key] = value
+
+        who.add_meta('locked_fields', entry.get('_locked_fields', []))
 
         chamber = entry.get('chamber')
         if chamber == "joint":
@@ -418,6 +421,11 @@ def migrate_people(state):
                     m.add_contact_detail(type=key,
                                          value=entry[key],
                                          note=key)
+
+            if entry.get("office_address"):
+                m.add_contact_detail(type='office',
+                                     value=entry['office_address'],
+                                     note='Office Address')
 
             for office in entry.get('offices', []):
                 note = office['name']
@@ -522,7 +530,7 @@ def migrate_bills(state):
                      "versions", "sources", "state", "action_dates",
                      "documents", "level", "country", "alternate_titles",
                      "subjects", "_id", "type", "_type", "_term", "_all_ids",
-                     "summary"]
+                     "summary", "_current_term", "_current_session"]
 
         for key, value in bill.items():
             if key in blacklist or not value:  # or key.startswith("_"):
