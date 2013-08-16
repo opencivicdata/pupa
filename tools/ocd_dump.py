@@ -12,7 +12,7 @@ parser.add_argument('jurisdiction', type=str, help='jurisdiction_id to dump',
 parser.add_argument('--server', type=str, help='Mongo Server',
                     default="localhost")
 parser.add_argument('--database', type=str, help='Mongo Database',
-                    default="larvae")
+                    default="opencivicdata")
 parser.add_argument('--port', type=int, help='Mongo Server Port',
                     default=27017)
 parser.add_argument('--output', type=str, help='Output Directory',
@@ -77,7 +77,7 @@ if not os.path.exists(path):
 
 def dump_people(where):
     orga = db.organizations.find_one({"jurisdiction_id": where,
-                                      "classification": "jurisdiction"})
+                                      "classification": "legislature"})
     if orga is None:
         raise Exception("Org came back none for %s" % (where))
 
@@ -130,7 +130,7 @@ with cd(path):
         dump_juris(jurisdiction)
     else:
         for orga in db.organizations.find({
-            "classification": "jurisdiction"
+            "classification": "jurisdiction",
         }):
             if 'jurisdiction_id' not in orga:
                 print "WARNING: NO JURISDICTION_ID ON %s" % (orga['_id'])

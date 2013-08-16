@@ -1,16 +1,17 @@
 from pupa.core import db
 from pupa.utils import fix_bill_id
+from pupa.models import Bill
 from .base import BaseImporter
 
 
 class BillImporter(BaseImporter):
     _type = 'bill'
+    _model_class = Bill
 
     def get_db_spec(self, bill):
         spec = {'jurisdiction_id': bill['jurisdiction_id'],
                 'session': bill['session'],
-                'name': bill['name'],
-               }
+                'name': bill['name']}
         if 'chamber' in bill:
             spec['chamber'] = bill['chamber']
         return spec

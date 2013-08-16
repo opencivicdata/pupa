@@ -37,3 +37,22 @@ def check(db):
                     tagname='membership-without-an-organization',
                     severity='important',
                     data=membership)
+
+    for membership in db.memberships.find({
+        "unmatched_legislator.name": {"$ne": None},
+        "person_id": {"$ne": None}}
+    ):
+        person = db.people.find_one({"_id": membership['person_id']})
+        name = membership['unmatched_legislator']['name']
+        if name not in person['other_names'] and name != person['name']:
+            yield Check(collection='memberships',
+                        id=membership['_id'],
+                        tagname='membership-badly-linked',
+                        severity='grave',
+                        data=membership)
+
+        yield Check(collection='memberships',
+                    id=membership['_id'],
+                    tagname='membership-linked-but-unlinked-data',
+                    severity='important',
+                    data=membership)

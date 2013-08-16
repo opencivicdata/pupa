@@ -2,7 +2,9 @@ import os
 import json
 import datetime
 from pupa.core import db
-from larvae.utils import DatetimeValidator
+from pupa.models import Organization
+from pupa.models.utils import DatetimeValidator
+from pupa.models.schemas.metadata import schema as metadata_schema
 
 
 def import_jurisdiction(org_importer, jurisdiction):
@@ -14,9 +16,6 @@ def import_jurisdiction(org_importer, jurisdiction):
 
     # validate metadata
     validator = DatetimeValidator()
-    with open(os.path.join(os.path.dirname(__file__),
-                           '../schemas/metadata.json')) as f:
-        metadata_schema = json.load(f)
     try:
         validator.validate(metadata, metadata_schema)
     except ValueError as ve:
@@ -25,16 +24,12 @@ def import_jurisdiction(org_importer, jurisdiction):
     db.metadata.save(metadata)
 
     # create organization
-    org = {'_type': 'organization',
-           'classification': 'jurisdiction',
-           'parent_id': None,
-           'jurisdiction_id': jurisdiction.jurisdiction_id,
-           'name': metadata['name']
-          }
+    org = Organization(name=metadata['name'], classification='jurisdiction',
+                       jurisdiction_id=jurisdiction.jurisdiction_id)
     if 'other_names' in metadata:
-        org['other_names'] = metadata['other_names']
+        org.other_names = metadata['other_names']
     if 'parent_id' in metadata:
-        org['parent_id'] = metadata['parent_id']
+        org.parent_id = metadata['parent_id']
 
     org_importer.import_object(org)
 
@@ -43,5 +38,5 @@ def import_jurisdiction(org_importer, jurisdiction):
         org = {'_type': 'organization',
                'classification': 'party',
                'name': party['name'],
-               'parent_id': None }
+               'parent_id': None}
         org_importer.import_object(org)

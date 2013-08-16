@@ -1,8 +1,8 @@
 import mock
 from nose.tools import assert_equal, assert_in, assert_raises
 
-from larvae.person import Person
-from larvae.organization import Organization
+from pupa.models.person import Person
+from pupa.models.organization import Organization
 from pupa.scrape.base import Scraper
 
 
