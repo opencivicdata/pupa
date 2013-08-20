@@ -81,6 +81,9 @@ class BaseImporter(object):
         self.critical = self.logger.critical
 
     def import_object(self, obj):
+        if isinstance(obj, dict):
+            raise ValueError("It appears that we're trying to import a dict.")
+
         spec = self.get_db_spec(obj)
 
         db_obj = self.collection.find_one(spec)

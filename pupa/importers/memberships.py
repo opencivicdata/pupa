@@ -18,8 +18,8 @@ def match_membership(membership, people=None):
             person = people[0]
             #   + update membership with this person's details (if it's
             #     not there already)
-            membership['person_id'] = person['_id']
-            membership.pop('unmatched_legislator')
+            membership.person_id = person['_id']
+            membership.unmatched_legislator = None
             return (True, membership)
     return (False, membership)
 
