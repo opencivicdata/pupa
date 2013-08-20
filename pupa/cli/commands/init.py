@@ -38,4 +38,5 @@ class Command(BaseCommand):
         self.enable_debug(args.debug)
         pupa_dir = dirname(abspath(__file__))
         example_dir = join(pupa_dir, '../../../example')
-        shutil.copytree(example_dir, args.module)
+        ignore = shutil.ignore_patterns('*.pyc', '__pycache__')
+        shutil.copytree(example_dir, args.module, ignore=ignore)
