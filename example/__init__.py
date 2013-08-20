@@ -1,5 +1,6 @@
-from pupa.scrape import Jurisdiction, Scraper, Legislator
-from pupa.models.organization import Organization
+from pupa.scrape import Jurisdiction
+
+from .people import PersonScraper
 
 
 class Example(Jurisdiction):
@@ -30,28 +31,8 @@ class Example(Jurisdiction):
 
     def get_scraper(self, term, session, scraper_type):
         if scraper_type == 'people':
-            return ExamplePersonScraper
+            return PersonScraper
 
     def scrape_session_list(self):
         return ['2013']
 
-
-class ExamplePersonScraper(Scraper):
-
-    def get_people(self):
-        # committee
-        tech = Organization('Technology', classification='committee')
-        tech.add_post('Chairman', 'chairman')
-        yield tech
-
-        # subcommittee
-        ecom = Organization('Subcommittee on E-Commerce',
-                            parent=tech,
-                            classification='committee')
-        yield ecom
-
-        p = Legislator('Paul Tagliamonte', district='6', chamber='upper',
-                       party='Independent')
-        p.add_committee_membership('Finance')
-        p.add_membership(tech, role='chairman')
-        yield p
