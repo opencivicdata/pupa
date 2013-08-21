@@ -1,5 +1,5 @@
 from pupa.scrape import Scraper
-from pupa.models.organization import Legislator, Organization
+from pupa.models import Person, Organization
 
 
 class PersonScraper(Scraper):
@@ -16,7 +16,7 @@ class PersonScraper(Scraper):
                             classification='committee')
         yield ecom
 
-        p = Legislator('Paul Tagliamonte', district='6', chamber='upper',
+        p = Person('Paul Tagliamonte', district='6', chamber='upper',
                        party='Independent')
         p.add_committee_membership('Finance')
         p.add_membership(tech, role='chairman')
