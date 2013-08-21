@@ -4,7 +4,7 @@ from .people import PersonScraper
 
 
 class Example(Jurisdiction):
-    jurisdiction_id = 'ex'
+    jurisdiction_id = 'ocd-jurisdiction/country:us/state:ex/place:example'
 
     def get_metadata(self):
         return {
