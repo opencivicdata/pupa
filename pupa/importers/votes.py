@@ -14,12 +14,12 @@ class VoteImporter(BaseImporter):
         self.person_importer = person_importer
         self.org_importer = org_importer
 
-    def get_db_spec(self, event):
+    def get_db_spec(self, vote):
         spec = {
-            "motion": event['motion'],
-            "chamber": event['chamber'],
-            "date": event['date'],
-            "jurisdiction_id": event['jurisdiction_id'],
+            "motion": vote.motion,
+            "chamber": vote.chamber,
+            "date": vote.date,
+            "jurisdiction_id": vote.jurisdiction_id,
         }
         return spec
 

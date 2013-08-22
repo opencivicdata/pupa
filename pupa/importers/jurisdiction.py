@@ -35,8 +35,8 @@ def import_jurisdiction(org_importer, jurisdiction):
 
     # create parties
     for party in metadata['parties']:
-        org = {'_type': 'organization',
-               'classification': 'party',
-               'name': party['name'],
-               'parent_id': None}
+        org = Organization(**{#'_type': 'organization',
+                              'classification': 'party',
+                              'name': party['name'],
+                              'parent_id': None})
         org_importer.import_object(org)
