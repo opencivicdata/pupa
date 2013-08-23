@@ -19,7 +19,6 @@ class PersonScraper(Scraper):
         yield ecom
 
         p = Person('Paul Tagliamonte', district='6', chamber='upper')
-        p.add_committee_membership('Finance')
         p.add_membership(tech, role='chairman')
         p.add_source('https://example.com')
         yield p
