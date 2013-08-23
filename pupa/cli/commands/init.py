@@ -39,4 +39,8 @@ class Command(BaseCommand):
         pupa_dir = dirname(abspath(__file__))
         example_dir = join(pupa_dir, '../../../example')
         ignore = shutil.ignore_patterns('*.pyc', '__pycache__')
-        shutil.copytree(example_dir, args.module, ignore=ignore)
+        try:
+            shutil.copytree(example_dir, args.module, ignore=ignore)
+        except OSError as exc:
+            if exc.errno:
+                print('Error: the folder %r already exists.' % args.module)
