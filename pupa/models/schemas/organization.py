@@ -1,6 +1,6 @@
 from .common import links, contact_details, identifiers, other_names, sources
 
-CLASSIFICATIONS = ['legislature', 'party', 'committee', 'commission']
+CLASSIFICATIONS = ['jurisdiction', 'legislature', 'party', 'committee', 'commission']
 
 schema = {
     "properties": {
