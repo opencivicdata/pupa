@@ -12,8 +12,10 @@ class BillImporter(BaseImporter):
         spec = {'jurisdiction_id': bill.jurisdiction_id,
                 'session': bill.session,
                'name': bill.name,}
-        if bill.chamber is not None:
+
+        if hasattr(bill, 'chamber') and bill.chamber is not None:
             spec['chamber'] = bill.chamber
+
         return spec
 
     def prepare_object_from_json(self, obj):
