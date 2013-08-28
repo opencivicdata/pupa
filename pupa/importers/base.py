@@ -55,7 +55,8 @@ def update_object(old, new):
         if key in locked_fields or key == '_id':
             continue
 
-        if getattr(old, key) != value:
+        if not hasattr(old, key) or getattr(old, key) != value:
+            # If we have a *new* value, let's update.
             setattr(old, key, value)
             updated = True
 
