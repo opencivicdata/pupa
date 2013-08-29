@@ -9,9 +9,12 @@ class VoteImporter(BaseImporter):
     _type = 'vote'
     _model_class = Vote
 
-    def __init__(self, jurisdiction_id, person_importer, org_importer):
+    def __init__(self, jurisdiction_id,
+                 person_importer, org_importer, bill_importer):
+
         super(VoteImporter, self).__init__(jurisdiction_id)
         self.person_importer = person_importer
+        self.bill_importer = bill_importer
         self.org_importer = org_importer
 
     def get_db_spec(self, vote):
@@ -26,15 +29,22 @@ class VoteImporter(BaseImporter):
     def prepare_object_from_json(self, obj):
         bill = obj.get('bill', None)
         if bill:
-            bills = bills_by_jurisdiction_and_name(
-                obj['jurisdiction_id'],
-                bill['name'],
-            )
-            if bills.count() != 1:
-                self.warning("Can't resolve bill `%s'" % (bill['name']))
+            if bill.get('id'):
+                # We've been given a hard ID. Let's use it to match against
+                # the real bill. (since the scraper knew what they were doing)
+                bill['id'] = self.bill_importer.resolve_json_id(bill['id'])
             else:
-                bill_obj = bills[0]
-                bill['id'] = bill_obj['_id']
+                # OK. Right. We weren't given an ID. Let's try to do a
+                # match by name.
+                bills = bills_by_jurisdiction_and_name(
+                    obj['jurisdiction_id'],
+                    bill['name'],
+                )
+                if bills.count() != 1:
+                    self.warning("Can't resolve bill `%s'" % (bill['name']))
+                else:
+                    bill_obj = bills[0]
+                    bill['id'] = bill_obj['_id']
 
         for vote in obj['roll_call']:
             who = vote['person']
