@@ -53,6 +53,11 @@ class Vote(BaseModel):
             "chamber": chamber
         }
 
+    def set_bill(self, bill):
+        self.add_bill(name=bill.name, id=bill._id)
+        if hasattr(bill, 'chamber') and bill.chamber:
+            self.bill['chamber'] = bill.chamber
+
     def vote(self, name, how, id=None):
         self.roll_call.append({
             "vote_type": how,
