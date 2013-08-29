@@ -52,7 +52,8 @@ class Vote(BaseModel):
         COMPLEX BEHAVIOR AHOY:
 
             If `what` is a `Bill` object, this will correctly link without
-            needing *anything* else.
+            needing *anything* else. Adding `id` or `chamber` will result in
+            a `TypeError` being raised.
 
             If `what` is not a `Bill` object, this will set `bill.name` to this
             value, and apply the rest of the keywords to the `bill` attribute.
