@@ -17,6 +17,7 @@ from pupa.importers.memberships import MembershipImporter
 from pupa.importers.events import EventImporter
 from pupa.importers.bills import BillImporter
 from pupa.importers.votes import VoteImporter
+from pupa.scrape import Jurisdiction
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')
@@ -85,9 +86,14 @@ class Command(BaseCommand):
         # get the jurisdiction object
         module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
-            if getattr(obj, 'jurisdiction_id', None):
-                # instantiate the class
-                return obj()
+            if (getattr(obj, 'jurisdiction_id', None) and
+                    issubclass(obj, Jurisdiction)):
+                # In the case of top-level scraper classes, the scraper objects
+                # will have a jurisdiction_id, but not actually be
+                # jurisdictions. As a result, we should ensure all objects we
+                # pick up are actually Jurisdiction subclasses.
+
+                return obj()  # instantiate the class
 
         raise UpdateError('unable to import Jurisdiction subclass from ' +
                           module_name)
