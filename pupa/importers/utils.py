@@ -35,7 +35,8 @@ def people_by_name(name, people_ids=None, **kwargs):
     spec = kwargs.copy()
     spec.update({"$or": [
         { "name": name },
-        { "other_names.name": name }
+        { "other_names.name": name },
+        { "identifiers.identifier": name },
     ]})
     if people_ids is not None:
         # This isn't a raw if conditional, since you could pass
@@ -49,7 +50,9 @@ def bills_by_name(name, bill_ids=None, **kwargs):
     spec = kwargs.copy()
     spec.update({"$or": [
         { "name": name },
+        { "bill_id": name },
         { "alternate_titles.title": name },
+        { "alternate_bill_ids.bill_id": name },
     ]})
     if bill_ids is not None:
         # This isn't a raw if conditional, since you could pass

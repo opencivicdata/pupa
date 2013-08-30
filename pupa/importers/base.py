@@ -55,7 +55,8 @@ def update_object(old, new):
         if key in locked_fields or key == '_id':
             continue
 
-        if getattr(old, key) != value:
+        if not hasattr(old, key) or getattr(old, key) != value:
+            # If we have a *new* value, let's update.
             setattr(old, key, value)
             updated = True
 
@@ -81,6 +82,9 @@ class BaseImporter(object):
         self.critical = self.logger.critical
 
     def import_object(self, obj):
+        if isinstance(obj, dict):
+            raise ValueError("It appears that we're trying to import a dict.")
+
         spec = self.get_db_spec(obj)
 
         db_obj = self.collection.find_one(spec)
@@ -137,7 +141,7 @@ class BaseImporter(object):
             # result in an unresolvable id
             parent_id = getattr(obj, 'parent_id', None)
             if parent_id:
-                obj['parent_id'] = self.resolve_json_id(parent_id)
+                obj.parent_id = self.resolve_json_id(parent_id)
 
             self.json_to_db_id[json_id] = self.import_object(obj)
 

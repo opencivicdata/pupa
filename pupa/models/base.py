@@ -73,6 +73,18 @@ class BaseModel(object):
             location = db_obj.pop('location')
             db_obj['location'] = None
 
+        if _type == 'vote':
+            # Hack to deal with Vote mangling. We abstract away the 
+            # counts so that scrapers don't have to deal with it. This
+            # isn't great, but kinda needed.
+            counts = db_obj['vote_counts']
+            for count in counts:
+                db_obj[{
+                    "yes": "yes_count",
+                    "no": "no_count",
+                    "other": "other_count"
+                }[count['vote_type']]] = count['count']
+
         newobj = cls(**db_obj)
 
         # set correct location object after creation

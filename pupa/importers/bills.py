@@ -9,11 +9,13 @@ class BillImporter(BaseImporter):
     _model_class = Bill
 
     def get_db_spec(self, bill):
-        spec = {'jurisdiction_id': bill['jurisdiction_id'],
-                'session': bill['session'],
-                'name': bill['name']}
-        if 'chamber' in bill:
-            spec['chamber'] = bill['chamber']
+        spec = {'jurisdiction_id': bill.jurisdiction_id,
+                'session': bill.session,
+               'name': bill.name,}
+
+        if hasattr(bill, 'chamber') and bill.chamber is not None:
+            spec['chamber'] = bill.chamber
+
         return spec
 
     def prepare_object_from_json(self, obj):

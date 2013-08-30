@@ -17,6 +17,7 @@ setup(name='pupa',
       entry_points='''[console_scripts]
 pupa = pupa.cli.__main__:main''',
       install_requires=[
+          'six',
           'pymongo>=2.5',
           'scrapelib>=0.8',
           'validictory>=0.9',

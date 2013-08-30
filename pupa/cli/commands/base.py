@@ -3,7 +3,7 @@
 class BaseCommand(object):
 
     def __init__(self, subparsers):
-        self.subparser = subparsers.add_parser(self.name, help=self.help)
+        self.subparser = subparsers.add_parser(self.name, description=self.help)
         self.add_args()
 
     def add_args(self):

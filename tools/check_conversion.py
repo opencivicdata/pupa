@@ -156,15 +156,24 @@ class ConvertedBill(Converted):
                     identifiers.remove(data)
         assert identifiers == []
 
+    def check_chamber(self):
+        assert self.new['chamber'] == self.old['chamber']
+
 
 class ConvertedVote(Converted):
     '''
     Possibly legitimate:
-    - chamber:
-    -
+    - bill_chamber: get copied to bill.chamber (currently None) i.e., 'ocd-vote/bc60ab4a-fac2-11e2-a853-f0def1bd785e'
+    - sources.retrieved: large number of bills have this timestamp in sources dicts--not getting copied
+    - committee: set to the committee name on some votes--not getting copied
+    - committee_id: small number of bills have this--not copied
 
     False negatives:
-
+    - date: string in new database, timestampy in old.
+    - state --> division_id
+    - other_votes.leg_id --> using ocd ids instead.
+    - no_votes.leg_id --> using ocd ids instead.
+    - yes_votes.leg_id --> using ocd ids instead.
     '''
 
 

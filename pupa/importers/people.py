@@ -22,9 +22,10 @@ class PersonImporter(BaseImporter):
                         {'other_names': person.name}],
                 '_id': {'$in': self.person_ids}}
 
-        if person.chamber:
+        if hasattr(person, 'chamber') and person.chamber is not None:
             spec['chamber'] = person.chamber
-        if person.post_id:
+
+        if hasattr(person, 'post_id') and person.post_id is not None:
             spec['post_id'] = person.post_id
 
         return spec
