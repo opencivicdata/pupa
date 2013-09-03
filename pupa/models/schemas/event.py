@@ -4,9 +4,6 @@
 
 from .common import sources
 
-
-# == Reused Schemas ==
-
 # **media_schema** - This "special" schema is used in two places in the
 # Event scema, on the top level and inside the agenda item. This is an
 # optional component that may be omited entirely from a document.
