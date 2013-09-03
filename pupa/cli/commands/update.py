@@ -167,7 +167,8 @@ class Command(BaseCommand):
                                                  person_importer,
                                                  org_importer)
 
-        bill_importer = BillImporter(juris.jurisdiction_id)
+        bill_importer = BillImporter(juris.jurisdiction_id,
+                                     org_importer)
 
         vote_importer = VoteImporter(juris.jurisdiction_id,
                                      person_importer,

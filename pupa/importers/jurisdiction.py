@@ -24,7 +24,7 @@ def import_jurisdiction(org_importer, jurisdiction):
     db.metadata.save(metadata)
 
     # create organization
-    org = Organization(name=metadata['name'], classification='jurisdiction',
+    org = Organization(name=metadata['name'], classification='legislature',
                        jurisdiction_id=jurisdiction.jurisdiction_id)
     if 'other_names' in metadata:
         org.other_names = metadata['other_names']
