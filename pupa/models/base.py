@@ -85,7 +85,22 @@ class BaseModel(object):
                     "other": "other_count"
                 }[count['vote_type']]] = count['count']
 
-        newobj = cls(**db_obj)
+        try:
+            newobj = cls(**db_obj)
+        except TypeError:
+            # OK. Let's try to save some good debug information.
+            print("Error: Signature doesn't match object on disk.")
+            print("We're trying to create a: %s" % (cls.__name__))
+            print("Dump of keys from object:")
+            for key in db_obj.keys():
+                print("  %s" % (key))
+            print("This can mean that you have a stale scraped_data folder")
+            print("Please remove it and re-try the scrape.")
+            print("")
+            print("Object in question:")
+            print("  %s" % (db_obj['_id']))
+            print("")
+            raise
 
         # set correct location object after creation
         if _type == 'event':
