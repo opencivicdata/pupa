@@ -14,6 +14,8 @@ class Jurisdiction(object):
     capitol_maps = []
     provides = []
     parties = []
+    other_names = []
+    parent_id = None
     _ignored_scraped_sessions = []
 
     _party_cache = {}
@@ -22,6 +24,7 @@ class Jurisdiction(object):
         return {'name': self.name,
                 'url': self.url,
                 'chambers': self.chambers,
+                'terms': self.terms,
                 'session_details': self.session_details,
                 'feature_flags': self.feature_flags,
                 'capitol_maps': self.capitol_maps}

@@ -25,9 +25,9 @@ schema = {
         "session_details": { "type": "object",
           "additionalProperties": { "type": "object",
             "properties": {
-              "type": {"type": "string" },
-              "start_date": {"type": ["datetime", "null"] },
-              "end_date": {"type": ["datetime", "null"] }
+              "type": {"type": "string", "required": False },
+              "start_date": {"type": ["datetime"], "required": False },
+              "end_date": {"type": ["datetime"], "required": False }
             }
           }
         },

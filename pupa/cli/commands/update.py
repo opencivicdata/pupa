@@ -3,6 +3,7 @@ import os
 import sys
 import glob
 import importlib
+import warnings
 import traceback
 from collections import defaultdict
 from functools import reduce
@@ -93,7 +94,20 @@ class Command(BaseCommand):
                 # jurisdictions. As a result, we should ensure all objects we
                 # pick up are actually Jurisdiction subclasses.
 
-                return obj()  # instantiate the class
+                # instantiate the class
+                retobj = obj()
+                if hasattr(retobj, 'get_metadata'):
+                    warnings.warn('Jurisdiction class uses deprecated old-style get_metadata')
+                    metadata = retobj.get_metadata()
+                    retobj.name = metadata['name']
+                    retobj.url = metadata['url']
+                    retobj.terms = metadata['terms']
+                    retobj.provides = metadata['provides']
+                    retobj.parties = metadata['parties']
+                    retobj.session_details = metadata['session_details']
+                    retobj.feature_flags = metadata['feature_flags']
+                return retobj
+
 
         raise UpdateError('unable to import Jurisdiction subclass from ' +
                           module_name)
@@ -178,7 +192,7 @@ class Command(BaseCommand):
 
         report = {}
 
-        # XXX: jurisdiction into report
+        # TODO: jurisdiction into report
         import_jurisdiction(org_importer, juris)
         report.update(org_importer.import_from_json(args.datadir))
         report.update(person_importer.import_from_json(args.datadir))
