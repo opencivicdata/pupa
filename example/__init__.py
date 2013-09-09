@@ -8,9 +8,8 @@ class Example(Jurisdiction):
 
     def get_metadata(self):
         return {
-            'name': 'Example',
-            'legislature_name': 'Example Legislature',
-            'legislature_url': 'http://example.com',
+            'name': 'Example Legislature',
+            'url': 'http://example.com',
             'terms': [{
                 'name': '2013-2014',
                 'sessions': ['2013'],
