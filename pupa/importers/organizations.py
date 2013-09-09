@@ -17,6 +17,29 @@ class OrganizationImporter(BaseImporter):
 
         return spec
 
+    def _resolve_org_by_chamber(self, jurisdiction_id, chamber):
+        """
+        This is used by the Bill importer to match an org purely based on
+        ``chamber`` if it exists.
+        """
+
+        orgs = db.organizations.find({
+            "classification": "legislature",
+            "jurisdiction_id": jurisdiction_id,
+            "chamber": chamber
+        })
+
+        if orgs.count() == 1:
+            return orgs[0]  # Neato! We found one!
+        elif orgs.count() == 0:
+            raise ValueError("Chamber `%s' isn't giving us an org in `%s'" % (
+                chamber, jurisdiction_id
+            ))
+        else:
+            raise ValueError("Chamber `%s' isn't a unique org in `%s'" % (
+                chamber, jurisdiction_id
+            ))
+
     def resolve_json_id(self, json_id):
         # handle special party:* and jurisdiction:* ids first
         for type_, key in (('party', 'name'),
