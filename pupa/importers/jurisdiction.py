@@ -8,23 +8,23 @@ from pupa.models.schemas.jurisdiction import schema as jurisdiction_schema
 
 
 def import_jurisdiction(org_importer, jurisdiction):
-    jurisdiction = jurisdiction.get_metadata()
+    obj = jurisdiction.get_db_object()
 
-    jurisdiction['_type'] = 'jurisdiction'
-    jurisdiction['_id'] = jurisdiction.jurisdiction_id
-    jurisdiction['latest_update'] = datetime.datetime.utcnow()
+    obj['_type'] = 'jurisdiction'
+    obj['_id'] = jurisdiction.jurisdiction_id
+    obj['latest_update'] = datetime.datetime.utcnow()
 
     # validate jurisdiction
     validator = DatetimeValidator()
     try:
-        validator.validate(jurisdiction, jurisdiction_schema)
+        validator.validate(obj, jurisdiction_schema)
     except ValueError as ve:
         raise ve
 
-    db.jurisdictions.save(jurisdiction)
+    db.jurisdictions.save(obj)
 
     # create organization(s) (TODO: if there are multiple chambers this isn't right)
-    org = Organization(name=jurisdiction['name'], classification='legislature',
+    org = Organization(name=jurisdiction.name, classification='legislature',
                        jurisdiction_id=jurisdiction.jurisdiction_id)
     if 'other_names' in jurisdiction:
         org.other_names = jurisdiction['other_names']

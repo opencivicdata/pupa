@@ -111,8 +111,8 @@ class Command(BaseCommand):
         elif term:
             sessions = juris.get_term_details(term)['sessions']
         else:
-            term = juris.metadata['terms'][-1]['name']
-            sessions = juris.metadata['terms'][-1]['sessions']
+            term = juris.terms[-1]['name']
+            sessions = juris.terms[-1]['sessions']
 
         return term, sessions
 
@@ -190,17 +190,15 @@ class Command(BaseCommand):
         return report
 
     def check_session_list(self, juris):
-        metadata = juris.get_metadata()
         sessions = juris.scrape_session_list()
 
         all_sessions_in_terms = list(
-            reduce(lambda x, y: x + y,
-                   [x['sessions'] for x in metadata['terms']])
+            reduce(lambda x, y: x + y, [x['sessions'] for x in juris.terms])
         )
         # copy the list to avoid modifying it
-        session_details = list(metadata.get('_ignored_scraped_sessions', []))
+        session_details = list(juris._ignored_scraped_sessions)
 
-        for k, v in metadata['session_details'].items():
+        for k, v in juris.session_details.items():
             try:
                 all_sessions_in_terms.remove(k)
             except ValueError:
@@ -238,7 +236,7 @@ class Command(BaseCommand):
         # terms, sessions, and object types
         args.term, args.sessions = self.get_timespan(juris, args.term,
                                                      args.sessions)
-        args.scrapers = args.scrapers or juris.metadata['provides']
+        args.scrapers = args.scrapers or juris.provides
 
         # print the plan
         print('module:', args.module)

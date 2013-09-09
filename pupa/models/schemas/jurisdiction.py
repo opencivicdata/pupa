@@ -8,12 +8,11 @@ schema = {
         "chambers": {
              "additionalProperties": {
                  "properties": {
-                     "name": { "required": True, "type": "string" },
-                     "title": { "required": True, "type": "string" }
+                     "name": { "type": "string" },
+                     "title": { "type": "string" }
                  },
                  "type": "object"
              },
-             "required": False,
              "type": "object"
         },
         "terms": { "type": "array", "minItems": 1, "items":
@@ -26,14 +25,14 @@ schema = {
         "session_details": { "type": "object",
           "additionalProperties": { "type": "object",
             "properties": {
-              "type": {"type": "string", "required": False},
-              "start_date": {"type": "datetime", "required": False},
-              "end_date": {"type": "datetime", "required": False}
+              "type": {"type": "string" },
+              "start_date": {"type": ["datetime", "null"] },
+              "end_date": {"type": ["datetime", "null"] }
             }
           }
         },
         "feature_flags": { "type": "array", "items": {"type": "string"}},
-        "capitol_maps": { "type": "array", "required": False, "items":
+        "capitol_maps": { "type": "array", "items":
            {"type":"object", "properties": {
             "name": {"type": "string"}, "url": {"type": "string"}
             }
