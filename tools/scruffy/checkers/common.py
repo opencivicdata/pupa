@@ -12,7 +12,7 @@ ocd_id = re.compile(ocd_id_re)
 def common_checks(obj, singular, plural):
 
     if obj.get('jurisdiction_id'):
-        org = db.metadata.find_one({
+        org = db.jurisdictions.find_one({
             "_id": obj['jurisdiction_id']
         })
         if org is None:

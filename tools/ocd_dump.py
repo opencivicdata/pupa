@@ -87,8 +87,8 @@ def dump_people(where):
         person = normalize_person(person)
         do_write(person, where=where)
 
-def dump_metadata(where):
-    meta = db.metadata.find_one({"_id": where})
+def dump_jurisdiction_data(where):
+    meta = db.jurisdictions.find_one({"_id": where})
     if meta is None:
         return
 
@@ -103,7 +103,7 @@ def dump_metadata(where):
         if key.startswith("_") and key != "_id":
             meta.pop(key)
 
-    path = "%s/metadata.json" % (meta['_id'])
+    path = "%s/jurisdiction.json" % (meta['_id'])
     with open(path, 'w') as fd:
         #print path
         json.dump(meta, fd, cls=JSONEncoderPlus)
@@ -122,7 +122,7 @@ def dump_juris(jurisdiction):
         dump(collection, spec)
 
     dump_people(jurisdiction)
-    dump_metadata(jurisdiction)
+    dump_jurisdiction_data(jurisdiction)
 
 
 with cd(path):

@@ -1,5 +1,5 @@
 schema = {
-    "description": "API metadata response",
+    "description": "Information about a jurisdiction, including session, term, etc. details.",
     "type": "object",
     "properties": {
         "name": {"type": "string",

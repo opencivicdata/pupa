@@ -3,16 +3,16 @@ from .common import common_checks
 
 
 def check(db):
-    for meta in db.metadata.find():
+    for meta in db.jurisdictions.find():
         if (meta['_id'] ==
                 "ocd-jurisdiction/country:us/state:ex/place:example"):
 
-            yield Check(collection='metadata',
+            yield Check(collection='jurisdictions',
                         id=meta['_id'],
-                        tagname='template-data-in-metadata',
+                        tagname='template-data-in-jurisdiction',
                         severity='grave')
 
-        for check in common_checks(meta, 'metadata', 'metadata'):
+        for check in common_checks(meta, 'jurisdiction', 'jurisdictions'):
             yield check
 
         blacklist = [
@@ -24,7 +24,7 @@ def check(db):
 
         for entry in blacklist:
             if entry in meta:
-                yield Check(collection='metadata',
+                yield Check(collection='jurisdictions',
                             id=meta['_id'],
                             tagname='meta-has-%s' % (entry),
                             severity='important')
