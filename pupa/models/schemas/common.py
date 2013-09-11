@@ -22,27 +22,40 @@ contact_details = {
 identifiers = {
     "items": {
         "properties": {
-            "identifier": {"type": "string"},
-            "scheme": {"type": ["string", "null"]},
+            "identifier": {"type": "string",
+                           "description": "The 3rd-party identifier, such as OKL0001000."},
+            "scheme": {"type": ["string", "null"],
+                       "description": "What service this identifier is used by."
+                      },
         }
     },
-    "type": "array"
+    "type": "array",
+    "description": "IDs other than the primary ID that the object may be known by."
 }
 
 other_names = {
     "description": "Alternate or former names for this object.",
     "items": {
         "properties": {
-            "name": {"type": "string"},
+            "name": {"type": "string",
+                     "description": "An alternate name this object is sometimes known by.",
+                    },
             "start_date": {
                 "type": ["string", "null"],
-                "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$"
+                "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
+                "description": ("The date at which this name became valid."
+                                "(null if unknown/valid indefinitely)"),
             },
             "end_date": {
                 "type": ["string", "null"],
-                "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$"
+                "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
+                "description": ("The date at which this name was no longer valid. "
+                                "(null if still valid/valid indefinitely)"),
             },
-            "note": {"type": ["string", "null"]}
+            "note": {"type": ["string", "null"],
+                     "description": ("An optional note describing where this alternate name came "
+                                     "from or its relationship to the entity."),
+                    }
         },
         "type": "object",
     },
