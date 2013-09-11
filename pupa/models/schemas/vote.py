@@ -26,7 +26,7 @@ schema = {
                       "description": "name of the voting organization"},
 
         'organization_id': {"type": ["string", "null"],
-                         "description": "name of the voting organization"},
+                         "description": "id of the voting organization"},
 
         '_type': {"enum": ["vote"], "type": "string",
                "description": "All vote objects must have a _type field set to vote." },
