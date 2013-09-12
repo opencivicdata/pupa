@@ -11,7 +11,7 @@ class Jurisdiction(object):
     terms = None
     session_details = None
     feature_flags = []
-    capitol_maps = []
+    building_maps = []
     provides = []
     parties = []
     other_names = []
@@ -27,7 +27,7 @@ class Jurisdiction(object):
                 'terms': self.terms,
                 'session_details': self.session_details,
                 'feature_flags': self.feature_flags,
-                'capitol_maps': self.capitol_maps}
+                'building_maps': self.building_maps}
 
     def term_for_session(self, session):
         for term in self.terms:
