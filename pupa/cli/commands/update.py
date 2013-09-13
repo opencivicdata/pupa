@@ -3,6 +3,7 @@ import os
 import sys
 import glob
 import importlib
+import warnings
 import traceback
 from collections import defaultdict
 from functools import reduce
@@ -17,6 +18,7 @@ from pupa.importers.memberships import MembershipImporter
 from pupa.importers.events import EventImporter
 from pupa.importers.bills import BillImporter
 from pupa.importers.votes import VoteImporter
+from pupa.scrape import Jurisdiction
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')
@@ -85,9 +87,27 @@ class Command(BaseCommand):
         # get the jurisdiction object
         module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
-            if getattr(obj, 'jurisdiction_id', None):
+            if (getattr(obj, 'jurisdiction_id', None) and
+                    issubclass(obj, Jurisdiction)):
+                # In the case of top-level scraper classes, the scraper objects
+                # will have a jurisdiction_id, but not actually be
+                # jurisdictions. As a result, we should ensure all objects we
+                # pick up are actually Jurisdiction subclasses.
+
                 # instantiate the class
-                return obj()
+                retobj = obj()
+                if hasattr(retobj, 'get_metadata'):
+                    warnings.warn('Jurisdiction class uses deprecated old-style get_metadata')
+                    metadata = retobj.get_metadata()
+                    retobj.name = metadata['name']
+                    retobj.url = metadata['url']
+                    retobj.terms = metadata['terms']
+                    retobj.provides = metadata['provides']
+                    retobj.parties = metadata['parties']
+                    retobj.session_details = metadata['session_details']
+                    retobj.feature_flags = metadata['feature_flags']
+                return retobj
+
 
         raise UpdateError('unable to import Jurisdiction subclass from ' +
                           module_name)
@@ -105,8 +125,8 @@ class Command(BaseCommand):
         elif term:
             sessions = juris.get_term_details(term)['sessions']
         else:
-            term = juris.metadata['terms'][-1]['name']
-            sessions = juris.metadata['terms'][-1]['sessions']
+            term = juris.terms[-1]['name']
+            sessions = juris.terms[-1]['sessions']
 
         return term, sessions
 
@@ -161,17 +181,19 @@ class Command(BaseCommand):
                                                  person_importer,
                                                  org_importer)
 
-        bill_importer = BillImporter(juris.jurisdiction_id)
+        bill_importer = BillImporter(juris.jurisdiction_id,
+                                     org_importer)
 
         vote_importer = VoteImporter(juris.jurisdiction_id,
                                      person_importer,
-                                     org_importer)
+                                     org_importer,
+                                     bill_importer)
 
         event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
 
-        # XXX: jurisdiction into report
+        # TODO: jurisdiction into report
         import_jurisdiction(org_importer, juris)
         report.update(org_importer.import_from_json(args.datadir))
         report.update(person_importer.import_from_json(args.datadir))
@@ -183,17 +205,15 @@ class Command(BaseCommand):
         return report
 
     def check_session_list(self, juris):
-        metadata = juris.get_metadata()
         sessions = juris.scrape_session_list()
 
         all_sessions_in_terms = list(
-            reduce(lambda x, y: x + y,
-                   [x['sessions'] for x in metadata['terms']])
+            reduce(lambda x, y: x + y, [x['sessions'] for x in juris.terms])
         )
         # copy the list to avoid modifying it
-        session_details = list(metadata.get('_ignored_scraped_sessions', []))
+        session_details = list(juris._ignored_scraped_sessions)
 
-        for k, v in metadata['session_details'].items():
+        for k, v in juris.session_details.items():
             try:
                 all_sessions_in_terms.remove(k)
             except ValueError:
@@ -231,7 +251,7 @@ class Command(BaseCommand):
         # terms, sessions, and object types
         args.term, args.sessions = self.get_timespan(juris, args.term,
                                                      args.sessions)
-        args.scrapers = args.scrapers or juris.metadata['provides']
+        args.scrapers = args.scrapers or juris.provides
 
         # print the plan
         print('module:', args.module)

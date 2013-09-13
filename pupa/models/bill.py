@@ -28,7 +28,8 @@ class Bill(BaseModel):
                  '_openstates_id', 'type', 'versions', 'jurisdiction_id',
                  'organization', 'organization_id', 'identifiers')
 
-    def __init__(self, name, session, title, organization, type=None, **kwargs):
+    def __init__(self, name, session, title,
+                 organization=None, type=None, **kwargs):
         super(Bill, self).__init__()
 
         self.name = name

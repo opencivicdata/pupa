@@ -109,7 +109,17 @@ class MembershipImporter(BaseImporter):
 
     def prepare_object_from_json(self, obj):
         org_json_id = obj['organization_id']
-        obj['organization_id'] = self.org_importer.resolve_json_id(org_json_id)
+
+        if org_json_id.startswith("jurisdiction:"):
+            _, jid = org_json_id.split(":", 1)
+            org = self.org_importer._resolve_org_by_chamber(jid, obj['chamber'])
+            if org is None:
+                raise ValueError("Something went wrong with the Jurisidction "
+                                 "import")
+            obj['organization_id'] = org['_id']
+        else:
+            obj['organization_id'] = self.org_importer.resolve_json_id(org_json_id)
+
         person_json_id = obj['person_id']
         obj['person_id'] = self.person_importer.resolve_json_id(person_json_id)
         return obj

@@ -182,7 +182,7 @@ def migrate_legislatures(state):
                        "latest_csv_url", "latest_csv_date",]:
             meta.pop(badtag)
 
-        nudb.metadata.save(meta, safe=True)
+        nudb.jurisdictions.save(meta)
 
 
 
@@ -208,7 +208,7 @@ def lookup_entry_id(collection, openstates_id):
 
 
 def get_current_term(jid):
-    meta = nudb.metadata.find_one({"_id": jid})
+    meta = nudb.jurisdictions.find_one({"_id": jid})
     term = meta['terms'][-1]
     return term
 
@@ -433,7 +433,7 @@ def migrate_people(state):
 
         for session in entry.get('old_roles', []):
             roles = entry['old_roles'][session]
-            meta = nudb.metadata.find_one({"_id": obj_to_jid(who)})
+            meta = nudb.jurisdictions.find_one({"_id": obj_to_jid(who)})
             term = None
 
             for role in roles:

@@ -4,39 +4,38 @@ import datetime
 from pupa.core import db
 from pupa.models import Organization
 from pupa.models.utils import DatetimeValidator
-from pupa.models.schemas.metadata import schema as metadata_schema
+from pupa.models.schemas.jurisdiction import schema as jurisdiction_schema
 
 
 def import_jurisdiction(org_importer, jurisdiction):
-    metadata = jurisdiction.get_metadata()
+    obj = jurisdiction.get_db_object()
 
-    metadata['_type'] = 'metadata'
-    metadata['_id'] = jurisdiction.jurisdiction_id
-    metadata['latest_update'] = datetime.datetime.utcnow()
+    obj['_type'] = 'jurisdiction'
+    obj['_id'] = jurisdiction.jurisdiction_id
+    obj['latest_update'] = datetime.datetime.utcnow()
 
-    # validate metadata
+    # validate jurisdiction
     validator = DatetimeValidator()
     try:
-        validator.validate(metadata, metadata_schema)
+        validator.validate(obj, jurisdiction_schema)
     except ValueError as ve:
         raise ve
 
-    db.metadata.save(metadata)
+    db.jurisdictions.save(obj)
 
-    # create organization
-    org = Organization(name=metadata['name'], classification='jurisdiction',
+    # create organization(s) (TODO: if there are multiple chambers this isn't right)
+    org = Organization(name=jurisdiction.name, classification='legislature',
                        jurisdiction_id=jurisdiction.jurisdiction_id)
-    if 'other_names' in metadata:
-        org.other_names = metadata['other_names']
-    if 'parent_id' in metadata:
-        org.parent_id = metadata['parent_id']
+    if jurisdiction.other_names:
+        org.other_names = jurisdiction.other_names
+    if jurisdiction.parent_id:
+        org.parent_id = jurisdiction.parent_id
 
     org_importer.import_object(org)
 
     # create parties
-    for party in metadata['parties']:
-        org = Organization(**{#'_type': 'organization',
-                              'classification': 'party',
+    for party in jurisdiction.parties:
+        org = Organization(**{'classification': 'party',
                               'name': party['name'],
                               'parent_id': None})
         org_importer.import_object(org)

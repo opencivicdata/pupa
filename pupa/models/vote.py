@@ -1,4 +1,5 @@
 from .base import BaseModel
+from .bill import Bill
 from .schemas.vote import schema
 
 
@@ -46,12 +47,35 @@ class Vote(BaseModel):
 
     __unicode__ = __str__
 
-    def add_bill(self, name, id=None, chamber=None):
+    def set_bill(self, what, id=None, chamber=None):
+        """
+        COMPLEX BEHAVIOR AHOY:
+
+            If `what` is a `Bill` object, this will correctly link without
+            needing *anything* else. Adding `id` or `chamber` will result in
+            a `TypeError` being raised.
+
+            If `what` is not a `Bill` object, this will set `bill.name` to this
+            value, and apply the rest of the keywords to the `bill` attribute.
+        """
+        if isinstance(what, Bill):
+            if id or chamber:
+                raise TypeError("set_bill takes no arguments "
+                                "when using a `Bill` object")
+            return self._set_bill_obj(what)
+        return self._set_bill_raw(name=what, id=id, chamber=chamber)
+
+    def _set_bill_raw(self, name, id=None, chamber=None):
         self.bill = {
             "id": id,
             "name": name,
             "chamber": chamber
         }
+
+    def _set_bill_obj(self, bill):
+        self._set_bill_raw(name=bill.name, id=bill._id)
+        if hasattr(bill, 'chamber') and bill.chamber:
+            self.bill['chamber'] = bill.chamber
 
     def vote(self, name, how, id=None):
         self.roll_call.append({

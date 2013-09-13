@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, args):
         all_indexes = {
-            'metadata': [
+            'jurisdictions': [
                 [('name', ASCENDING)]
             ],
             'organizations': [],
