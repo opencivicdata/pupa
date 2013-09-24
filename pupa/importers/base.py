@@ -5,7 +5,7 @@ import uuid
 import logging
 import datetime
 from pupa.core import db
-from topsort.network import Network
+from pupa.utils.topsort import Network
 
 
 def make_id(type_):
