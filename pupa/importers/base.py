@@ -5,6 +5,7 @@ import uuid
 import logging
 import datetime
 from pupa.core import db
+from topsort.network import Network
 
 
 def make_id(type_):
@@ -129,9 +130,27 @@ class BaseImporter(object):
         self.duplicates = duplicates
 
         # now do import, ignoring duplicates
-        to_import = sorted([(k, v) for k, v in raw_objects.items()
-                            if k not in duplicates],
-                           key=lambda i: getattr(i[1], 'parent_id', 0))
+        import_pool = {k: v for k, v in raw_objects.items()
+                     if k not in duplicates}
+
+        network = Network()
+
+        to_import = []
+
+        for json_id, obj in import_pool.items():
+            parent_id = getattr(obj, 'parent_id', None)
+            if parent_id:
+                network.add_edge(json_id, parent_id)
+            else:
+                network.add_node(json_id)
+
+        for link in network.sort():
+            to_import.append((link, import_pool[link]))
+            import_pool.pop(link)
+
+        if import_pool != {}:
+            raise ValueError("""Something went wrong internally with the
+                                dependency resolution.""")
 
         for json_id, obj in to_import:
             # parentless objects come first, should mean they are in
