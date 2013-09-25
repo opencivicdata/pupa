@@ -70,7 +70,7 @@ class Network(object):
                 if remove_backrefs:
                     # If we should remove backrefs:
                     self.edges[fro].remove(node)
-                elif node in self.edges[fro]:
+                else:
                     # Let's raise an Exception
                     raise ValueError("""Attempting to remove a node with
                                      backrefs. You may consider setting
