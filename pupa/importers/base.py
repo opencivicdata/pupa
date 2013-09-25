@@ -154,11 +154,6 @@ class BaseImporter(object):
                                 dependency resolution.""")
 
         for json_id, obj in to_import:
-            # parentless objects come first, should mean they are in
-            # self.json_to_db_id before their children need them so we can
-            # resolve their id
-            # XXX: known issue here if there are sub-subcommittees, it'll
-            # result in an unresolvable id
             parent_id = getattr(obj, 'parent_id', None)
             if parent_id:
                 obj.parent_id = self.resolve_json_id(parent_id)
