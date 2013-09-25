@@ -21,7 +21,7 @@ class Network(object):
 
     def __init__(self):
         self.nodes = []
-        self.edges = defaultdict(list)
+        self.edges = defaultdict(set)
 
     def add_node(self, node):
         """ Add a node to the graph (with no edges) """
@@ -41,7 +41,7 @@ class Network(object):
         if to not in self.nodes:
             self.add_node(to)
 
-        self.edges[fro].append(to)
+        self.edges[fro].add(to)
 
     def leaf_nodes(self):
         """
@@ -63,7 +63,7 @@ class Network(object):
             self.edges.pop(node)
         for fro, connections in self.edges.items():
             if node in self.edges[fro]:
-                self.edges[fro] = [x for x in connections if x != node]
+                self.edges[fro].remove(node)
 
     def sort(self):
         """
