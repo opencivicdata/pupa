@@ -54,18 +54,27 @@ class Network(object):
         return (x for x in self.nodes if x not in deps)  # Generator that
         # contains all nodes *without* any dependencies (leaf nodes)
 
-    def prune_node(self, node):
+    def prune_node(self, node, remove_backrefs=False):
         """
         remove node `node` from the network (including any edges that may
         have been pointing at `node`).
         """
         self.nodes = [x for x in self.nodes if x != node]
         if node in self.edges:
+            # Remove add edges from this node if we're pruning it.
             self.edges.pop(node)
 
         for fro, connections in self.edges.items():
+            # Remove any links to this node (if they exist)
             if node in self.edges[fro]:
-                self.edges[fro].remove(node)
+                if remove_backrefs:
+                    # If we should remove backrefs:
+                    self.edges[fro].remove(node)
+                elif node in self.edges[fro]:
+                    # Let's raise an Exception
+                    raise ValueError("""Attempting to remove a node with
+                                     backrefs. You may consider setting
+                                     `remove_backrefs` to true.""")
 
     def sort(self):
         """
