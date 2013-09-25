@@ -50,8 +50,9 @@ class Network(object):
         """
         deps = set([
             item for sublist in self.edges.values() for item in sublist
-        ])
-        return (x for x in self.nodes if x not in deps)
+        ])  # Now contains all nodes that contain dependencies.
+        return (x for x in self.nodes if x not in deps)  # Generator that
+        # contains all nodes *without* any dependencies (leaf nodes)
 
     def prune_node(self, node):
         """
@@ -61,6 +62,7 @@ class Network(object):
         self.nodes = [x for x in self.nodes if x != node]
         if node in self.edges:
             self.edges.pop(node)
+
         for fro, connections in self.edges.items():
             if node in self.edges[fro]:
                 self.edges[fro].remove(node)
