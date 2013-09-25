@@ -136,19 +136,20 @@ class BaseImporter(object):
         network = Network()
 
         to_import = []
+        seen = set()
 
         for json_id, obj in import_pool.items():
             parent_id = getattr(obj, 'parent_id', None)
             if parent_id:
-                network.add_edge(json_id, parent_id)
+                network.add_edge(parent_id, json_id)
             else:
                 network.add_node(json_id)
 
         for link in network.sort():
             to_import.append((link, import_pool[link]))
-            import_pool.pop(link)
+            seen.add(link)
 
-        if import_pool != {}:
+        if seen != set(import_pool.keys()):
             raise ValueError("""Something went wrong internally with the
                                 dependency resolution.""")
 
@@ -161,7 +162,6 @@ class BaseImporter(object):
             parent_id = getattr(obj, 'parent_id', None)
             if parent_id:
                 obj.parent_id = self.resolve_json_id(parent_id)
-
             self.json_to_db_id[json_id] = self.import_object(obj)
 
         return {self._type: self.results}
