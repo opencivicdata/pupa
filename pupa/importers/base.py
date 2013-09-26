@@ -124,9 +124,10 @@ class BaseImporter(object):
         duplicates = {}
         items = list(raw_objects.items())
         for i, (json_id, obj) in enumerate(items):
-            for json_id2, obj2 in items[i:]:
-                if json_id != json_id2 and obj == obj2:
-                    duplicates[json_id2] = json_id
+            if json_id not in duplicates:
+              for json_id2, obj2 in items[i + 1:]:
+                  if json_id != json_id2 and obj == obj2:
+                      duplicates[json_id2] = json_id
         self.duplicates = duplicates
 
         # now do import, ignoring duplicates
