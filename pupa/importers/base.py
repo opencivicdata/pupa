@@ -5,6 +5,7 @@ import uuid
 import logging
 import datetime
 from pupa.core import db
+from pupa.utils.topsort import Network
 
 
 def make_id(type_):
@@ -130,20 +131,50 @@ class BaseImporter(object):
         self.duplicates = duplicates
 
         # now do import, ignoring duplicates
-        to_import = sorted([(k, v) for k, v in raw_objects.items()
-                            if k not in duplicates],
-                           key=lambda i: getattr(i[1], 'parent_id', 0))
 
-        for json_id, obj in to_import:
-            # parentless objects come first, should mean they are in
-            # self.json_to_db_id before their children need them so we can
-            # resolve their id
-            # XXX: known issue here if there are sub-subcommittees, it'll
-            # result in an unresolvable id
+        # Firstly, before we start, let's de-dupe the pool.
+        import_pool = {k: v for k, v in raw_objects.items()
+                     if k not in duplicates}
+
+        # Now, we create a pupa.utils.topsort.Network object, so that
+        # we can contain the import dependencies.
+        network = Network()
+
+        to_import = []  # Used to hold the import order
+        seen = set()   # Used to ensure we got all nodes.
+
+        for json_id, obj in import_pool.items():
             parent_id = getattr(obj, 'parent_id', None)
             if parent_id:
-                obj.parent_id = self.resolve_json_id(parent_id)
+                # Right. There's an import dep. We need to add the edge from
+                # the parent to the current node, so that we import the parent
+                # before the current node.
+                network.add_edge(parent_id, json_id)
+            else:
+                # Otherwise, there is no parent, and we just need to add it to
+                # the network to add whenever we feel like it during the import
+                # phase.
+                network.add_node(json_id)
 
+        for link in network.sort():
+            to_import.append((link, import_pool[link]))
+            seen.add(link)  # This extra step is to make sure that our plan
+            # is actually importing all entries into the database.
+
+        if seen != set(import_pool.keys()):  # If it's gone wrong (shouldn't)
+            raise ValueError("""Something went wrong internally with the
+                                dependency resolution.""")
+            # We'll blow up, since we've not done our job and failed to import
+            # all of our files into the Database.
+
+        for json_id, obj in to_import:
+            parent_id = getattr(obj, 'parent_id', None)
+            if parent_id:
+                # If we've got a parent ID, let's resolve it's JSON id
+                # (scrape-time) to a Database ID (needs to have had the
+                # parent imported first - which we asserted is true via
+                # the topological sort)
+                obj.parent_id = self.resolve_json_id(parent_id)
             self.json_to_db_id[json_id] = self.import_object(obj)
 
         return {self._type: self.results}
