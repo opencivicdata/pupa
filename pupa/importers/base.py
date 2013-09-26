@@ -121,18 +121,12 @@ class BaseImporter(object):
 
         # map duplicate ids to first occurance of same object
         duplicates = {}
-
-        def orig(objid):
-            if objid in duplicates:
-                obj = orig(duplicates[objid])
-                return obj
-            return objid
-
         items = list(raw_objects.items())
         for i, (json_id, obj) in enumerate(items):
-            for json_id2, obj2 in items[i:]:
-                if json_id != json_id2 and obj == obj2:
-                    duplicates[json_id2] = orig(json_id)
+            if json_id not in duplicates:
+              for json_id2, obj2 in items[i + 1:]:
+                  if json_id != json_id2 and obj == obj2:
+                      duplicates[json_id2] = json_id
         self.duplicates = duplicates
 
         # now do import, ignoring duplicates
