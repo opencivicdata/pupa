@@ -908,6 +908,7 @@ if __name__ == "__main__":
 
 
     def handle_state(state):
+        print "now processing ", state
         for seq in SEQUENCE:
             seq(state)
 
