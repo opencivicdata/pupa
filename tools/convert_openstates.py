@@ -721,7 +721,7 @@ def migrate_votes(state):
             if dbill:
                 bill_id = dbill['name']
 
-        v.set_bill(name=bill_id, id=bid, chamber=entry['chamber'])
+        v.set_bill(what=bill_id, id=bid, chamber=entry['chamber'])
 
         save_object(v)
 
