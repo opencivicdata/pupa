@@ -671,6 +671,18 @@ def migrate_votes(state):
             ocdid = _hot_cache.get('{state}-{chamber}'.format(**entry))
             org = nudb.organizations.find_one({"_id": ocdid})
             if ocdid is None or org is None:
+                if entry['chamber'] == 'joint':
+                    print ""
+                    print ""
+                    print "XXX: Vote is marked as joint, but has no committee."
+                    print "     This is likely (totally is) a bug. Please"
+                    print "     fix the scraper. We'll pass on it in the"
+                    print "     meantime."
+                    print ""
+                    print "     VoteID: %s" % (entry['_id'])
+                    print ""
+                    continue
+
                 raise Exception("""Can't look up the legislature? Something
                                  went wrong internally. The cache might be
                                  wrong for some reason. Look into this.""")
