@@ -50,7 +50,7 @@ def load_hot_cache(state):
     if state:
         spec['state'] = state
     #print "Loading cache"
-    for entry in nudb.openstates_cache.find(spec):
+    for entry in nudb.openstates_cache.find(spec, timeout=False):
         _hot_cache[entry['_id']] = entry['ocd-id']
     #print "Cache loaded"
 
@@ -148,7 +148,7 @@ def migrate_legislatures(state):
     if state:
         spec['_id'] = state
 
-    for metad in db.metadata.find(spec):
+    for metad in db.metadata.find(spec, timeout=False):
         abbr = metad['abbreviation']
         geoid = "ocd-division/country:us/state:%s" % (abbr)
         for chamber in metad['chambers']:
@@ -247,7 +247,7 @@ def migrate_committees(state):
     if state:
         spec['state'] = state
 
-    for committee in db.committees.find(spec):
+    for committee in db.committees.find(spec, timeout=False):
         # OK, we need to do the root committees first, so that we have IDs that
         # we can latch onto down below.
         org = Organization(committee['committee'],
@@ -266,7 +266,7 @@ def migrate_committees(state):
 
     spec.update({"subcommittee": {"$ne": None}})
 
-    for committee in db.committees.find(spec):
+    for committee in db.committees.find(spec, timeout=False):
         org = Organization(committee['subcommittee'],
                            classification="committee")
 
@@ -321,7 +321,7 @@ def migrate_people(state):
     spec = {}
     if state:
         spec["state"] = state
-    for entry in db.legislators.find(spec):
+    for entry in db.legislators.find(spec, timeout=False):
         jurisdiction_id = openstates_to_jid(entry['_id'])
 
         who = Person(entry['full_name'])
@@ -496,7 +496,7 @@ def migrate_bills(state):
     if state:
         spec['state'] = state
 
-    bills = db.bills.find(spec)
+    bills = db.bills.find(spec, timeout=False)
     for bill in bills:
 
         ocdid = _hot_cache.get('{state}-{chamber}'.format(**bill))
@@ -651,7 +651,7 @@ def migrate_votes(state):
     if state:
         spec['state'] = state
 
-    for entry in db.votes.find(spec):
+    for entry in db.votes.find(spec, timeout=False):
         #def __init__(self, session, date, type, passed,
         #             yes_count, no_count, other_count=0,
         #             chamber=None, **kwargs):
@@ -743,7 +743,7 @@ def migrate_events(state):
     if state:
         spec['state'] = state
 
-    for entry in db.events.find(spec):
+    for entry in db.events.find(spec, timeout=False):
 
         e = Event(
             name=entry['description'],
@@ -927,7 +927,8 @@ if __name__ == "__main__":
     if state:
         handle_state(state)
     else:
-        for state in (x['abbreviation'] for x in db.metadata.find()):
+        for state in (x['abbreviation'] for x in
+                      db.metadata.find(timeout=False)):
             handle_state(state)
 
     print("")
