@@ -39,7 +39,7 @@ jurisdiction = args.jurisdiction
 def normalize_person(entry):
     data = list(db.memberships.find({
         "person_id": entry['_id']
-    }))
+    }, timeout=False))
     for datum in data:
         datum.pop('_id')
 
@@ -50,7 +50,7 @@ def normalize_person(entry):
 
 
 def dump(collection, spec):
-    for entry in collection.find(spec):
+    for entry in collection.find(spec, timeout=False):
         do_write(entry)
 
 
@@ -81,7 +81,8 @@ def dump_people(where):
     if orga is None:
         raise Exception("Org came back none for %s" % (where))
 
-    for membership in db.memberships.find({"organization_id": orga['_id']}):
+    for membership in db.memberships.find({"organization_id": orga['_id']},
+                                          timeout=False):
         person = db.people.find_one({"_id": membership['person_id']})
         assert person is not None
         person = normalize_person(person)
@@ -131,7 +132,7 @@ with cd(path):
     else:
         for orga in db.organizations.find({
             "classification": "legislature",
-        }):
+        }, timeout=False):
             if 'jurisdiction_id' not in orga:
                 print "WARNING: NO JURISDICTION_ID ON %s" % (orga['_id'])
                 continue
