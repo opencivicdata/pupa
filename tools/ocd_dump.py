@@ -130,7 +130,7 @@ with cd(path):
         dump_juris(jurisdiction)
     else:
         for orga in db.organizations.find({
-            "classification": "jurisdiction",
+            "classification": "legislature",
         }):
             if 'jurisdiction_id' not in orga:
                 print "WARNING: NO JURISDICTION_ID ON %s" % (orga['_id'])
