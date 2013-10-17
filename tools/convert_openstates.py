@@ -13,6 +13,15 @@ import sys
 QUIET = True
 VALIDATE = True
 
+indices = [
+    ("bills", "_openstates_id"),
+    ("people", "_openstates_id"),
+    ("organizations", "_openstates_id"),
+    ("memberships", "_openstates_id"),
+    ("events", "_openstates_id"),
+    ("votes", "_openstates_id"),
+]
+
 
 type_tables = {
     Organization: "organizations",
@@ -82,6 +91,7 @@ def ocd_namer(obj):
         ret = _hot_cache.get(obj._openstates_id)
         if ret is not None:
             return ret
+
         # OK. Let's try a last-ditch.
         what = type_tables[type(obj)]
         dbobj = getattr(nudb, what).find_one({
@@ -946,6 +956,8 @@ if __name__ == "__main__":
     connection = Connection(args.ocd_server, args.ocd_port)
     nudb = getattr(connection, args.ocd_database)
 
+    for database, index in indices:
+        getattr(nudb, database).ensure_index(index)
 
     def handle_state(state):
         print "now processing ", state
