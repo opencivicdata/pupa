@@ -24,6 +24,7 @@ type_tables = {
 
 _hot_cache = {}
 _cache_touched = {}
+name_cache = {}
 
 
 def obj_to_jid(obj):
@@ -133,6 +134,9 @@ def save_objects(payload):
         if hasattr(entry, "_openstates_id"):
             _hot_cache[entry._openstates_id] = entry._id
             _cache_touched[entry._openstates_id] = True
+
+        if hasattr(entry, "name"):
+            name_cache[entry._id] = entry.name
 
         if QUIET:
             sys.stdout.write(entry._type[0])
@@ -491,9 +495,6 @@ def migrate_people(state):
                         save_object(m)
 
 
-bill_id_to_name = {}
-
-
 def migrate_bills(state):
     spec = {}
     if state:
@@ -503,9 +504,8 @@ def migrate_bills(state):
     for bill in bills:
 
         ocdid = _hot_cache.get('{state}-{chamber}'.format(**bill))
-        org = nudb.organizations.find_one({"_id": ocdid})
-        org_name = org['name']
-        if not org or not org_name or not ocdid:
+        org_name = name_cache.get(ocdid)
+        if not org_name or not ocdid:
             raise Exception("""Can't look up chamber this legislative
                             instrument was introduced into.""")
 
@@ -648,8 +648,6 @@ def migrate_bills(state):
         b.validate()
         save_object(b)
 
-        bill_id_to_name[b._id] = b.name
-
 
 
 def migrate_votes(state):
@@ -675,8 +673,8 @@ def migrate_votes(state):
             # OK. We don't have a committee. We should have a chamber.
             # Let's fallback on the COW.
             ocdid = _hot_cache.get('{state}-{chamber}'.format(**entry))
-            org = nudb.organizations.find_one({"_id": ocdid})
-            if ocdid is None or org is None:
+            org_name = name_cache.get(ocdid)
+            if ocdid is None or org_name is None:
                 if entry['chamber'] == 'joint':
                     print ""
                     print ""
@@ -692,7 +690,6 @@ def migrate_votes(state):
                 raise Exception("""Can't look up the legislature? Something
                                  went wrong internally. The cache might be
                                  wrong for some reason. Look into this.""")
-            org_name = org['name']
 
         v = Vote(
             organization=org_name,
@@ -735,8 +732,8 @@ def migrate_votes(state):
 
         bill_id = entry['bill_id']  # as fallback.
         if bid:
-            if bid in bill_id_to_name:
-                bill_id = bill_id_to_name[bid]
+            if bid in name_cache:
+                bill_id = name_cache[bid]
 
             # The following is the old code path. However, if the bill didn't
             # get converted, we won't have the object in the database anyway,
