@@ -655,7 +655,6 @@ def migrate_bills(state):
                 chamber=sponsor.get('chamber', None),
                 **kwargs)
 
-        b.validate()
         save_object(b)
 
 
@@ -873,7 +872,6 @@ def migrate_events(state):
                 note=who['type'],
                 chamber=who_chamber)
 
-        e.validate()
         save_object(e)
 
 
