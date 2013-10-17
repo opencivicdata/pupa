@@ -94,6 +94,8 @@ def ocd_namer(obj):
 
         # OK. Let's try a last-ditch.
         what = type_tables[type(obj)]
+        ## This is one of the *major* time-sinks. This codepath is taken when
+        # the last run only went halfway, without writing the cache back out.
         dbobj = getattr(nudb, what).find_one({
             "_openstates_id": obj._openstates_id
         })
@@ -213,7 +215,7 @@ def lookup_entry_id(collection, openstates_id):
         return hcid
 
     org = getattr(nudb, collection).find_one({
-        "openstates_id": openstates_id
+        "_openstates_id": openstates_id
     })
 
     if org is None:
