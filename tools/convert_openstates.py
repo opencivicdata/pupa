@@ -391,9 +391,9 @@ def migrate_people(state):
 
         legislature = None
         if chamber:
-            legislature = lookup_entry_id('organizations', "%s-%s" % (
-                entry['state'],
-                chamber,
+            legislature = _hot_cache.get('{state}-{chamber}'.format(
+                state=entry['state'],
+                chamber=chamber,
             ))
 
             if legislature is None:
@@ -494,9 +494,9 @@ def migrate_people(state):
 
                 if 'district' in role:
                     oid = "{state}-{chamber}".format(**role)
-                    leg = nudb.organizations.find_one({"_openstates_id": oid})
-                    if leg:
-                        m = Membership(who._id, leg['_id'],
+                    leg_ocdid = _hot_cache.get(oid)
+                    if leg_ocdid:
+                        m = Membership(who._id, leg_ocdid,
                                        start_date=str(start_year),
                                        end_date=str(end_year),
                                        post_id=role['district'],
