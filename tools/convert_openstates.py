@@ -11,6 +11,7 @@ import sys
 
 
 QUIET = True
+VALIDATE = True
 
 
 type_tables = {
@@ -102,7 +103,10 @@ def is_ocd_id(string):
 
 def save_objects(payload):
     for entry in payload:
-        entry.validate()
+
+        if VALIDATE:
+            entry.validate()
+
         what = type_tables[type(entry)]
         table = getattr(nudb, what)
 
@@ -926,10 +930,15 @@ if __name__ == "__main__":
                         help='Dont spam my screen',
                         default=True)
 
+    parser.add_argument('--dont-validate', action='store_false',
+                        help='Dont validate incoming objects',
+                        default=True)
+
     args = parser.parse_args()
 
     state = args.state
     QUIET = args.quiet
+    VALIDATE = args.dont_validate
 
     connection = Connection(args.billy_server, args.billy_port)
     db = getattr(connection, args.billy_database)
