@@ -212,7 +212,7 @@ def lookup_entry_id(collection, openstates_id):
 
 
 def get_current_term(jid):
-    meta = nudb.jurisdictions.find_one({"_id": jid})
+    meta = get_metadata(jid)
     term = meta['terms'][-1]
     return term
 
@@ -296,6 +296,16 @@ def drop_existing_data(state):
     for entry in type_tables.values():
         print("Dropping %s" % (entry))
         nudb.drop_collection(entry)
+
+
+def get_metadata(what):
+    hcid = _hot_cache.get(what, None)
+    if hcid:
+        return hcid
+
+    meta = nudb.jurisdictions.find_one({"_id": what})
+    _hot_cache[what] = meta
+    return meta
 
 
 def create_or_get_party(what):
@@ -437,7 +447,7 @@ def migrate_people(state):
 
         for session in entry.get('old_roles', []):
             roles = entry['old_roles'][session]
-            meta = nudb.jurisdictions.find_one({"_id": obj_to_jid(who)})
+            meta = get_metadata(obj_to_jid(who))
             term = None
 
             for role in roles:
