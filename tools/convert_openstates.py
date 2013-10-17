@@ -491,6 +491,9 @@ def migrate_people(state):
                         save_object(m)
 
 
+bill_id_to_name = {}
+
+
 def migrate_bills(state):
     spec = {}
     if state:
@@ -645,6 +648,9 @@ def migrate_bills(state):
         b.validate()
         save_object(b)
 
+        bill_id_to_name[b._id] = b.name
+
+
 
 def migrate_votes(state):
     spec = {}
@@ -729,9 +735,17 @@ def migrate_votes(state):
 
         bill_id = entry['bill_id']  # as fallback.
         if bid:
-            dbill = nudb.bills.find_one({"_id": bid})
-            if dbill:
-                bill_id = dbill['name']
+            if bid in bill_id_to_name:
+                bill_id = bill_id_to_name[bid]
+
+            # The following is the old code path. However, if the bill didn't
+            # get converted, we won't have the object in the database anyway,
+            # so, we'll make a memory/network tradeoff here.
+            #                       -- PRT
+            #
+            # dbill = nudb.bills.find_one({"_id": bid})
+            # if dbill:
+            #     bill_id = dbill['name']
 
         v.set_bill(what=bill_id, id=bid, chamber=entry['chamber'])
 
