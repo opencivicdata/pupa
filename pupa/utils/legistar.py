@@ -1,4 +1,5 @@
 import sys
+import pprint
 from os.path import join, abspath, dirname
 
 import sh
@@ -69,3 +70,70 @@ class LegistarScraper(Scraper):
         bill = Bill(bill_id, self.session, title=title, type=_type)
         bill.add_source(self.url)
         return bill
+
+
+class FlowTranslator(object):
+    '''Read in a flow file, then spit out some requests code.
+    '''
+    def __init__(self, flow_filename):
+        with open(flow_filename) as f:
+            self.flows = list(flow.FlowReader(f).stream())
+        self.flow_index = 0
+        self.requests = []
+
+    def __iter__(self):
+        '''Yield data/code for each request in the sequences.
+        '''
+        while True:
+            yield self.next()
+
+    def next(self):
+        try:
+            flow = self.flows[self.flow_index]
+        except IndexError:
+            raise StopIteration
+        requestdata = self._flow_to_data(flow)
+        self.flow_index += 1
+        return requestdata
+
+    def previous_flow(self):
+        index = self.flow_index - 1
+        if 0 <= index:
+            return self.flows[index]
+
+    def _flow_to_data(self, flow):
+
+        data = dict(
+            url=flow.request.get_url(),
+            method=flow.request.method)
+
+        form = flow.request.get_form_urlencoded().items()
+        if form is not None:
+            params = dict(form)
+            previous_flow = self.previous_flow()
+            if previous_flow is not None:
+                response = previous_flow.response
+                html = response.get_decoded_content()
+                doc = lxml.html.fromstring(html)
+            for name in params:
+                if not name.startswith('__'):
+                    continue
+                el = doc.xpath('//*[@name="%s"]' % name)[0]
+                params[name] = el.attrib['value']
+
+        data['params'] = params
+        return data
+
+
+if __name__ == '__main__':
+    import sys
+    import requests
+    fn = sys.argv[1]
+    cafile = '/home/thom/.mitmproxy/mitmproxy-ca-cert.p12'
+    for data in FlowTranslator(fn):
+        proxies = dict(https='localhost:8080')
+        resp = requests.request(verify=cafile, proxies=proxies, **data)
+        print resp
+        del data['params']
+        pprint.pprint(data)
+    import pdb; pdb.set_trace()
