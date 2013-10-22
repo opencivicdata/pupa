@@ -39,7 +39,7 @@ jurisdiction = args.jurisdiction
 def normalize_person(entry):
     data = list(db.memberships.find({
         "person_id": entry['_id']
-    }))
+    }, timeout=False))
     for datum in data:
         datum.pop('_id')
 
@@ -50,7 +50,7 @@ def normalize_person(entry):
 
 
 def dump(collection, spec):
-    for entry in collection.find(spec):
+    for entry in collection.find(spec, timeout=False):
         do_write(entry)
 
 
@@ -76,16 +76,20 @@ if not os.path.exists(path):
 
 
 def dump_people(where):
-    orga = db.organizations.find_one({"jurisdiction_id": where,
-                                      "classification": "legislature"})
-    if orga is None:
+    iterated = False
+    for orga in db.organizations.find({"jurisdiction_id": where,
+                                       "classification": "legislature"}):
+        iterated = True
+        for membership in db.memberships.find({"organization_id": orga['_id']},
+                                              timeout=False):
+            person = db.people.find_one({"_id": membership['person_id']})
+            assert person is not None
+            person = normalize_person(person)
+            do_write(person, where=where)
+
+    if iterated is False:
         raise Exception("Org came back none for %s" % (where))
 
-    for membership in db.memberships.find({"organization_id": orga['_id']}):
-        person = db.people.find_one({"_id": membership['person_id']})
-        assert person is not None
-        person = normalize_person(person)
-        do_write(person, where=where)
 
 def dump_jurisdiction_data(where):
     meta = db.jurisdictions.find_one({"_id": where})
@@ -130,8 +134,8 @@ with cd(path):
         dump_juris(jurisdiction)
     else:
         for orga in db.organizations.find({
-            "classification": "jurisdiction",
-        }):
+            "classification": "legislature",
+        }, timeout=False):
             if 'jurisdiction_id' not in orga:
                 print "WARNING: NO JURISDICTION_ID ON %s" % (orga['_id'])
                 continue

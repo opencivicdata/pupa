@@ -11,6 +11,16 @@ import sys
 
 
 QUIET = True
+VALIDATE = True
+
+indices = [
+    ("bills", "_openstates_id"),
+    ("people", "_openstates_id"),
+    ("organizations", "_openstates_id"),
+    ("memberships", "_openstates_id"),
+    ("events", "_openstates_id"),
+    ("votes", "_openstates_id"),
+]
 
 
 type_tables = {
@@ -24,6 +34,7 @@ type_tables = {
 
 _hot_cache = {}
 _cache_touched = {}
+name_cache = {}
 
 
 def obj_to_jid(obj):
@@ -50,7 +61,7 @@ def load_hot_cache(state):
     if state:
         spec['state'] = state
     #print "Loading cache"
-    for entry in nudb.openstates_cache.find(spec):
+    for entry in nudb.openstates_cache.find(spec, timeout=False):
         _hot_cache[entry['_id']] = entry['ocd-id']
     #print "Cache loaded"
 
@@ -80,8 +91,11 @@ def ocd_namer(obj):
         ret = _hot_cache.get(obj._openstates_id)
         if ret is not None:
             return ret
+
         # OK. Let's try a last-ditch.
         what = type_tables[type(obj)]
+        ## This is one of the *major* time-sinks. This codepath is taken when
+        # the last run only went halfway, without writing the cache back out.
         dbobj = getattr(nudb, what).find_one({
             "_openstates_id": obj._openstates_id
         })
@@ -101,7 +115,10 @@ def is_ocd_id(string):
 
 def save_objects(payload):
     for entry in payload:
-        entry.validate()
+
+        if VALIDATE:
+            entry.validate()
+
         what = type_tables[type(entry)]
         table = getattr(nudb, what)
 
@@ -134,6 +151,9 @@ def save_objects(payload):
             _hot_cache[entry._openstates_id] = entry._id
             _cache_touched[entry._openstates_id] = True
 
+        if hasattr(entry, "name"):
+            name_cache[entry._id] = entry.name
+
         if QUIET:
             sys.stdout.write(entry._type[0])
             sys.stdout.flush()
@@ -148,7 +168,7 @@ def migrate_legislatures(state):
     if state:
         spec['_id'] = state
 
-    for metad in db.metadata.find(spec):
+    for metad in db.metadata.find(spec, timeout=False):
         abbr = metad['abbreviation']
         geoid = "ocd-division/country:us/state:%s" % (abbr)
         for chamber in metad['chambers']:
@@ -195,7 +215,7 @@ def lookup_entry_id(collection, openstates_id):
         return hcid
 
     org = getattr(nudb, collection).find_one({
-        "openstates_id": openstates_id
+        "_openstates_id": openstates_id
     })
 
     if org is None:
@@ -208,7 +228,7 @@ def lookup_entry_id(collection, openstates_id):
 
 
 def get_current_term(jid):
-    meta = nudb.jurisdictions.find_one({"_id": jid})
+    meta = get_metadata(jid)
     term = meta['terms'][-1]
     return term
 
@@ -247,7 +267,7 @@ def migrate_committees(state):
     if state:
         spec['state'] = state
 
-    for committee in db.committees.find(spec):
+    for committee in db.committees.find(spec, timeout=False):
         # OK, we need to do the root committees first, so that we have IDs that
         # we can latch onto down below.
         org = Organization(committee['committee'],
@@ -266,7 +286,7 @@ def migrate_committees(state):
 
     spec.update({"subcommittee": {"$ne": None}})
 
-    for committee in db.committees.find(spec):
+    for committee in db.committees.find(spec, timeout=False):
         org = Organization(committee['subcommittee'],
                            classification="committee")
 
@@ -292,6 +312,16 @@ def drop_existing_data(state):
     for entry in type_tables.values():
         print("Dropping %s" % (entry))
         nudb.drop_collection(entry)
+
+
+def get_metadata(what):
+    hcid = _hot_cache.get(what, None)
+    if hcid:
+        return hcid
+
+    meta = nudb.jurisdictions.find_one({"_id": what})
+    _hot_cache[what] = meta
+    return meta
 
 
 def create_or_get_party(what):
@@ -321,7 +351,7 @@ def migrate_people(state):
     spec = {}
     if state:
         spec["state"] = state
-    for entry in db.legislators.find(spec):
+    for entry in db.legislators.find(spec, timeout=False):
         jurisdiction_id = openstates_to_jid(entry['_id'])
 
         who = Person(entry['full_name'])
@@ -377,9 +407,9 @@ def migrate_people(state):
 
         legislature = None
         if chamber:
-            legislature = lookup_entry_id('organizations', "%s-%s" % (
-                entry['state'],
-                chamber,
+            legislature = _hot_cache.get('{state}-{chamber}'.format(
+                state=entry['state'],
+                chamber=chamber,
             ))
 
             if legislature is None:
@@ -433,7 +463,7 @@ def migrate_people(state):
 
         for session in entry.get('old_roles', []):
             roles = entry['old_roles'][session]
-            meta = nudb.jurisdictions.find_one({"_id": obj_to_jid(who)})
+            meta = get_metadata(obj_to_jid(who))
             term = None
 
             for role in roles:
@@ -480,9 +510,9 @@ def migrate_people(state):
 
                 if 'district' in role:
                     oid = "{state}-{chamber}".format(**role)
-                    leg = nudb.organizations.find_one({"_openstates_id": oid})
-                    if leg:
-                        m = Membership(who._id, leg['_id'],
+                    leg_ocdid = _hot_cache.get(oid)
+                    if leg_ocdid:
+                        m = Membership(who._id, leg_ocdid,
                                        start_date=str(start_year),
                                        end_date=str(end_year),
                                        post_id=role['district'],
@@ -496,13 +526,12 @@ def migrate_bills(state):
     if state:
         spec['state'] = state
 
-    bills = db.bills.find(spec)
+    bills = db.bills.find(spec, timeout=False)
     for bill in bills:
 
         ocdid = _hot_cache.get('{state}-{chamber}'.format(**bill))
-        org = nudb.organizations.find_one({"_id": ocdid})
-        org_name = org['name']
-        if not org or not org_name or not ocdid:
+        org_name = name_cache.get(ocdid)
+        if not org_name or not ocdid:
             raise Exception("""Can't look up chamber this legislative
                             instrument was introduced into.""")
 
@@ -642,8 +671,8 @@ def migrate_bills(state):
                 chamber=sponsor.get('chamber', None),
                 **kwargs)
 
-        b.validate()
         save_object(b)
+
 
 
 def migrate_votes(state):
@@ -651,7 +680,7 @@ def migrate_votes(state):
     if state:
         spec['state'] = state
 
-    for entry in db.votes.find(spec):
+    for entry in db.votes.find(spec, timeout=False):
         #def __init__(self, session, date, type, passed,
         #             yes_count, no_count, other_count=0,
         #             chamber=None, **kwargs):
@@ -669,12 +698,23 @@ def migrate_votes(state):
             # OK. We don't have a committee. We should have a chamber.
             # Let's fallback on the COW.
             ocdid = _hot_cache.get('{state}-{chamber}'.format(**entry))
-            org = nudb.organizations.find_one({"_id": ocdid})
-            if ocdid is None or org is None:
+            org_name = name_cache.get(ocdid)
+            if ocdid is None or org_name is None:
+                if entry['chamber'] == 'joint':
+                    print ""
+                    print ""
+                    print "XXX: Vote is marked as joint, but has no committee."
+                    print "     This is likely (totally is) a bug. Please"
+                    print "     fix the scraper. We'll pass on it in the"
+                    print "     meantime."
+                    print ""
+                    print "     VoteID: %s" % (entry['_id'])
+                    print ""
+                    continue
+
                 raise Exception("""Can't look up the legislature? Something
                                  went wrong internally. The cache might be
                                  wrong for some reason. Look into this.""")
-            org_name = org['name']
 
         v = Vote(
             organization=org_name,
@@ -717,11 +757,19 @@ def migrate_votes(state):
 
         bill_id = entry['bill_id']  # as fallback.
         if bid:
-            dbill = nudb.bills.find_one({"_id": bid})
-            if dbill:
-                bill_id = dbill['name']
+            if bid in name_cache:
+                bill_id = name_cache[bid]
 
-        v.add_bill(name=bill_id, id=bid, chamber=entry['chamber'])
+            # The following is the old code path. However, if the bill didn't
+            # get converted, we won't have the object in the database anyway,
+            # so, we'll make a memory/network tradeoff here.
+            #                       -- PRT
+            #
+            # dbill = nudb.bills.find_one({"_id": bid})
+            # if dbill:
+            #     bill_id = dbill['name']
+
+        v.set_bill(what=bill_id, id=bid, chamber=entry['chamber'])
 
         save_object(v)
 
@@ -731,7 +779,7 @@ def migrate_events(state):
     if state:
         spec['state'] = state
 
-    for entry in db.events.find(spec):
+    for entry in db.events.find(spec, timeout=False):
 
         e = Event(
             name=entry['description'],
@@ -840,7 +888,6 @@ def migrate_events(state):
                 note=who['type'],
                 chamber=who_chamber)
 
-        e.validate()
         save_object(e)
 
 
@@ -895,10 +942,15 @@ if __name__ == "__main__":
                         help='Dont spam my screen',
                         default=True)
 
+    parser.add_argument('--dont-validate', action='store_false',
+                        help='Dont validate incoming objects',
+                        default=True)
+
     args = parser.parse_args()
 
     state = args.state
     QUIET = args.quiet
+    VALIDATE = args.dont_validate
 
     connection = Connection(args.billy_server, args.billy_port)
     db = getattr(connection, args.billy_database)
@@ -906,15 +958,19 @@ if __name__ == "__main__":
     connection = Connection(args.ocd_server, args.ocd_port)
     nudb = getattr(connection, args.ocd_database)
 
+    for database, index in indices:
+        getattr(nudb, database).ensure_index(index)
 
     def handle_state(state):
+        print "now processing ", state
         for seq in SEQUENCE:
             seq(state)
 
     if state:
         handle_state(state)
     else:
-        for state in (x['abbreviation'] for x in db.metadata.find()):
+        for state in (x['abbreviation'] for x in
+                      db.metadata.find(timeout=False)):
             handle_state(state)
 
     print("")

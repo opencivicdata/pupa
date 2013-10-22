@@ -10,7 +10,7 @@ class Organization(BaseModel):
     __slots__ = ('classification', 'dissolution_date', 'founding_date',
                  'identifiers', 'name', 'other_names', 'parent_id', 'chamber',
                  'posts', '_openstates_id', 'contact_details', 'division_id',
-                 'abbreviation', 'jurisdiction_id', 'identifiers')
+                 'abbreviation', 'jurisdiction_id', 'identifiers', 'links',)
 
     _post_slots = ('end_date', 'id', 'label', 'organization_id', 'role',
                    'start_date', 'chamber', 'division_id',
@@ -25,6 +25,7 @@ class Organization(BaseModel):
         Constructor for the Organization object.
         """
         super(Organization, self).__init__()
+        self.links = []
         self.name = name
         self.classification = None
         self.founding_date = None
@@ -67,6 +68,9 @@ class Organization(BaseModel):
     @parent.setter
     def parent(self, val):
         self.parent_id = val._id
+
+    def add_link(self, url, note):
+        self.links.append({"note": note, "url": url})
 
     def add_identifier(self, identifier, scheme=None):
         data = {"identifier": identifier}
