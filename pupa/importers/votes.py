@@ -59,7 +59,7 @@ class VoteImporter(BaseImporter):
                 continue  # can't match
 
             person_obj = people[0]
-            vote['person']['id'] = person_obj['_id']
+            vote['id'] = person_obj['_id']
 
         org = obj.get('organization')
         org_id = obj.get('organization_id')
