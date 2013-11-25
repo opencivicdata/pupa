@@ -202,6 +202,10 @@ def migrate_legislatures(state):
                        "latest_csv_url", "latest_csv_date",]:
             meta.pop(badtag)
 
+        meta['division_id'] = "ocd-division/country:us/state:%s" % (
+            cow.abbreviation
+        )
+
         nudb.jurisdictions.save(meta)
 
 
