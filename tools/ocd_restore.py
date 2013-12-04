@@ -36,6 +36,7 @@ TABLES = {
     "ocd-organization": db.organizations,
     "ocd-person": db.people,
     "ocd-vote": db.votes,
+    "ocd-event": db.events,
 }
 
 
