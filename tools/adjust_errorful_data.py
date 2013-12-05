@@ -62,6 +62,16 @@ for collection, entries in data.items():
                 event['when'] = datetime.datetime.fromtimestamp(event['when'])
                 cdb.save(event)
 
+        if datum['tagname'] == 'misspelled-organization':
+            obj = cdb.find_one({"_id": datum['id']})
+            obj.pop('orgnization')  # Well, this is silly.
+            cdb.save(obj)
+
+        if datum['tagname'] == 'misspelled-organization_id':
+            obj = cdb.find_one({"_id": datum['id']})
+            obj.pop('orgnization_id')
+            cdb.save(obj)
+
         if datum['tagname'] == 'vote-missing-organization_id':
             vote = cdb.find_one({"_id": datum['id']})
             vote['organization_id'] = None

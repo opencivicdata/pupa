@@ -29,6 +29,9 @@ args = parser.parse_args()
 connection = Connection(args.server, args.port)
 db = getattr(connection, args.database)
 
+print "Connected to: %s (port %s)" % (args.server, args.port)
+print "  database: %s" % (args.database)
+
 
 TABLES = {
     "ocd-jurisdiction": db.jurisdictions,
@@ -55,7 +58,8 @@ def insert(obj):
     etype, _ = id_.split("/", 1)
     sys.stdout.write(etype.split("-")[1][0].lower())
     sys.stdout.flush()
-    return TABLES[etype].save(obj)
+    TABLES[etype].save(obj, safe=True)
+
 
 
 with cd(args.root):
@@ -64,3 +68,5 @@ with cd(args.root):
         for entry in (os.path.join(path, x) for x in nodes):
             data = json.load(open(entry, 'r'))
             insert(data)
+
+print ""
