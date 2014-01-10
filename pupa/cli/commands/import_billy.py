@@ -1,17 +1,12 @@
 from __future__ import print_function
-import itertools
-from collections import defaultdict
 import datetime as dt
-import operator
 import uuid
 import sys
-from pymongo import ASCENDING, DESCENDING, Connection
+from pymongo import Connection
 from .base import BaseCommand
 from pupa.core import db
 from pupa.models import Organization, Membership, Person, Event, Vote, Bill
 
-QUIET = True
-VALIDATE = True
 
 indices = [
     ("bills", "_openstates_id"),
@@ -38,7 +33,6 @@ name_cache = {}
 
 
 def obj_to_jid(obj):
-    abbr = None
     if obj._openstates_id:
         jid = openstates_to_jid(obj._openstates_id)
 
@@ -70,12 +64,9 @@ def write_hot_cache(state):
             continue
 
         if _cache_touched.get(entry, False):
-            db.openstates_cache.update({"_id": entry},
-                                         {"_id": entry,
-                                          "state": entry[:2].lower(),
-                                          "ocd-id": _hot_cache[entry]},
-                                          upsert=True,
-                                          safe=True)
+            db.openstates_cache.update({"_id": entry}, {"_id": entry, "state": entry[:2].lower(),
+                                                        "ocd-id": _hot_cache[entry]}, upsert=True,
+                                       safe=True)
     _cache_touched = {}
 
 
@@ -107,55 +98,6 @@ def ocd_namer(obj):
 def is_ocd_id(string):
     return string.startswith("ocd-")
 
-
-def save_objects(payload):
-    for entry in payload:
-
-        if VALIDATE:
-            entry.validate()
-
-        what = type_tables[type(entry)]
-        table = getattr(db, what)
-
-        _id = None
-        try:
-            _id = entry._id
-        except AttributeError:
-            pass
-
-        ocd_id = ocd_namer(entry)
-        if ocd_id:
-            if _id and not is_ocd_id(_id):
-                _id = None
-
-            if _id is None:
-                entry._id = ocd_id
-
-        if what != 'people' and getattr(entry, '_openstates_id', None):
-            jid = obj_to_jid(entry)
-            entry.jurisdiction_id = jid
-
-        entry.add_meta_software('openstates')
-        eo = entry.as_dict()
-        mongo_id = table.save(eo)
-
-        if _id is None and ocd_id is None:
-            entry._id = mongo_id
-
-        if hasattr(entry, "_openstates_id"):
-            _hot_cache[entry._openstates_id] = entry._id
-            _cache_touched[entry._openstates_id] = True
-
-        if hasattr(entry, "name"):
-            name_cache[entry._id] = entry.name
-
-        if QUIET:
-            sys.stdout.write(entry._type[0])
-            sys.stdout.flush()
-
-
-def save_object(payload):
-    return save_objects([payload])
 
 def lookup_entry_id(collection, openstates_id):
     if openstates_id is None:
@@ -194,56 +136,26 @@ def get_metadata(what):
     return meta
 
 
-def create_or_get_party(what):
-    hcid = _hot_cache.get(what, None)
-    if hcid:
-        return hcid
-
-    org = db.organizations.find_one({
-        "name": what
-    })
-    if org:
-        _hot_cache[what] = org['_id']
-        _cache_touched[what] = True
-        return org['_id']
-
-    org = Organization(what, classification="party")
-
-    save_object(org)
-
-    _hot_cache[what] = org._id
-    _cache_touched[what] = True
-
-    return org._id
-
-
-
-
-
 class Command(BaseCommand):
     name = 'import-billy'
     help = '''import data from a billy instance'''
 
     def add_args(self):
-        self.add_argument('state', type=str, help='State to rebuild',
-                            default=None, nargs='?')
+        self.add_argument('state', type=str, help='State to rebuild', default=None, nargs='?')
         self.add_argument('--billy-server', type=str, help='Billy Mongo Server',
-                            default="localhost")
-        self.add_argument('--billy-database', type=str,
-                            help='Billy Mongo Database', default="fiftystates")
-        self.add_argument('--billy-port', type=int, help='Billy Mongo Server Port',
-                            default=27017)
+                          default="localhost")
+        self.add_argument('--billy-database', type=str, help='Billy Mongo Database',
+                          default="fiftystates")
+        self.add_argument('--billy-port', type=int, help='Billy Mongo Server Port', default=27017)
         self.add_argument('--quiet', action='store_false', help='Dont spam my screen',
-                            default=True)
+                          default=True)
         self.add_argument('--dont-validate', action='store_false',
-                            help='Dont validate incoming objects',
-                            default=True)
-
+                          help='Dont validate incoming objects', default=True)
 
     def handle(self, args):
         state = args.state
-        QUIET = args.quiet
-        VALIDATE = args.dont_validate
+        self.quiet = args.quiet
+        self.validate = args.dont_validate
         self.billy_db = Connection(args.billy_server, args.billy_port)[args.billy_database]
 
         for database, index in indices:
@@ -281,6 +193,27 @@ class Command(BaseCommand):
 
         print("\nMigration complete.")
 
+    def create_or_get_party(self, what):
+        hcid = _hot_cache.get(what, None)
+        if hcid:
+            return hcid
+
+        org = db.organizations.find_one({
+            "name": what
+        })
+        if org:
+            _hot_cache[what] = org['_id']
+            _cache_touched[what] = True
+            return org['_id']
+
+        org = Organization(what, classification="party")
+
+        self.save_object(org)
+
+        _hot_cache[what] = org._id
+        _cache_touched[what] = True
+
+        return org._id
 
     def migrate_legislatures(self, state):
         spec = {}
@@ -304,12 +237,10 @@ class Command(BaseCommand):
                     if post['chamber'] != chamber:
                         continue
 
-                    cow.add_post(label="Member",
-                                 role="member",
-                                 num_seats=post['num_seats'],
+                    cow.add_post(label="Member", role="member", num_seats=post['num_seats'],
                                  id=post['name'])
 
-                save_object(cow)
+                self.save_object(cow)
 
             meta = self.billy_db.metadata.find_one({"_id": cow.abbreviation})
             if meta is None:
@@ -318,7 +249,7 @@ class Command(BaseCommand):
             meta['_id'] = cow.jurisdiction_id
 
             for badtag in ["latest_json_url", "latest_json_date",
-                           "latest_csv_url", "latest_csv_date",]:
+                           "latest_csv_url", "latest_csv_date"]:
                 meta.pop(badtag)
 
             meta['division_id'] = "ocd-division/country:us/state:%s" % (
@@ -344,7 +275,7 @@ class Command(BaseCommand):
                     # We can assume there's no end_year because it's a current
                     # member of the committee. If they left the committee, we don't
                     # know about it yet :)
-                    save_object(m)
+                    self.save_object(m)
 
                     if m.role != 'member':
                         # In addition to being the (chair|vice-chair),
@@ -354,7 +285,7 @@ class Command(BaseCommand):
                                        chamber=org.chamber,
                                        start_date=str(term['start_year']))
                         m.add_extra('term', term['name'])
-                        save_object(m)
+                        self.save_object(m)
 
         spec = {"subcommittee": None}
 
@@ -375,7 +306,7 @@ class Command(BaseCommand):
             org.created_at = committee['created_at']
             org.updated_at = committee['updated_at']
             # Look into posts; but we can't be sure.
-            save_object(org)
+            self.save_object(org)
             attach_members(committee, org)
 
         spec.update({"subcommittee": {"$ne": None}})
@@ -398,9 +329,8 @@ class Command(BaseCommand):
             org.sources = committee['sources']
             org.chamber = committee['chamber']
             # Look into posts; but we can't be sure.
-            save_object(org)
+            self.save_object(org)
             attach_members(committee, org)
-
 
     def migrate_people(self, state):
         spec = {}
@@ -471,14 +401,14 @@ class Command(BaseCommand):
                     print(chamber, entry['state'], entry['_id'])
                     raise Exception("Someone's in the void.")
 
-            save_object(who)  # gives who an id, btw.
+            self.save_object(who)  # gives who an id, btw.
 
             party = entry.get('party', None)
             db.memberships.remove({"person_id": who._id}, safe=True)
 
             if party:
-                m = Membership(who._id, create_or_get_party(entry['party']))
-                save_object(m)
+                m = Membership(who._id, self.create_or_get_party(entry['party']))
+                self.save_object(m)
 
             if legislature:
                 term = get_current_term(jurisdiction_id)
@@ -514,7 +444,7 @@ class Command(BaseCommand):
                             continue
                         m.add_contact_detail(type=key, value=value, note=note)
 
-                save_object(m)
+                self.save_object(m)
 
             for session in entry.get('old_roles', []):
                 roles = entry['old_roles'][session]
@@ -523,7 +453,7 @@ class Command(BaseCommand):
 
                 for role in roles:
                     term = role['term']
-                    t = None
+                    to = None
                     for to in meta['terms']:
                         if term == to['name']:
                             term = to
@@ -549,7 +479,7 @@ class Command(BaseCommand):
                                 if "position" in role:
                                     m.role = role['position']
 
-                                save_object(m)
+                                self.save_object(m)
 
                                 if m.role != 'member':
                                     # In addition to being the (chair|vice-chair),
@@ -561,7 +491,7 @@ class Command(BaseCommand):
                                                    end_date=str(end_year),
                                                    chamber=role['chamber'])
                                     m.add_extra('term', term['name'])
-                                    save_object(m)
+                                    self.save_object(m)
 
                     if 'district' in role:
                         oid = "{state}-{chamber}".format(**role)
@@ -573,8 +503,7 @@ class Command(BaseCommand):
                                            post_id=role['district'],
                                            chamber=role['chamber'])
                             m.add_extra('term', term['name'])
-                            save_object(m)
-
+                            self.save_object(m)
 
     def migrate_bills(self, state):
         spec = {}
@@ -726,9 +655,7 @@ class Command(BaseCommand):
                     chamber=sponsor.get('chamber', None),
                     **kwargs)
 
-            save_object(b)
-
-
+            self.save_object(b)
 
     def migrate_votes(self, state):
         spec = {}
@@ -785,7 +712,6 @@ class Command(BaseCommand):
                              'identifier': entry['_id']}]
             v._openstates_id = entry['_id']
 
-
             for source in entry['sources']:
                 v.add_source(**source)
 
@@ -821,8 +747,7 @@ class Command(BaseCommand):
 
             v.set_bill(what=bill_id, id=bid, chamber=entry['chamber'])
 
-            save_object(v)
-
+            self.save_object(v)
 
     def migrate_events(self, state):
         spec = {}
@@ -854,7 +779,7 @@ class Command(BaseCommand):
                          "updated_at", "created_at", "end", "sources",
                          "documents", "related_bills", "state", "+link",
                          "link", "level", "participants", "country",
-                         "_all_ids", "type",]
+                         "_all_ids", "type"]
 
             e.status = entry.get('status')
             typos = {
@@ -938,4 +863,52 @@ class Command(BaseCommand):
                     note=who['type'],
                     chamber=who_chamber)
 
-            save_object(e)
+            self.save_object(e)
+
+    def save_objects(self, payload):
+        for entry in payload:
+
+            if self.validate:
+                entry.validate()
+
+            what = type_tables[type(entry)]
+            table = getattr(db, what)
+
+            _id = None
+            try:
+                _id = entry._id
+            except AttributeError:
+                pass
+
+            ocd_id = ocd_namer(entry)
+            if ocd_id:
+                if _id and not is_ocd_id(_id):
+                    _id = None
+
+                if _id is None:
+                    entry._id = ocd_id
+
+            if what != 'people' and getattr(entry, '_openstates_id', None):
+                jid = obj_to_jid(entry)
+                entry.jurisdiction_id = jid
+
+            entry.add_meta_software('openstates')
+            eo = entry.as_dict()
+            mongo_id = table.save(eo)
+
+            if _id is None and ocd_id is None:
+                entry._id = mongo_id
+
+            if hasattr(entry, "_openstates_id"):
+                _hot_cache[entry._openstates_id] = entry._id
+                _cache_touched[entry._openstates_id] = True
+
+            if hasattr(entry, "name"):
+                name_cache[entry._id] = entry.name
+
+            if self.quiet:
+                sys.stdout.write(entry._type[0])
+                sys.stdout.flush()
+
+    def save_object(self, payload):
+        return self.save_objects([payload])

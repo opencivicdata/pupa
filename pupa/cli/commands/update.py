@@ -108,7 +108,6 @@ class Command(BaseCommand):
                     retobj.feature_flags = metadata['feature_flags']
                 return retobj
 
-
         raise UpdateError('unable to import Jurisdiction subclass from ' +
                           module_name)
 
