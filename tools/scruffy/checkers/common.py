@@ -27,6 +27,19 @@ def common_checks(obj, singular, plural):
                     tagname='%s-has-null-_id' % (singular),
                     severity='critical')
 
+    if obj.get("orgnization"):
+        yield Check(collection=plural,
+                    id=obj['_id'],
+                    tagname='misspelled-organization',
+                    severity='critical')
+
+    if obj.get("orgnization_id"):
+        yield Check(collection=plural,
+                    id=obj['_id'],
+                    tagname='misspelled-organization_id',
+                    severity='critical')
+
+
     elif singular not in ['membership']:
         id_ = str(obj['_id'])  # If we catch an ObjectId
         if not ocd_id.match(id_):

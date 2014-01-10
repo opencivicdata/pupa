@@ -15,6 +15,20 @@ def check(db):
         for t, c in ((x['vote_type'], x['count'])
                      for x in vote['vote_counts']):
 
+            if 'organization' not in vote:
+                yield Check(collection='votes',
+                            id=vote['_id'],
+                            tagname='vote-missing-organization',
+                            severity='grave',
+                            data=vote)
+
+            if 'organization_id' not in vote:
+                yield Check(collection='votes',
+                            id=vote['_id'],
+                            tagname='vote-missing-organization_id',
+                            severity='grave',
+                            data=vote)
+
             if count[t] != c:
                 yield Check(collection='votes',
                             id=vote['_id'],
