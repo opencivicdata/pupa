@@ -76,7 +76,7 @@ def dump_jurisdiction_data(where):
         'latest_json_date', 'latest_csv_date'
     ]:
         if x in meta:
-            meta.pop(x)
+            meta.pop(x, None)
 
     for key in meta.keys():
         if key.startswith("_") and key != "_id":

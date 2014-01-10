@@ -250,7 +250,7 @@ class Command(BaseCommand):
 
             for badtag in ["latest_json_url", "latest_json_date",
                            "latest_csv_url", "latest_csv_date"]:
-                meta.pop(badtag)
+                meta.pop(badtag, None)
 
             meta['division_id'] = "ocd-division/country:us/state:%s" % (
                 cow.abbreviation
