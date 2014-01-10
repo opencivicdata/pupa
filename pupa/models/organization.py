@@ -69,7 +69,7 @@ class Organization(BaseModel):
     def parent(self, val):
         self.parent_id = val._id
 
-    def add_link(self, url, note):
+    def add_link(self, url, note=None):
         self.links.append({"note": note, "url": url})
 
     def add_identifier(self, identifier, scheme=None):
