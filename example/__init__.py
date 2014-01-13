@@ -13,7 +13,7 @@ class Example(Jurisdiction):
         'start_year': 2013,
         'end_year': 2014
     }]
-    provides = ['people'],
+    provides = ['people']
     parties = [
         {'name': 'Independent' },
         {'name': 'Green' },
