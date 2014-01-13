@@ -273,3 +273,4 @@ class Command(BaseCommand):
 
         # XXX: save report instead of printing
         print(report)
+        return report
