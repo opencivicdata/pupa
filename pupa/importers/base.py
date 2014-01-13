@@ -4,6 +4,7 @@ import json
 import uuid
 import logging
 import datetime
+from collections import defaultdict
 from pupa.core import db
 from pupa.utils.topsort import Network
 
@@ -121,13 +122,13 @@ class BaseImporter(object):
                 raw_objects[json_id] = obj
 
         # map duplicate ids to first occurance of same object
+        inverse = defaultdict(list)
+        for json_id, obj in raw_objects.items():
+            inverse[repr(sorted((k, v) for (k, v) in obj.as_dict().items()))].append(json_id)
         duplicates = {}
-        items = list(raw_objects.items())
-        for i, (json_id, obj) in enumerate(items):
-            if json_id not in duplicates:
-              for json_id2, obj2 in items[i + 1:]:
-                  if json_id != json_id2 and obj == obj2:
-                      duplicates[json_id2] = json_id
+        for json_ids in inverse.values():
+            for json_id in json_ids[1:]:
+                duplicates[json_id] = json_ids[0]
         self.duplicates = duplicates
 
         # now do import, ignoring duplicates
