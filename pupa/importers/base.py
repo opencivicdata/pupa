@@ -124,7 +124,7 @@ class BaseImporter(object):
         # map duplicate ids to first occurance of same object
         inverse = defaultdict(list)
         for json_id, obj in raw_objects.items():
-            inverse[repr(obj)].append(json_id)
+            inverse[repr(sorted((k, v) for (k, v) in obj.as_dict().items()))].append(json_id)
         duplicates = {}
         for json_ids in inverse.values():
             for json_id in json_ids[1:]:
