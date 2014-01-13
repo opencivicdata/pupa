@@ -6,7 +6,7 @@ from pupa.models.membership import Membership
 
 class Legislator(Person):
     _is_legislator = True
-    __slots__ = ('post_id', 'party', 'chamber', '_contact_details', 'role')
+    __slots__ = ('post_id', 'party', 'chamber', '_contact_details', '_role')
 
     def __init__(self, name, post_id, party=None, chamber=None, role='member', **kwargs):
         super(Legislator, self).__init__(name, **kwargs)
@@ -14,7 +14,7 @@ class Legislator(Person):
         self.party = party
         self.chamber = chamber
         self._contact_details = []
-        self.role = role
+        self._role = role
 
     def add_contact(self, type, value, note):
         self._contact_details.append({'type': type, 'value': value,
