@@ -47,7 +47,7 @@ class Person(BaseModel):
             other_name[k] = v
         self.other_names.append(other_name)
 
-    def add_link(self, url, note):
+    def add_link(self, url, note=None):
         self.links.append({"note": note, "url": url})
 
     def add_identifier(self, identifier, scheme=None):
