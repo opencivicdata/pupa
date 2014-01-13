@@ -75,7 +75,8 @@ class Scraper(scrapelib.Scraper):
                 contact_details=obj._contact_details, role=getattr(obj, 'role', 'member'))
             # remove placeholder _contact_details
             del obj._contact_details
-            del obj.role
+            if hasattr(obj, 'role'):
+                del obj.role
             obj._related.append(membership)
 
             # create a party membership
