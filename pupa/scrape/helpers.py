@@ -14,6 +14,7 @@ class Legislator(Person):
         self.party = party
         self.chamber = chamber
         self._contact_details = []
+        self.role = 'member'
 
     def add_contact(self, type, value, note):
         self._contact_details.append({'type': type, 'value': value,
