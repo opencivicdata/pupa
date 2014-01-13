@@ -72,7 +72,7 @@ class Scraper(scrapelib.Scraper):
             membership = Membership(
                 obj._id, 'jurisdiction:' + self.jurisdiction.jurisdiction_id,
                 post_id=obj.post_id, chamber=obj.chamber,
-                contact_details=obj._contact_details, role=obj.get('role', 'member'))
+                contact_details=obj._contact_details, role=getattr(obj, 'role', 'member'))
             # remove placeholder _contact_details
             del obj._contact_details
             del obj.role
