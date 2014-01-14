@@ -4,8 +4,19 @@ import json
 import uuid
 import logging
 import datetime
+from collections import defaultdict
 from pupa.core import db
 from pupa.utils.topsort import Network
+
+
+def _hash(obj):
+    """ recursively hash unhashable objects """
+    if isinstance(obj, (set, tuple, list)):
+        return hash(tuple(_hash(e) for e in o))
+    elif isinstance(obj, dict):
+        return hash(frozenset(k, _hash(v) for k, v in obj.items()))
+    else:
+        return hash(obj)
 
 
 def make_id(type_):
@@ -121,20 +132,20 @@ class BaseImporter(object):
                 raw_objects[json_id] = obj
 
         # map duplicate ids to first occurance of same object
-        duplicates = {}
-        items = list(raw_objects.items())
-        for i, (json_id, obj) in enumerate(items):
-            if json_id not in duplicates:
-              for json_id2, obj2 in items[i + 1:]:
-                  if json_id != json_id2 and obj == obj2:
-                      duplicates[json_id2] = json_id
-        self.duplicates = duplicates
+        inverse = defaultdict(list)
+        for json_id, obj in raw_objects.items():
+            inverse[_hash(obj)].append(json_id)
+
+        self.duplicates = {}
+
+        for json_ids in inverse.values():
+            for json_id in json_ids[1:]:
+                self.duplicates[json_id] = json_ids[0]
 
         # now do import, ignoring duplicates
 
         # Firstly, before we start, let's de-dupe the pool.
-        import_pool = {k: v for k, v in raw_objects.items()
-                     if k not in duplicates}
+        import_pool = {k: v for k, v in raw_objects.items() if k not in self.duplicates}
 
         # Now, we create a pupa.utils.topsort.Network object, so that
         # we can contain the import dependencies.
