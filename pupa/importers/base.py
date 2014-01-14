@@ -14,7 +14,7 @@ def _hash(obj):
     if isinstance(obj, (set, tuple, list)):
         return hash(tuple(_hash(e) for e in o))
     elif isinstance(obj, dict):
-        return hash(frozenset(k, _hash(v) for k, v in obj.items()))
+        return hash(frozenset((k, _hash(v)) for k, v in obj.items()))
     else:
         return hash(obj)
 
