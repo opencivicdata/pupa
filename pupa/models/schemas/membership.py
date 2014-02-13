@@ -5,25 +5,37 @@ schema = {
     "description": "A relationship between a person and an organization",
     "id": "http://popoloproject.com/schemas/membership.json#",
     "properties": {
-        # **updated_at** - the time that this object was last updated.
-        "updated_at": {"type": ["string", "datetime"], "required": False},
-        # **created_at** - the time that this object was first created.
-        "created_at": {"type": ["string", "datetime"], "required": False},
+        "updated_at": {
+            "description": "The time at which the resource was last modified",
+            "type": ["string", "datetime", "null"],
+        },
+        "created_at": {
+            "description": "The time at which the resource was created",
+            "type": ["string", "datetime", "null"],
+        },
 
         "organization_id": {
             "description": "The ID of the organization that is a party to the relationship",
-            "type": "string"
+            "type": "string",
         },
         "person_id": {
             "description": "The ID of the person who is a party to the relationship",
             "type": ["string", "null"],
         },
         "post_id": {
-            "description": "Post ID key.",
+            "description": "The ID of the post held by the person in the organization through this membership",
+            "type": ["string", "null"],
+        },
+        "on_behalf_of_id": {
+            "description": "The ID of the organization on whose behalf the person is a party to the relationship",
+            "type": ["string", "null"],
+        },
+        "label": {
+            "description": "A label describing the membership",
             "type": ["string", "null"],
         },
         "role": {
-            "description": "The role that the holder of the post fulfills",
+            "description": "The role that the person fulfills in the organization",
             "type": ["string", "null"],
         },
         "start_date": {
