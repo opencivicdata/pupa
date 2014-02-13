@@ -60,10 +60,6 @@ schema = {
                         "description": "A label describing the post",
                         "type": "string"
                     },
-                    "organization_id": {
-                        "description": "The ID of the organization in which the post is held",
-                        "type": ["string", "null"],
-                    },
                     "role": {
                         "description": "The function that the holder of the post fulfills",
                         "type": ["string", "null"],

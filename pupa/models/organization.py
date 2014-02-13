@@ -12,7 +12,7 @@ class Organization(BaseModel):
                  'posts', '_openstates_id', 'contact_details', 'division_id',
                  'abbreviation', 'jurisdiction_id', 'identifiers', 'links',)
 
-    _post_slots = ('end_date', 'id', 'label', 'organization_id', 'role',
+    _post_slots = ('end_date', 'id', 'label', 'role',
                    'start_date', 'chamber', 'division_id',
                    'num_seats')
 
