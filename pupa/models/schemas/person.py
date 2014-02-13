@@ -11,11 +11,14 @@ schema = {
         ('Common Fields', ('updated_at', 'created_at', 'sources')),
     ),
     "properties": {
-        'updated_at': {"type": ["string", "datetime"], "required": False,
-                    "description": "the time that the object was last updated",
-                   },
-        'created_at': {"type": ["string", "datetime"], "required": False,
-                    "description": "the time that this object was first created" },
+        "updated_at": {
+            "description": "The time at which the resource was last modified",
+            "type": ["string", "datetime", "null"],
+        },
+        "created_at": {
+            "description": "The time at which the resource was created",
+            "type": ["string", "datetime", "null"],
+        },
         "biography": {
             "description": "An extended account of a person's life",
             "type": ["string", "null"],
@@ -34,15 +37,6 @@ schema = {
             "description": "A gender",
             "type": ["string", "null"],
         },
-        # reinstate these?
-        #"honorific_prefix": {
-        #    "description": "One or more honorifics preceding a person's name",
-        #    "type": ["string", "null"],
-        #},
-        #"honorific_suffix": {
-        #    "description": "One or more honorifics following a person's name",
-        #    "type": ["string", "null"],
-        #},
         "image": {
             "description": "A URL of a head shot",
             "format": "uri",
@@ -50,11 +44,11 @@ schema = {
         },
         "name": {
             "description": "A person's preferred full name",
-            "type": "string"
+            "type": "string",
         },
         "sort_name": {
             "description": "A name to use in a lexicographically ordered list",
-            "type": "string"
+            "type": "string",
         },
         "contact_details": contact_details,
         "other_names": other_names,
@@ -62,6 +56,10 @@ schema = {
         "identifiers": identifiers,
         "summary": {
             "description": "A one-line account of a person's life",
+            "type": ["string", "null"],
+        },
+        "national_identity": {
+            "description": "A national identity",
             "type": ["string", "null"],
         },
         "sources": sources,

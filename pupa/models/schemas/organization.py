@@ -5,7 +5,7 @@ CLASSIFICATIONS = ['legislature', 'party', 'committee', 'commission']
 schema = {
     "properties": {
         "classification": {
-            "description": "The type of organization represented by this entity.",
+            "description": "An organization category, e.g. committee",
             "type": ["string", "null"],
             "enum": CLASSIFICATIONS,
         },
@@ -20,11 +20,14 @@ schema = {
             "type": ["string", "null"],
         },
 
-        'updated_at': {"type": ["string", "datetime"], "required": False,
-                    "description": "the time that the object was last updated",
-                   },
-        'created_at': {"type": ["string", "datetime"], "required": False,
-                    "description": "the time that this object was first created" },
+        "updated_at": {
+            "description": "The time at which the resource was last modified",
+            "type": ["string", "datetime", "null"],
+        },
+        "created_at": {
+            "description": "The time at which the resource was created",
+            "type": ["string", "datetime", "null"],
+        },
 
         "identifiers": identifiers,
         "other_names": other_names,
@@ -36,12 +39,15 @@ schema = {
             "type": "string"
         },
         "parent_id": {
-            "description": "Open Civic Data ID of organization that contains this organization.",
+            "description": "The ID of the organization that contains this organization",
+            "type": ["string", "null"],
+        },
+        "image": {
+            "description": "A URL of an image",
             "type": ["string", "null"],
         },
         "posts": {
-            "description": ("Positions that exist independently of the person holding them. "
-                            "(such as chairman or minority whip)"),
+            "description": "Posts within the organization",
             "items": {
                 "properties": {
                     "contact_details": contact_details,
@@ -51,7 +57,7 @@ schema = {
                         "type": ["string", "null"],
                     },
                     "label": {
-                        "description": "A label describing the post.",
+                        "description": "A label describing the post",
                         "type": "string"
                     },
                     "organization_id": {
@@ -59,16 +65,16 @@ schema = {
                         "type": ["string", "null"],
                     },
                     "role": {
-                        "description": "The role that the holder of the post fulfills",
+                        "description": "The function that the holder of the post fulfills",
                         "type": ["string", "null"],
                     },
                     "start_date": {
-                        "description": "Startting date of the post.",
+                        "description": "The date on which the post was created",
                         "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
                         "type": ["string", "null"],
                     },
                     "end_date": {
-                        "description": "Ending date of the post.",
+                        "description": "The date on which the post was eliminated",
                         "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
                         "type": ["string", "null"],
                     },
