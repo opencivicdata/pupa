@@ -12,7 +12,9 @@ class Membership(BaseModel):
     _collection = 'memberships'
     __slots__ = ("organization_id", "person_id", "post_id", "role",
                  "start_date", "end_date", "contact_details", "chamber",
-                 'jurisdiction_id', 'unmatched_legislator')
+                 'jurisdiction_id', 'unmatched_legislator', 'label',
+                 'on_behalf_of_id',
+                )
 
     def __init__(self, person_id, organization_id, **kwargs):
         """
@@ -31,6 +33,8 @@ class Membership(BaseModel):
         self.post_id = None
         self.role = None
         self.unmatched_legislator = None
+        self.label = None
+        self.on_behalf_of_id = None
 
         for k, v in kwargs.items():
             setattr(self, k, v)

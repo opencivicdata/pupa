@@ -10,7 +10,9 @@ class Organization(BaseModel):
     __slots__ = ('classification', 'dissolution_date', 'founding_date',
                  'identifiers', 'name', 'other_names', 'parent_id', 'chamber',
                  'posts', '_openstates_id', 'contact_details', 'division_id',
-                 'abbreviation', 'jurisdiction_id', 'identifiers', 'links',)
+                 'abbreviation', 'jurisdiction_id', 'identifiers', 'links',
+                 'image',
+                )
 
     _post_slots = ('end_date', 'id', 'label', 'organization_id', 'role',
                    'start_date', 'chamber', 'division_id',
@@ -31,6 +33,7 @@ class Organization(BaseModel):
         self.founding_date = None
         self.dissolution_date = None
         self.parent_id = None
+        self.image = None
         self.other_names = []
         self.identifiers = []
         self.posts = []
