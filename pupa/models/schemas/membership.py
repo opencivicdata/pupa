@@ -18,6 +18,9 @@ schema = {
             "description": "The ID of the organization that is a party to the relationship",
             "type": "string",
         },
+        # The membership's person may only be linked at import time, but objects
+        # are validated at scrape time; therefore, the person_id is allowed to
+        # have a type of "null" at scrape time.
         "person_id": {
             "description": "The ID of the person who is a party to the relationship",
             "type": ["string", "null"],

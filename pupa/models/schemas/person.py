@@ -6,7 +6,7 @@ schema = {
     "id": "http://popoloproject.com/schemas/person.json#",
     "_order": (
         ('Basics', ('name', 'image', 'contact_details', 'links')),
-        ('Extended Details', ('gender', 'summary', 'biography', 'birth_date', 'death_date', 'sort_name')),
+        ('Extended Details', ('gender', 'summary', 'biography', 'birth_date', 'death_date')),
         ('Alternate Names/Identifiers', ('identifiers', 'other_names')),
         ('Common Fields', ('updated_at', 'created_at', 'sources')),
     ),
@@ -44,10 +44,6 @@ schema = {
         },
         "name": {
             "description": "A person's preferred full name",
-            "type": "string",
-        },
-        "sort_name": {
-            "description": "A name to use in a lexicographically ordered list",
             "type": "string",
         },
         "contact_details": contact_details,
