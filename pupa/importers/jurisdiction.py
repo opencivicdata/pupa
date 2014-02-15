@@ -23,7 +23,7 @@ def import_jurisdiction(org_importer, jurisdiction):
 
     db.jurisdictions.save(obj)
 
-    # create organization(s) (TODO: if there are multiple chambers this isn't right)
+    # create organization(s)
     org = Organization(name=jurisdiction.name, classification='legislature',
                        jurisdiction_id=jurisdiction.jurisdiction_id)
     if jurisdiction.other_names:
@@ -31,7 +31,14 @@ def import_jurisdiction(org_importer, jurisdiction):
     if jurisdiction.parent_id:
         org.parent_id = jurisdiction.parent_id
 
-    org_importer.import_object(org)
+    parent_id = org_importer.import_object(org)
+
+    if jurisdiction.chambers:
+        for chamber, properties in jurisdiction.chambers.items():
+            org = Organization(name=properties['name'], classification='legislature',
+                               chamber=chamber, parent_id=parent_id,
+                               jurisdiction_id=jurisdiction.jurisdiction_id)
+            org_importer.import_object(org)
 
     # create parties
     for party in jurisdiction.parties:
