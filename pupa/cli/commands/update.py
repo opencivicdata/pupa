@@ -169,6 +169,8 @@ class Command(BaseCommand):
                     report[session].update(scraper.scrape_votes())
                 elif 'speeches' in scraper_types:
                     report[session].update(scraper.scrape_speeches())
+                elif 'statutes' in scraper_types:
+                    report[session].update(scraper.scrape_statutes())
 
         return report
 
