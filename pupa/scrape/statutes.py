@@ -1,7 +1,7 @@
 import os
 import json
 
-from pupa.models.statutes import StructureNode, Edge
+from pupa.models.statutes import StructureNode, ContentNode, Edge
 from pupa.utils import JSONEncoderPlus
 from pupa.utils.urls import Urls
 from .base import Scraper

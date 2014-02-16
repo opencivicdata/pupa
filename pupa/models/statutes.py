@@ -41,8 +41,9 @@ class ContentNode(StructureNode):
     still displayed statutes).
     """
     _schema = content_schema
-    __slots__ = ('division', 'enum', 'heading', 'order', 'status')
-    _other_name_slots = ('start_date', 'end_date', 'notes', 'history')
+    __slots__ = (
+        'division', 'enum', 'heading', 'order', 'children', 'status',
+        'notes', 'history')
 
     def __repr__(self):
         as_dict = self.as_dict()
