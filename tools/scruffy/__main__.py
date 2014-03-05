@@ -33,5 +33,4 @@ for checker in load_checkers():
     for check in checker(db):
         report[check['collection']].append(check)
 
-
 print json.dumps(report, indent=4, sort_keys=True, cls=JSONEncoderPlus)

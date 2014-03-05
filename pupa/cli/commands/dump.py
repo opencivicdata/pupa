@@ -1,13 +1,20 @@
-#!/usr/bin/env python
-from pupa.utils import JSONEncoderPlus
+from __future__ import print_function
 from contextlib import contextmanager
-from pymongo import Connection
-import argparse
 import json
 import os
+from pupa.core import db
+from .base import BaseCommand
+from pupa.utils import JSONEncoderPlus
 
 
-jurisdiction = args.jurisdiction
+@contextmanager
+def cd(path):
+    pop = os.getcwd()
+    os.chdir(path)
+    try:
+        yield path
+    finally:
+        os.chdir(pop)
 
 
 def normalize_person(entry):
@@ -20,7 +27,6 @@ def normalize_person(entry):
     entry['memberships'] = data
 
     return entry
-
 
 
 def dump(collection, spec):
@@ -42,11 +48,6 @@ def do_write(entry, where=None):
     with open(path, 'w') as fd:
         #print path
         json.dump(entry, fd, cls=JSONEncoderPlus)
-
-
-path = args.output
-if not os.path.exists(path):
-    os.makedirs(path)
 
 
 def dump_people(where):
@@ -75,7 +76,7 @@ def dump_jurisdiction_data(where):
         'latest_json_date', 'latest_csv_date'
     ]:
         if x in meta:
-            meta.pop(x)
+            meta.pop(x, None)
 
     for key in meta.keys():
         if key.startswith("_") and key != "_id":
@@ -87,31 +88,39 @@ def dump_jurisdiction_data(where):
         json.dump(meta, fd, cls=JSONEncoderPlus)
 
 
-
 def dump_juris(jurisdiction):
     spec = {"jurisdiction_id": jurisdiction}
 
-    for collection in [
-        db.bills,
-        db.votes,
-        db.events,
-        db.organizations,
-    ]:
+    for collection in [db.bills, db.votes, db.events, db.organizations]:
         dump(collection, spec)
 
     dump_people(jurisdiction)
     dump_jurisdiction_data(jurisdiction)
 
 
-with cd(path):
-    if jurisdiction:
-        dump_juris(jurisdiction)
-    else:
-        for orga in db.organizations.find({
-            "classification": "legislature",
-        }, timeout=False):
-            if 'jurisdiction_id' not in orga:
-                print "WARNING: NO JURISDICTION_ID ON %s" % (orga['_id'])
-                continue
+class Command(BaseCommand):
+    name = 'dump'
+    help = '''create a json dump'''
 
-            dump_juris(orga['jurisdiction_id'])
+    def add_args(self):
+        self.add_argument('jurisdiction', type=str, help='jurisdiction_id to dump',
+                          default=None, nargs='?')
+        self.add_argument('--output', type=str, help='output directory', default="dump")
+
+    def handle(self, args):
+        path = args.output
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        with cd(path):
+            if args.jurisdiction:
+                dump_juris(args.jurisdiction)
+            else:
+                for orga in db.organizations.find({
+                    "classification": "legislature",
+                }, timeout=False):
+                    if 'jurisdiction_id' not in orga:
+                        print("WARNING: NO JURISDICTION_ID ON %s" % (orga['_id']))
+                        continue
+
+                    dump_juris(orga['jurisdiction_id'])

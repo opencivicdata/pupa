@@ -10,9 +10,11 @@ class Organization(BaseModel):
     __slots__ = ('classification', 'dissolution_date', 'founding_date',
                  'identifiers', 'name', 'other_names', 'parent_id', 'chamber',
                  'posts', '_openstates_id', 'contact_details', 'division_id',
-                 'abbreviation', 'jurisdiction_id', 'identifiers', 'links',)
+                 'abbreviation', 'jurisdiction_id', 'identifiers', 'links',
+                 'image',
+                )
 
-    _post_slots = ('end_date', 'id', 'label', 'organization_id', 'role',
+    _post_slots = ('end_date', 'id', 'label', 'role',
                    'start_date', 'chamber', 'division_id',
                    'num_seats')
 
@@ -31,6 +33,7 @@ class Organization(BaseModel):
         self.founding_date = None
         self.dissolution_date = None
         self.parent_id = None
+        self.image = None
         self.other_names = []
         self.identifiers = []
         self.posts = []
@@ -69,7 +72,7 @@ class Organization(BaseModel):
     def parent(self, val):
         self.parent_id = val._id
 
-    def add_link(self, url, note):
+    def add_link(self, url, note=None):
         self.links.append({"note": note, "url": url})
 
     def add_identifier(self, identifier, scheme=None):

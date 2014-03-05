@@ -34,13 +34,19 @@ def check(db):
                         tagname='jurisdiction-has-a-parent',
                         severity='important')
 
-        prefix, uid = jid.split("/", 1)
-        uid, what = uid.rsplit("/", 1)
-        if prefix != 'ocd-jurisdiction':
+        if "/" not in jid:
             yield Check(collection='organizations',
                         id=org['_id'],
-                        tagname='org-has-bad-jurisdiction-id-prefix',
-                        severity='critical')
+                        tagname='jurisdiction-has-no-slashes',
+                        severity='grave')
+        else:
+            prefix, uid = jid.split("/", 1)
+            uid, what = uid.rsplit("/", 1)
+            if prefix != 'ocd-jurisdiction':
+                yield Check(collection='organizations',
+                            id=org['_id'],
+                            tagname='org-has-bad-jurisdiction-id-prefix',
+                            severity='critical')
 
         if ":" in what:
             yield Check(collection='organizations',

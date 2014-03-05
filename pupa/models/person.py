@@ -16,7 +16,7 @@ class Person(BaseModel):
                  'death_date', 'image', 'summary', 'biography', 'links',
                  'other_names', 'contact_details', '_openstates_id',
                  'chamber', 'district', 'identifiers',
-                 'post_id',
+                 'post_id', 'national_identity',
                 )
     _other_name_slots = ('name', 'start_date', 'end_date', 'note')
 
@@ -29,6 +29,7 @@ class Person(BaseModel):
         self.death_date = None
         self.image = None
         self.gender = None
+        self.national_identity = None
         self.links = []
         self.identifiers = []
         self.other_names = []
@@ -47,7 +48,7 @@ class Person(BaseModel):
             other_name[k] = v
         self.other_names.append(other_name)
 
-    def add_link(self, url, note):
+    def add_link(self, url, note=None):
         self.links.append({"note": note, "url": url})
 
     def add_identifier(self, identifier, scheme=None):

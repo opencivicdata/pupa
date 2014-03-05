@@ -9,6 +9,8 @@ COMMAND_MODULES = (
     'pupa.cli.commands.update',
     'pupa.cli.commands.ensure_indexes',
     'pupa.cli.commands.init',
+    'pupa.cli.commands.import_billy',
+    'pupa.cli.commands.dump',
 )
 
 

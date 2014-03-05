@@ -18,7 +18,7 @@ class PersonScraper(Scraper):
         ecom.add_source('https://example.com')
         yield ecom
 
-        p = Person('Paul Tagliamonte', district='6', chamber='upper')
-        p.add_committee_membership(tech, role='chairman')
+        p = Legislator('Paul Tagliamonte', '6')
+        p.add_membership(tech, role='chairman')
         p.add_source('https://example.com')
         yield p

@@ -49,7 +49,7 @@ def check(db):
                             tagname='end-is-not-datetime',
                             severity='important',
                             data={
-                                "type": type(end),
+                                "type": str(type(end)),
                                 "value": end,
                             })
 
@@ -60,7 +60,7 @@ def check(db):
                         tagname='start-is-not-datetime',
                         severity='important',
                         data={
-                            "type": type(end),
+                            "type": str(type(end)),
                             "value": end,
                         })
 

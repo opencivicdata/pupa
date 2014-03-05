@@ -12,7 +12,9 @@ class Membership(BaseModel):
     _collection = 'memberships'
     __slots__ = ("organization_id", "person_id", "post_id", "role",
                  "start_date", "end_date", "contact_details", "chamber",
-                 'jurisdiction_id', 'unmatched_legislator')
+                 'jurisdiction_id', 'unmatched_legislator', 'label',
+                 'on_behalf_of_id', 'links',
+                )
 
     def __init__(self, person_id, organization_id, **kwargs):
         """
@@ -31,6 +33,9 @@ class Membership(BaseModel):
         self.post_id = None
         self.role = None
         self.unmatched_legislator = None
+        self.label = None
+        self.on_behalf_of_id = None
+        self.links = []
 
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -39,6 +44,9 @@ class Membership(BaseModel):
         self.contact_details.append({"type": type,
                                      "value": value,
                                      "note": note})
+
+    def add_link(self, url, note=None):
+        self.links.append({"note": note, "url": url})
 
     def __str__(self):
         if self.person_id:
