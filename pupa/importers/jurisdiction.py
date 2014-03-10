@@ -12,6 +12,12 @@ def import_jurisdiction(org_importer, jurisdiction):
 
     obj['_type'] = 'jurisdiction'
     obj['_id'] = jurisdiction.jurisdiction_id
+
+    if not obj['_id'].startswith("ocd-jurisdiction/"):
+        raise ValueError("The Jurisdiction appears to have an ID that does not"
+                         " begin with 'ocd-jurisdiction'. I found '%s'" % (
+                         jurisdiction.jurisdiction_id))
+
     obj['latest_update'] = datetime.datetime.utcnow()
 
     # validate jurisdiction
