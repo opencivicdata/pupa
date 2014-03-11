@@ -7,6 +7,7 @@ from .base import BaseCommand
 from pupa.core import db
 from pupa.models import Organization, Membership, Person, Event, Vote, Bill
 
+import csv
 
 indices = [
     ("bills", "_openstates_id"),
@@ -30,6 +31,8 @@ type_tables = {
 _hot_cache = {}
 _cache_touched = {}
 name_cache = {}
+
+OCD_ID_LISTING = "/home/tag/dev/sunlight/ocd-division-ids/identifiers/country-us.csv"
 
 
 def obj_to_jid(obj):
@@ -141,6 +144,7 @@ class Command(BaseCommand):
     help = '''import data from a billy instance'''
 
     def add_args(self):
+        self.add_argument('mappings', type=str, help='OpenStates mapping files to use')
         self.add_argument('state', type=str, help='State to rebuild', default=None, nargs='?')
         self.add_argument('--billy-server', type=str, help='Billy Mongo Server',
                           default="localhost")
@@ -157,6 +161,15 @@ class Command(BaseCommand):
         self.quiet = args.quiet
         self.validate = args.dont_validate
         self.billy_db = Connection(args.billy_server, args.billy_port)[args.billy_database]
+        self.mapping_dir = args.mappings
+
+        self.valid_geo_ids = {}
+        self.osid_to_geo_id = {}
+        for row in csv.DictReader(open(OCD_ID_LISTING, 'r').readlines()):
+            self.valid_geo_ids[row['id']] = row
+
+            if row['openstates_district'] != "":
+                self.osid_to_geo_id[row['openstates_district']] = row
 
         for database, index in indices:
             db[database].ensure_index(index)
@@ -496,14 +509,47 @@ class Command(BaseCommand):
                     if 'district' in role:
                         oid = "{state}-{chamber}".format(**role)
                         leg_ocdid = _hot_cache.get(oid)
+
+                        geo_id = self.get_slug(
+                            entry['state'], role['chamber'], role['district']
+                        )
+
                         if leg_ocdid:
                             m = Membership(who._id, leg_ocdid,
                                            start_date=str(start_year),
                                            end_date=str(end_year),
+                                           division_id=geo_id,
                                            post_id=role['district'],
                                            chamber=role['chamber'])
                             m.add_extra('term', term['name'])
                             self.save_object(m)
+
+    def get_slug(self, state, chamber, district):
+        path = "%s/%s.csv" % (self.mapping_dir, state)
+        for row in csv.DictReader(open(path, 'r').readlines()):
+            if (row['chamber'] == chamber and
+                    row['name'].lower().strip() == district.lower().strip() and
+                    row['abbr'] == state):
+
+                _, slug = row['boundary_id'].rsplit("/", 1)
+                _, slug = slug.split("-", 1)
+
+                osid = "%s-%s-%s" % (state, chamber, slug)
+                return self.osid_to_geo_id[osid]['id']
+
+        if "-" in district or "," in district:
+            # Hack for MA.
+            if "," in district:
+                nd, _ = district.rsplit(",", 1)
+            else:
+                nd, _ = district.rsplit("-", 1)
+
+            return self.get_slug(state, chamber, nd.strip())
+
+        print("")
+        print("Note: Not finding geo-id for %s %s %s" % (
+            state, chamber, district))
+        print("")
 
     def migrate_bills(self, state):
         spec = {}

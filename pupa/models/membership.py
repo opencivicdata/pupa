@@ -13,7 +13,7 @@ class Membership(BaseModel):
     __slots__ = ("organization_id", "person_id", "post_id", "role",
                  "start_date", "end_date", "contact_details", "chamber",
                  'jurisdiction_id', 'unmatched_legislator', 'label',
-                 'on_behalf_of_id', 'links',
+                 'division_id', 'on_behalf_of_id', 'links',
                 )
 
     def __init__(self, person_id, organization_id, **kwargs):
@@ -36,6 +36,7 @@ class Membership(BaseModel):
         self.label = None
         self.on_behalf_of_id = None
         self.links = []
+        self.division_id = None
 
         for k, v in kwargs.items():
             setattr(self, k, v)
