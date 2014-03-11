@@ -32,8 +32,6 @@ _hot_cache = {}
 _cache_touched = {}
 name_cache = {}
 
-OCD_ID_LISTING = "/home/tag/dev/sunlight/ocd-division-ids/identifiers/country-us.csv"
-
 
 def obj_to_jid(obj):
     if obj._openstates_id:
@@ -145,6 +143,7 @@ class Command(BaseCommand):
 
     def add_args(self):
         self.add_argument('mappings', type=str, help='OpenStates mapping files to use')
+        self.add_argument('ocd_mapping', type=str, help='OpenCivic mapping file to use (country-us.csv)')
         self.add_argument('state', type=str, help='State to rebuild', default=None, nargs='?')
         self.add_argument('--billy-server', type=str, help='Billy Mongo Server',
                           default="localhost")
@@ -162,10 +161,11 @@ class Command(BaseCommand):
         self.validate = args.dont_validate
         self.billy_db = Connection(args.billy_server, args.billy_port)[args.billy_database]
         self.mapping_dir = args.mappings
+        self.ocd_mapping = args.ocd_mapping
 
         self.valid_geo_ids = {}
         self.osid_to_geo_id = {}
-        for row in csv.DictReader(open(OCD_ID_LISTING, 'r').readlines()):
+        for row in csv.DictReader(open(self.ocd_mapping, 'r').readlines()):
             self.valid_geo_ids[row['id']] = row
 
             if row['openstates_district'] != "":
