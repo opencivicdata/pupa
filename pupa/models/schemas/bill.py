@@ -127,11 +127,17 @@ schema = {
                     "name": {"type": "string",
                              "description": "Name of related bill."
                             },
-                    "relation_type": {"enum": ["companion"], "type": "string",
-                                      "description": ("Currently should be 'companion', others "
-                                                      "may be added in the future."),
-
-                                     },
+                    "relation_type": {
+                        "enum": [
+                            "companion",
+                            "other-session",
+                        ],
+                        "type": "string",
+                        "description": (
+                            "Currently should be either 'companion',"
+                            "or 'other-session' for reintroductions"
+                        ),
+                    },
                 },
                 "type": "object"
             },
