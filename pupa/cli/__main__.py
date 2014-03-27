@@ -29,7 +29,10 @@ def main():
 
     # process args
     args = parser.parse_args()
-    subcommands[args.subcommand].handle(args)
+    if not args.subcommand:
+        parser.print_help()
+    else:
+        subcommands[args.subcommand].handle(args)
 
 
 if __name__ == '__main__':
