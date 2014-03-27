@@ -33,11 +33,9 @@ def bills_by_jurisdiction(jurisdiction_id):
 def people_by_name(name, people_ids=None, **kwargs):
     """ Find all people by their name. Optional people_ids _id constraint """
     spec = kwargs.copy()
-    spec.update({"$or": [
-        { "name": name },
-        { "other_names.name": name },
-        { "identifiers.identifier": name },
-    ]})
+    spec.update({"$or": [{"name": name},
+                         {"other_names.name": name},
+                         {"identifiers.identifier": name}, ]})
     if people_ids is not None:
         # This isn't a raw if conditional, since you could pass
         # an empty list.
@@ -48,12 +46,10 @@ def people_by_name(name, people_ids=None, **kwargs):
 def bills_by_name(name, bill_ids=None, **kwargs):
     """ Find all bills by their name. Optional bill_ids _id constraint """
     spec = kwargs.copy()
-    spec.update({"$or": [
-        { "name": name },
-        { "bill_id": name },
-        { "alternate_titles.title": name },
-        { "alternate_bill_ids.bill_id": name },
-    ]})
+    spec.update({"$or": [{"name": name},
+                         {"bill_id": name},
+                         {"alternate_titles.title": name},
+                         {"alternate_bill_ids.bill_id": name}]})
     if bill_ids is not None:
         # This isn't a raw if conditional, since you could pass
         # an empty list.
@@ -65,11 +61,9 @@ def orgs_by_name(name, org_ids=None, **kwargs):
     """ Find all orgs their name. Optional org_ids _id constraint """
     spec = kwargs.copy()
 
-    spec.update({"$or": [
-        { "name": name },
-        { "other_names.name": name },
-        { "identifiers.identifier": name },
-    ]})
+    spec.update({"$or": [{"name": name},
+                         {"other_names.name": name},
+                         {"identifiers.identifier": name}]})
 
     if org_ids is not None:
         # This isn't a raw if conditional, since you could pass

@@ -74,7 +74,7 @@ class BaseModel(object):
             db_obj['location'] = None
 
         if _type == 'vote':
-            # Hack to deal with Vote mangling. We abstract away the 
+            # Hack to deal with Vote mangling. We abstract away the
             # counts so that scrapers don't have to deal with it. This
             # isn't great, but kinda needed.
             counts = db_obj['vote_counts']
@@ -125,7 +125,6 @@ class BaseModel(object):
     def save(self):
         db[self._collection].save(self.as_dict())
 
-
     # operators
 
     def __eq__(self, other):
@@ -135,4 +134,3 @@ class BaseModel(object):
         sd.pop('_id')
         od.pop('_id')
         return sd == od
-

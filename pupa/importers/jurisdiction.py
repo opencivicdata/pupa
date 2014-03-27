@@ -1,5 +1,3 @@
-import os
-import json
 import datetime
 from pupa.core import db
 from pupa.models import Organization
@@ -16,7 +14,7 @@ def import_jurisdiction(org_importer, jurisdiction):
     if not obj['_id'].startswith("ocd-jurisdiction/"):
         raise ValueError("The Jurisdiction appears to have an ID that does not"
                          " begin with 'ocd-jurisdiction'. I found '%s'" % (
-                         jurisdiction.jurisdiction_id))
+                             jurisdiction.jurisdiction_id))
 
     obj['latest_update'] = datetime.datetime.utcnow()
 

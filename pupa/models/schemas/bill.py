@@ -26,16 +26,13 @@ schema = {
     "properties": {
 
         "_type": {"enum": ["bill"], "type": "string",
-                  "description": "All bills have a _type field set to bill."
-                 },
+                  "description": "All bills have a _type field set to bill."},
 
         "organization": {"type": ["string", "null"],
-                         "description": "name of the legislative body that this bill belongs to",
-                        },
+                         "description": "name of the legislative body that this bill belongs to"},
 
         "organization_id": {"type": ["string", "null"],
-                            "description": "ID of legislative body that this bill belongs to",
-                           },
+                            "description": "ID of legislative body that this bill belongs to"},
 
         "session": {"type": "string",
                     "description": "associated with one of the jurisdiction's sessions"},
@@ -43,20 +40,18 @@ schema = {
         "name": {"type": "string",
                  "description": ("jurisdiction-assigned permanent name.  Must be unique within a "
                                  "given session (e.g. HB 3).  Note: not to be confused with "
-                                 "``title``.")
-                },
+                                 "``title``.") },
 
         'updated_at': {"type": ["string", "datetime"], "required": False,
-                    "description": "the time that the object was last updated",
-                   },
+                    "description": "the time that the object was last updated", },
 
         'created_at': {"type": ["string", "datetime"], "required": False,
                     "description": "the time that this object was first created" },
 
         'chamber': {
             "enum": ["upper", "lower", "joint"], "type": ["string", "null"],
-            "description": "chamber vote took place in (if legislature is bicameral, otherwise null)",
-        },
+            "description": ("chamber vote took place in (if legislature is bicameral, "
+                            "otherwise null)"),},
 
         "title": {"type": "string", "description": "primary display title for the bill"},
 

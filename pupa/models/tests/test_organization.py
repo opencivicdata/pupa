@@ -28,7 +28,6 @@ def test_add_post():
     assert orga.posts[0]['role'] == "Chef"
     assert orga.posts[0]['label'] == "Human Readable Name"
 
-
     @raises(TypeError)
     def _():
         orga.add_identifier("id10t", foo="bar")

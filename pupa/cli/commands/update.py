@@ -3,10 +3,8 @@ import os
 import sys
 import glob
 import importlib
-import warnings
 import traceback
 from collections import defaultdict
-from functools import reduce
 
 from .base import BaseCommand
 from pupa import utils

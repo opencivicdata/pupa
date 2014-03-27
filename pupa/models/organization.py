@@ -11,8 +11,7 @@ class Organization(BaseModel):
                  'identifiers', 'name', 'other_names', 'parent_id', 'chamber',
                  'posts', '_openstates_id', 'contact_details', 'division_id',
                  'abbreviation', 'jurisdiction_id', 'identifiers', 'links',
-                 'image',
-                )
+                 'image')
 
     _post_slots = ('end_date', 'id', 'label', 'role',
                    'start_date', 'chamber', 'division_id',

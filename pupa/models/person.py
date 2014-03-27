@@ -16,8 +16,7 @@ class Person(BaseModel):
                  'death_date', 'image', 'summary', 'biography', 'links',
                  'other_names', 'contact_details', '_openstates_id',
                  'chamber', 'district', 'identifiers',
-                 'post_id', 'national_identity',
-                )
+                 'post_id', 'national_identity',)
     _other_name_slots = ('name', 'start_date', 'end_date', 'note')
 
     def __init__(self, name, **kwargs):
