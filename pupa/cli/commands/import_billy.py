@@ -143,7 +143,8 @@ class Command(BaseCommand):
 
     def add_args(self):
         self.add_argument('mappings', type=str, help='OpenStates mapping files to use')
-        self.add_argument('ocd_mapping', type=str, help='OpenCivic mapping file to use (country-us.csv)')
+        self.add_argument('ocd_mapping', type=str,
+                          help='OpenCivic mapping file to use (country-us.csv)')
         self.add_argument('state', type=str, help='State to rebuild', default=None, nargs='?')
         self.add_argument('--billy-server', type=str, help='Billy Mongo Server',
                           default="localhost")

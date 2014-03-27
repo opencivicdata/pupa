@@ -7,14 +7,11 @@ contact_details = {
             "type": {"type": "string",
                      "description": "type of contact (e.g. phone, email, address)"},
             "value": {"type": "string",
-                      "description": "actual phone number/email address/etc.",
-                     },
+                      "description": "actual phone number/email address/etc.", },
             "note": {"type": ["string", "null"],
-                     "description": "for grouping data by location/etc."
-                    },
+                     "description": "for grouping data by location/etc.", },
             "label": {"type": ["string", "null"],
-                      "description": "human readable label",
-                     },
+                      "description": "human readable label", },
         }
     }
 }
@@ -25,8 +22,7 @@ identifiers = {
             "identifier": {"type": "string",
                            "description": "The 3rd-party identifier, such as OKL0001000."},
             "scheme": {"type": ["string", "null"],
-                       "description": "What service this identifier is used by."
-                      },
+                       "description": "What service this identifier is used by."},
         }
     },
     "type": "array",
@@ -38,8 +34,7 @@ other_names = {
     "items": {
         "properties": {
             "name": {"type": "string",
-                     "description": "An alternate name this object is sometimes known by.",
-                    },
+                     "description": "An alternate name this object is sometimes known by."},
             "start_date": {
                 "type": ["string", "null"],
                 "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
@@ -54,8 +49,7 @@ other_names = {
             },
             "note": {"type": ["string", "null"],
                      "description": ("An optional note describing where this alternate name came "
-                                     "from or its relationship to the entity."),
-                    }
+                                     "from or its relationship to the entity."), }
         },
         "type": "object",
     },

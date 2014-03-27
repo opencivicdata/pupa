@@ -40,18 +40,18 @@ schema = {
         "name": {"type": "string",
                  "description": ("jurisdiction-assigned permanent name.  Must be unique within a "
                                  "given session (e.g. HB 3).  Note: not to be confused with "
-                                 "``title``.") },
+                                 "``title``.")},
 
         'updated_at': {"type": ["string", "datetime"], "required": False,
-                    "description": "the time that the object was last updated", },
+                       "description": "the time that the object was last updated", },
 
         'created_at': {"type": ["string", "datetime"], "required": False,
-                    "description": "the time that this object was first created" },
+                       "description": "the time that this object was first created", },
 
         'chamber': {
             "enum": ["upper", "lower", "joint"], "type": ["string", "null"],
             "description": ("chamber vote took place in (if legislature is bicameral, "
-                            "otherwise null)"),},
+                            "otherwise null)"), },
 
         "title": {"type": "string", "description": "primary display title for the bill"},
 
@@ -69,10 +69,9 @@ schema = {
                 "properties": {
                     "text": {"type": "string", "description": "Summary of bill."},
                     "note": {"type": ["string", "null"],
-                                      "description": "note describing source of summary"},
+                             "description": "note describing source of summary"},
                 },
-                "type": "object"
-            },
+                "type": "object"},
             "type": "array",
             "description": ("List of summaries of bill, each item in list has a note and text "
                             "attribute."),
@@ -116,22 +115,13 @@ schema = {
         "related_bills": {
             "items": {
                 "properties": {
-                    "session": {"type": "string",
-                                "description": "Session of related bill."
-                               },
-                    "name": {"type": "string",
-                             "description": "Name of related bill."
-                            },
+                    "session": {"type": "string", "description": "Session of related bill."},
+                    "name": {"type": "string", "description": "Name of related bill."},
                     "relation_type": {
-                        "enum": [
-                            "companion",
-                            "other-session",
-                        ],
+                        "enum": ["companion", "other-session"],
                         "type": "string",
-                        "description": (
-                            "Currently should be either 'companion',"
-                            "or 'other-session' for reintroductions"
-                        ),
+                        "description": ("Currently should be either 'companion',"
+                                        "or 'other-session' for reintroductions"),
                     },
                 },
                 "type": "object"
@@ -145,28 +135,25 @@ schema = {
         "sponsors": {
             "items": {
                 "properties": {
-                    "sponsorship_type": {"type": "string",
-                                         "description": "Type of sponsorship, via upstream source."
-                                        },
+                    "sponsorship_type": {
+                        "type": "string",
+                        "description": "Type of sponsorship, via upstream source."
+                    },
                     "primary": {
                         "type": "boolean",
                         "description": "Indicates if sponsor is considered primary by source",
                     },
                     "name": {"type": "string",
-                             "description": "Name of sponsor, as given by source.",
-                            },
+                             "description": "Name of sponsor, as given by source.", },
                     # TODO: convert to hint object?
                     "chamber": {"enum": ["upper", "lower"], "type": ["string", "null"],
-                                "description": "Chamber of sponsor.",
-                               },
+                                "description": "Chamber of sponsor.", },
                     "id": {"type": ["string", "null"],
                            "description": ("ID of entity if the sponsor has been resolved to "
-                                           "another entity in the database.")
-                          },
+                                           "another entity in the database."), },
                     "_type": {"type": ["string", "null"], "enum": ["organization", "person"],
-                           "description": ("Type of entity if the sponsor has been resolved to "
-                                           "another entity in the database.")
-                             }
+                              "description": ("Type of entity if the sponsor has been resolved to "
+                                              "another entity in the database."), }
                 },
                 "type": "object"
             },
@@ -205,14 +192,11 @@ schema = {
                                           "type": ["string", "null"],
                                           "description": ("Type of entity if the sponsor has been "
                                                           "resolved to another entity in the "
-                                                          "database."),
-
-                                         },
+                                                          "database."), },
                                 "id": {"type": ["string", "null"],
                                        "description": ("ID of entity if the sponsor has been "
                                                        "resolved to another entity in the "
-                                                       "database.")
-                                      },
+                                                       "database.")},
                             },
                             "type": "object"
                         },
@@ -245,9 +229,8 @@ schema = {
                         "items": {
                             "properties": {
                                 "mimetype": {"type": ["string", "null"],
-                                             "description": "mimetype of document"
-                                            },
-                                "url": {"type": "string", "description": "URL to document" }
+                                             "description": "mimetype of document"},
+                                "url": {"type": "string", "description": "URL to document"}
                             },
                             "type": "object"
                         },
@@ -275,9 +258,8 @@ schema = {
                         "items": {
                             "properties": {
                                 "mimetype": {"type": ["string", "null"],
-                                             "description": "mimetype of document"
-                                            },
-                                "url": {"type": "string", "description": "URL to document" }
+                                             "description": "mimetype of document"},
+                                "url": {"type": "string", "description": "URL to document"}
                             },
                             "type": "object"
                         },
@@ -288,7 +270,7 @@ schema = {
                 "type": "object"
             },
             "type": "array",
-            "description": "Any non-version related documents, elements are identical to versions.",
+            "description": "Any non-version related documents. (elements same format as versions)",
         },
         "sources": sources,
     }

@@ -23,36 +23,36 @@ schema = {
     "properties": {
 
         'organization': {"type": ["string", "null"],
-                      "description": "name of the voting organization"},
+                         "description": "name of the voting organization"},
 
         'organization_id': {"type": ["string", "null"],
-                         "description": "id of the voting organization"},
+                            "description": "id of the voting organization"},
 
         '_type': {"enum": ["vote"], "type": "string",
-               "description": "All vote objects must have a _type field set to vote." },
+                  "description": "All vote objects must have a _type field set to vote."},
 
         'session': {"type": "string",
-                 "description": "Associated with one of the jurisdiction's sessions"},
+                    "description": "Associated with one of the jurisdiction's sessions"},
 
         'updated_at': {"type": ["string", "datetime"], "required": False,
-                    "description": "the time that the object was last updated",
-                   },
+                       "description": "the time that the object was last updated"},
 
         'created_at': {"type": ["string", "datetime"], "required": False,
-                    "description": "the time that this object was first created" },
+                       "description": "the time that this object was first created"},
 
         'chamber': {
             "enum": ["upper", "lower", "joint"], "type": ["string", "null"],
-            "description": "chamber vote took place in (if legislature is bicameral, otherwise null)",
-        },
+            "description": ("chamber vote took place in (if legislature is bicameral, "
+                            "otherwise null)"), },
 
         'date': {"pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$", "type": "string",
-              "description": "date of the action" },
+                 "description": "date of the action"},
 
-        'motion': {"type": "string", "description": "description of motion (from upstream source)"},
+        'motion': {"type": "string",
+                   "description": "description of motion (from upstream source)"},
 
         'type': {"items": {"type": "string", "enum": VOTE_TYPES}, "type": "array",
-                 "description": "array of types" },
+                 "description": "array of types"},
 
         'passed': {"type": "boolean", "description": "boolean indicating if vote passed"},
 
@@ -61,14 +61,12 @@ schema = {
             "properties": {
                 "id": {"type": ["string", "null"],
                        "description": ("bill's internal id if bill was matched with an object in "
-                                       "the database")
-
-                      },
+                                       "the database")},
                 "name": {"type": "string", "description": "bill name (e.g. HB 21)"},
                 "chamber": {
                     "enum": ["upper", "lower"], "type": ["string", "null"],
-                    "description": "bill's chamber if vote was on a bill (and legislature is bicameral, otherwise null)"
-                },
+                    "description": ("bill's chamber if vote was on a bill "
+                                    "(if legislature is bicameral, otherwise null)")},
             },
             "description": ("Related bill, votes will have a non-null bill object if"
                             "they are related to a bill. Bills will have the following fields:"),
@@ -78,11 +76,9 @@ schema = {
             "items": {
                 "properties": {
                     "vote_type": {"type": "string", "enum": ROLLCALL_TYPES,
-                                  "description": "(e.g. yes, no, not-voting)"
-                                 },
+                                  "description": "(e.g. yes, no, not-voting)"},
                     "count": {"type": "integer", "minimum": 0,
-                              "description": "number of people voting this way",
-                             }
+                              "description": "number of people voting this way"}
                 },
                 "type": "object"
             },
@@ -94,8 +90,7 @@ schema = {
                 "type": "object",
                 "properties": {
                     "vote_type": {"type": "string", "enum": ROLLCALL_TYPES,
-                                  "description": "(e.g. yes, no, not-voting)"
-                                 },
+                                  "description": "(e.g. yes, no, not-voting)"},
 
                     #     * **name** - person's name as provided by source
                     #     * **id** - person's internal id if they've been
@@ -103,8 +98,11 @@ schema = {
                     "person": {
                         "type": "object",
                         "properties": {
-                            "name": {"type": "string", "description": "person's name as provided by the source"},
-                            "id": {"type": ["string", "null"], "description": "person's internal id if they've been matched to an entity in the database"},
+                            "name": {"type": "string",
+                                     "description": "person's name as provided by the source"},
+                            "id": {"type": ["string", "null"],
+                                   "description": ("person's internal id if they've been matched "
+                                                   "to an entity in the database")},
                         },
                         "description": "person object representing the voter",
                     }

@@ -26,11 +26,13 @@ schema = {
             "type": ["string", "null"],
         },
         "post_id": {
-            "description": "The ID of the post held by the person in the organization through this membership",
+            "description": ("The ID of the post held by the person in the organization "
+                            "through this membership"),
             "type": ["string", "null"],
         },
         "on_behalf_of_id": {
-            "description": "The ID of the organization on whose behalf the person is a party to the relationship",
+            "description": ("The ID of the organization on whose behalf the person "
+                            "is a party to the relationship"),
             "type": ["string", "null"],
         },
         "label": {

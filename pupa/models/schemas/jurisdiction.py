@@ -9,8 +9,7 @@ schema = {
         "name": {"type": "string",
                  "description": "Name of jurisdiction (e.g. North Carolina General Assembly)"},
         "url": {"type": "string",
-                "description": "URL pointing to jurisdiction's website."
-               },
+                "description": "URL pointing to jurisdiction's website.", },
         "chambers": {
             "additionalProperties": {
                 "properties": {
@@ -33,17 +32,14 @@ schema = {
         },
         "sessions": {
             "type": "array", "items": {"type": "object", "properties": {
-              "name": {"type": "string",
-                       "description": "Name of session." },
-              "type": {"type": "string", "required": False,
-                       "description": "Type of session: primary or special." },
-              "start_date": {"type": ["datetime"], "required": False,
-                             "description": "Start date of session."
-                            },
-              "end_date": {"type": ["datetime"], "required": False,
-                           "description": "End date of session."
-                          }
-            } },
+                "name": {"type": "string", "description": "Name of session."},
+                "type": {"type": "string", "required": False,
+                         "description": "Type of session: primary or special."},
+                "start_date": {"type": ["datetime"], "required": False,
+                               "description": "Start date of session."},
+                "end_date": {"type": ["datetime"], "required": False,
+                             "description": "End date of session."}
+            }},
             "description": ("List of sessions. Elements "
                             "consist of several fields giving detail about the session.")
         },
@@ -54,11 +50,10 @@ schema = {
                             "basis."),
         },
         "building_maps": {
-            "type": "array", "items": {"type":"object", "properties": {
+            "type": "array", "items": {"type": "object", "properties": {
                 "name": {"type": "string", "description": "Name of map (e.g. Floor 1)"},
                 "url": {"type": "string", "description": "URL to map image/PDF"}
-            } },
-            "description": ("Links to image/PDF maps of the building."),
-         }
+            }},
+            "description": ("Links to image/PDF maps of the building."), }
     }
 }
