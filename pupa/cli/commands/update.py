@@ -94,17 +94,7 @@ class Command(BaseCommand):
                 # pick up are actually Jurisdiction subclasses.
 
                 # instantiate the class
-                retobj = obj()
-                if hasattr(retobj, 'get_metadata'):
-                    warnings.warn('Jurisdiction class uses deprecated old-style get_metadata')
-                    metadata = retobj.get_metadata()
-                    retobj.name = metadata['name']
-                    retobj.url = metadata['url']
-                    retobj.provides = metadata['provides']
-                    retobj.parties = metadata['parties']
-                    retobj.session_details = metadata['session_details']
-                    retobj.feature_flags = metadata['feature_flags']
-                return retobj
+                return obj()
 
         raise UpdateError('unable to import Jurisdiction subclass from ' +
                           module_name)
