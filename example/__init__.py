@@ -13,9 +13,9 @@ class Example(Jurisdiction):
         {'name': 'Green' },
         {'name': 'Bull-Moose'}
     ]
-    session_details = {
-        '2013': {'_scraped_name': '2013'}
-    }
+    sessions = [
+        {'name': '2013', '_scraped_name': '2013'}
+    ]
 
     def get_scraper(self, session, scraper_type):
         if scraper_type == 'people':
