@@ -6,15 +6,18 @@ import logging
 import datetime
 from collections import defaultdict
 from pupa.core import db
+from pupa.models.base import BaseModel
 from pupa.utils.topsort import Network
 
 
 def _hash(obj):
     """ recursively hash unhashable objects """
     if isinstance(obj, (set, tuple, list)):
-        return hash(tuple(_hash(e) for e in o))
+        return hash(tuple(_hash(e) for e in obj))
     elif isinstance(obj, dict):
         return hash(frozenset((k, _hash(v)) for k, v in obj.items()))
+    elif isinstance(obj, BaseModel):
+        return _hash(obj.as_dict())
     else:
         return hash(obj)
 
