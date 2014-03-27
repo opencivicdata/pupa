@@ -185,7 +185,7 @@ class Command(BaseCommand):
             if sn:
                 sessions.append(sn)
 
-        unaccounted_sessions = list(set(scraped_session) - set(sessions))
+        unaccounted_sessions = list(set(scraped_sessions) - set(sessions))
         if unaccounted_sessions:
             raise UpdateError('session(s) unaccounted for: %s' % ', '.join(unaccounted_sessions))
 
@@ -201,6 +201,7 @@ class Command(BaseCommand):
         args.datadir = os.path.join(args.datadir, juris.jurisdiction_id)
 
         # get scrapers to run
+        args.sessions = args.sessions or [juris.sessions[-1]['name']]
         args.scrapers = args.scrapers or juris.provides
 
         # print the plan

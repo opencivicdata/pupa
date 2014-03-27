@@ -64,7 +64,7 @@ class Scraper(scrapelib.Scraper):
         self.critical = self.logger.critical
 
     def get_current_session(self):
-        return self.sessions[-1]
+        return self.jurisdiction.sessions[-1]['name']
 
     def save_object(self, obj):
         if hasattr(obj, '_is_legislator'):
