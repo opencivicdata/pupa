@@ -1,5 +1,9 @@
 # Pupa: A legislative data scraping framework
 
+The latest stable version of pupa is 0.3.0, which can be obtained via ``pip install pupa`` or by grabbing the tag 0.3.0.
+
+The master branch is in an experimental state at the moment, and usage is not recommended.
+
 ## Popolo
 
 Pupa implements the Person, Organization, Membership and Post models from the [Popolo data specification](http://popoloproject.com/). Notably, it:
