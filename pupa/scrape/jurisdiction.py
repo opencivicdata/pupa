@@ -8,8 +8,7 @@ class Jurisdiction(object):
     name = None
     url = None
     chambers = {}
-    terms = None
-    session_details = None
+    sessions = []
     feature_flags = []
     building_maps = []
     provides = []
@@ -24,22 +23,9 @@ class Jurisdiction(object):
         return {'name': self.name,
                 'url': self.url,
                 'chambers': self.chambers,
-                'terms': self.terms,
-                'session_details': self.session_details,
+                'sessions': self.sessions,
                 'feature_flags': self.feature_flags,
                 'building_maps': self.building_maps}
-
-    def term_for_session(self, session):
-        for term in self.terms:
-            if session in term['sessions']:
-                return term['name']
-        raise ValueError('no such session: ' + session)
-
-    def get_term_details(self, termname):
-        for term in self.terms:
-            if term['name'] == termname:
-                return term
-        raise ValueError('no such term: ' + termname)
 
     def get_party(self, party_name):
         if not self._party_cache:
@@ -57,5 +43,5 @@ class Jurisdiction(object):
     def extract_text(self):
         raise NotImplementedError('extract_text is not implemented')
 
-    def get_scraper(self, term, session, obj_type):
+    def get_scraper(self, session, obj_type):
         raise NotImplementedError('get_scraper is not implemented')

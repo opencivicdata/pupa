@@ -46,7 +46,6 @@ class Command(BaseCommand):
 
         self.add_argument('-s', '--session', action='append', dest='sessions',
                           default=[], help='session(s) to scrape')
-        self.add_argument('-t', '--term', dest='term', help='term to scrape')
 
         # debugging
         self.add_argument('--debug', nargs='?', const='pdb', default=None,
@@ -95,39 +94,10 @@ class Command(BaseCommand):
                 # pick up are actually Jurisdiction subclasses.
 
                 # instantiate the class
-                retobj = obj()
-                if hasattr(retobj, 'get_metadata'):
-                    warnings.warn('Jurisdiction class uses deprecated old-style get_metadata')
-                    metadata = retobj.get_metadata()
-                    retobj.name = metadata['name']
-                    retobj.url = metadata['url']
-                    retobj.terms = metadata['terms']
-                    retobj.provides = metadata['provides']
-                    retobj.parties = metadata['parties']
-                    retobj.session_details = metadata['session_details']
-                    retobj.feature_flags = metadata['feature_flags']
-                return retobj
+                return obj()
 
         raise UpdateError('unable to import Jurisdiction subclass from ' +
                           module_name)
-
-    def get_timespan(self, juris, term, sessions):
-        if term and sessions:
-            raise UpdateError('cannot specify both --term and --session')
-        elif sessions:
-            terms = set()
-            for sess in sessions:
-                terms.add(juris.term_for_session(sess))
-            if len(terms) != 1:
-                raise UpdateError('cannot scrape sessions across terms')
-            term = terms.pop()
-        elif term:
-            sessions = juris.get_term_details(term)['sessions']
-        else:
-            term = juris.terms[-1]['name']
-            sessions = juris.terms[-1]['sessions']
-
-        return term, sessions
 
     def do_scrape(self, juris, args):
         # make output and cache dirs
@@ -144,12 +114,10 @@ class Command(BaseCommand):
             # get mapping of ScraperClass -> scrapers
             session_scrapers = defaultdict(list)
             for scraper_type in args.scrapers:
-                ScraperCls = juris.get_scraper(args.term, session,
-                                               scraper_type)
+                ScraperCls = juris.get_scraper(session, scraper_type)
                 if not ScraperCls:
-                    raise Exception('no scraper for term={0} session={1} '
-                                    'type={2}'.format(args.term, session,
-                                                      scraper_type))
+                    raise Exception('no scraper for session={} type={}'.format(
+                        session, scraper_type))
                 session_scrapers[ScraperCls].append(scraper_type)
 
             report[session] = {}
@@ -204,37 +172,22 @@ class Command(BaseCommand):
         return report
 
     def check_session_list(self, juris):
-        sessions = juris.scrape_session_list()
+        scraped_sessions = juris.scrape_session_list()
 
-        all_sessions_in_terms = list(
-            reduce(lambda x, y: x + y, [x['sessions'] for x in juris.terms])
-        )
-        # copy the list to avoid modifying it
-        session_details = list(juris._ignored_scraped_sessions)
-
-        for k, v in juris.session_details.items():
-            try:
-                all_sessions_in_terms.remove(k)
-            except ValueError:
-                raise UpdateError('session {0} exists in session_details but '
-                                  'not in a term'.format(k))
-
-            session_details.append(v.get('_scraped_name'))
-
-        if not sessions:
+        if not scraped_sessions:
             raise UpdateError('no sessions from scrape_session_list()')
 
-        if all_sessions_in_terms:
-            raise UpdateError('no session_details for session(s): %r' %
-                              all_sessions_in_terms)
+        # copy the list to avoid modifying it
+        sessions = list(juris._ignored_scraped_sessions)
+        # add _scraped_names
+        for session in juris.sessions:
+            sn = session.get('_scraped_name')
+            if sn:
+                sessions.append(sn)
 
-        unaccounted_sessions = []
-        for s in sessions:
-            if s not in session_details:
-                unaccounted_sessions.append(s)
+        unaccounted_sessions = list(set(scraped_sessions) - set(sessions))
         if unaccounted_sessions:
-            raise UpdateError('session(s) unaccounted for: %r' %
-                              unaccounted_sessions)
+            raise UpdateError('session(s) unaccounted for: %s' % ', '.join(unaccounted_sessions))
 
     def handle(self, args):
         self.enable_debug(args.debug)
@@ -247,19 +200,16 @@ class Command(BaseCommand):
         args.cachedir = os.path.join(args.cachedir, juris.jurisdiction_id)
         args.datadir = os.path.join(args.datadir, juris.jurisdiction_id)
 
-        # terms, sessions, and object types
-        args.term, args.sessions = self.get_timespan(juris, args.term,
-                                                     args.sessions)
+        # get scrapers to run
+        args.sessions = args.sessions or [juris.sessions[-1]['name']]
         args.scrapers = args.scrapers or juris.provides
 
         # print the plan
         print('module:', args.module)
         print('actions:', ', '.join(args.actions))
-        print('term:', args.term)
         print('sessions:', ', '.join(args.sessions))
         print('scrapers:', ', '.join(args.scrapers))
-        plan = {'module': args.module, 'actions': args.actions,
-                'term': args.term, 'sessions': args.sessions,
+        plan = {'module': args.module, 'actions': args.actions, 'sessions': args.sessions,
                 'scrapers': args.scrapers}
 
         report = {'plan': plan}
