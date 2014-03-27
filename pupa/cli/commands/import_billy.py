@@ -282,7 +282,6 @@ class Command(BaseCommand):
                     m = Membership(person_id, org._id,
                                    role=member['role'],
                                    chamber=org.chamber,
-                                   # term=term['name'],
                                    start_date=str(term['start_year']))
                     m.add_extra('term', term['name'])
                     # We can assume there's no end_year because it's a current

@@ -7,12 +7,6 @@ class Example(Jurisdiction):
     jurisdiction_id = 'ocd-jurisdiction/country:us/state:ex/place:example'
     name = 'Example Legislature'
     url = 'http://example.com'
-    terms = [{
-        'name': '2013-2014',
-        'sessions': ['2013'],
-        'start_year': 2013,
-        'end_year': 2014
-    }]
     provides = ['people']
     parties = [
         {'name': 'Independent' },
@@ -23,7 +17,7 @@ class Example(Jurisdiction):
         '2013': {'_scraped_name': '2013'}
     }
 
-    def get_scraper(self, term, session, scraper_type):
+    def get_scraper(self, session, scraper_type):
         if scraper_type == 'people':
             return PersonScraper
 

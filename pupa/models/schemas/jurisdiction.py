@@ -1,8 +1,8 @@
 schema = {
-    "description": "Information about a jurisdiction, including session, term, etc. details.",
+    "description": "Information about a jurisdiction, including session, chamber, etc.",
     "type": "object",
     "_order": (
-        ('Basic Details', ('name', 'url', 'chambers', 'terms', 'session_details')),
+        ('Basic Details', ('name', 'url', 'chambers', 'sessions')),
         ('Additional Metadata', ('feature_flags', 'building_maps')),
     ),
     "properties": {
@@ -31,32 +31,10 @@ schema = {
                             " (only needs to be specified if there are multiple chambers)")
 
         },
-        "terms": {
-            "type": "array", "minItems": 1, "items": { "type":"object", "properties": {
-                "name": {
-                    "type": "string",
-                    "description": ("Name of term, typically a year span (e.g. 2011-2012)")
-                },
-                "start_year": {
-                    "type": "integer", "minimum": 1000, "maximum": 2020,
-                    "description": "Year that term started.",
-                },
-                "end_year": {
-                    "type": "integer", "minimum": 1000, "maximum": 2030,
-                    "description": "Year that term ended."
-                },
-                "sessions": {
-                    "type": "array", "minItems": 1, "items": {"type": "string"},
-                    "description": ("List of sessions within this term. "
-                                    "Each session must also appear in session_details"),
-                }
-            }},
-            "description": "List of all terms, in chronological order.",
-        },
-        "session_details": {
-            "type": "object",
-            "additionalProperties": { "type": "object",
-            "properties": {
+        "sessions": {
+            "type": "array", "items": {"type": "object", "properties": {
+              "name": {"type": "string",
+                       "description": "Name of session." },
               "type": {"type": "string", "required": False,
                        "description": "Type of session: primary or special." },
               "start_date": {"type": ["datetime"], "required": False,
@@ -66,9 +44,8 @@ schema = {
                            "description": "End date of session."
                           }
             } },
-            "description": ("Dictionary describing sessions, each key is a session slug that "
-                            "must also appear in one ``sessions`` list in ``terms``.  Values "
-                            "consist of several fields giving more detail about the session.")
+            "description": ("List of sessions. Elements "
+                            "consist of several fields giving detail about the session.")
         },
         "feature_flags": {
             "type": "array",
