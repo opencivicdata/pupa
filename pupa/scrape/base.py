@@ -18,12 +18,7 @@ class ScrapeError(Exception):
 class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
 
-    class ContinueScraping(Exception):
-        """ indicate that scraping should continue without saving an object """
-        pass
-
-    def __init__(self, jurisdiction, session, output_dir, cache_dir=None,
-                 strict_validation=True, fastmode=False):
+    def __init__(self, jurisdiction, strict_validation=True, fastmode=False):
 
         super(Scraper, self).__init__()
 
@@ -31,7 +26,6 @@ class Scraper(scrapelib.Scraper):
 
         # set options
         self.jurisdiction = jurisdiction
-        self.session = session
 
         # scrapelib setup
         self.timeout = settings.SCRAPELIB_TIMEOUT
@@ -40,14 +34,13 @@ class Scraper(scrapelib.Scraper):
         self.retry_wait_seconds = settings.SCRAPELIB_RETRY_WAIT_SECONDS
         self.follow_robots = False
 
+        # caching
+        if settings.CACHE_DIR:
+            self.cache_storage = scrapelib.FileCache(settings.CACHE_DIR)
+
         if fastmode:
             self.requests_per_minute = 0
             self.cache_write_only = False
-
-        # directories
-        self.output_dir = output_dir
-        if cache_dir:
-            self.cache_storage = scrapelib.FileCache(cache_dir)
 
         # validation
         self.strict_validation = strict_validation
@@ -62,9 +55,6 @@ class Scraper(scrapelib.Scraper):
         self.warning = self.logger.warning
         self.error = self.logger.error
         self.critical = self.logger.critical
-
-    def get_current_session(self):
-        return self.jurisdiction.sessions[-1]['name']
 
     def save_object(self, obj):
         if hasattr(obj, '_is_legislator'):
@@ -92,7 +82,7 @@ class Scraper(scrapelib.Scraper):
 
         self.output_names[obj._type].add(filename)
 
-        with open(os.path.join(self.output_dir, filename), 'w') as f:
+        with open(os.path.join(settings.SCRAPED_DATA_DIR, filename), 'w') as f:
             json.dump(obj.as_dict(), f, cls=utils.JSONEncoderPlus)
 
         # validate after writing, allows for inspection on failure
@@ -119,29 +109,26 @@ class Scraper(scrapelib.Scraper):
                 self.save_object(obj)
         record['end'] = datetime.datetime.utcnow()
         if not self.output_names:
-            raise ScrapeError("no objects returned from {0} scrape".format(
-                scrape_type))
+            raise ScrapeError("no objects returned from {0} scrape".format(scrape_type))
         for _type, nameset in self.output_names.items():
             record['objects'][_type] += len(nameset)
 
         return {scrape_type: record}
 
-    def scrape_people(self):
-        return self._scrape(self.get_people(), 'people')
+    def scrape(self):
+        return self._scrape(self.get_objects(), 'speeches')
 
-    def scrape_bills(self):
-        return self._scrape(self.get_bills(), 'bills')
+    def get_objects(self):
+        raise NotImplementedError(self.__class__.__name__ + ' must provide a get_objects() method')
 
-    def scrape_votes(self):
-        return self._scrape(self.get_votes(), 'votes')
 
-    def scrape_events(self):
-        return self._scrape(self.get_events(), 'events')
+class SkippableBillScraper(object):
 
-    def scrape_speeches(self):
-        return self._scrape(self.get_speeches(), 'speeches')
+    class ContinueScraping(Exception):
+        """ indicate that scraping should continue without saving an object """
+        pass
 
-    def get_bills(self):
+    def get_objects(self):
         for bill_id, extras in self.get_bill_ids():
             try:
                 yield self.get_bill(bill_id, **extras)
@@ -149,29 +136,3 @@ class Scraper(scrapelib.Scraper):
                 self.warning('skipping %s: %r', bill_id, exc)
                 self.skipped += 1
                 continue
-
-    def get_people(self):
-        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
-                                  'get_people() method')
-
-    def get_bill_ids(self):
-        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
-                                  'get_bill_ids() method or override '
-                                  'get_bills()')
-
-    def get_bill(self, bill_id, **kwargs):
-        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
-                                  'get_bill() method or override '
-                                  'get_bills()')
-
-    def get_events(self):
-        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
-                                  'get_events() method')
-
-    def get_votes(self):
-        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
-                                  'get_votes() method')
-
-    def get_speeches(self):
-        raise NotImplementedError(self.__class__.__name__ + ' must provide a '
-                                  'get_speeches() method')
