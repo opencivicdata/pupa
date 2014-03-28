@@ -1,3 +1,5 @@
+import os
+
 MONGO_HOST = 'localhost'
 MONGO_PORT = 27017
 MONGO_DATABASE = 'opencivicdata'
@@ -6,6 +8,9 @@ SCRAPELIB_RPM = 60
 SCRAPELIB_TIMEOUT = 60
 SCRAPELIB_RETRY_ATTEMPTS = 3
 SCRAPELIB_RETRY_WAIT_SECONDS = 20
+
+CACHE_DIR = os.path.join(os.getcwd(), '_cache')
+SCRAPED_DATA_DIR = os.path.join(os.getcwd(), 'scraped_data')
 
 ENABLE_ELASTICSEARCH = False
 ELASTICSEARCH_HOST = 'localhost'
