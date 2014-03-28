@@ -46,7 +46,6 @@ def do_write(entry, where=None):
         os.makedirs(basename)
 
     with open(path, 'w') as fd:
-        #print path
         json.dump(entry, fd, cls=JSONEncoderPlus)
 
 
@@ -84,7 +83,6 @@ def dump_jurisdiction_data(where):
 
     path = "%s/jurisdiction.json" % (meta['_id'])
     with open(path, 'w') as fd:
-        #print path
         json.dump(meta, fd, cls=JSONEncoderPlus)
 
 

@@ -61,7 +61,7 @@ class MembershipImporter(BaseImporter):
                 # OK. Since we matched, let's also update existing
                 # copies of this guy.
 
-                #### This will find anyone who has our ID *OR* has a None.
+                # This will find anyone who has our ID *OR* has a None.
                 pspec = spec.copy()
                 pspec['person_id'] = membership.person_id
 
@@ -90,7 +90,7 @@ class MembershipImporter(BaseImporter):
                 spec = {"$or": [pspec, uspec]}
                 return spec
 
-            #### This will find anyone who has our name *OR* has a None.
+            # This will find anyone who has our name *OR* has a None.
             # (not the same code as above)
             pspec = spec.copy()
             pspec['person_id'] = {"$in": people.distinct("_id")}

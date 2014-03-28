@@ -83,17 +83,17 @@ class Command(BaseCommand):
             print('indexing', collection, '...')
             current = set(db[collection].index_information().keys())
             current.discard('_id_')
-            #if collection == 'bills':
-                # basic lookup / unique constraint on abbr/session/bill_id
-                #current.discard('%s_1_session_1_chamber_1_bill_id_1' %
-                #                settings.LEVEL_FIELD)
-                #db.bills.ensure_index([
-                #    (settings.LEVEL_FIELD, pymongo.ASCENDING),
-                #    ('session', pymongo.ASCENDING),
-                #    ('chamber', pymongo.ASCENDING),
-                #    ('bill_id', pymongo.ASCENDING)
-                #], unique=True)
-                #print('creating level-session-chamber-bill_id index')
+            # if collection == 'bills':
+            #    # basic lookup / unique constraint on abbr/session/bill_id
+            #    current.discard('%s_1_session_1_chamber_1_bill_id_1' %
+            #                    settings.LEVEL_FIELD)
+            #    db.bills.ensure_index([
+            #        (settings.LEVEL_FIELD, pymongo.ASCENDING),
+            #        ('session', pymongo.ASCENDING),
+            #        ('chamber', pymongo.ASCENDING),
+            #        ('bill_id', pymongo.ASCENDING)
+            #    ], unique=True)
+            #    print('creating level-session-chamber-bill_id index')
             print('currently has', len(current), 'indexes (not counting _id)')
             print('ensuring', len(all_indexes[collection]), 'indexes')
             ensured = set()

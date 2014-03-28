@@ -81,7 +81,7 @@ def ocd_namer(obj):
 
         # OK. Let's try a last-ditch.
         what = type_tables[type(obj)]
-        ## This is one of the *major* time-sinks. This codepath is taken when
+        # This is one of the *major* time-sinks. This codepath is taken when
         # the last run only went halfway, without writing the cache back out.
         dbobj = getattr(db, what).find_one({
             "_openstates_id": obj._openstates_id
@@ -709,10 +709,6 @@ class Command(BaseCommand):
             spec['state'] = state
 
         for entry in self.billy_db.votes.find(spec, timeout=False):
-            #def __init__(self, session, date, type, passed,
-            #             yes_count, no_count, other_count=0,
-            #             chamber=None, **kwargs):
-
             when = dt.datetime.strftime(entry['date'], "%Y-%m-%d")
             if entry.get('type') is None:
                 continue

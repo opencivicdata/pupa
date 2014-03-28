@@ -24,17 +24,12 @@ class BillImporter(BaseImporter):
 
     def prepare_object_from_json(self, obj):
         obj['name'] = fix_bill_id(obj['name'])
-        # obj['organization']
-        org = self.org_importer._resolve_org_by_chamber(self.jurisdiction_id,
-                                                        obj['organization'])
+        org = self.org_importer._resolve_org_by_chamber(self.jurisdiction_id, obj['organization'])
 
-        #self.debug("Scraped chamber for %s was `%s'" % (obj['name'],
-        #                                                obj['organization']))
         obj['organization'] = org['_id']
 
         if 'alternate_bill_ids' in obj:
-            obj['alternate_bill_ids'] = [fix_bill_id(bid) for bid in
-                                         obj['alternate_bill_ids']]
+            obj['alternate_bill_ids'] = [fix_bill_id(bid) for bid in obj['alternate_bill_ids']]
 
         # XXX: subject categorizer
         # XXX: action categorizer
