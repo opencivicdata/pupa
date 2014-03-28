@@ -4,10 +4,11 @@ import sys
 import glob
 import importlib
 import traceback
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from .base import BaseCommand
 from pupa import utils
+from pupa.core import settings
 
 from pupa.importers.jurisdiction import import_jurisdiction
 from pupa.importers.organizations import OrganizationImporter
@@ -34,138 +35,72 @@ class Command(BaseCommand):
         # what to scrape
         self.add_argument('module', type=str, help='path to scraper module')
         for arg in ALL_ACTIONS:
-            self.add_argument('--' + arg, dest='actions',
-                              action='append_const', const=arg,
-                              help='only run {0} post-scrape step'.format(arg))
-        for arg in ('people', 'bills', 'events', 'votes', 'speeches'):
-            self.add_argument('--' + arg, dest='scrapers',
-                              action='append_const', const=arg,
-                              help='run {0} scraper'.format(arg))
-
-        self.add_argument('-s', '--session', action='append', dest='sessions',
-                          default=[], help='session(s) to scrape')
-
-        # debugging
-        self.add_argument('--debug', nargs='?', const='pdb', default=None,
-                          help='drop into pdb (or set =ipdb =pudb)')
+            self.add_argument('--' + arg, dest='actions', action='append_const', const=arg,
+                              help='only run {} post-scrape step'.format(arg))
 
         # scraper arguments
-        self.add_argument('--datadir', help='data directory',
-                          default=os.path.join(os.getcwd(), 'scraped_data'))
-        self.add_argument('--cachedir', help='cache directory',
-                          default=os.path.join(os.getcwd(), 'scrape_cache'))
         self.add_argument('--nonstrict', action='store_false', dest='strict',
                           default=True, help='skip validation on save')
         self.add_argument('--fastmode', action='store_true', default=False,
                           help='use cache and turn off throttling')
-        self.add_argument('-r', '--rpm', help='scrapelib rpm', type=int,
-                          dest='SCRAPELIB_RPM')
-        self.add_argument('--timeout', help='scrapelib timeout', type=int,
-                          dest='SCRAPELIB_TIMEOUT')
-        self.add_argument('--retries', help='scrapelib retries', type=int,
-                          dest='SCRAPELIB_RETRIES')
-        self.add_argument('--retry_wait', help='scrapelib retry wait',
-                          type=int, dest='SCRAPELIB_RETRY_WAIT_SECONDS')
 
-    def enable_debug(self, debug):
-        # turn debug on
-        if debug:
-            _debugger = importlib.import_module(debug)
+        # settings overrides
+        self.add_argument('--datadir', help='data directory', dest='SCRAPED_DATA_DIR')
+        self.add_argument('--cachedir', help='cache directory', dest='CACHE_DIR')
+        self.add_argument('-r', '--rpm', help='scraper rpm', type=int, dest='SCRAPELIB_RPM')
+        self.add_argument('--timeout', help='scraper timeout', type=int, dest='SCRAPELIB_TIMEOUT')
+        self.add_argument('--retries', help='scraper retries', type=int, dest='SCRAPELIB_RETRIES')
+        self.add_argument('--retry_wait', help='scraper retry wait', type=int,
+                          dest='SCRAPELIB_RETRY_WAIT_SECONDS')
 
-            # turn on PDB-on-error mode
-            # stolen from http://stackoverflow.com/questions/1237379/
-            # if this causes problems in interactive mode check that page
-            def _tb_info(type, value, tb):
-                traceback.print_exception(type, value, tb)
-                _debugger.pm()
-            sys.excepthook = _tb_info
 
     def get_jurisdiction(self, module_name):
         # get the jurisdiction object
         module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
-            if (getattr(obj, 'jurisdiction_id', None) and
-                    issubclass(obj, Jurisdiction)):
-                # In the case of top-level scraper classes, the scraper objects
-                # will have a jurisdiction_id, but not actually be
-                # jurisdictions. As a result, we should ensure all objects we
-                # pick up are actually Jurisdiction subclasses.
-
-                # instantiate the class
+            # ensure we're sealing with a subclass of Jurisdiction
+            if getattr(obj, 'jurisdiction_id', None) and issubclass(obj, Jurisdiction):
                 return obj()
 
-        raise UpdateError('unable to import Jurisdiction subclass from ' +
-                          module_name)
+        raise UpdateError('unable to import Jurisdiction subclass from ' + module_name)
 
-    def do_scrape(self, juris, args):
+    def do_scrape(self, juris, args, scrapers):
         # make output and cache dirs
-        utils.makedirs(args.cachedir)
-        utils.makedirs(args.datadir)
+        utils.makedirs(settings.CACHE_DIR)
+        utils.makedirs(settings.SCRAPED_DATA_DIR)
         # clear json from data dir
-        for f in glob.glob(args.datadir + '/*.json'):
+        for f in glob.glob(settings.SCRAPED_DATA_DIR + '/*.json'):
             os.remove(f)
 
         report = {}
 
-        # run scrapers
-        for session in args.sessions:
-            # get mapping of ScraperClass -> scrapers
-            session_scrapers = defaultdict(list)
-            for scraper_type in args.scrapers:
-                ScraperCls = juris.get_scraper(session, scraper_type)
-                if not ScraperCls:
-                    raise Exception('no scraper for session={} type={}'.format(
-                        session, scraper_type))
-                session_scrapers[ScraperCls].append(scraper_type)
-
-            report[session] = {}
-
-            # run each scraper once
-            for ScraperCls, scraper_types in session_scrapers.items():
-                scraper = ScraperCls(juris, session, args.datadir,
-                                     args.cachedir, args.strict,
-                                     args.fastmode)
-                if 'people' in scraper_types:
-                    report[session].update(scraper.scrape_people())
-                elif 'bills' in scraper_types:
-                    report[session].update(scraper.scrape_bills())
-                elif 'events' in scraper_types:
-                    report[session].update(scraper.scrape_events())
-                elif 'votes' in scraper_types:
-                    report[session].update(scraper.scrape_votes())
-                elif 'speeches' in scraper_types:
-                    report[session].update(scraper.scrape_speeches())
+        for scraper, scrape_args in scrapers.items():
+            ScraperCls = juris.scrapers[scraper]
+            scraper = ScraperCls(juris, args.strict, args.fastmode, **scrape_args)
+            report.update(scraper.scrape())
 
         return report
 
     def do_import(self, juris, args):
         org_importer = OrganizationImporter(juris.jurisdiction_id)
         person_importer = PersonImporter(juris.jurisdiction_id)
-
-        membership_importer = MembershipImporter(juris.jurisdiction_id,
-                                                 person_importer,
+        membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
                                                  org_importer)
-
-        bill_importer = BillImporter(juris.jurisdiction_id,
-                                     org_importer)
-
-        vote_importer = VoteImporter(juris.jurisdiction_id,
-                                     person_importer,
-                                     org_importer,
+        bill_importer = BillImporter(juris.jurisdiction_id, org_importer)
+        vote_importer = VoteImporter(juris.jurisdiction_id, person_importer, org_importer,
                                      bill_importer)
-
         event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
 
         # TODO: jurisdiction into report
         import_jurisdiction(org_importer, juris)
-        report.update(org_importer.import_from_json(args.datadir))
-        report.update(person_importer.import_from_json(args.datadir))
-        report.update(membership_importer.import_from_json(args.datadir))
-        report.update(bill_importer.import_from_json(args.datadir))
-        report.update(event_importer.import_from_json(args.datadir))
-        report.update(vote_importer.import_from_json(args.datadir))
+        report.update(org_importer.import_from_json(settings.SCRAPED_DATA_DIR))
+        report.update(person_importer.import_from_json(settings.SCRAPED_DATA_DIR))
+        report.update(membership_importer.import_from_json(settings.SCRAPED_DATA_DIR))
+        report.update(bill_importer.import_from_json(settings.SCRAPED_DATA_DIR))
+        report.update(event_importer.import_from_json(settings.SCRAPED_DATA_DIR))
+        report.update(vote_importer.import_from_json(settings.SCRAPED_DATA_DIR))
 
         return report
 
@@ -187,33 +122,39 @@ class Command(BaseCommand):
         if unaccounted_sessions:
             raise UpdateError('session(s) unaccounted for: %s' % ', '.join(unaccounted_sessions))
 
-    def handle(self, args):
-        self.enable_debug(args.debug)
+    def handle(self, args, other):
+        if not other:
+            raise UpdateError('no scrapers specified')
 
         juris = self.get_jurisdiction(args.module)
+
+        # parse arg list in format: (scraper (k:v)+)+
+        scrapers = OrderedDict()
+        cur_scraper = None
+        for arg in other:
+            if '=' in arg:
+                if not cur_scraper:
+                    raise UpdateError('argument {} before scraper name'.format(arg))
+                k, v = arg.split('=', 1)
+                scrapers[cur_scraper][k] = v
+            elif arg in juris.scrapers:
+                cur_scraper = arg
+                scrapers[cur_scraper] = {}
 
         # modify args in-place so we can pass them around
         if not args.actions:
             args.actions = ALL_ACTIONS
-        args.cachedir = os.path.join(args.cachedir, juris.jurisdiction_id)
-        args.datadir = os.path.join(args.datadir, juris.jurisdiction_id)
-
-        # get scrapers to run
-        args.sessions = args.sessions or [juris.sessions[-1]['name']]
-        args.scrapers = args.scrapers or juris.provides
 
         # print the plan
         print('module:', args.module)
         print('actions:', ', '.join(args.actions))
-        print('sessions:', ', '.join(args.sessions))
-        print('scrapers:', ', '.join(args.scrapers))
-        plan = {'module': args.module, 'actions': args.actions, 'sessions': args.sessions,
-                'scrapers': args.scrapers}
+        print('scrapers:', ', '.join(scrapers))
+        plan = {'module': args.module, 'actions': args.actions, 'scrapers': scrapers}
 
         report = {'plan': plan}
+
         if 'scrape' in args.actions:
-            self.check_session_list(juris)
-            report['scrape'] = self.do_scrape(juris, args)
+            report['scrape'] = self.do_scrape(juris, args, scrapers)
         if 'import' in args.actions:
             report['import'] = self.do_import(juris, args)
 

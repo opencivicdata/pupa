@@ -19,10 +19,7 @@ class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
 
     def __init__(self, jurisdiction, strict_validation=True, fastmode=False):
-
         super(Scraper, self).__init__()
-
-        self.skipped = 0
 
         # set options
         self.jurisdiction = jurisdiction
@@ -69,9 +66,7 @@ class Scraper(scrapelib.Scraper):
 
             # create a party membership
             if obj.party:
-                membership = Membership(obj._id,
-                                        'party:' + obj.party,
-                                        role='member')
+                membership = Membership(obj._id, 'party:' + obj.party, role='member')
                 obj._related.append(membership)
 
         filename = '{0}_{1}.json'.format(obj._type, obj._id)
@@ -97,11 +92,11 @@ class Scraper(scrapelib.Scraper):
         for obj in getattr(obj, '_related', []):
             self.save_object(obj)
 
-    def _scrape(self, iterable, scrape_type):
+    def scrape(self):
         record = {'objects': defaultdict(int)}
         self.output_names = defaultdict(set)
         record['start'] = datetime.datetime.utcnow()
-        for obj in iterable:
+        for obj in self.get_objects():
             if hasattr(obj, '__iter__'):
                 for iterobj in obj:
                     self.save_object(iterobj)
@@ -109,20 +104,18 @@ class Scraper(scrapelib.Scraper):
                 self.save_object(obj)
         record['end'] = datetime.datetime.utcnow()
         if not self.output_names:
-            raise ScrapeError("no objects returned from {0} scrape".format(scrape_type))
+            raise ScrapeError('no objects returned from scrape')
         for _type, nameset in self.output_names.items():
             record['objects'][_type] += len(nameset)
 
-        return {scrape_type: record}
-
-    def scrape(self):
-        return self._scrape(self.get_objects(), 'speeches')
+        return record
 
     def get_objects(self):
         raise NotImplementedError(self.__class__.__name__ + ' must provide a get_objects() method')
 
 
 class SkippableBillScraper(object):
+    skipped = 0
 
     class ContinueScraping(Exception):
         """ indicate that scraping should continue without saving an object """
