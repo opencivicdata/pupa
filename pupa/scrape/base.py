@@ -2,7 +2,7 @@ import os
 import json
 import logging
 import datetime
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 import scrapelib
 
@@ -87,6 +87,7 @@ class Scraper(scrapelib.Scraper):
         filename = '{0}_{1}.json'.format(obj._type, obj._id)
 
         self.info('save %s %s as %s', obj._type, obj, filename)
+        self.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())), cls=utils.JSONEncoderPlus, indent=4, separators=(',', ': ')))
 
         self.output_names[obj._type].add(filename)
 
