@@ -49,7 +49,7 @@ def main():
     if not args.subcommand:
         parser.print_help()
     else:
-        subcommands[args.subcommand].handle(args)
+        subcommands[args.subcommand].handle(args, other)
 
 
 if __name__ == '__main__':

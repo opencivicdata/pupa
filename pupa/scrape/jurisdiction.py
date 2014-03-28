@@ -7,11 +7,11 @@ class Jurisdiction(object):
     # schema objects
     name = None
     url = None
+    scrapers = {}
     chambers = {}
     sessions = []
     feature_flags = []
     building_maps = []
-    provides = []
     parties = []
     other_names = []
     parent_id = None
@@ -42,6 +42,3 @@ class Jurisdiction(object):
 
     def extract_text(self):
         raise NotImplementedError('extract_text is not implemented')
-
-    def get_scraper(self, session, obj_type):
-        raise NotImplementedError('get_scraper is not implemented')
