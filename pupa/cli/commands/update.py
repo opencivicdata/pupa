@@ -22,6 +22,23 @@ from pupa.scrape import Jurisdiction
 
 ALL_ACTIONS = ('scrape', 'import', 'report')
 
+def print_report(report):
+    plan = report['plan']
+    print('{} ({})'.format(plan['module'], ', '.join(plan['actions'])))
+    for scraper, args in plan['scrapers'].items():
+        print('  {}: {}'.format(scraper, args))
+    if 'scrape' in report:
+        scrape = report['scrape']
+        print('scrape duration: ', (scrape['end'] - scrape['start']))
+        print('scraped objects:')
+        for type, num in sorted(scrape['objects'].items()):
+            print('  {}: {}'.format(type, num))
+    if 'import' in report:
+        print('import:')
+        for type, changes in sorted(report['import'].items()):
+            if(changes['insert'] or changes['update'] or changes['noop']):
+                print('  {}: {} new {} updated {} noop'.format(type, changes['insert'],
+                                                               changes['update'], changes['noop']))
 
 class UpdateError(Exception):
     pass
@@ -123,10 +140,11 @@ class Command(BaseCommand):
             raise UpdateError('session(s) unaccounted for: %s' % ', '.join(unaccounted_sessions))
 
     def handle(self, args, other):
-        if not other:
-            raise UpdateError('no scrapers specified')
-
         juris = self.get_jurisdiction(args.module)
+
+        if not other:
+            raise UpdateError('no scrapers specified. available scrapers: ' +
+                              ', '.join(juris.scrapers.keys()))
 
         # parse arg list in format: (scraper (k:v)+)+
         scrapers = OrderedDict()
@@ -146,12 +164,8 @@ class Command(BaseCommand):
             args.actions = ALL_ACTIONS
 
         # print the plan
-        print('module:', args.module)
-        print('actions:', ', '.join(args.actions))
-        print('scrapers:', ', '.join(scrapers))
-        plan = {'module': args.module, 'actions': args.actions, 'scrapers': scrapers}
-
-        report = {'plan': plan}
+        report = {'plan': {'module': args.module, 'actions': args.actions, 'scrapers': scrapers}}
+        print_report(report)
 
         if 'scrape' in args.actions:
             report['scrape'] = self.do_scrape(juris, args, scrapers)
@@ -160,6 +174,6 @@ class Command(BaseCommand):
 
         report['success'] = True
 
-        # XXX: save report instead of printing
-        print(report)
+        # XXX: save report
+        print_report(report)
         return report
