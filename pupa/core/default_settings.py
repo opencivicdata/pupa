@@ -10,7 +10,7 @@ SCRAPELIB_RETRY_ATTEMPTS = 3
 SCRAPELIB_RETRY_WAIT_SECONDS = 20
 
 CACHE_DIR = os.path.join(os.getcwd(), '_cache')
-SCRAPED_DATA_DIR = os.path.join(os.getcwd(), 'scraped_data')
+SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 
 ENABLE_ELASTICSEARCH = False
 ELASTICSEARCH_HOST = 'localhost'
