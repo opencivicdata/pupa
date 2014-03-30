@@ -18,11 +18,12 @@ class ScrapeError(Exception):
 class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
 
-    def __init__(self, jurisdiction, strict_validation=True, fastmode=False):
+    def __init__(self, jurisdiction, datadir, strict_validation=True, fastmode=False):
         super(Scraper, self).__init__()
 
         # set options
         self.jurisdiction = jurisdiction
+        self.datadir = datadir
 
         # scrapelib setup
         self.timeout = settings.SCRAPELIB_TIMEOUT
@@ -77,7 +78,7 @@ class Scraper(scrapelib.Scraper):
 
         self.output_names[obj._type].add(filename)
 
-        with open(os.path.join(settings.SCRAPED_DATA_DIR, filename), 'w') as f:
+        with open(os.path.join(self.datadir, filename), 'w') as f:
             json.dump(obj.as_dict(), f, cls=utils.JSONEncoderPlus)
 
         # validate after writing, allows for inspection on failure

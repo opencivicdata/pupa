@@ -84,21 +84,24 @@ class Command(BaseCommand):
     def do_scrape(self, juris, args, scrapers):
         # make output and cache dirs
         utils.makedirs(settings.CACHE_DIR)
-        utils.makedirs(settings.SCRAPED_DATA_DIR)
+        datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
+        utils.makedirs(datadir)
         # clear json from data dir
-        for f in glob.glob(settings.SCRAPED_DATA_DIR + '/*.json'):
+        for f in glob.glob(datadir + '/*.json'):
             os.remove(f)
 
         report = {}
 
         for scraper, scrape_args in scrapers.items():
             ScraperCls = juris.scrapers[scraper]
-            scraper = ScraperCls(juris, args.strict, args.fastmode, **scrape_args)
+            scraper = ScraperCls(juris, datadir, args.strict, args.fastmode, **scrape_args)
             report.update(scraper.scrape())
 
         return report
 
     def do_import(self, juris, args):
+        datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
+
         org_importer = OrganizationImporter(juris.jurisdiction_id)
         person_importer = PersonImporter(juris.jurisdiction_id)
         membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
@@ -112,12 +115,12 @@ class Command(BaseCommand):
 
         # TODO: jurisdiction into report
         import_jurisdiction(org_importer, juris)
-        report.update(org_importer.import_from_json(settings.SCRAPED_DATA_DIR))
-        report.update(person_importer.import_from_json(settings.SCRAPED_DATA_DIR))
-        report.update(membership_importer.import_from_json(settings.SCRAPED_DATA_DIR))
-        report.update(bill_importer.import_from_json(settings.SCRAPED_DATA_DIR))
-        report.update(event_importer.import_from_json(settings.SCRAPED_DATA_DIR))
-        report.update(vote_importer.import_from_json(settings.SCRAPED_DATA_DIR))
+        report.update(org_importer.import_from_json(datadir))
+        report.update(person_importer.import_from_json(datadir))
+        report.update(membership_importer.import_from_json(datadir))
+        report.update(bill_importer.import_from_json(datadir))
+        report.update(event_importer.import_from_json(datadir))
+        report.update(vote_importer.import_from_json(datadir))
 
         return report
 
