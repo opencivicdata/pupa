@@ -13,11 +13,12 @@ def prompt(ps, default=''):
 def write_jurisdiction_template(dirname, short_name, jurisdiction_id, long_name, url,
                                 scraper_types):
     camel_case = short_name.title().replace(' ', '')
+    class_dict = {'events': 'Event', 'people': 'Person', 'bills': 'Bill', 'votes': 'Vote'}
 
     # write __init__
     lines = ['from pupa.scrape import Jurisdiction']
     for stype in scraper_types:
-        lines.append('from .{} import {}{}Scraper'.format(stype, camel_case, stype.title()))
+        lines.append('from .{} import {}{}Scraper'.format(stype, camel_case, class_dict[stype]))
     lines.append('')
     lines.append('')
     lines.append('class {}(Jurisdiction):'.format(camel_case))
@@ -26,25 +27,25 @@ def write_jurisdiction_template(dirname, short_name, jurisdiction_id, long_name,
     lines.append('    url = "{}"'.format(url))
     lines.append('    scrapers = {')
     for stype in scraper_types:
-        lines.append('        "{}": {}{}Scraper,'.format(stype, camel_case, stype.title()))
+        lines.append('        "{}": {}{}Scraper,'.format(stype, camel_case, class_dict[stype]))
     lines.append('    }')
+    lines.append('')
 
     with open(os.path.join(dirname, '__init__.py'), 'w') as of:
         of.write('\n'.join(lines))
 
     # write scraper files
     for stype in scraper_types:
-        classname = {'events': 'Event', 'people': 'Person',
-                     'bills': 'Bill', 'votes': 'Vote'}[stype]
         lines = ['from pupa.scrape import Scraper']
-        lines.append('from pupa.models import {}'.format(classname))
+        lines.append('from pupa.models import {}'.format(class_dict[stype]))
         lines.append('')
         lines.append('')
-        lines.append('class {}{}Scraper(Scraper):'.format(camel_case, stype.title()))
+        lines.append('class {}{}Scraper(Scraper):'.format(camel_case, class_dict[stype]))
         lines.append('')
         lines.append('    def scrape(self):')
         lines.append('        # needs to be implemented')
         lines.append('        pass')
+        lines.append('')
         with open(os.path.join(dirname, stype + '.py'), 'w') as of:
             of.write('\n'.join(lines))
 
@@ -61,9 +62,8 @@ class Command(BaseCommand):
             raise CommandError(args.module + ' already exists')
         os.makedirs(args.module)
 
-        short_name = prompt('short name (e.g. Cary): ')
-        jurisdiction = prompt('jurisdiction id (e.g. ocd-jurisdiction/country:us/state:nc/place:cary/council): ')
-        long_name = prompt('long name (e.g. Cary Town Council): ')
+        long_name = prompt('jurisdiction name (e.g. Seattle City Council): ')
+        jurisdiction = prompt('jurisdiction id (e.g. ocd-jurisdiction/country:us/state:wa/place:seattle/council): ')
         url = prompt('official URL: ')
 
         # will default to True until they pick one, then defaults to False
@@ -77,5 +77,5 @@ class Command(BaseCommand):
             if result == 'Y':
                 selected_scraper_types.append(stype)
 
-        write_jurisdiction_template(args.module, short_name, jurisdiction, long_name, url,
+        write_jurisdiction_template(args.module, args.module, jurisdiction, long_name, url,
                                     selected_scraper_types)
