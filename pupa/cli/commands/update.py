@@ -132,7 +132,7 @@ class Command(BaseCommand):
             raise UpdateError('no sessions from scrape_session_list()')
 
         # copy the list to avoid modifying it
-        sessions = list(juris._ignored_scraped_sessions)
+        sessions = list(juris.ignored_scraped_sessions)
         # add _scraped_names
         for session in juris.sessions:
             sn = session.get('_scraped_name')
@@ -147,26 +147,25 @@ class Command(BaseCommand):
         juris = self.get_jurisdiction(args.module)
 
         available_scrapers = getattr(juris, 'scrapers', {})
+        scrapers = OrderedDict()
 
         if not available_scrapers:
             raise UpdateError('no scrapers defined on jurisdiction')
 
-        if not other:
-            raise UpdateError('no scrapers specified. available scrapers: ' +
-                              ', '.join(juris.scrapers.keys()))
-
-        # parse arg list in format: (scraper (k:v)+)+
-        scrapers = OrderedDict()
-        cur_scraper = None
-        for arg in other:
-            if '=' in arg:
-                if not cur_scraper:
-                    raise UpdateError('argument {} before scraper name'.format(arg))
-                k, v = arg.split('=', 1)
-                scrapers[cur_scraper][k] = v
-            elif arg in juris.scrapers:
-                cur_scraper = arg
-                scrapers[cur_scraper] = {}
+        if other:
+            # parse arg list in format: (scraper (k:v)+)+
+            cur_scraper = None
+            for arg in other:
+                if '=' in arg:
+                    if not cur_scraper:
+                        raise UpdateError('argument {} before scraper name'.format(arg))
+                    k, v = arg.split('=', 1)
+                    scrapers[cur_scraper][k] = v
+                elif arg in juris.scrapers:
+                    cur_scraper = arg
+                    scrapers[cur_scraper] = {}
+        else:
+            scrapers = {key: {} for key in available_scrapers.keys()}
 
         # modify args in-place so we can pass them around
         if not args.actions:
