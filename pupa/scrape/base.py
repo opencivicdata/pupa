@@ -93,11 +93,11 @@ class Scraper(scrapelib.Scraper):
         for obj in getattr(obj, '_related', []):
             self.save_object(obj)
 
-    def scrape(self):
+    def do_scrape(self, **kwargs):
         record = {'objects': defaultdict(int)}
         self.output_names = defaultdict(set)
         record['start'] = datetime.datetime.utcnow()
-        for obj in self.get_objects():
+        for obj in self.scrape(**kwargs):
             if hasattr(obj, '__iter__'):
                 for iterobj in obj:
                     self.save_object(iterobj)
@@ -111,19 +111,20 @@ class Scraper(scrapelib.Scraper):
 
         return record
 
-    def get_objects(self):
-        raise NotImplementedError(self.__class__.__name__ + ' must provide a get_objects() method')
+    def scrape(self):
+        raise NotImplementedError(self.__class__.__name__ + ' must provide a scrape() method')
 
 
-class SkippableBillScraper(object):
+class BaseBillScraper(Scraper):
     skipped = 0
 
     class ContinueScraping(Exception):
         """ indicate that scraping should continue without saving an object """
         pass
 
-    def get_objects(self):
-        for bill_id, extras in self.get_bill_ids():
+    def scrape(self, session, **kwargs):
+        self.session = session
+        for bill_id, extras in self.get_bill_ids(**kwargs):
             try:
                 yield self.get_bill(bill_id, **extras)
             except self.ContinueScraping as exc:

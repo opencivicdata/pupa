@@ -95,8 +95,8 @@ class Command(BaseCommand):
 
         for scraper_name, scrape_args in scrapers.items():
             ScraperCls = juris.scrapers[scraper_name]
-            scraper = ScraperCls(juris, datadir, args.strict, args.fastmode, **scrape_args)
-            report[scraper_name] = scraper.scrape()
+            scraper = ScraperCls(juris, datadir, args.strict, args.fastmode)
+            report[scraper_name] = scraper.do_scrape(**scrape_args)
 
         return report
 
