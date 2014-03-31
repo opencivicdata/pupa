@@ -28,11 +28,12 @@ def print_report(report):
     for scraper, args in plan['scrapers'].items():
         print('  {}: {}'.format(scraper, args))
     if 'scrape' in report:
-        scrape = report['scrape']
-        print('scrape duration: ', (scrape['end'] - scrape['start']))
-        print('scraped objects:')
-        for type, num in sorted(scrape['objects'].items()):
-            print('  {}: {}'.format(type, num))
+        for type, details in sorted(report['scrape'].items()):
+            print(type + ' scrape:')
+            print('  duration: ', (details['end'] - details['start']))
+            print('  objects:')
+            for objtype, num in sorted(details['objects'].items()):
+                print('    {}: {}'.format(objtype, num))
     if 'import' in report:
         print('import:')
         for type, changes in sorted(report['import'].items()):
@@ -92,10 +93,10 @@ class Command(BaseCommand):
 
         report = {}
 
-        for scraper, scrape_args in scrapers.items():
-            ScraperCls = juris.scrapers[scraper]
+        for scraper_name, scrape_args in scrapers.items():
+            ScraperCls = juris.scrapers[scraper_name]
             scraper = ScraperCls(juris, datadir, args.strict, args.fastmode, **scrape_args)
-            report.update(scraper.scrape())
+            report[scraper_name] = scraper.scrape()
 
         return report
 
@@ -144,6 +145,11 @@ class Command(BaseCommand):
 
     def handle(self, args, other):
         juris = self.get_jurisdiction(args.module)
+
+        available_scrapers = getattr(juris, 'scrapers', {})
+
+        if not available_scrapers:
+            raise UpdateError('no scrapers defined on jurisdiction')
 
         if not other:
             raise UpdateError('no scrapers specified. available scrapers: ' +
