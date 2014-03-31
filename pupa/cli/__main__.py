@@ -4,6 +4,7 @@ import argparse
 import importlib
 import traceback
 from pupa.core import settings
+from pupa.cli.commands.base import CommandError
 
 logger = logging.getLogger('pupa')
 
@@ -56,7 +57,10 @@ def main():
     if not args.subcommand:
         parser.print_help()
     else:
-        subcommands[args.subcommand].handle(args, other)
+        try:
+            subcommands[args.subcommand].handle(args, other)
+        except CommandError as e:
+            logger.critical(str(e))
 
 
 if __name__ == '__main__':

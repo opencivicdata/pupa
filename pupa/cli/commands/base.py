@@ -1,3 +1,5 @@
+class CommandError(Exception):
+    pass
 
 
 class BaseCommand(object):

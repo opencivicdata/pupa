@@ -6,7 +6,7 @@ import importlib
 import traceback
 from collections import defaultdict, OrderedDict
 
-from .base import BaseCommand
+from .base import BaseCommand, CommandError
 from pupa import utils
 from pupa.core import settings
 
@@ -40,9 +40,6 @@ def print_report(report):
             if(changes['insert'] or changes['update'] or changes['noop']):
                 print('  {}: {} new {} updated {} noop'.format(type, changes['insert'],
                                                                changes['update'], changes['noop']))
-
-class UpdateError(Exception):
-    pass
 
 
 class Command(BaseCommand):
@@ -80,7 +77,7 @@ class Command(BaseCommand):
             if getattr(obj, 'jurisdiction_id', None) and issubclass(obj, Jurisdiction):
                 return obj()
 
-        raise UpdateError('unable to import Jurisdiction subclass from ' + module_name)
+        raise CommandError('unable to import Jurisdiction subclass from ' + module_name)
 
     def do_scrape(self, juris, args, scrapers):
         # make output and cache dirs
@@ -129,7 +126,7 @@ class Command(BaseCommand):
         scraped_sessions = juris.scrape_session_list()
 
         if not scraped_sessions:
-            raise UpdateError('no sessions from scrape_session_list()')
+            raise CommandError('no sessions from scrape_session_list()')
 
         # copy the list to avoid modifying it
         sessions = list(juris.ignored_scraped_sessions)
@@ -141,7 +138,7 @@ class Command(BaseCommand):
 
         unaccounted_sessions = list(set(scraped_sessions) - set(sessions))
         if unaccounted_sessions:
-            raise UpdateError('session(s) unaccounted for: %s' % ', '.join(unaccounted_sessions))
+            raise CommandError('session(s) unaccounted for: %s' % ', '.join(unaccounted_sessions))
 
     def handle(self, args, other):
         juris = self.get_jurisdiction(args.module)
@@ -150,7 +147,7 @@ class Command(BaseCommand):
         scrapers = OrderedDict()
 
         if not available_scrapers:
-            raise UpdateError('no scrapers defined on jurisdiction')
+            raise CommandError('no scrapers defined on jurisdiction')
 
         if other:
             # parse arg list in format: (scraper (k:v)+)+
@@ -158,7 +155,7 @@ class Command(BaseCommand):
             for arg in other:
                 if '=' in arg:
                     if not cur_scraper:
-                        raise UpdateError('argument {} before scraper name'.format(arg))
+                        raise CommandError('argument {} before scraper name'.format(arg))
                     k, v = arg.split('=', 1)
                     scrapers[cur_scraper][k] = v
                 elif arg in juris.scrapers:
