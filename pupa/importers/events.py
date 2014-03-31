@@ -20,29 +20,23 @@ class EventImporter(BaseImporter):
 
         def person(obj, what):
             spec = {}
-            spec['session'] = obj['session']
             if 'chamber' in what:
                 spec['chamber'] = what['chamber']
             spec['name'] = what['name']
-            # needs to get the right session (current)
             return spec
 
         def bill(obj, what):
             spec = {}
-            spec['session'] = obj['session']
             if 'chamber' in what:
                 spec['chamber'] = what['chamber']
             spec['bill_id'] = what['name']
-            # needs to get the right session (current)
             return spec
 
         def org(obj, what):
             spec = {}
-            spec['session'] = obj['session']
             if 'chamber' in what:
                 spec['chamber'] = what['chamber']
             spec['name'] = what['name']
-            # needs to get the right session (current)
             return spec
 
         spec_generators = {

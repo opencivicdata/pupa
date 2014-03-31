@@ -63,11 +63,11 @@ class Event(BaseModel):
     _collection = 'events'
     __slots__ = ("when", "all_day", "name", "description", "documents",
                  "end", "links", "location", "participants",
-                 "agenda", "sources", "status", "type", 'session',
+                 "agenda", "sources", "status", "type",
                  "media", '_openstates_id', 'jurisdiction_id',
                  'identifiers',)
 
-    def __init__(self, name, when, location, session=None, **kwargs):
+    def __init__(self, name, when, location, **kwargs):
         super(Event, self).__init__()
         self.when = when
         self.name = name
@@ -86,7 +86,6 @@ class Event(BaseModel):
         self.status = "confirmed"
         self.type = "event"
         self._related = []
-        self.session = session
 
         for k, v in kwargs.items():
             setattr(self, k, v)
