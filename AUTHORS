@@ -1,8 +1,12 @@
-James Turk          <jturk@sunlightfoundation.com>
-Paul Tagliamonte    <paultag@sunlightfoundation.com>
-Thom Neale          <tneale@sunlightfoundation.com>
+Pupa is written & maintained by:
+    James Turk          <jturk@sunlightfoundation.com>
+    Paul Tagliamonte    <paultag@sunlightfoundation.com>
+    Thom Neale          <tneale@sunlightfoundation.com>
 
-pupa is a partial-fork of billy, which itself was spun out of openstates:
+For a full list of contributors see:
+    https://github.com/opencivicdata/pupa/graphs/contributors
+
+pupa is a partial fork of billy, which itself was spun out of openstates:
 
 For the full history of the project's predecessors:
 
