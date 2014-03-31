@@ -3,8 +3,8 @@ import logging
 import argparse
 import importlib
 import traceback
+from pupa.core import settings
 
-logging.basicConfig()
 logger = logging.getLogger('pupa')
 
 COMMAND_MODULES = (
@@ -20,6 +20,9 @@ def main():
     parser = argparse.ArgumentParser('pupa', description='pupa CLI')
     parser.add_argument('--debug', nargs='?', const='pdb', default=None,
                         help='drop into pdb (or set =ipdb =pudb)')
+    parser.add_argument('--loglevel', default='INFO', help=('set log level. options are: '
+                                                            'DEBUG|INFO|WARNING|ERROR|CRITICAL '
+                                                            '(default is INFO)'))
     subparsers = parser.add_subparsers(dest='subcommand')
 
     subcommands = {}
@@ -28,11 +31,15 @@ def main():
             cmd = importlib.import_module(mod).Command(subparsers)
             subcommands[cmd.name] = cmd
         except ImportError as e:
-            logger.warning('error "%s" prevented loading of %s module',
-                           e, mod)
+            logger.error('exception "%s" prevented loading of %s module', e, mod)
 
     # process args
     args, other = parser.parse_known_args()
+
+    # set log level from command line
+    handler_level = getattr(logging, args.loglevel.upper(), 'INFO')
+    settings.LOGGING_CONFIG['handlers']['default']['level'] = handler_level
+    settings.LOGGING_CONFIG = settings.LOGGING_CONFIG
 
     # turn debug on
     if args.debug:
