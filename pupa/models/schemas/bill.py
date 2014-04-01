@@ -121,8 +121,15 @@ schema = {
                         "enum": ["companion", "other-session",
                                  "replaced-by", "replaces"],
                         "type": "string",
-                        "description": ("Currently should be either 'companion',"
-                                        "or 'other-session' for reintroductions"),
+                        "description": (
+                            """
+                            This notes what kind of relation exists between the
+                            two bills - something like 'companion' for a
+                            companion bill, 'other-session' for a reintroduction
+                            or past session of a bill, or 'replaces' /
+                            'replaced-by' for something like an omnibus bill.
+                            """
+                        ),
                     },
                 },
                 "type": "object"
