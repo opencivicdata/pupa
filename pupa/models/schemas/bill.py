@@ -118,7 +118,8 @@ schema = {
                     "session": {"type": "string", "description": "Session of related bill."},
                     "name": {"type": "string", "description": "Name of related bill."},
                     "relation_type": {
-                        "enum": ["companion", "other-session"],
+                        "enum": ["companion", "other-session",
+                                 "replaced-by", "replaces"],
                         "type": "string",
                         "description": ("Currently should be either 'companion',"
                                         "or 'other-session' for reintroductions"),
