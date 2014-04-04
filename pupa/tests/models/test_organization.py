@@ -1,6 +1,6 @@
 from pupa.models import Organization
 from validictory import ValidationError
-from nose.tools import raises
+from nose.tools import assert_raises
 
 
 def test_basic_invalid_organization():
@@ -11,10 +11,8 @@ def test_basic_invalid_organization():
 
     orga.name = None
 
-    @raises(ValidationError)
-    def _():
+    with assert_raises(ValidationError):
         orga.validate()
-    _()
 
 
 def test_add_post():
@@ -28,10 +26,8 @@ def test_add_post():
     assert orga.posts[0]['role'] == "Chef"
     assert orga.posts[0]['label'] == "Human Readable Name"
 
-    @raises(TypeError)
-    def _():
+    with assert_raises(TypeError):
         orga.add_identifier("id10t", foo="bar")
-    _()
 
     orga.add_identifier("id10t")
     orga.add_identifier("l0l", scheme="kruft")
@@ -42,13 +38,11 @@ def test_add_post():
 
 
 def test_add_contact():
-    """ test we can add a contact detail to an orga """
+    """ test we can add a contact detail to an org """
     orga = Organization("name")
     orga.add_source(url='foo')
     orga.validate()
 
-    orga.add_contact_detail(type='pigeon',
-                            value='39328',
-                            note='His name is Joe')
+    orga.add_contact_detail(type='voice', value='555-393-2821', note='nothing')
 
     orga.validate()

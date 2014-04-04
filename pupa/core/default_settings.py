@@ -20,6 +20,14 @@ BILL_FILTERS = {}
 LEGISLATOR_FILTERS = {}
 EVENT_FILTERS = {}
 
+ORGANIZATION_CLASSIFICATIONS = ['legislature', 'party', 'committee', 'commission']
+BILL_TYPES = ['bill', 'resolution', 'concurrent resolution', 'joint resolution', 'memorial']
+BILL_ACTION_TYPES = ['introduced', 'reading:1', 'reading:2', 'reading:3']
+BILL_RELATION_TYPES = ["companion", "other-session", "replaced-by", "replaces"]
+VERSION_TYPES = []
+DOCUMENT_TYPES = []
+CONTACT_TYPES = ['address', 'email', 'fax', 'voice']
+
 LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,

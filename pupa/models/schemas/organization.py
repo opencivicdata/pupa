@@ -1,13 +1,12 @@
 from .common import links, contact_details, identifiers, other_names, sources
-
-CLASSIFICATIONS = ['legislature', 'party', 'committee', 'commission']
+from pupa.core import settings
 
 schema = {
     "properties": {
         "classification": {
             "description": "An organization category, e.g. committee",
             "type": ["string", "null"],
-            "enum": CLASSIFICATIONS,
+            "enum": settings.ORGANIZATION_CLASSIFICATIONS,
         },
         "dissolution_date": {
             "description": "A date of dissolution",

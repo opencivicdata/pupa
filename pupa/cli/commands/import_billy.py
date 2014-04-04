@@ -689,7 +689,7 @@ class Command(BaseCommand):
                 etype = {"people": "person",
                          "organizations": "organization"}[type_]
 
-                #if sponsor.get('official_type'):
+                # if sponsor.get('official_type'):
                 #    kwargs['official_type'] = sponsor['official_type']
                 # Not needed???
 
@@ -747,8 +747,8 @@ class Command(BaseCommand):
                 no_count=entry['no_count'],
                 other_count=entry['other_count'],
                 chamber=entry['chamber'],
-                #created_at=entry['created_at'],
-                #updated_at=entry['updated_at'],
+                # created_at=entry['created_at'],
+                # updated_at=entry['updated_at'],
             )
             v.identifiers = [{'scheme': 'openstates',
                              'identifier': entry['_id']}]

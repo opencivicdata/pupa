@@ -1,3 +1,5 @@
+from pupa.core import settings
+
 contact_details = {
     "description": "Contact information for this entity.",
     "type": "array",
@@ -5,6 +7,7 @@ contact_details = {
         "type": "object",
         "properties": {
             "type": {"type": "string",
+                     "enum": settings.CONTACT_TYPES,
                      "description": "type of contact (e.g. phone, email, address)"},
             "value": {"type": "string",
                       "description": "actual phone number/email address/etc.", },

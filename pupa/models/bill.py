@@ -1,4 +1,4 @@
-from six import text_type as str_type
+from six import string_types
 from .base import BaseModel
 from .utils import add_associated_link
 from .schemas.bill import schema
@@ -7,7 +7,7 @@ from .schemas.bill import schema
 def _cleanup_list(obj, default):
     if not obj:
         obj = default
-    elif isinstance(obj, str_type):
+    elif isinstance(obj, string_types):
         obj = [obj]
     elif not isinstance(obj, list):
         obj = list(obj)

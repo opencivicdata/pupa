@@ -10,6 +10,7 @@ def toy_bill():
              organization="Foo Senate",
              type="bill")
     b.add_source("http://uri.example.com/", note="foo")
+    print(b.as_dict())
     b.validate()
     return b
 

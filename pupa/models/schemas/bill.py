@@ -3,13 +3,7 @@
 """
 
 from .common import sources
-
-
-BILL_TYPES = ['bill', 'resolution', 'concurrent resolution', 'joint resolution', 'memorial']
-ACTION_TYPES = ['introduced', 'reading:1', 'reading:2', 'reading:3']
-VERSION_TYPES = []
-DOCUMENT_TYPES = []
-
+from pupa.core import settings
 
 schema = {
     "description": "bill data",
@@ -54,7 +48,7 @@ schema = {
 
         "title": {"type": "string", "description": "primary display title for the bill"},
 
-        "type": {"items": {"type": "string"}, "type": "array",
+        "type": {"items": {"type": "string", "enum": settings.BILL_TYPES}, "type": "array",
                  "description": "array of types (e.g. bill, resolution)"},
 
         "subject": {
@@ -117,8 +111,7 @@ schema = {
                     "session": {"type": "string", "description": "Session of related bill."},
                     "name": {"type": "string", "description": "Name of related bill."},
                     "relation_type": {
-                        "enum": ["companion", "other-session",
-                                 "replaced-by", "replaces"],
+                        "enum": settings.BILL_RELATION_TYPES,
                         "type": "string",
                         "description": (
                             """
@@ -185,7 +178,8 @@ schema = {
                     },
                     "type": {
                         "items": {
-                            "type": "string"
+                            "type": "string",
+                            "enum": settings.BILL_ACTION_TYPES,
                         },
                         "type": "array",
                         "description": "array of normalized action types",
@@ -225,7 +219,7 @@ schema = {
             "items": {
                 "properties": {
                     "name": {"type": "string", "description": "Name of version"},
-                    "type": {"type": ["string", "null"], "enum": VERSION_TYPES,
+                    "type": {"type": ["string", "null"], "enum": settings.VERSION_TYPES,
                              "description": "Type of version"},
                     "date": {
                         "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
@@ -254,7 +248,7 @@ schema = {
             "items": {
                 "properties": {
                     "name": {"type": "string", "description": "Name of document"},
-                    "type": {"type": ["string", "null"], "enum": DOCUMENT_TYPES,
+                    "type": {"type": ["string", "null"], "enum": settings.DOCUMENT_TYPES,
                              "description": "Type of document"},
                     "date": {
                         "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
