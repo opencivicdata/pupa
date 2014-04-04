@@ -5,9 +5,7 @@
 from .common import sources
 
 
-#BILL_TYPES = ['bill', 'resolution', 'concurrent resolution',
-#              'joint resolution', 'memorial']
-BILL_TYPES = []
+BILL_TYPES = ['bill', 'resolution', 'concurrent resolution', 'joint resolution', 'memorial']
 ACTION_TYPES = ['introduced', 'reading:1', 'reading:2', 'reading:3']
 VERSION_TYPES = []
 DOCUMENT_TYPES = []

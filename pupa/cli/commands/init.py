@@ -1,5 +1,4 @@
 from __future__ import print_function
-import shutil
 import os
 from six.moves import input
 
@@ -63,7 +62,8 @@ class Command(BaseCommand):
         os.makedirs(args.module)
 
         long_name = prompt('jurisdiction name (e.g. Seattle City Council): ')
-        jurisdiction = prompt('jurisdiction id (e.g. ocd-jurisdiction/country:us/state:wa/place:seattle/council): ')
+        jurisdiction = prompt('jurisdiction id (e.g. '
+                              'ocd-jurisdiction/country:us/state:wa/place:seattle/council): ')
         url = prompt('official URL: ')
 
         # will default to True until they pick one, then defaults to False

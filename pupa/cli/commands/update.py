@@ -1,10 +1,8 @@
 from __future__ import print_function
 import os
-import sys
 import glob
 import importlib
-import traceback
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict
 
 from .base import BaseCommand, CommandError
 from pupa import utils
@@ -21,6 +19,7 @@ from pupa.scrape import Jurisdiction
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')
+
 
 def print_report(report):
     plan = report['plan']
@@ -67,7 +66,6 @@ class Command(BaseCommand):
         self.add_argument('--retries', help='scraper retries', type=int, dest='SCRAPELIB_RETRIES')
         self.add_argument('--retry_wait', help='scraper retry wait', type=int,
                           dest='SCRAPELIB_RETRY_WAIT_SECONDS')
-
 
     def get_jurisdiction(self, module_name):
         # get the jurisdiction object
