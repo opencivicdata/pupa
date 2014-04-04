@@ -7,3 +7,5 @@ script: nosetests
 notifications:
     email:
         - jturk@sunlightfoundation.com
+        - tneale@sunlightfoundation.com
+        - paultag@sunlightfoundation.com
