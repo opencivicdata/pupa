@@ -1,5 +1,5 @@
 from nose.tools import raises
-from ..membership import Membership
+from pupa.models import Membership
 
 
 @raises(ValueError)

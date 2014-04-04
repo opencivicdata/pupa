@@ -1,4 +1,4 @@
-from ..event import Event
+from pupa.models import Event
 import datetime as dt
 
 

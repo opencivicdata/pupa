@@ -1,4 +1,4 @@
-from ..bill import Bill
+from pupa.models import Bill
 from nose.tools import raises
 from validictory import ValidationError
 

@@ -1,4 +1,4 @@
-from ..organization import Organization
+from pupa.models import Organization
 from validictory import ValidationError
 from nose.tools import raises
 

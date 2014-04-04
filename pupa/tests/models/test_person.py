@@ -1,4 +1,4 @@
-from ..person import Person
+from pupa.models import Person
 from nose.tools import raises
 from validictory import ValidationError
 

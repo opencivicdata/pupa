@@ -7,7 +7,7 @@ from pupa.scrape.base import Scraper
 
 
 def test_save_object_basics():
-    s = Scraper('jurisdiction', '2013', '/tmp/')
+    s = Scraper('jurisdiction', '/tmp/')
     p = Person('Michael Jordan')
     p.add_source('http://example.com')
 
@@ -21,17 +21,16 @@ def test_save_object_basics():
 
 
 def test_save_invalid_object():
-    s = Scraper('jurisdiction', '2013', '/tmp/')
+    s = Scraper('jurisdiction', '/tmp/')
     p = Person('Michael Jordan')
     # no source, won't validate
 
-    # this is hideous...
     with assert_raises(ValueError):
         s.save_object(p)
 
 
 def test_save_related():
-    s = Scraper('jurisdiction', '2013', '/tmp/')
+    s = Scraper('jurisdiction', '/tmp/')
     p = Person('Michael Jordan')
     p.add_source('http://example.com')
     o = Organization('Chicago Bulls')
