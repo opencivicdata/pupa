@@ -1,5 +1,6 @@
 from .base import BaseModel
 from .schemas.organization import schema
+from .post import Post
 
 
 class Organization(BaseModel):
@@ -9,13 +10,9 @@ class Organization(BaseModel):
 
     __slots__ = ('classification', 'dissolution_date', 'founding_date',
                  'identifiers', 'name', 'other_names', 'parent_id', 'chamber',
-                 'posts', '_openstates_id', 'contact_details', 'division_id',
+                 '_openstates_id', 'contact_details', 'division_id',
                  'abbreviation', 'jurisdiction_id', 'identifiers', 'links',
                  'image')
-
-    _post_slots = ('end_date', 'id', 'label', 'role',
-                   'start_date', 'chamber', 'division_id',
-                   'num_seats')
 
     _type = 'organization'
     _schema = schema
@@ -35,7 +32,6 @@ class Organization(BaseModel):
         self.image = None
         self.other_names = []
         self.identifiers = []
-        self.posts = []
         self.contact_details = []
         self._related = []
         for k, v in kwargs.items():
@@ -81,15 +77,8 @@ class Organization(BaseModel):
         self.identifiers.append(data)
 
     def add_post(self, label, role, **kwargs):
-        post = {"label": label, "role": role}
-        for k, v in kwargs.items():
-            if k not in self._post_slots:
-                raise AttributeError(
-                    '{0} not a valid kwarg for add_post'.format(k))
-            post[k] = v
-        self.posts.append(post)
+        post = Post(label=label, role=role, **kwargs)
+        self._related.append(post)
 
     def add_contact_detail(self, type, value, note):
-        self.contact_details.append({"type": type,
-                                     "value": value,
-                                     "note": note})
+        self.contact_details.append({"type": type, "value": value, "note": note})

@@ -12,11 +12,9 @@ class Person(BaseModel):
     _schema = schema
     _collection = 'people'
 
-    __slots__ = ('name', 'gender', 'birth_date',
-                 'death_date', 'image', 'summary', 'biography', 'links',
-                 'other_names', 'contact_details', '_openstates_id',
-                 'chamber', 'district', 'identifiers',
-                 'post_id', 'national_identity',)
+    __slots__ = ('name', 'gender', 'birth_date', 'death_date', 'image', 'summary', 'biography',
+                 'links', 'other_names', 'contact_details', '_openstates_id', 'chamber',
+                 'district', 'identifiers', 'national_identity',)
     _other_name_slots = ('name', 'start_date', 'end_date', 'note')
 
     def __init__(self, name, **kwargs):
@@ -42,8 +40,7 @@ class Person(BaseModel):
         other_name = {'name': name}
         for k, v in kwargs.items():
             if k not in self._other_name_slots:
-                raise AttributeError('{0} not a valid kwarg for add_name'
-                                     .format(k))
+                raise AttributeError('{0} not a valid kwarg for add_name'.format(k))
             other_name[k] = v
         self.other_names.append(other_name)
 
@@ -57,17 +54,14 @@ class Person(BaseModel):
         self.identifiers.append(data)
 
     def add_contact_detail(self, type, value, note):
-        self.contact_details.append({"type": type,
-                                     "value": value,
-                                     "note": note})
+        self.contact_details.append({"type": type, "value": value, "note": note})
 
     def add_membership(self, organization, role='member', **kwargs):
         """
             add a membership in an organization and return the membership
             object in case there are more details to add
         """
-        membership = Membership(self._id, organization._id, role=role,
-                                **kwargs)
+        membership = Membership(self._id, organization._id, role=role, **kwargs)
         self._related.append(membership)
         return membership
 

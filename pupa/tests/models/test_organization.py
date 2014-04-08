@@ -23,8 +23,8 @@ def test_add_post():
 
     orga.add_post("Human Readable Name", "Chef")
 
-    assert orga.posts[0]['role'] == "Chef"
-    assert orga.posts[0]['label'] == "Human Readable Name"
+    assert orga._related[0].role == "Chef"
+    assert orga._related[0].label == "Human Readable Name"
 
     with assert_raises(TypeError):
         orga.add_identifier("id10t", foo="bar")

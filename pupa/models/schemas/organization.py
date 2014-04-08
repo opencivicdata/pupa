@@ -45,40 +45,6 @@ schema = {
             "description": "A URL of an image",
             "type": ["string", "null"],
         },
-        "posts": {
-            "description": "Posts within the organization",
-            "items": {
-                "properties": {
-                    "contact_details": contact_details,
-                    "links": links,
-                    "id": {
-                        "description": "The post's unique identifier",
-                        "type": ["string", "null"],
-                    },
-                    "label": {
-                        "description": "A label describing the post",
-                        "type": "string"
-                    },
-                    "role": {
-                        "description": "The function that the holder of the post fulfills",
-                        "type": ["string", "null"],
-                    },
-                    "start_date": {
-                        "description": "The date on which the post was created",
-                        "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
-                        "type": ["string", "null"],
-                    },
-                    "end_date": {
-                        "description": "The date on which the post was eliminated",
-                        "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
-                        "type": ["string", "null"],
-                    },
-                },
-                "title": "Post",
-                "type": "object"
-            },
-            "type": "array"
-        },
         "sources": sources,
     },
     "title": "Organization",

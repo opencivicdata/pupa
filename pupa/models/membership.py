@@ -4,7 +4,7 @@ from .schemas.membership import schema
 
 class Membership(BaseModel):
     """
-    A single popolo encoded Membership.
+    A popolo-style Membership.
     """
 
     _type = 'membership'
