@@ -10,8 +10,7 @@ class BaseModel(object):
     """
 
     # needs slots defined so children __slots__ are enforced
-    __slots__ = ('_id', '_related', 'sources', 'created_at', 'updated_at',
-                 'extras', '_meta')
+    __slots__ = ('_id', '_related', 'sources', 'created_at', 'updated_at', 'extras', '_meta')
 
     # to be overridden by children. Something like "person" or "organization".
     # Used in :func:`validate`.
@@ -19,9 +18,10 @@ class BaseModel(object):
     _schema = None
 
     def __init__(self):
-        self.extras = {}
         self._id = str(uuid.uuid1())
+        self._related = []
         self.sources = []
+        self.extras = {}
         self._meta = {}
 
     # scraping helpers

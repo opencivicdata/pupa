@@ -16,20 +16,18 @@ def _cleanup_list(obj, default):
 
 class Bill(BaseModel):
     """
-    A single OpenCivic bill.
+    An Open Civic Data bill.
     """
 
     _type = 'bill'
     _schema = schema
     _collection = 'bills'
-    __slots__ = ('actions', 'other_names', 'other_titles',
-                 'related_bills', 'name', 'chamber', 'documents', 'session',
-                 'sources', 'sponsors', 'summaries', 'subject', 'title',
-                 '_openstates_id', 'type', 'versions', 'jurisdiction_id',
-                 'organization', 'organization_id', 'identifiers')
+    __slots__ = ('actions', 'other_names', 'other_titles', 'related_bills', 'name', 'chamber',
+                 'documents', 'session', 'sources', 'sponsors', 'summaries', 'subject', 'title',
+                 '_openstates_id', 'type', 'versions', 'jurisdiction_id', 'organization',
+                 'organization_id', 'identifiers')
 
-    def __init__(self, name, session, title,
-                 organization=None, type=None, **kwargs):
+    def __init__(self, name, session, title, organization=None, type=None, **kwargs):
         super(Bill, self).__init__()
 
         self.name = name
@@ -52,8 +50,7 @@ class Bill(BaseModel):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-    def add_action(self, description, actor, date,
-                   type=None, related_entities=None):
+    def add_action(self, description, actor, date, type=None, related_entities=None):
         self.actions.append({
             "description": description,
             "actor": actor,
@@ -70,8 +67,7 @@ class Bill(BaseModel):
             "relation_type": relation  # validate
         })
 
-    def add_sponsor(self, name, sponsorship_type,
-                    entity_type, primary,
+    def add_sponsor(self, name, sponsorship_type, entity_type, primary,
                     chamber=None, entity_id=None):
         ret = {
             "name": name,
@@ -81,43 +77,25 @@ class Bill(BaseModel):
             "id": entity_id,
             "chamber": chamber,
         }
-
         self.sponsors.append(ret)
 
     def add_subject(self, subject):
         self.subject.append(subject)
 
-    def add_document_link(self, name, url, date=None, type=None,
-                          mimetype=None, on_duplicate='error',
-                          document_id=None):
-        return self._add_associated_link(
-            collection='documents',
-            name=name,
-            url=url,
-            date=date,
-            type=type,
-            mimetype=mimetype,
-            on_duplicate=on_duplicate,
-            document_id=document_id)
-
-    def add_version_link(self, name, url, date=None, type=None,
-                         mimetype=None, on_duplicate='error',
-                         document_id=None):
-        return self._add_associated_link(
-            collection='versions',
-            name=name,
-            url=url,
-            date=date,
-            type=type,
-            mimetype=mimetype,
-            on_duplicate=on_duplicate,
-            document_id=document_id)
-
     def add_summary(self, note, text):
-        self.summaries.append({
-            "note": note,
-            "text": text,
-        })
+        self.summaries.append({"note": note, "text": text})
+
+    def add_document_link(self, name, url, date=None, type=None, mimetype=None,
+                          on_duplicate='error', document_id=None):
+        return self._add_associated_link(collection='documents', name=name, url=url, date=date,
+                                         type=type, mimetype=mimetype, on_duplicate=on_duplicate,
+                                         document_id=document_id)
+
+    def add_version_link(self, name, url, date=None, type=None, mimetype=None,
+                         on_duplicate='error', document_id=None):
+        return self._add_associated_link(collection='versions', name=name, url=url, date=date,
+                                         type=type, mimetype=mimetype, on_duplicate=on_duplicate,
+                                         document_id=document_id)
 
     def __str__(self):
         return self.name + ' in ' + self.session
