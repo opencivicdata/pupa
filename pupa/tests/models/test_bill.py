@@ -16,6 +16,24 @@ def test_basic_valid_bill():
     b.validate()
 
 
+def test_bill_type_setting():
+    # default
+    b = Bill(name="some bill", session="session", title="the title")
+    assert b.type == ["bill"]
+
+    # string -> list
+    b = Bill(name="some bill", session="session", title="the title", type="string")
+    assert b.type == ["string"]
+
+    # list unmodified
+    b = Bill(name="some bill", session="session", title="the title", type=["two", "items"])
+    assert b.type == ["two", "items"]
+
+    # tuple -> list
+    b = Bill(name="some bill", session="session", title="the title", type=("two", "items"))
+    assert b.type == ["two", "items"]
+
+
 def test_basic_invalid_bill():
     """ Test that we can create an invalid bill, and validation will fail """
     b = toy_bill()
