@@ -1,52 +1,50 @@
-from pupa.models import Event
+import pytest
 import datetime as dt
+from pupa.models import Event
 
 
 def event_obj():
-    e = Event(name="get-together",
-              when=dt.datetime.utcnow(),
-              location="Joe's Place")
-
+    e = Event(name="get-together", when=dt.datetime.utcnow(), location="Joe's Place")
     e.add_source(url='foobar')
-    e.validate()
     return e
 
 
 def test_basic_event():
-    """ test that we can create an event """
-    e = Event(name="get-together",
-              when=dt.datetime.utcnow(),
-              location="Joe's Place")
-
-    e.add_source(url='foobar')
+    e = event_obj()
     e.validate()
 
+
+def test_bad_event():
+    e = event_obj()
+    e.when = 6
+
+    with pytest.raises(ValueError):
+        e.validate()
+
+
+def test_add_link():
+    e = event_obj()
     e.add_link("http://foobar.baz")
     e.add_link("http://foobar.baz", note="foo")
-    e.validate()
-
     assert len(e.links) == 2
+    e.validate()
 
 
 def test_basic_agenda():
-    e = Event(name="get-together",
-              when=dt.datetime.utcnow(),
-              location="Joe's Place")
-
-    e.add_source(url='foobar')
-    e.validate()
-
+    e = event_obj()
     agenda = e.add_agenda_item("foo bar")
-    assert agenda
+    assert agenda['description'] == 'foo bar'
+    assert e.agenda[0] == agenda
     e.validate()
 
 
-def test_add_person():
+def test_agenda_add_person():
     e = event_obj()
     agenda = e.add_agenda_item("foo bar")
     assert agenda['related_entities'] == []
 
     agenda.add_person(person='John Q. Hacker', note='chair')
+    assert len(e.agenda[0]['related_entities']) == 1
     e.validate()
 
 
@@ -70,12 +68,11 @@ def test_add_bill():
 def test_add_document():
     e = event_obj()
     assert e.documents == []
-    e.add_document(name='hello', url='http://example.com',
-                   mimetype="text/html")
+    e.add_document(name='hello', url='http://example.com', mimetype="text/html")
     assert len(e.documents) == 1
     o = e.documents[0]
     assert o['name'] == 'hello'
-    assert o['url'] == 'http://example.com'
+    assert o['links'] == [{'url': 'http://example.com', 'mimetype': 'text/html'}]
     e.validate()
 
 
