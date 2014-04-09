@@ -1,10 +1,10 @@
 import pytest
-import datetime as dt
+import datetime
 from pupa.models import Event
 
 
 def event_obj():
-    e = Event(name="get-together", when=dt.datetime.utcnow(), location="Joe's Place")
+    e = Event(name="get-together", when=datetime.datetime.utcnow(), location="Joe's Place")
     e.add_source(url='foobar')
     return e
 
@@ -78,29 +78,16 @@ def test_add_document():
 
 def test_add_media():
     e = event_obj()
-    e.validate()
     name = "Hello, World"
-
     a = e.add_agenda_item(description='foo')
-
-    a.add_media_link(name=name, url="http://pault.ag", type='media',
-                     mimetype="text/html")
-
-    a.add_media_link(name=name, url="ftp://pault.ag",
-                     type='media', mimetype="text/ftp-or-something")
-
+    a.add_media_link(name=name, url="http://pault.ag", type='media', mimetype="text/html")
+    a.add_media_link(name=name, url="ftp://pault.ag", type='media', mimetype="text/plain")
     e.validate()
-
     assert len(e.agenda[0]['media']) == 1
     assert len(e.agenda[0]['media'][0]['links']) == 2
 
-    e.add_media_link(name=name, url="http://pault.ag", type='media',
-                     mimetype="text/html")
-
-    e.add_media_link(name=name, url="ftp://pault.ag",
-                     type='media', mimetype="text/ftp-or-something")
-
+    e.add_media_link(name=name, url="http://pault.ag", type='media', mimetype="text/html")
+    e.add_media_link(name=name, url="ftp://pault.ag", type='media', mimetype="text/plain")
     e.validate()
-
     assert len(e.media) == 1
     assert len(e.media[0]['links']) == 2
