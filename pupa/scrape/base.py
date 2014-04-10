@@ -104,6 +104,7 @@ class Scraper(scrapelib.Scraper):
             else:
                 self.save_object(obj)
         record['end'] = datetime.datetime.utcnow()
+        record['skipped'] = getattr(self, 'skipped', 0)
         if not self.output_names:
             raise ScrapeError('no objects returned from scrape')
         for _type, nameset in self.output_names.items():
@@ -111,7 +112,7 @@ class Scraper(scrapelib.Scraper):
 
         return record
 
-    def scrape(self):
+    def scrape(self, **kwargs):
         raise NotImplementedError(self.__class__.__name__ + ' must provide a scrape() method')
 
 

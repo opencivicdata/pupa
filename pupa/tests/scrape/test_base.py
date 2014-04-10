@@ -1,9 +1,7 @@
 import mock
-from nose.tools import assert_equal, assert_in, assert_raises
-
-from pupa.models.person import Person
-from pupa.models.organization import Organization
-from pupa.scrape.base import Scraper
+import pytest
+from pupa.models import Person, Organization, Bill
+from pupa.scrape.base import Scraper, ScrapeError, BaseBillScraper
 
 
 def test_save_object_basics():
@@ -16,7 +14,7 @@ def test_save_object_basics():
 
     # saved in right place
     filename = 'person_' + p._id + '.json'
-    assert_in(filename, s.output_names['person'])
+    assert filename in s.output_names['person']
     json_dump.assert_called_once_with(p.as_dict(), mock.ANY, cls=mock.ANY)
 
 
@@ -25,7 +23,7 @@ def test_save_invalid_object():
     p = Person('Michael Jordan')
     # no source, won't validate
 
-    with assert_raises(ValueError):
+    with pytest.raises(ValueError):
         s.save_object(p)
 
 
@@ -40,7 +38,75 @@ def test_save_related():
     with mock.patch('json.dump') as json_dump:
         s.save_object(p)
 
-    assert_equal(json_dump.mock_calls, [
-        mock.call(p.as_dict(), mock.ANY, cls=mock.ANY),
-        mock.call(o.as_dict(), mock.ANY, cls=mock.ANY)
-    ])
+    assert json_dump.mock_calls == [mock.call(p.as_dict(), mock.ANY, cls=mock.ANY),
+                                    mock.call(o.as_dict(), mock.ANY, cls=mock.ANY)]
+
+
+def test_simple_do_scrape():
+    class FakeScraper(Scraper):
+        def scrape(self):
+            p = Person('Michael Jordan')
+            p.add_source('http://example.com')
+            yield p
+
+    with mock.patch('json.dump') as json_dump:
+        record = FakeScraper('jurisdiction', '/tmp/').do_scrape()
+
+    assert len(json_dump.mock_calls) == 1
+    assert record['objects']['person'] == 1
+    assert record['end'] > record['start']
+    assert record['skipped'] == 0
+
+
+def test_double_iter():
+    """ tests that scrapers that yield iterables work OK """
+    class IterScraper(Scraper):
+        def scrape(self):
+            yield self.scrape_people()
+
+        def scrape_people(self):
+            p = Person('Michael Jordan')
+            p.add_source('http://example.com')
+            yield p
+
+
+    with mock.patch('json.dump') as json_dump:
+        record = IterScraper('jurisdiction', '/tmp/').do_scrape()
+
+    assert len(json_dump.mock_calls) == 1
+    assert record['objects']['person'] == 1
+
+
+def test_no_objects():
+    class NullScraper(Scraper):
+        def scrape(self):
+            pass
+
+    with pytest.raises(ScrapeError):
+        NullScraper('jurisdiction', '/tmp/').do_scrape()
+
+
+def test_bill_scraper():
+    class BillScraper(BaseBillScraper):
+        def get_bill_ids(self):
+            yield '1', {'extra': 'param'}
+            yield '2', {}
+
+        def get_bill(self, bill_id, **kwargs):
+            if bill_id == '1':
+                assert kwargs == {'extra': 'param'}
+                raise self.ContinueScraping
+            else:
+                assert bill_id == '2'
+                assert kwargs == {}
+                b = Bill('1', self.session, 'title')
+                b.add_source('http;//example.com')
+                return b
+
+    bs = BillScraper('jurisdiction', '/tmp/')
+    with mock.patch('json.dump') as json_dump:
+        record = bs.do_scrape(session='2020')
+
+    assert len(json_dump.mock_calls) == 1
+    assert record['objects']['bill'] == 1
+    assert record['skipped'] == 1
