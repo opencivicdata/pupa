@@ -4,7 +4,6 @@ import time
 import json
 import datetime
 import subprocess
-
 from bson import ObjectId
 
 
@@ -13,7 +12,7 @@ def makedirs(dname):
         os.makedirs(dname)
 
 
-# fixing bill ids
+#:w fixing bill ids
 _bill_id_re = re.compile(r'([A-Z]*)\s*0*([-\d]+)')
 _mi_bill_id_re = re.compile(r'(SJR|HJR)\s*([A-Z]+)')
 
@@ -48,8 +47,7 @@ def convert_pdf(filename, type='xml'):
                 'xml': ['pdftohtml', '-xml', '-stdout', filename],
                 'html': ['pdftohtml', '-stdout', filename]}
     try:
-        pipe = subprocess.Popen(commands[type], stdout=subprocess.PIPE,
-                                close_fds=True).stdout
+        pipe = subprocess.Popen(commands[type], stdout=subprocess.PIPE, close_fds=True).stdout
     except OSError as e:
         raise EnvironmentError("error running %s, missing executable? [%s]" %
                                ' '.join(commands[type]), e)
