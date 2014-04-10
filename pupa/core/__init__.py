@@ -60,8 +60,7 @@ def _configure_db(host, port, db_name):
         conn = pymongo.Connection(host, port)
         db = conn[db_name]
     # return a dummy NoDB object if we couldn't connect
-    except (pymongo.errors.AutoReconnect,
-            pymongo.errors.ConnectionFailure) as e:
+    except (pymongo.errors.AutoReconnect, pymongo.errors.ConnectionFailure) as e:
         db = ErrorProxy(e)
 
 
@@ -69,13 +68,11 @@ def _configure_es(host, timeout):
     import pyelasticsearch
     global elasticsearch
     try:
-        elasticsearch = pyelasticsearch.ElasticSearch(host, timeout=timeout,
-                                                      revival_delay=0)
+        elasticsearch = pyelasticsearch.ElasticSearch(host, timeout=timeout, revival_delay=0)
     except Exception as e:
         elasticsearch = ErrorProxy(e)
 
 
-_configure_db(settings.MONGO_HOST, settings.MONGO_PORT,
-              settings.MONGO_DATABASE)
+_configure_db(settings.MONGO_HOST, settings.MONGO_PORT, settings.MONGO_DATABASE)
 if settings.ENABLE_ELASTICSEARCH:
     _configure_es(settings.ELASTICSEARCH_HOST, settings.ELASTICSEARCH_TIMEOUT)

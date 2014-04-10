@@ -16,10 +16,6 @@ ENABLE_ELASTICSEARCH = False
 ELASTICSEARCH_HOST = 'localhost'
 ELASTICSEARCH_TIMEOUT = 2
 
-BILL_FILTERS = {}
-LEGISLATOR_FILTERS = {}
-EVENT_FILTERS = {}
-
 ORGANIZATION_CLASSIFICATIONS = ['legislature', 'party', 'committee', 'commission']
 BILL_TYPES = ['bill', 'resolution', 'concurrent resolution', 'joint resolution', 'memorial']
 BILL_ACTION_TYPES = ['introduced', 'reading:1', 'reading:2', 'reading:3']
