@@ -2,8 +2,8 @@ language: python
 python:
     - "2.7"
     - "3.3"
-install: pip install -r requirements-dev.txt --use-mirrors
-script: nosetests
+install: pip install -r pymongo six pytest mock pymongo validictory scrapelib --use-mirrors
+script: py.test
 notifications:
     email:
         - jturk@sunlightfoundation.com

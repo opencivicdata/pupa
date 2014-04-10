@@ -1,6 +1,0 @@
-pymongo
-validictory
-scrapelib
-nose
-mock
-six
