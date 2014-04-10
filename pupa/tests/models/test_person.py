@@ -1,5 +1,5 @@
+import pytest
 from pupa.models import Person
-from nose.tools import raises
 from validictory import ValidationError
 
 
@@ -11,10 +11,8 @@ def test_basic_invalid_person():
 
     bob.name = None
 
-    @raises(ValidationError)
-    def _():
+    with pytest.raises(ValidationError):
         bob.validate()
-    _()
 
 
 def test_str():

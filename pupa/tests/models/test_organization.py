@@ -1,6 +1,6 @@
+import pytest
 from pupa.models import Organization
 from validictory import ValidationError
-from nose.tools import assert_raises
 
 
 def test_basic_invalid_organization():
@@ -11,7 +11,7 @@ def test_basic_invalid_organization():
 
     orga.name = None
 
-    with assert_raises(ValidationError):
+    with pytest.raises(ValidationError):
         orga.validate()
 
 
@@ -26,7 +26,7 @@ def test_add_post():
     assert orga._related[0].role == "Chef"
     assert orga._related[0].label == "Human Readable Name"
 
-    with assert_raises(TypeError):
+    with pytest.raises(TypeError):
         orga.add_identifier("id10t", foo="bar")
 
     orga.add_identifier("id10t")
