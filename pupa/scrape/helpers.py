@@ -1,7 +1,5 @@
 """ these are helper classes for object creation during the scrape """
-from pupa.models.person import Person
-from pupa.models.organization import Organization
-from pupa.models.membership import Membership
+from pupa.models import Person, Organization, Membership
 
 
 class Legislator(Person):
@@ -17,8 +15,7 @@ class Legislator(Person):
         self._role = role
 
     def add_contact(self, type, value, note):
-        self._contact_details.append({'type': type, 'value': value,
-                                      'note': note})
+        self._contact_details.append({'type': type, 'value': value, 'note': note})
 
     def add_committee_membership(self, com_name, role='member'):
         org = Organization(com_name, classification='committee')
@@ -33,7 +30,6 @@ class Committee(Organization):
         super(Committee, self).__init__(*args, **kwargs)
 
     def add_member(self, name, role='member', **kwargs):
-        membership = Membership(None, self._id, role=role,
-                                unmatched_legislator={'name': name},
+        membership = Membership(None, self._id, role=role, unmatched_legislator={'name': name},
                                 **kwargs)
         self._related.append(membership)

@@ -1,4 +1,4 @@
-from pupa.models.organization import Organization
+from pupa.models import Organization
 
 
 class Jurisdiction(object):
@@ -24,11 +24,8 @@ class Jurisdiction(object):
     _party_cache = {}
 
     def get_db_object(self):
-        return {'name': self.name,
-                'url': self.url,
-                'chambers': self.chambers,
-                'sessions': self.sessions,
-                'feature_flags': self.feature_flags,
+        return {'name': self.name, 'url': self.url, 'chambers': self.chambers,
+                'sessions': self.sessions, 'feature_flags': self.feature_flags,
                 'building_maps': self.building_maps}
 
     def get_party(self, party_name):
