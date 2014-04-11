@@ -1,4 +1,4 @@
-from .base import BaseModel, AssociatedLinkMixin
+from .base import BaseModel, SourceMixin, AssociatedLinkMixin
 from .schemas.event import schema
 
 
@@ -38,16 +38,13 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
         self['related_entities'].append({"name": name, "type": type, "id": id, "note": note})
 
 
-class Event(BaseModel, AssociatedLinkMixin):
+class Event(BaseModel, SourceMixin, AssociatedLinkMixin):
     """
     Details for an event in .format
     """
     _type = 'event'
     _schema = schema
     _collection = 'events'
-    __slots__ = ("when", "all_day", "name", "description", "documents", "end", "links",
-                 "location", "participants", "agenda", "sources", "status", "type", "media",
-                 '_openstates_id', 'jurisdiction_id', 'identifiers',)
 
     def __init__(self, name, when, location, **kwargs):
         super(Event, self).__init__()

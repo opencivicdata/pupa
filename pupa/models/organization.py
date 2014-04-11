@@ -1,18 +1,12 @@
-from .base import BaseModel
+from .base import BaseModel, SourceMixin
 from .schemas.organization import schema
 from .post import Post
 
 
-class Organization(BaseModel):
+class Organization(BaseModel, SourceMixin):
     """
     A single popolo encoded Organization
     """
-
-    __slots__ = ('classification', 'dissolution_date', 'founding_date',
-                 'identifiers', 'name', 'other_names', 'parent_id', 'chamber',
-                 '_openstates_id', 'contact_details', 'division_id',
-                 'abbreviation', 'jurisdiction_id', 'identifiers', 'links',
-                 'image')
 
     _type = 'organization'
     _schema = schema

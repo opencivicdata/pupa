@@ -9,28 +9,17 @@ class BaseModel(object):
     common methods and abstractions for OCD objects.
     """
 
-    # needs slots defined so children __slots__ are enforced
-    __slots__ = ('_id', '_related', 'sources', 'created_at', 'updated_at', 'extras', '_meta')
-
     # to be overridden by children. Something like "person" or "organization".
     # Used in :func:`validate`.
     _type = None
     _schema = None
 
     def __init__(self):
+        super(BaseModel, self).__init__()
         self._id = str(uuid.uuid1())
         self._related = []
-        self.sources = []
-        self.extras = {}
         self._meta = {}
-
-    # scraping helpers
-
-    def add_source(self, url, note=None, **kwargs):
-        """ Add a source URL from which data was collected """
-        new = kwargs.copy()
-        new.update({'url': url, 'note': note})
-        self.sources.append(new)
+        self.extras = {}
 
     # validation
 
@@ -101,13 +90,8 @@ class BaseModel(object):
 
     def as_dict(self):
         d = {}
-        all_slots = set(self.__slots__)
-        for cls in self.__class__.__mro__:
-            all_slots |= set(cls.__slots__)
-            if cls == BaseModel:
-                break
-        for attr in all_slots:
-            if attr != '_related' and hasattr(self, attr):
+        for attr in self._schema['properties'].keys():
+            if hasattr(self, attr):
                 d[attr] = getattr(self, attr)
         d['_type'] = self._type
         return d
@@ -118,6 +102,11 @@ class BaseModel(object):
 
     # operators
 
+    def __setattr__(self, key, val):
+        if key[0] != '_' and key not in self._schema['properties'].keys():
+            raise ValueError('property "{}" not in {} schema'.format(key, self._type))
+        super(BaseModel, self).__setattr__(key, val)
+
     def __eq__(self, other):
         """ equality requires all fields to be equal except for the _id """
         sd = self.as_dict()
@@ -127,8 +116,20 @@ class BaseModel(object):
         return sd == od
 
 
-class AssociatedLinkMixin(object):
+class SourceMixin(object):
+    def __init__(self):
+        super(SourceMixin, self).__init__()
+        self.sources = []
+        print('sourcemixin')
 
+    def add_source(self, url, note=None, **kwargs):
+        """ Add a source URL from which data was collected """
+        new = kwargs.copy()
+        new.update({'url': url, 'note': note})
+        self.sources.append(new)
+
+
+class AssociatedLinkMixin(object):
     def _add_associated_link(self, collection, name, url, type, mimetype, on_duplicate, date=None,
                              offset=None, document_id=None):
         if on_duplicate not in ['error', 'ignore']:

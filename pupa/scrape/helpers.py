@@ -4,7 +4,6 @@ from pupa.models import Person, Organization, Membership
 
 class Legislator(Person):
     _is_legislator = True
-    __slots__ = ('post_id', 'party', 'chamber', '_contact_details', '_role')
 
     def __init__(self, name, post_id, party=None, chamber=None, role='member', **kwargs):
         super(Legislator, self).__init__(name, **kwargs)
@@ -30,6 +29,6 @@ class Committee(Organization):
         super(Committee, self).__init__(*args, **kwargs)
 
     def add_member(self, name, role='member', **kwargs):
-        membership = Membership(None, self._id, role=role, unmatched_legislator={'name': name},
+        membership = Membership(None, self._id, role=role, _unmatched_legislator={'name': name},
                                 **kwargs)
         self._related.append(membership)

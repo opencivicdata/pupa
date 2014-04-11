@@ -98,3 +98,8 @@ sources = {
     "minItems": 1,
     "type": "array"
 }
+
+extras = {
+    "description": "extra data outside the core schema",
+    "type": "object",
+}

@@ -5,9 +5,9 @@ from pupa.core import db
 
 
 def match_membership(membership, people=None):
-    if membership.unmatched_legislator:
+    if membership._unmatched_legislator:
         if people is None:
-            unmatched_name = membership['unmatched_legislator']['name']
+            unmatched_name = membership['_unmatched_legislator']['name']
             people = people_by_jurisdiction_and_name(
                 unmatched_name,
                 membership['jurisdiction_id'],
@@ -18,7 +18,7 @@ def match_membership(membership, people=None):
             #   + update membership with this person's details (if it's
             #     not there already)
             membership.person_id = person['_id']
-            membership.unmatched_legislator = None
+            membership._unmatched_legislator = None
             return (True, membership)
     return (False, membership)
 
@@ -46,9 +46,9 @@ class MembershipImporter(BaseImporter):
             # manually. If we know it in the scraper, it better be in the DB!
             spec['post_id'] = membership.post_id
 
-        if membership.unmatched_legislator:
-            spec['unmatched_legislator'] = membership.unmatched_legislator
-            unmatched_name = membership.unmatched_legislator['name']
+        if membership._unmatched_legislator:
+            spec['_unmatched_legislator'] = membership._unmatched_legislator
+            unmatched_name = membership._unmatched_legislator['name']
 
             people = people_by_jurisdiction_and_name(membership.jurisdiction_id, unmatched_name)
 
@@ -82,7 +82,7 @@ class MembershipImporter(BaseImporter):
 
                 uspec = spec.copy()
                 uspec['person_id'] = None
-                uspec['unmatched_legislator.name'] = {
+                uspec['_unmatched_legislator.name'] = {
                     "$in": [
                         x['name'] for x in person['other_names']
                     ] + [person['name']]
@@ -94,7 +94,7 @@ class MembershipImporter(BaseImporter):
             # (not the same code as above)
             pspec = spec.copy()
             pspec['person_id'] = {"$in": people.distinct("_id")}
-            pspec.pop('unmatched_legislator')
+            pspec.pop('_unmatched_legislator')
             # Either we have this person, who's already matched (e.g.
             # everything already matches)
 

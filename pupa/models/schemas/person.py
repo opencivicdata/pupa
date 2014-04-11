@@ -1,4 +1,4 @@
-from .common import links, contact_details, identifiers, other_names, sources
+from .common import links, contact_details, identifiers, other_names, sources, extras
 
 schema = {
     "$schema": "http://json-schema.org/draft-03/schema#",
@@ -8,7 +8,7 @@ schema = {
         ('Basics', ('name', 'image', 'contact_details', 'links')),
         ('Extended Details', ('gender', 'summary', 'biography', 'birth_date', 'death_date')),
         ('Alternate Names/Identifiers', ('identifiers', 'other_names')),
-        ('Common Fields', ('updated_at', 'created_at', 'sources')),
+        ('Common Fields', ('updated_at', 'created_at', 'sources', 'extras')),
     ),
     "properties": {
         "updated_at": {
@@ -59,6 +59,7 @@ schema = {
             "type": ["string", "null"],
         },
         "sources": sources,
+        "extras": extras,
     },
     "title": "Person",
     "type": "object"

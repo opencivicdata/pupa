@@ -1,5 +1,5 @@
 from six import string_types
-from .base import BaseModel, AssociatedLinkMixin
+from .base import BaseModel, SourceMixin, AssociatedLinkMixin
 from .schemas.bill import schema
 
 
@@ -13,7 +13,7 @@ def _cleanup_list(obj, default):
     return obj
 
 
-class Bill(BaseModel, AssociatedLinkMixin):
+class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     """
     An Open Civic Data bill.
     """
@@ -21,10 +21,6 @@ class Bill(BaseModel, AssociatedLinkMixin):
     _type = 'bill'
     _schema = schema
     _collection = 'bills'
-    __slots__ = ('actions', 'other_names', 'other_titles', 'related_bills', 'name', 'chamber',
-                 'documents', 'session', 'sources', 'sponsors', 'summaries', 'subject', 'title',
-                 '_openstates_id', 'type', 'versions', 'jurisdiction_id', 'organization',
-                 'organization_id', 'identifiers')
 
     def __init__(self, name, session, title, organization=None, type=None, **kwargs):
         super(Bill, self).__init__()

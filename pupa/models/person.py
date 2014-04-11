@@ -1,9 +1,9 @@
-from .base import BaseModel
+from .base import BaseModel, SourceMixin
 from .membership import Membership
 from .schemas.person import schema
 
 
-class Person(BaseModel):
+class Person(BaseModel, SourceMixin):
     """
     Details for a Person in Popolo format.
     """
@@ -11,11 +11,6 @@ class Person(BaseModel):
     _type = 'person'
     _schema = schema
     _collection = 'people'
-
-    __slots__ = ('name', 'gender', 'birth_date', 'death_date', 'image', 'summary', 'biography',
-                 'links', 'other_names', 'contact_details', '_openstates_id', 'chamber',
-                 'district', 'identifiers', 'national_identity',)
-    _other_name_slots = ('name', 'start_date', 'end_date', 'note')
 
     def __init__(self, name, **kwargs):
         super(Person, self).__init__()
@@ -36,12 +31,14 @@ class Person(BaseModel):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-    def add_name(self, name, **kwargs):
+    def add_name(self, name, start_date=None, end_date=None, note=None):
         other_name = {'name': name}
-        for k, v in kwargs.items():
-            if k not in self._other_name_slots:
-                raise AttributeError('{0} not a valid kwarg for add_name'.format(k))
-            other_name[k] = v
+        if start_date:
+            other_name['start_date'] = start_date
+        if end_date:
+            other_name['end_date'] = end_date
+        if note:
+            other_name['note'] = note
         self.other_names.append(other_name)
 
     def add_link(self, url, note=None):

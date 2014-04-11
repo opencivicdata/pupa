@@ -1,4 +1,4 @@
-from .common import links, contact_details, identifiers, other_names, sources
+from .common import links, contact_details, identifiers, other_names, sources, extras
 from pupa.core import settings
 
 schema = {
@@ -46,6 +46,7 @@ schema = {
             "type": ["string", "null"],
         },
         "sources": sources,
+        "extras": extras,
     },
     "title": "Organization",
     "type": "object",

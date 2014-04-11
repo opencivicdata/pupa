@@ -1,4 +1,4 @@
-from .common import links, contact_details
+from .common import links, contact_details, extras
 
 schema = {
     "$schema": "http://json-schema.org/draft-03/schema#",
@@ -37,6 +37,7 @@ schema = {
         },
         "contact_details": contact_details,
         "links": links,
+        "extras": extras,
     },
     "title": "Post",
     "type": "object"

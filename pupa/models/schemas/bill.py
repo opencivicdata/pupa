@@ -2,7 +2,7 @@
     Schema for bill objects.
 """
 
-from .common import sources
+from .common import sources, extras
 from pupa.core import settings
 
 schema = {
@@ -274,5 +274,6 @@ schema = {
             "description": "Any non-version related documents. (elements same format as versions)",
         },
         "sources": sources,
+        "extras": extras,
     }
 }

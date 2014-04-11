@@ -12,7 +12,6 @@ def makedirs(dname):
         os.makedirs(dname)
 
 
-#:w fixing bill ids
 _bill_id_re = re.compile(r'([A-Z]*)\s*0*([-\d]+)')
 _mi_bill_id_re = re.compile(r'(SJR|HJR)\s*([A-Z]+)')
 

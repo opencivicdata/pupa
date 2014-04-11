@@ -9,10 +9,6 @@ class Vote(BaseModel):
     _type = 'vote'
     _schema = schema
     _collection = 'votes'
-    __slots__ = ("session", "chamber", "date", "motion", "type", "passed",
-                 "organization", "organization_id", "bill", "vote_counts",
-                 "roll_call", "sources", '_openstates_id', 'jurisdiction_id',
-                 'identifiers')
 
     def __init__(self, organization, session, date, motion, type, passed,
                  yes_count, no_count, other_count=0, organization_id=None,

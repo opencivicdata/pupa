@@ -2,7 +2,7 @@
     Schema for vote objects.
 """
 
-from .common import sources
+from .common import sources, extras
 
 
 VOTE_TYPES = ['passage', 'amendment', 'reading:2', 'reading:3',
@@ -16,7 +16,7 @@ schema = {
     "_order": (
         ('Basic Fields', ["organization", "organization_id", "_type", "session",
                           "chamber", "date", "motion", "type", "passed"]),
-        ('Common Fields', ['updated_at', 'created_at', 'sources']),
+        ('Common Fields', ['updated_at', 'created_at', 'sources', 'extras']),
         ('Relationship to Bill', ["bill"]),
         ('Vote Counts', ["vote_counts", "roll_call"])
     ),
@@ -112,5 +112,6 @@ schema = {
         },
 
         'sources': sources,
+        'extras': extras,
     }
 }

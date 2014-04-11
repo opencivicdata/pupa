@@ -10,8 +10,6 @@ class Post(BaseModel):
     _type = 'post'
     _schema = schema
     _collection = 'posts'
-    __slots__ = ('label', 'role', 'organization_id', 'start_date', 'end_date',
-                 'contact_details', 'links')
 
     def __init__(self, label, role, **kwargs):
         super(Post, self).__init__()

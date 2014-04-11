@@ -2,7 +2,7 @@
     Schema for event objects.
 """
 
-from .common import sources
+from .common import sources, extras
 
 media_schema = {
     "description": ("This \"special\" schema is used in two places in the Event"
@@ -84,6 +84,17 @@ schema = {
             "description": ('A simple name of the event, such as "Fiscal'
                             ' subcommittee hearing on pudding cups"')
         },
+
+        "all_day": {
+            "type": ["boolean"],
+            "description": ("Indicates if the event is an all-day event"),
+        },
+
+        "type": {
+            "type": ["string"],
+            "description": ("type of event"),
+        },
+        # TODO: turn into enum
 
         "updated_at": {
             "type": ["string", "datetime"],
@@ -367,6 +378,7 @@ schema = {
             "type": "array"
         },
         "sources": sources,
+        "extras": extras,
     },
     "type": "object"
 }

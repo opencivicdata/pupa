@@ -10,9 +10,6 @@ class Membership(BaseModel):
     _type = 'membership'
     _schema = schema
     _collection = 'memberships'
-    __slots__ = ("organization_id", "person_id", "post_id", "role", "start_date", "end_date",
-                 "contact_details", "chamber", 'jurisdiction_id', 'unmatched_legislator', 'label',
-                 'division_id', 'on_behalf_of_id', 'links')
 
     def __init__(self, person_id, organization_id, **kwargs):
         """
@@ -30,11 +27,10 @@ class Membership(BaseModel):
         self.end_date = None
         self.post_id = None
         self.role = None
-        self.unmatched_legislator = None
         self.label = None
         self.on_behalf_of_id = None
         self.links = []
-        self.division_id = None
+        self._unmatched_legislator = None
 
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -49,5 +45,5 @@ class Membership(BaseModel):
         if self.person_id:
             return self.person_id + ' membership in ' + self.organization_id
         else:
-            return (self.unmatched_legislator['name'] + ' membership in ' + self.organization_id)
+            return (self._unmatched_legislator['name'] + ' membership in ' + self.organization_id)
     __unicode__ = __str__
