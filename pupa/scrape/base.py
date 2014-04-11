@@ -146,11 +146,7 @@ class JurisdictionScraper(Scraper):
             org.add_source(self.jurisdiction.url)
             yield org
         else:
-            for chamber, properties in jurisdiction.chambers.items():
-                org = Organization(classification='party', name=properties['name'],
-                                   chamber=chamber, parent_id=parent_id,
-                                   jurisdiction_id=self.jurisdiction.jurisdiction_id)
-                org.add_source(self.jurisdiction.url)
+            for org in self.jurisdiction.organizations:
                 yield org
 
         for party in self.jurisdiction.parties:

@@ -69,7 +69,6 @@ def test_double_iter():
             p.add_source('http://example.com')
             yield p
 
-
     with mock.patch('json.dump') as json_dump:
         record = IterScraper('jurisdiction', '/tmp/').do_scrape()
 

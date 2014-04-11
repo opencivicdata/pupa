@@ -1,4 +1,3 @@
-from pupa.core import db
 from pupa.models import Jurisdiction
 from .base import BaseImporter
 

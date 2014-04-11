@@ -2,34 +2,13 @@ schema = {
     "description": "Information about a jurisdiction, including session, chamber, etc.",
     "type": "object",
     "_order": (
-        ('Basic Details', ('name', 'url', 'chambers', 'sessions')),
+        ('Basic Details', ('name', 'url', 'sessions')),
         ('Additional Metadata', ('feature_flags', 'building_maps')),
     ),
     "properties": {
         "name": {"type": "string",
                  "description": "Name of jurisdiction (e.g. North Carolina General Assembly)"},
-        "url": {"type": "string",
-                "description": "URL pointing to jurisdiction's website.", },
-        "chambers": {
-            "additionalProperties": {
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Human-readable name of chamber (e.g. Senate)"
-                    },
-                    "title": {
-                        "type": "string",
-                        "description": "Title of an individual in this chamber (e.g. Senator)"
-                    }
-                },
-                "type": "object"
-            },
-            "type": "object",
-            "description": ("Dictionary where keys are slugs for chambers (e.g. upper, lower) "
-                            " and values describe the chamber in human-readable terms. "
-                            " (only needs to be specified if there are multiple chambers)")
-
-        },
+        "url": {"type": "string", "description": "URL pointing to jurisdiction's website.", },
         "sessions": {
             "type": "array", "items": {"type": "object", "properties": {
                 "name": {"type": "string", "description": "Name of session."},

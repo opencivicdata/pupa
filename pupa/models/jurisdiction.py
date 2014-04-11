@@ -1,6 +1,5 @@
 from .base import BaseModel
 from .schemas.jurisdiction import schema
-from .organization import Organization
 
 
 class Jurisdiction(BaseModel):
@@ -27,6 +26,12 @@ class Jurisdiction(BaseModel):
     parent_id = None
     ignored_scraped_sessions = []
 
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    # add _id property to mimic other types without a user-set ID
+
     @property
     def _id(self):
         return self.jurisdiction_id
@@ -34,10 +39,6 @@ class Jurisdiction(BaseModel):
     @_id.setter
     def _id(self, val):
         self.jurisdiction_id = val
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
     def as_dict(self):
         return {'_type': self._type, '_id': self._id, '_meta': self._meta,
