@@ -1,6 +1,5 @@
 from six import string_types
-from .base import BaseModel
-from .utils import add_associated_link
+from .base import BaseModel, AssociatedLinkMixin
 from .schemas.bill import schema
 
 
@@ -14,7 +13,7 @@ def _cleanup_list(obj, default):
     return obj
 
 
-class Bill(BaseModel):
+class Bill(BaseModel, AssociatedLinkMixin):
     """
     An Open Civic Data bill.
     """
@@ -99,6 +98,4 @@ class Bill(BaseModel):
 
     def __str__(self):
         return self.name + ' in ' + self.session
-
     __unicode__ = __str__
-    _add_associated_link = add_associated_link

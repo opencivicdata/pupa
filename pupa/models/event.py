@@ -1,11 +1,9 @@
-from .base import BaseModel
-from .utils import add_associated_link
+from .base import BaseModel, AssociatedLinkMixin
 from .schemas.event import schema
 
 
-class EventAgendaItem(dict):
+class EventAgendaItem(dict, AssociatedLinkMixin):
     event = None
-    _add_associated_link = add_associated_link
 
     def __init__(self, description, event):
         super(EventAgendaItem, self).__init__({
@@ -40,7 +38,7 @@ class EventAgendaItem(dict):
         self['related_entities'].append({"name": name, "type": type, "id": id, "note": note})
 
 
-class Event(BaseModel):
+class Event(BaseModel, AssociatedLinkMixin):
     """
     Details for an event in .format
     """
@@ -91,8 +89,6 @@ class Event(BaseModel):
         obj = EventAgendaItem(description, self)
         self.agenda.append(obj)
         return obj
-
-    _add_associated_link = add_associated_link
 
     def add_media_link(self, name, url, type='media', mimetype=None, offset=None,
                        on_duplicate='error'):
