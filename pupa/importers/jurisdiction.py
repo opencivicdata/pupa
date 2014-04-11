@@ -1,14 +1,14 @@
-import datetime
 from pupa.core import db
-from pupa.models import Organization
-from pupa.models.utils import DatetimeValidator
-from pupa.models.schemas.jurisdiction import schema as jurisdiction_schema
+from pupa.models import Jurisdiction
+from .base import BaseImporter
 
 
-def import_jurisdiction(org_importer, jurisdiction):
-    obj['_type'] = 'jurisdiction'
-    obj['_id'] = jurisdiction.jurisdiction_id
+class JurisdictionImporter(BaseImporter):
+    _type = 'jurisdiction'
+    _model_class = Jurisdiction
 
-    if not obj['_id'].startswith("ocd-jurisdiction/"):
-        raise ValueError("Jurisdiction ids must start with 'ocd-jurisdiction'. (%s)" % (
-            jurisdiction.jurisdiction_id))
+    def __init__(self, jurisdiction_id):
+        super(JurisdictionImporter, self).__init__(jurisdiction_id)
+
+    def get_db_spec(self, jurisdiction):
+        return {'_id': jurisdiction.jurisdiction_id}

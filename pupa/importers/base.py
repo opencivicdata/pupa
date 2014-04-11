@@ -35,11 +35,10 @@ def insert_object(obj):
     return:
         database id of new object
     """
-    # XXX: check if object already has an id?
-
     # add updated_at/created_at timestamp
     obj.updated_at = obj.created_at = datetime.datetime.utcnow()
-    obj._id = make_id(obj._type)
+    if not getattr(obj, '_id'):
+        obj._id = make_id(obj._type)
 
     obj.save()
     return obj._id
@@ -176,8 +175,7 @@ class BaseImporter(object):
             # is actually importing all entries into the database.
 
         if seen != set(import_pool.keys()):  # If it's gone wrong (shouldn't)
-            raise ValueError("""Something went wrong internally with the
-                                dependency resolution.""")
+            raise ValueError("Something went wrong internally with the dependency resolution.")
             # We'll blow up, since we've not done our job and failed to import
             # all of our files into the Database.
 

@@ -8,12 +8,12 @@ from .base import BaseCommand, CommandError
 from pupa import utils
 from pupa.core import settings
 
-from pupa.importers.jurisdiction import import_jurisdiction
+from pupa.importers.bills import BillImporter
+from pupa.importers.events import EventImporter
+from pupa.importers.jurisdiction import JurisdictionImporter
+from pupa.importers.memberships import MembershipImporter
 from pupa.importers.organizations import OrganizationImporter
 from pupa.importers.people import PersonImporter
-from pupa.importers.memberships import MembershipImporter
-from pupa.importers.events import EventImporter
-from pupa.importers.bills import BillImporter
 from pupa.importers.votes import VoteImporter
 from pupa.scrape.base import JurisdictionScraper
 from pupa.models import Jurisdiction
@@ -103,6 +103,7 @@ class Command(BaseCommand):
     def do_import(self, juris, args):
         datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
 
+        juris_importer = JurisdictionImporter(juris.jurisdiction_id)
         org_importer = OrganizationImporter(juris.jurisdiction_id)
         person_importer = PersonImporter(juris.jurisdiction_id)
         membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
@@ -113,9 +114,7 @@ class Command(BaseCommand):
         event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
-
-        # TODO: jurisdiction into report
-        import_jurisdiction(org_importer, juris)
+        report.update(juris_importer.import_from_json(datadir))
         report.update(org_importer.import_from_json(datadir))
         report.update(person_importer.import_from_json(datadir))
         report.update(membership_importer.import_from_json(datadir))

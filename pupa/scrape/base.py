@@ -70,7 +70,7 @@ class Scraper(scrapelib.Scraper):
                 membership = Membership(obj._id, 'party:' + obj.party, role='member')
                 obj._related.append(membership)
 
-        filename = '{0}_{1}.json'.format(obj._type, obj._id)
+        filename = '{0}_{1}.json'.format(obj._type, obj._id).replace('/', '-')
 
         self.info('save %s %s as %s', obj._type, obj, filename)
         self.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),

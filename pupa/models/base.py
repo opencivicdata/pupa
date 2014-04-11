@@ -98,7 +98,7 @@ class BaseModel(object):
             print("Please remove it and re-try the scrape.")
             print("")
             print("Object in question:")
-            print("  %s" % (db_obj['_id']))
+            print("  %s" % (db_obj.get('_id')))
             print("")
             raise
 
