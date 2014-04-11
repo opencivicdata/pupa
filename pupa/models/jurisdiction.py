@@ -13,7 +13,6 @@ class Jurisdiction(BaseModel):
     # schema objects
     name = None
     url = None
-    chambers = {}
     sessions = []
     feature_flags = []
     building_maps = []
@@ -22,14 +21,14 @@ class Jurisdiction(BaseModel):
     # non-db properties
     scrapers = {}
     default_scrapers = {}
+    organizations = []
     parties = []
     parent_id = None
     ignored_scraped_sessions = []
 
     def as_dict(self):
-        return {'_type': self._type, 'name': self.name, 'url': self.url, 'chambers': self.chambers,
-                'sessions': self.sessions, 'feature_flags': self.feature_flags,
-                'building_maps': self.building_maps}
+        return {'_type': self._type, 'name': self.name, 'url': self.url, 'sessions': self.sessions,
+                'feature_flags': self.feature_flags, 'building_maps': self.building_maps}
 
     def get_session_list(self):
         raise NotImplementedError('get_session_list is not implemented')

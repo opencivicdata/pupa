@@ -15,7 +15,8 @@ from pupa.importers.memberships import MembershipImporter
 from pupa.importers.events import EventImporter
 from pupa.importers.bills import BillImporter
 from pupa.importers.votes import VoteImporter
-from pupa.scrape import Jurisdiction
+from pupa.scrape.base import JurisdictionScraper
+from pupa.models import Jurisdiction
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')
@@ -87,6 +88,10 @@ class Command(BaseCommand):
             os.remove(f)
 
         report = {}
+
+        # do jurisdiction
+        jscraper = JurisdictionScraper(juris, datadir, args.strict, args.fastmode)
+        report['jurisdiction'] = jscraper.do_scrape()
 
         for scraper_name, scrape_args in scrapers.items():
             ScraperCls = juris.scrapers[scraper_name]

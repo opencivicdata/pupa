@@ -7,7 +7,7 @@ from collections import defaultdict, OrderedDict
 import scrapelib
 
 from pupa import utils
-from pupa.models import Membership
+from pupa.models import Membership, Organization
 from pupa.core import settings
 
 
@@ -132,3 +132,28 @@ class BaseBillScraper(Scraper):
                 self.warning('skipping %s: %r', bill_id, exc)
                 self.skipped += 1
                 continue
+
+
+class JurisdictionScraper(Scraper):
+    def scrape(self):
+        # yield a single Jurisdiction object
+        yield self.jurisdiction
+
+        # if organizations weren't specified yield one top-level org
+        if not self.jurisdiction.organizations:
+            org = Organization(name=self.jurisdiction.name, classification='legislature',
+                               jurisdiction_id=self.jurisdiction.jurisdiction_id)
+            org.add_source(self.jurisdiction.url)
+            yield org
+        else:
+            for chamber, properties in jurisdiction.chambers.items():
+                org = Organization(classification='party', name=properties['name'],
+                                   chamber=chamber, parent_id=parent_id,
+                                   jurisdiction_id=self.jurisdiction.jurisdiction_id)
+                org.add_source(self.jurisdiction.url)
+                yield org
+
+        for party in self.jurisdiction.parties:
+            org = Organization(classification='party', name=party['name'])
+            org.add_source(self.jurisdiction.url)
+            yield org
