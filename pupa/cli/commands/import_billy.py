@@ -156,7 +156,7 @@ class Command(BaseCommand):
         self.add_argument('--dont-validate', action='store_false',
                           help='Dont validate incoming objects', default=True)
 
-    def handle(self, args):
+    def handle(self, args, subcommands):
         state = args.state
         self.quiet = args.quiet
         self.validate = args.dont_validate
@@ -441,12 +441,12 @@ class Command(BaseCommand):
 
                 for key in ['email', 'fax', 'phone']:
                     if key in entry and entry[key]:
-                        m.add_contact_detail(type=key,
+                        who.add_contact_detail(type=key,
                                              value=entry[key],
                                              note=key)
 
                 if entry.get("office_address"):
-                    m.add_contact_detail(type='office',
+                    who.add_contact_detail(type='office',
                                          value=entry['office_address'],
                                          note='Office Address')
 
@@ -455,7 +455,7 @@ class Command(BaseCommand):
                     for key, value in office.items():
                         if not value or key in ["name", "type"]:
                             continue
-                        m.add_contact_detail(type=key, value=value, note=note)
+                        who.add_contact_detail(type=key, value=value, note=note)
 
                 self.save_object(m)
 
