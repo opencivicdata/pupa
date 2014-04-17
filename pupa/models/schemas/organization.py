@@ -12,6 +12,10 @@ schema = {
             "type": ["string", "null"],
             "enum": settings.ORGANIZATION_CLASSIFICATIONS,
         },
+        "division_id": {
+            "description": "Linked geospatial ID in OCD division ID format",
+            "type": ["string", "null"],
+        },
         "dissolution_date": {
             "description": "A date of dissolution",
             "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
