@@ -6,7 +6,7 @@ import logging
 import datetime
 from collections import defaultdict
 from pupa.core import db
-from pupa.models.base import BaseModel
+from pupa.scrape.models.base import BaseModel
 from pupa.utils.topsort import Network
 
 

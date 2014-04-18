@@ -36,7 +36,7 @@ def write_jurisdiction_template(dirname, short_name, jurisdiction_id, long_name,
     # write scraper files
     for stype in scraper_types:
         lines = ['from pupa.scrape import Scraper']
-        lines.append('from pupa.models import {}'.format(class_dict[stype]))
+        lines.append('from pupa.scrape.models import {}'.format(class_dict[stype]))
         lines.append('')
         lines.append('')
         lines.append('class {}{}Scraper(Scraper):'.format(camel_case, class_dict[stype]))

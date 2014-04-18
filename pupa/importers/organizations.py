@@ -1,5 +1,5 @@
 from pupa.core import db
-from pupa.models import Organization
+from pupa.scrape.models import Organization
 from .base import BaseImporter
 
 

@@ -1,4 +1,4 @@
-from pupa.models import Jurisdiction
+from pupa.scrape.models import Jurisdiction
 from .base import BaseImporter
 
 

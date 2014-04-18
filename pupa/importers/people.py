@@ -1,4 +1,4 @@
-from pupa.models import Person
+from pupa.scrape.models import Person
 from .base import BaseImporter, db
 
 

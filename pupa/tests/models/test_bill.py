@@ -1,6 +1,6 @@
 import pytest
 from validictory import ValidationError
-from pupa.models import Bill
+from pupa.scrape.models import Bill
 
 
 def toy_bill():

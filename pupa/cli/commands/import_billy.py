@@ -5,7 +5,7 @@ import sys
 from pymongo import Connection
 from .base import BaseCommand
 from pupa.core import db
-from pupa.models import Organization, Membership, Person, Event, Vote, Bill
+from pupa.scrape.models import Organization, Membership, Person, Event, Vote, Bill
 
 import csv
 

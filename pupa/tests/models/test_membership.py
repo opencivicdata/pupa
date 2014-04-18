@@ -1,5 +1,5 @@
 import pytest
-from pupa.models import Membership
+from pupa.scrape.models import Membership
 
 
 def test_basic_invalid_membership():

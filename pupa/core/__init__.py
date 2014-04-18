@@ -3,8 +3,6 @@ import sys
 import logging
 import logging.config
 
-import pymongo
-
 from . import default_settings
 
 
@@ -41,7 +39,6 @@ try:
 except ImportError:
     logging.warning('no pupa_settings file found, continuing with defaults..')
 
-db = None
 elasticsearch = None
 
 
@@ -54,17 +51,6 @@ class ErrorProxy(object):
     __getitem__ = __getattr__
 
 
-def _configure_db(host, db_name):
-    global db
-
-    try:
-        conn = pymongo.Connection(host)
-        db = conn[db_name]
-    # return a dummy NoDB object if we couldn't connect
-    except (pymongo.errors.AutoReconnect, pymongo.errors.ConnectionFailure) as e:
-        db = ErrorProxy(e)
-
-
 def _configure_es(host, timeout):
     import pyelasticsearch
     global elasticsearch
@@ -74,6 +60,5 @@ def _configure_es(host, timeout):
         elasticsearch = ErrorProxy(e)
 
 
-_configure_db(settings.MONGO_HOST, settings.MONGO_DATABASE)
 if settings.ENABLE_ELASTICSEARCH:
     _configure_es(settings.ELASTICSEARCH_HOST, settings.ELASTICSEARCH_TIMEOUT)

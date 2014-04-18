@@ -16,7 +16,7 @@ from pupa.importers.organizations import OrganizationImporter
 from pupa.importers.people import PersonImporter
 from pupa.importers.votes import VoteImporter
 from pupa.scrape.base import JurisdictionScraper
-from pupa.models import Jurisdiction
+from pupa.scrape.models import Jurisdiction
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')

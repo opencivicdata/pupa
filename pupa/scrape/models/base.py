@@ -1,6 +1,5 @@
 import uuid
 from .utils import DatetimeValidator
-from pupa.core import db
 
 
 class BaseModel(object):
@@ -95,10 +94,6 @@ class BaseModel(object):
                 d[attr] = getattr(self, attr)
         d['_type'] = self._type
         return d
-
-    # database stuff
-    def save(self):
-        db[self._collection].save(self.as_dict())
 
     # operators
 

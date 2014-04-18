@@ -1,6 +1,6 @@
 from .base import BaseImporter
 from .utils import people_by_jurisdiction_and_name
-from pupa.models import Membership
+from pupa.scrape.models import Membership
 from pupa.core import db
 
 

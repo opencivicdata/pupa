@@ -1,6 +1,6 @@
 import mock
 import pytest
-from pupa.models import Person, Organization, Bill
+from pupa.scrape.models import Person, Organization, Bill
 from pupa.scrape.base import Scraper, ScrapeError, BaseBillScraper
 
 

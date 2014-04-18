@@ -1,5 +1,5 @@
 import pytest
-from pupa.models import Organization
+from pupa.scrape.models import Organization
 from validictory import ValidationError
 
 
