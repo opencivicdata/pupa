@@ -46,6 +46,19 @@ class Jurisdiction(BaseModel):
                 'sessions': self.sessions, 'feature_flags': self.feature_flags,
                 'building_maps': self.building_maps}
 
+    def get_organization(self, chamber=None, party=None):
+        if chamber:
+            for org in self.organizations:
+                if org['chamber'] == chamber:
+                    return org
+            raise ValueError('no such chamber: ' + chamber)
+        if party:
+            for org in self.parties:
+                if org['name'] == party:
+                    return org
+            return ValueError('no such party: ' + party)
+        pass
+
     def get_session_list(self):
         raise NotImplementedError('get_session_list is not implemented')
 

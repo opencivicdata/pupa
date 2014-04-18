@@ -5,11 +5,11 @@ from pupa.models import Person, Organization, Membership
 class Legislator(Person):
     _is_legislator = True
 
-    def __init__(self, name, post_id, party=None, chamber=None, role='member', **kwargs):
+    def __init__(self, name, district, party=None, chamber=None, role='member', **kwargs):
         super(Legislator, self).__init__(name, **kwargs)
-        self.post_id = post_id
-        self.party = party
-        self.chamber = chamber
+        self._district = district
+        self._party = party
+        self._chamber = chamber
         self._contact_details = []
         self._role = role
 

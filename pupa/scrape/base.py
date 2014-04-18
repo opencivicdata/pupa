@@ -57,8 +57,11 @@ class Scraper(scrapelib.Scraper):
     def save_object(self, obj):
         if hasattr(obj, '_is_legislator'):
             membership = Membership(
-                obj._id, 'jurisdiction:' + self.jurisdiction.jurisdiction_id,
-                post_id=obj.post_id, chamber=obj.chamber,
+                obj._id,
+                # placeholder id is either chamber:jurisdiction_id or jurisdiction:jurisdiction_id
+                (obj._chamber or 'jurisdiction') + ':' + self.jurisdiction.jurisdiction_id,
+                # post placeholder id is district:name
+                post_id='district:' + obj._district,
                 contact_details=obj._contact_details, role=obj._role)
             # remove placeholder _contact_details
             del obj._contact_details
@@ -66,7 +69,7 @@ class Scraper(scrapelib.Scraper):
             obj._related.append(membership)
 
             # create a party membership
-            if obj.party:
+            if obj._party:
                 membership = Membership(obj._id, 'party:' + obj.party, role='member')
                 obj._related.append(membership)
 
