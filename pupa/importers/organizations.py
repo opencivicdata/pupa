@@ -19,8 +19,7 @@ class OrganizationImporter(BaseImporter):
 
     def _resolve_org_by_chamber(self, jurisdiction_id, chamber):
         """
-        This is used by the Bill importer to match an org purely based on
-        ``chamber`` if it exists.
+        This is used by the other importers to match an org based on ``chamber`` if it exists.
         """
 
         orgs = db.organizations.find({
@@ -32,11 +31,11 @@ class OrganizationImporter(BaseImporter):
         if orgs.count() == 1:
             return orgs[0]  # Neato! We found one!
         elif orgs.count() == 0:
-            raise ValueError("Chamber `%s' isn't giving us an org in `%s'" % (
+            raise ValueError("Chamber '%s' isn't giving us an org in '%s'" % (
                 chamber, jurisdiction_id
             ))
         else:
-            raise ValueError("Chamber `%s' isn't a unique org in `%s'" % (
+            raise ValueError("Chamber '%s' isn't a unique org in '%s'" % (
                 chamber, jurisdiction_id
             ))
 

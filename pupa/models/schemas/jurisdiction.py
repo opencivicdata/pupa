@@ -22,6 +22,18 @@ schema = {
             "description": ("List of sessions. Elements "
                             "consist of several fields giving detail about the session.")
         },
+        "jurisdiction_id": {
+            "description": "ID of the jurisdiction",
+            "type": ["string"],
+        },
+        "updated_at": {
+            "description": "The time at which the resource was last modified",
+            "type": ["string", "datetime", "null"],
+        },
+        "created_at": {
+            "description": "The time at which the resource was created",
+            "type": ["string", "datetime", "null"],
+        },
         "division_id": {
             "description": "Linked geospatial ID in OCD division ID format",
             "type": ["string", "null"],

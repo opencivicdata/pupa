@@ -58,8 +58,8 @@ class Scraper(scrapelib.Scraper):
         if hasattr(obj, '_is_legislator'):
             membership = Membership(
                 obj._id,
-                # placeholder id is either chamber:jurisdiction_id or jurisdiction:jurisdiction_id
-                (obj._chamber or 'jurisdiction') + ':' + self.jurisdiction.jurisdiction_id,
+                # placeholder id is jurisdiction:chamber:id
+                'jurisdiction:' + (obj._chamber or '') + ':' + self.jurisdiction.jurisdiction_id,
                 # post placeholder id is district:name
                 post_id='district:' + obj._district,
                 contact_details=obj._contact_details, role=obj._role)
@@ -150,6 +150,7 @@ class JurisdictionScraper(Scraper):
             yield org
         else:
             for org in self.jurisdiction.organizations:
+                org.add_source(self.jurisdiction.url)
                 yield org
 
         for party in self.jurisdiction.parties:

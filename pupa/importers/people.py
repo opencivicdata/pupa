@@ -13,19 +13,11 @@ class PersonImporter(BaseImporter):
             {'jurisdiction_id': jurisdiction_id}).distinct('person_id')
 
     def prepare_object_from_json(self, obj):
-        if 'party' in obj:
-            obj.pop('party')
         return obj
 
     def get_db_spec(self, person):
         spec = {'$or': [{'name': person.name},
                         {'other_names': person.name}],
                 '_id': {'$in': self.person_ids}}
-
-        if hasattr(person, 'chamber') and person.chamber is not None:
-            spec['chamber'] = person.chamber
-
-        if hasattr(person, 'post_id') and person.post_id is not None:
-            spec['post_id'] = person.post_id
 
         return spec

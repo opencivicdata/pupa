@@ -37,7 +37,7 @@ def insert_object(obj):
     """
     # add updated_at/created_at timestamp
     obj.updated_at = obj.created_at = datetime.datetime.utcnow()
-    if not getattr(obj, '_id'):
+    if obj._type not in getattr(obj, '_id'):
         obj._id = make_id(obj._type)
 
     obj.save()
@@ -100,7 +100,6 @@ class BaseImporter(object):
             raise ValueError("It appears that we're trying to import a dict.")
 
         spec = self.get_db_spec(obj)
-
         db_obj = self.collection.find_one(spec)
 
         if db_obj:

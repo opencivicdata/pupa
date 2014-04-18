@@ -53,6 +53,10 @@ schema = {
             "description": "A URL of an image",
             "type": ["string", "null"],
         },
+        'chamber': {
+            "enum": ["upper", "lower"], "type": ["string", "null"],
+            "description": ("chamber (if legislature is bicameral, otherwise null)"),
+        },
         "sources": sources,
         "extras": extras,
     },
