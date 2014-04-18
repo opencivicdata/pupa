@@ -22,6 +22,10 @@ schema = {
             "description": ("List of sessions. Elements "
                             "consist of several fields giving detail about the session.")
         },
+        "division_id": {
+            "description": "Linked geospatial ID in OCD division ID format",
+            "type": ["string", "null"],
+        },
         "feature_flags": {
             "type": "array",
             "items": {"type": "string"},

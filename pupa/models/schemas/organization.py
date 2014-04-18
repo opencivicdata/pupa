@@ -3,10 +3,18 @@ from pupa.core import settings
 
 schema = {
     "properties": {
+        "jurisdiction_id": {
+            "description": "The ID of the Jurisdiction to which this org belongs",
+            "type": ["string"],
+        },
         "classification": {
             "description": "An organization category, e.g. committee",
             "type": ["string", "null"],
             "enum": settings.ORGANIZATION_CLASSIFICATIONS,
+        },
+        "division_id": {
+            "description": "Linked geospatial ID in OCD division ID format",
+            "type": ["string", "null"],
         },
         "dissolution_date": {
             "description": "A date of dissolution",

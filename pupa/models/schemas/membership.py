@@ -5,6 +5,14 @@ schema = {
     "description": "A relationship between a person and an organization",
     "id": "http://popoloproject.com/schemas/membership.json#",
     "properties": {
+        "jurisdiction_id": {
+            "description": "The ID of the Jurisdiction to which this org belongs",
+            "type": ["string"],
+        },
+        "division_id": {
+            "description": "Linked geospatial ID in OCD division ID format",
+            "type": ["string", "null"],
+        },
         "updated_at": {
             "description": "The time at which the resource was last modified",
             "type": ["string", "datetime", "null"],
