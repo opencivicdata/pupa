@@ -1,8 +1,8 @@
-from .base import BaseModel
+from .base import BaseModel, LinkMixin
 from .schemas.post import schema
 
 
-class Post(BaseModel):
+class Post(BaseModel, LinkMixin):
     """
     A popolo-style Post
     """
@@ -18,8 +18,6 @@ class Post(BaseModel):
         self.organization_id = None
         self.start_date = None
         self.end_date = None
-        self.contact_details = []
-        self.links = []
         for k, v in kwargs.items():
             setattr(self, k, v)
 

@@ -1,4 +1,4 @@
-from .base import BaseModel, SourceMixin, AssociatedLinkMixin
+from .base import BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin
 from .schemas.event import schema
 
 
@@ -38,7 +38,7 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
         self['related_entities'].append({"name": name, "type": type, "id": id, "note": note})
 
 
-class Event(BaseModel, SourceMixin, AssociatedLinkMixin):
+class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     """
     Details for an event in .format
     """
@@ -54,7 +54,6 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin):
         self.documents = []
         self.description = None
         self.end = None
-        self.links = []
         self.location = {"name": location, "note": None, "coordinates": None}
         self.participants = []
         self.media = []
@@ -70,10 +69,6 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin):
     def __str__(self):
         return u'{0} {1}'.format(self.when, self.name.strip())
     __unicode__ = __str__
-
-    def add_link(self, url, note=None):
-        info = {"url": url, "note": note}
-        self.links.append(info)
 
     def add_participant(self, name, type, note='participant', chamber=None, id=None):
         self.participants.append({"chamber": chamber, "type": type, "note": note, "name": name,

@@ -1,9 +1,9 @@
-from .base import BaseModel, SourceMixin
+from .base import BaseModel, SourceMixin, ContactDetailMixin, LinkMixin
 from .schemas.organization import schema
 from .post import Post
 
 
-class Organization(BaseModel, SourceMixin):
+class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin):
     """
     A single popolo encoded Organization
     """
@@ -17,7 +17,6 @@ class Organization(BaseModel, SourceMixin):
         Constructor for the Organization object.
         """
         super(Organization, self).__init__()
-        self.links = []
         self.name = name
         self.classification = None
         self.founding_date = None
@@ -26,7 +25,6 @@ class Organization(BaseModel, SourceMixin):
         self.image = None
         self.other_names = []
         self.identifiers = []
-        self.contact_details = []
         self._related = []
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -61,9 +59,6 @@ class Organization(BaseModel, SourceMixin):
     def parent(self, val):
         self.parent_id = val._id
 
-    def add_link(self, url, note=None):
-        self.links.append({"note": note, "url": url})
-
     def add_identifier(self, identifier, scheme=None):
         data = {"identifier": identifier}
         if scheme:
@@ -73,6 +68,3 @@ class Organization(BaseModel, SourceMixin):
     def add_post(self, label, role, **kwargs):
         post = Post(label=label, role=role, **kwargs)
         self._related.append(post)
-
-    def add_contact_detail(self, type, value, note):
-        self.contact_details.append({"type": type, "value": value, "note": note})

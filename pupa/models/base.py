@@ -120,13 +120,30 @@ class SourceMixin(object):
     def __init__(self):
         super(SourceMixin, self).__init__()
         self.sources = []
-        print('sourcemixin')
 
     def add_source(self, url, note=None, **kwargs):
         """ Add a source URL from which data was collected """
         new = kwargs.copy()
         new.update({'url': url, 'note': note})
         self.sources.append(new)
+
+
+class ContactDetailMixin(object):
+    def __init__(self):
+        super(ContactDetailMixin, self).__init__()
+        self.contact_details = []
+
+    def add_contact_detail(self, type, value, note):
+        self.contact_details.append({"type": type, "value": value, "note": note})
+
+
+class LinkMixin(object):
+    def __init__(self):
+        super(LinkMixin, self).__init__()
+        self.links = []
+
+    def add_link(self, url, note=None):
+        self.links.append({"note": note, "url": url})
 
 
 class AssociatedLinkMixin(object):

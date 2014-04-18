@@ -1,9 +1,9 @@
-from .base import BaseModel, SourceMixin
+from .base import BaseModel, SourceMixin, ContactDetailMixin, LinkMixin
 from .membership import Membership
 from .schemas.person import schema
 
 
-class Person(BaseModel, SourceMixin):
+class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin):
     """
     Details for a Person in Popolo format.
     """
@@ -22,11 +22,9 @@ class Person(BaseModel, SourceMixin):
         self.image = None
         self.gender = None
         self.national_identity = None
-        self.links = []
         self.identifiers = []
         self.other_names = []
         self._related = []
-        self.contact_details = []
 
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -41,17 +39,11 @@ class Person(BaseModel, SourceMixin):
             other_name['note'] = note
         self.other_names.append(other_name)
 
-    def add_link(self, url, note=None):
-        self.links.append({"note": note, "url": url})
-
     def add_identifier(self, identifier, scheme=None):
         data = {"identifier": identifier}
         if scheme:
             data['scheme'] = scheme
         self.identifiers.append(data)
-
-    def add_contact_detail(self, type, value, note):
-        self.contact_details.append({"type": type, "value": value, "note": note})
 
     def add_membership(self, organization, role='member', **kwargs):
         """
