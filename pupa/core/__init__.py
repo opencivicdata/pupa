@@ -51,13 +51,14 @@ class ErrorProxy(object):
 
     def __getattr__(self, attr):
         raise self.error
+    __getitem__ = __getattr__
 
 
-def _configure_db(host, port, db_name):
+def _configure_db(host, db_name):
     global db
 
     try:
-        conn = pymongo.Connection(host, port)
+        conn = pymongo.Connection(host)
         db = conn[db_name]
     # return a dummy NoDB object if we couldn't connect
     except (pymongo.errors.AutoReconnect, pymongo.errors.ConnectionFailure) as e:
@@ -73,6 +74,6 @@ def _configure_es(host, timeout):
         elasticsearch = ErrorProxy(e)
 
 
-_configure_db(settings.MONGO_HOST, settings.MONGO_PORT, settings.MONGO_DATABASE)
+_configure_db(settings.MONGO_HOST, settings.MONGO_DATABASE)
 if settings.ENABLE_ELASTICSEARCH:
     _configure_es(settings.ELASTICSEARCH_HOST, settings.ELASTICSEARCH_TIMEOUT)
