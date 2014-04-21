@@ -45,6 +45,7 @@ class BaseImporter(object):
         self.critical = self.logger.critical
 
     def dedupe_json_id(self, jid):
+        # TODO: is this needed? aren't duplicates all pointing to first now?
         nid = self.duplicates.get(jid, jid)
         if nid != jid:
             return self.dedupe_json_id(nid)
@@ -67,10 +68,6 @@ class BaseImporter(object):
             return None
 
         json_id = self.dedupe_json_id(json_id)
-
-        # make sure this sort of looks like a UUID
-        if len(json_id) != 36:
-            raise ValueError('cannot resolve non-uuid: {0}'.format(json_id))
 
         try:
             return self.json_to_db_id[json_id]
@@ -146,10 +143,7 @@ class BaseImporter(object):
         what = None
         updated = False
 
-        # add jurisdiction_id
-        if self._type not in ('jurisdiction', 'person', 'post'):
-            data['jurisdiction_id'] = self.jurisdiction_id
-
+        # add fields/etc.
         data = self.prepare_data(data)
 
         # TODO: add a JSON field for extras

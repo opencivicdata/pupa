@@ -21,11 +21,11 @@ class Membership(BaseModel, ContactDetailMixin, LinkMixin):
         super(Membership, self).__init__()
         self.person_id = person_id
         self.organization_id = organization_id
-        self.start_date = None
-        self.end_date = None
+        self.start_date = ''
+        self.end_date = ''
+        self.role = ''
+        self.label = ''
         self.post_id = None
-        self.role = None
-        self.label = None
         self.on_behalf_of_id = None
         self._unmatched_legislator = None
 

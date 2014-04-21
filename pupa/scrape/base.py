@@ -60,9 +60,10 @@ class Scraper(scrapelib.Scraper):
                 obj._id,
                 # placeholder id is jurisdiction:chamber:id
                 'jurisdiction:' + (obj._chamber or '') + ':' + self.jurisdiction.jurisdiction_id,
-                # post placeholder id is district:name
-                post_id='district:' + obj._district,
-                contact_details=obj._contact_details, role=obj._role)
+                # post placeholder id is district:chamber:name
+                post_id='district:' + (obj._chamber or '') + ':' + obj._district,
+                contact_details=obj._contact_details,
+                role=obj._role)
             # remove placeholder _contact_details
             del obj._contact_details
             del obj._role

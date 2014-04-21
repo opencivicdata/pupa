@@ -90,7 +90,8 @@ class Membership(CommonBase):
     organization = models.ForeignKey(Organization, related_name='memberships')
     person = models.ForeignKey(Person, related_name='memberships')
     post = models.ForeignKey(Post, related_name='posts', null=True)
-    on_behalf_of = models.ForeignKey(Organization, related_name='memberships_on_behalf_of')
+    on_behalf_of = models.ForeignKey(Organization, related_name='memberships_on_behalf_of',
+                                     null=True)
     label = models.CharField(max_length=300, blank=True)
     role = models.CharField(max_length=300, blank=True)
     start_date = models.CharField(max_length=10, blank=True)    # YYYY[-MM[-DD]]

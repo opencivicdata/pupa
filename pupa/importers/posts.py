@@ -18,3 +18,10 @@ class PostImporter(BaseImporter):
     def get_object(self, data):
         return self.model_class.objects.get(organization_id=data['organization_id'],
                                             label=data['label'])
+
+    def resolve_json_id(self, json_id):
+        if json_id.startswith('district:'):
+            _, chamber, id_piece = json_id.split(':', 2)
+            return Post.objects.get(organization__chamber=chamber, label=id_piece).id
+
+        return super(PostImporter, self).resolve_json_id(json_id)

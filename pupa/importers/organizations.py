@@ -23,23 +23,20 @@ class OrganizationImporter(BaseImporter):
 
         return self.model_class.objects.get(**spec)
 
-    def _resolve_org_by_chamber(self, jurisdiction_id, chamber):
-        """
-        This is used by the other importers to match an org based on ``chamber`` if it exists.
-        """
-        return Organization.objects.get(classification='legislature',
-                                        jurisdiction_id=jurisdiction_id,
-                                        chamber=chamber)
+    def prepare_data(self, data):
+        data['jurisdiction_id'] = self.jurisdiction_id
+        return data
 
     def resolve_json_id(self, json_id):
         # handle special party:* and jurisdiction:* ids first
-        for type_, key in (('party', 'name'), ('jurisdiction', 'jurisdiction_id')):
-            if json_id.startswith(type_ + ':'):
-                id_piece = json_id.split(':', 1)[1]
-                try:
-                    return Organization.objects.get(**{'classification': type_, key: id_piece}).id
-                except Organization.DoesNotExist:
-                    raise ValueError('attempt to create membership to unknown id: ' + json_id)
+        if json_id.startswith('party:'):
+            id_piece = json_id[6:]
+            return Organization.objects.get(classification='party', name=id_piece).id
+        elif json_id.startswith('jurisdiction:'):
+            _, chamber, id_piece = json_id.split(':', 2)
+            print(chamber, id_piece)
+            return Organization.objects.get(classification='legislature', chamber=chamber,
+                                            jurisdiction_id=id_piece).id
 
         # or just resolve the normal way
         return super(OrganizationImporter, self).resolve_json_id(json_id)

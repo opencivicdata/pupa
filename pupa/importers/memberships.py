@@ -28,10 +28,11 @@ class MembershipImporter(BaseImporter):
     related_models = {'contact_details': MembershipContactDetail,
                       'links': MembershipLink}
 
-    def __init__(self, jurisdiction_id, person_importer, org_importer):
+    def __init__(self, jurisdiction_id, person_importer, org_importer, post_importer):
         super(MembershipImporter, self).__init__(jurisdiction_id)
         self.person_importer = person_importer
         self.org_importer = org_importer
+        self.post_importer = post_importer
 
     def get_object(self, membership):
         spec = {'organization_id': membership['organization_id'],
@@ -47,7 +48,7 @@ class MembershipImporter(BaseImporter):
         if membership['post_id']:
             spec['post_id'] = membership['post_id']
 
-        #if False: #membership._unmatched_legislator:
+        #if membership._unmatched_legislator:
         #    spec['_unmatched_legislator'] = membership._unmatched_legislator
         #    unmatched_name = membership._unmatched_legislator['name']
 
@@ -107,21 +108,8 @@ class MembershipImporter(BaseImporter):
 
         return self.model_class.objects.get(**spec)
 
-    def prepare_object_from_json(self, obj):
-        org_json_id = obj['organization_id']
-
-        if org_json_id.startswith("jurisdiction:"):
-            # jurisidction:upper:whatever
-            _, chamber, jid = org_json_id.split(":", 2)
-
-            org = self.org_importer._resolve_org_by_chamber(jid, chamber)
-
-            if org is None:
-                raise ValueError("no such organization ")
-            obj['organization_id'] = org['_id']
-        else:
-            obj['organization_id'] = self.org_importer.resolve_json_id(org_json_id)
-
-        person_json_id = obj['person_id']
-        obj['person_id'] = self.person_importer.resolve_json_id(person_json_id)
-        return obj
+    def prepare_data(self, data):
+        data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
+        data['person_id'] = self.person_importer.resolve_json_id(data['person_id'])
+        data['post_id'] = self.post_importer.resolve_json_id(data['post_id'])
+        return data
