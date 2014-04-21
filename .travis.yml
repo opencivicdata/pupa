@@ -2,7 +2,7 @@ language: python
 python:
     - "2.7"
     - "3.3"
-install: pip install six pytest mock pymongo validictory scrapelib --use-mirrors
+install: pip install six pytest mock validictory scrapelib Django dj_database_url --use-mirrors
 script: py.test
 notifications:
     email:
