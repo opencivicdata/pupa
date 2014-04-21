@@ -10,5 +10,5 @@ class JurisdictionImporter(BaseImporter):
     def __init__(self, jurisdiction_id):
         super(JurisdictionImporter, self).__init__(jurisdiction_id)
 
-    def get_fingerprint(self, data):
-        return {'id': data['id']}
+    def get_object(self, data):
+        return self.model_class.objects.get(id=data['id'])

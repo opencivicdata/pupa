@@ -12,7 +12,7 @@ class OrganizationImporter(BaseImporter):
                       'links': OrganizationLink,
                       'sources': OrganizationSource}
 
-    def get_fingerprint(self, org):
+    def get_object(self, org):
         spec = {'classification': org['classification'],
                 'name': org['name'],
                 'parent_id': org['parent_id']}
@@ -21,15 +21,15 @@ class OrganizationImporter(BaseImporter):
         if org['classification'] != 'party':
             spec['jurisdiction_id'] = org.get('jurisdiction_id')
 
-        return spec
+        return self.model_class.objects.get(**spec)
 
     def _resolve_org_by_chamber(self, jurisdiction_id, chamber):
         """
         This is used by the other importers to match an org based on ``chamber`` if it exists.
         """
         org = Organization.objects.get(classification='legislature',
-                                       jurisdiction_id=jurisdiction_id, chamber=chamber)
-
+                                       jurisdiction_id=jurisdiction_id,
+                                       chamber=chamber)
 
     def resolve_json_id(self, json_id):
         # handle special party:* and jurisdiction:* ids first

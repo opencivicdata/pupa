@@ -1,23 +1,20 @@
-from pupa.scrape.models import Person
+from django.db.models import Q
+from pupa.models import (Person, PersonIdentifier, PersonName, PersonContactDetail, PersonLink,
+                         PersonSource)
 from .base import BaseImporter
 
 
 class PersonImporter(BaseImporter):
     _type = 'person'
-    _model_class = Person
+    model_class = Person
+    related_models = {'identifiers': PersonIdentifier,
+                      'other_names': PersonName,
+                      'contact_details': PersonContactDetail,
+                      'links': PersonLink,
+                      'sources': PersonSource}
 
-    def __init__(self, jurisdiction_id):
-        super(PersonImporter, self).__init__(jurisdiction_id)
-        # get list of all people w/ memberships in this org
-        self.person_ids = db.memberships.find(
-            {'jurisdiction_id': jurisdiction_id}).distinct('person_id')
-
-    def prepare_object_from_json(self, obj):
-        return obj
-
-    def get_db_spec(self, person):
-        spec = {'$or': [{'name': person.name},
-                        {'other_names': person.name}],
-                '_id': {'$in': self.person_ids}}
-
-        return spec
+    def get_object(self, person):
+        return self.model_class.objects.get(
+            Q(memberships__organization__jurisdiction_id=self.jurisdiction_id),
+            (Q(name=person['name']) | Q(other_names__name=person['name']))
+        )

@@ -105,7 +105,7 @@ class Command(BaseCommand):
 
         juris_importer = JurisdictionImporter(juris.jurisdiction_id)
         org_importer = OrganizationImporter(juris.jurisdiction_id)
-        #person_importer = PersonImporter(juris.jurisdiction_id)
+        person_importer = PersonImporter(juris.jurisdiction_id)
         #membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
         #                                         org_importer)
         #bill_importer = BillImporter(juris.jurisdiction_id, org_importer)
@@ -116,7 +116,7 @@ class Command(BaseCommand):
         report = {}
         report.update(juris_importer.import_directory(datadir))
         report.update(org_importer.import_directory(datadir))
-        #report.update(person_importer.import_from_json(datadir))
+        report.update(person_importer.import_directory(datadir))
         #report.update(membership_importer.import_from_json(datadir))
         #report.update(bill_importer.import_from_json(datadir))
         #report.update(event_importer.import_from_json(datadir))

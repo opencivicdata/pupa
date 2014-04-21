@@ -139,10 +139,8 @@ class BaseImporter(object):
         updated = False
 
         # add jurisdiction_id
-        if self._type != 'jurisdiction':
+        if self._type not in ('jurisdiction', 'person'):
             data['jurisdiction_id'] = self.jurisdiction_id
-
-        fingerprint = self.get_fingerprint(data)
 
         # TODO: add a JSON field for extras
         data.pop('extras', None)
@@ -153,7 +151,7 @@ class BaseImporter(object):
             related[field] = data.pop(field)
 
         try:
-            obj = self.model_class.objects.get(**fingerprint)
+            obj = self.get_object(data)
 
             for key, value in data.items():
                 # TODO: avoid updating locked fields

@@ -14,13 +14,13 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin):
     def __init__(self, name, **kwargs):
         super(Person, self).__init__()
         self.name = name
-        self.biography = None
-        self.summary = None
-        self.birth_date = None
-        self.death_date = None
-        self.image = None
-        self.gender = None
-        self.national_identity = None
+        self.birth_date = ''
+        self.death_date = ''
+        self.biography = ''
+        self.summary = ''
+        self.image = ''
+        self.gender = ''
+        self.national_identity = ''
         self.identifiers = []
         self.other_names = []
         self._related = []
