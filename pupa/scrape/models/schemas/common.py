@@ -1,4 +1,4 @@
-from pupa.core import settings
+from pupa import settings
 
 contact_details = {
     "description": "Contact information for this entity.",
@@ -11,9 +11,9 @@ contact_details = {
                      "description": "type of contact (e.g. phone, email, address)"},
             "value": {"type": "string",
                       "description": "actual phone number/email address/etc.", },
-            "note": {"type": ["string", "null"],
+            "note": {"type": "string", "blank": True,
                      "description": "for grouping data by location/etc.", },
-            "label": {"type": ["string", "null"],
+            "label": {"type": "string", "blank": True,
                       "description": "human readable label", },
         }
     }
@@ -24,7 +24,7 @@ identifiers = {
         "properties": {
             "identifier": {"type": "string",
                            "description": "The 3rd-party identifier, such as OKL0001000."},
-            "scheme": {"type": ["string", "null"],
+            "scheme": {"type": "string", "blank": True,
                        "description": "What service this identifier is used by."},
         }
     },
@@ -39,18 +39,18 @@ other_names = {
             "name": {"type": "string",
                      "description": "An alternate name this object is sometimes known by."},
             "start_date": {
-                "type": ["string", "null"],
-                "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
+                "type": "string",
+                "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}$",
                 "description": ("The date at which this name became valid."
                                 "(null if unknown/valid indefinitely)"),
             },
             "end_date": {
-                "type": ["string", "null"],
-                "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
+                "type": "string",
+                "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}$",
                 "description": ("The date at which this name was no longer valid. "
                                 "(null if still valid/valid indefinitely)"),
             },
-            "note": {"type": ["string", "null"],
+            "note": {"type": "string", "blank": True,
                      "description": ("An optional note describing where this alternate name came "
                                      "from or its relationship to the entity."), }
         },
@@ -66,7 +66,7 @@ links = {
         "properties": {
             "note": {
                 "description": "A note, e.g. 'Wikipedia page'",
-                "type": ["string", "null"],
+                "type": "string", "blank": True,
             },
             "url": {
                 "description": "A URL for a document about the person",
@@ -89,7 +89,7 @@ sources = {
                 "description": "URL of resource used to collect information",
             },
             "note": {
-                "type": ["null", "string"],
+                "type": "string", "blank": True,
                 "description": "note about what information this URL was used for",
             }
         },

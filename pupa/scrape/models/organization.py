@@ -18,8 +18,8 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin):
         super(Organization, self).__init__()
         self.name = name
         self.classification = None
-        self.founding_date = None
-        self.dissolution_date = None
+        self.founding_date = ''
+        self.dissolution_date = ''
         self.parent_id = None
         self.image = ''
         self.other_names = []

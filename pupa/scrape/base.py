@@ -8,7 +8,7 @@ import scrapelib
 
 from pupa import utils
 from pupa.scrape.models import Membership, Organization
-from pupa.core import settings
+from pupa import settings
 
 
 class ScrapeError(Exception):

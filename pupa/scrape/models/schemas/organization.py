@@ -1,5 +1,5 @@
 from .common import links, contact_details, identifiers, other_names, sources, extras
-from pupa.core import settings
+from pupa import settings
 
 schema = {
     "properties": {
@@ -18,13 +18,15 @@ schema = {
         },
         "dissolution_date": {
             "description": "A date of dissolution",
-            "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
-            "type": ["string", "null"],
+            "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
+            "type": ["string"],
+            "blank": True,
         },
         "founding_date": {
             "description": "A date of founding",
-            "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
-            "type": ["string", "null"],
+            "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
+            "type": ["string"],
+            "blank": True,
         },
 
         "updated_at": {

@@ -5,7 +5,7 @@ import uuid
 import logging
 import datetime
 from collections import defaultdict
-from pupa.scrape.models.base import BaseModel
+from django.db.models import Model
 from pupa.utils.topsort import Network
 
 
@@ -15,8 +15,9 @@ def _hash(obj):
         return hash(tuple(_hash(e) for e in obj))
     elif isinstance(obj, dict):
         return hash(frozenset((k, _hash(v)) for k, v in obj.items()))
-    elif isinstance(obj, BaseModel):
-        return _hash(obj.as_dict())
+    elif isinstance(obj, Model):
+        return _hash(frozenset((k, getattr(obj, k)) for k in obj._meta.get_all_field_names()
+                               if k != 'id'))
     else:
         return hash(obj)
 
@@ -136,6 +137,11 @@ class BaseImporter(object):
     def import_json(self, data):
         what = None
         updated = False
+
+        # add jurisdiction_id
+        if self._type != 'jurisdiction':
+            data['jurisdiction_id'] = self.jurisdiction_id
+
         fingerprint = self.get_fingerprint(data)
 
         # TODO: add a JSON field for extras
@@ -157,30 +163,41 @@ class BaseImporter(object):
 
             if updated:
                 obj.save()
-                what = 'updated'
+                what = 'update'
             else:
                 what = 'noop'
 
-            # for each field - check if there are notable differences
+            # for each related field - check if there are notable differences
             for field, items in related.items():
-                differ = False
-                allitems = getattr(obj, field).all()
-                dbitems = set(_hash(item) for item in allitems)
-                jsonitems = set(_hash(item) for item in items)
-                # if they differ, update what & delete existsing set and replace it
-                if jsonitems != dbitems:
-                    what = 'updated'
+                if items:
+                    # get keys to compare (assumes all objects have same keys)
+                    keys = sorted(items[0].keys())
+
+                # get items from database
+                dbitems = getattr(obj, field).all()
+                dbdicts = [{k: getattr(item,k) for k in keys} for item in dbitems]
+                # if the hashes differ, update what & delete existing set, then replace it
+                if _hash(items) != _hash(dbdicts):
+                    what = 'update'
                     getattr(obj, field).all().delete()
                     for item in items:
-                        getattr(obj, field).add(**item)
+                        try:
+                            getattr(obj, field).create(**item)
+                        except TypeError as e:
+                            raise TypeError(str(e) + ' while importing ' + str(item))
 
         except self.model_class.DoesNotExist:
+            if 'id' not in data:
+                data['id'] = make_id(self._type)
             obj = self.model_class.objects.create(**data)
-            what = 'created'
+            what = 'insert'
 
             # for each field add related
             for field, items in related.items():
                 for item in items:
-                    getattr(obj, field).add(**item)
+                    try:
+                        getattr(obj, field).create(**item)
+                    except TypeError as e:
+                            raise TypeError(str(e) + ' while importing ' + str(item))
 
         return obj, what

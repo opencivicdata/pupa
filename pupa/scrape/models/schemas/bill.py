@@ -3,7 +3,7 @@
 """
 
 from .common import sources, extras
-from pupa.core import settings
+from pupa import settings
 
 schema = {
     "description": "bill data",

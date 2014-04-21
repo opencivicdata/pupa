@@ -69,7 +69,7 @@ class SourceMixin(object):
         super(SourceMixin, self).__init__()
         self.sources = []
 
-    def add_source(self, url, note=None, **kwargs):
+    def add_source(self, url, note='', **kwargs):
         """ Add a source URL from which data was collected """
         new = kwargs.copy()
         new.update({'url': url, 'note': note})
@@ -90,7 +90,7 @@ class LinkMixin(object):
         super(LinkMixin, self).__init__()
         self.links = []
 
-    def add_link(self, url, note=None):
+    def add_link(self, url, note=''):
         self.links.append({"note": note, "url": url})
 
 
