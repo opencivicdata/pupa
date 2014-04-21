@@ -7,7 +7,7 @@ from collections import defaultdict, OrderedDict
 import scrapelib
 
 from pupa import utils
-from pupa.scrape.models import Membership, Organization
+from pupa.scrape.models import Membership, Organization, Post
 from pupa import settings
 
 
@@ -157,3 +157,6 @@ class JurisdictionScraper(Scraper):
             org = Organization(classification='party', name=party['name'])
             org.add_source(self.jurisdiction.url)
             yield org
+
+        for post in self.jurisdiction.posts:
+            yield post

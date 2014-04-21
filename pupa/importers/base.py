@@ -27,6 +27,12 @@ def make_id(type_):
 
 
 class BaseImporter(object):
+    """ BaseImporter
+
+    Override:
+        prepare_data(data) [optional]
+        get_object(data)
+    """
 
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
@@ -72,6 +78,10 @@ class BaseImporter(object):
             return self.json_to_db_id[json_id]
         except KeyError:
             raise ValueError('cannot resolve id: {0}'.format(json_id))
+
+    def prepare_data(self, data):
+        # no-op to be overridden
+        return data
 
     def import_directory(self, datadir):
         """ import a JSON directory into the database """
@@ -139,8 +149,10 @@ class BaseImporter(object):
         updated = False
 
         # add jurisdiction_id
-        if self._type not in ('jurisdiction', 'person'):
+        if self._type not in ('jurisdiction', 'person', 'post'):
             data['jurisdiction_id'] = self.jurisdiction_id
+
+        data = self.prepare_data(data)
 
         # TODO: add a JSON field for extras
         data.pop('extras', None)

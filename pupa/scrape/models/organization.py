@@ -34,7 +34,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin):
 
     def __repr__(self):
         as_dict = self.as_dict()
-        list(map(as_dict.pop, ('_type', '_id', 'name')))
+        list(map(as_dict.pop, ('_id', 'name')))
         args = (self.__class__.__name__, self.name, as_dict)
         return '%s(name=%r, **%r)' % args
 

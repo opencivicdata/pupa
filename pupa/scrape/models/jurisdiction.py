@@ -21,6 +21,7 @@ class Jurisdiction(BaseModel):
     scrapers = {}
     default_scrapers = {}
     organizations = []
+    posts = []
     parties = []
     parent_id = None
     ignored_scraped_sessions = []

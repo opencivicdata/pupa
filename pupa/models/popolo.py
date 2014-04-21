@@ -37,6 +37,7 @@ class OrganizationSource(LinkBase):
 
 
 class Post(CommonBase):
+    id = models.CharField(max_length=100, primary_key=True)
     label = models.CharField(max_length=300, blank=True)
     role = models.CharField(max_length=300, blank=True)
     organization = models.ForeignKey(Organization, related_name='posts')
@@ -85,6 +86,7 @@ class PersonSource(LinkBase):
 
 
 class Membership(CommonBase):
+    id = models.CharField(max_length=100, primary_key=True)
     organization = models.ForeignKey(Organization, related_name='memberships')
     person = models.ForeignKey(Person, related_name='memberships')
     post = models.ForeignKey(Post, related_name='posts', null=True)

@@ -15,11 +15,11 @@ schema = {
         },
         "label": {
             "description": "A label describing the post",
-            "type": ["string", "null"],
+            "type": "string", "blank": True,
         },
         "role": {
             "description": "The function that the holder of the post fulfills",
-            "type": ["string", "null"],
+            "type": "string", "blank": True,
         },
         "organization_id": {
             "description": "The ID of the organization in which the post is held",
@@ -27,13 +27,13 @@ schema = {
         },
         "start_date": {
             "description": "The date on which the relationship began",
-            "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
-            "type": ["string", "null"],
+            "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
+            "type": "string", "blank": True,
         },
         "end_date": {
             "description": "The date on which the relationship ended",
-            "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
-            "type": ["string", "null"],
+            "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
+            "type": "string", "blank": True,
         },
         "contact_details": contact_details,
         "links": links,
