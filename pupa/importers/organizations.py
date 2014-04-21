@@ -27,9 +27,9 @@ class OrganizationImporter(BaseImporter):
         """
         This is used by the other importers to match an org based on ``chamber`` if it exists.
         """
-        org = Organization.objects.get(classification='legislature',
-                                       jurisdiction_id=jurisdiction_id,
-                                       chamber=chamber)
+        return Organization.objects.get(classification='legislature',
+                                        jurisdiction_id=jurisdiction_id,
+                                        chamber=chamber)
 
     def resolve_json_id(self, json_id):
         # handle special party:* and jurisdiction:* ids first

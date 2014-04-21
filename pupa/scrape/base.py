@@ -7,7 +7,7 @@ from collections import defaultdict, OrderedDict
 import scrapelib
 
 from pupa import utils
-from pupa.scrape.models import Membership, Organization, Post
+from pupa.scrape.models import Membership, Organization
 from pupa import settings
 
 

@@ -1,5 +1,6 @@
-from .jurisdiction import JurisdictionImporter      # NOQA
-from .organizations import OrganizationImporter     # NOQA
-from .people import PersonImporter                  # NOQA
-from .posts import PostImporter                     # NOQA
-from .memberships import MembershipImporter         # NOQA
+# flake8: NOQA
+from .jurisdiction import JurisdictionImporter
+from .organizations import OrganizationImporter
+from .people import PersonImporter
+from .posts import PostImporter
+from .memberships import MembershipImporter

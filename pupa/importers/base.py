@@ -3,8 +3,6 @@ import glob
 import json
 import uuid
 import logging
-import datetime
-from collections import defaultdict
 from django.db.models import Model
 from pupa.utils.topsort import Network
 
@@ -185,7 +183,7 @@ class BaseImporter(object):
 
                 # get items from database
                 dbitems = getattr(obj, field).all()
-                dbdicts = [{k: getattr(item,k) for k in keys} for item in dbitems]
+                dbdicts = [{k: getattr(item, k) for k in keys} for item in dbitems]
                 # if the hashes differ, update what & delete existing set, then replace it
                 if _hash(items) != _hash(dbdicts):
                     what = 'update'

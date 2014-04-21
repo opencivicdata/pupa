@@ -1,3 +1,4 @@
+# flake8: NOQA
 #
 # Copyright (C) 2010-2012 Vinay Sajip. All rights reserved.
 # Licensed under the new BSD license.
@@ -64,7 +65,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
             self.handleError(record)
 
     if os.name != 'nt':
-        def output_colorized(self, message):    # NOQA
+        def output_colorized(self, message):
             self.stream.write(message)
     else:
         import re
@@ -81,7 +82,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
             7: 0x07,    # white
         }
 
-        def output_colorized(self, message):            # NOQA
+        def output_colorized(self, message):
             parts = self.ansi_esc.split(message)
             write = self.stream.write
             h = None
