@@ -8,14 +8,8 @@ from .base import BaseCommand, CommandError
 from pupa import utils
 from pupa import settings
 
-from pupa.importers.bills import BillImporter
-from pupa.importers.events import EventImporter
-from pupa.importers.jurisdiction import JurisdictionImporter
-from pupa.importers.memberships import MembershipImporter
-from pupa.importers.posts import PostImporter
-from pupa.importers.organizations import OrganizationImporter
-from pupa.importers.people import PersonImporter
-from pupa.importers.votes import VoteImporter
+from pupa.importers import (JurisdictionImporter, OrganizationImporter, PersonImporter,
+                            PostImporter, MembershipImporter)
 from pupa.scrape.base import JurisdictionScraper
 from pupa.scrape.models import Jurisdiction
 
@@ -121,7 +115,7 @@ class Command(BaseCommand):
         report.update(org_importer.import_directory(datadir))
         report.update(person_importer.import_directory(datadir))
         report.update(post_importer.import_directory(datadir))
-        #report.update(membership_importer.import_directory(datadir))
+        report.update(membership_importer.import_directory(datadir))
         #report.update(bill_importer.import_from_json(datadir))
         #report.update(event_importer.import_from_json(datadir))
         #report.update(vote_importer.import_from_json(datadir))

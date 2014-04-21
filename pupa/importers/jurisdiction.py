@@ -1,4 +1,4 @@
-from pupa.models.jurisdiction import Jurisdiction, JurisdictionSession
+from pupa.models import Jurisdiction, JurisdictionSession
 from .base import BaseImporter
 
 
