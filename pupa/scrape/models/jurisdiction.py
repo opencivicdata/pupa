@@ -40,7 +40,7 @@ class Jurisdiction(BaseModel):
         self.jurisdiction_id = val
 
     def as_dict(self):
-        return {'id': self._id, 'name': self.name, 'url': self.url,
+        return {'_id': self._id, 'id': self._id, 'name': self.name, 'url': self.url,
                 'sessions': self.sessions,
                 #'feature_flags': self.feature_flags,
                 #'building_maps': self.building_maps

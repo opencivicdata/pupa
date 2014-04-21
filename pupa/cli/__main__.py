@@ -1,9 +1,11 @@
+import os
 import sys
 import logging
 import argparse
 import importlib
 import traceback
-from pupa.core import settings
+import django
+from django.conf import settings
 from pupa.cli.commands.base import CommandError
 
 logger = logging.getLogger('pupa')
@@ -24,6 +26,10 @@ def main():
                                                             '(default is INFO)'))
     subparsers = parser.add_subparsers(dest='subcommand')
 
+    # configure Django before model imports
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'pupa.settings'
+    django.setup()
+
     subcommands = {}
     for mod in COMMAND_MODULES:
         try:
@@ -37,8 +43,8 @@ def main():
 
     # set log level from command line
     handler_level = getattr(logging, args.loglevel.upper(), 'INFO')
-    settings.LOGGING_CONFIG['handlers']['default']['level'] = handler_level
-    settings.LOGGING_CONFIG = settings.LOGGING_CONFIG
+    settings.LOGGING['handlers']['default']['level'] = handler_level
+    logging.config.dictConfig(settings.LOGGING)
 
     # turn debug on
     if args.debug:

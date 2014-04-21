@@ -4,16 +4,9 @@ import glob
 import importlib
 from collections import OrderedDict
 
-import django
-from django.conf import settings as djsettings
-
 from .base import BaseCommand, CommandError
 from pupa import utils
-from pupa.core import settings
-
-# configure Django before model imports
-os.environ['DJANGO_SETTINGS_MODULE'] = 'pupa.core.django_settings'
-django.setup()
+from pupa import settings
 
 from pupa.importers.bills import BillImporter
 from pupa.importers.events import EventImporter
@@ -111,7 +104,7 @@ class Command(BaseCommand):
         datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
 
         juris_importer = JurisdictionImporter(juris.jurisdiction_id)
-        #org_importer = OrganizationImporter(juris.jurisdiction_id)
+        org_importer = OrganizationImporter(juris.jurisdiction_id)
         #person_importer = PersonImporter(juris.jurisdiction_id)
         #membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
         #                                         org_importer)
@@ -122,7 +115,7 @@ class Command(BaseCommand):
 
         report = {}
         report.update(juris_importer.import_directory(datadir))
-        #report.update(org_importer.import_from_json(datadir))
+        report.update(org_importer.import_directory(datadir))
         #report.update(person_importer.import_from_json(datadir))
         #report.update(membership_importer.import_from_json(datadir))
         #report.update(bill_importer.import_from_json(datadir))

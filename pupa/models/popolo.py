@@ -4,9 +4,10 @@ from .jurisdiction import Jurisdiction
 
 
 class Organization(CommonBase):
+    id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=300)
     image = models.URLField(blank=True)
-    parent = models.ForeignKey('self', related_name='children')
+    parent = models.ForeignKey('self', related_name='children', null=True)
     jurisdiction = models.ForeignKey(Jurisdiction, related_name='organizations')
     classification = models.CharField(max_length=100, blank=True)   # enum
     chamber = models.CharField(max_length=10, blank=True)
@@ -48,10 +49,11 @@ class PostContactDetail(ContactDetailBase):
 
 
 class PostLinks(LinkBase):
-    post = models.ForeignKey(Post, related_name='contact_details')
+    post = models.ForeignKey(Post, related_name='links')
 
 
 class Person(CommonBase):
+    id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=300)
     image = models.URLField(blank=True)
     gender = models.CharField(max_length=100)

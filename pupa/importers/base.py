@@ -83,7 +83,7 @@ class BaseImporter(object):
         for fname in glob.glob(os.path.join(datadir, self._type + '_*.json')):
             with open(fname) as f:
                 data = json.load(f)
-                json_id = data['id']
+                json_id = data.pop('_id')
                 objhash = _hash(data)
                 if objhash not in seen_hashes:
                     seen_hashes[objhash] = json_id
@@ -137,6 +137,9 @@ class BaseImporter(object):
         what = None
         updated = False
         fingerprint = self.get_fingerprint(data)
+
+        # TODO: add a JSON field for extras
+        data.pop('extras', None)
 
         # pull related fields off
         related = {}

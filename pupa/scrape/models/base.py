@@ -40,59 +40,12 @@ class BaseModel(object):
         validator = DatetimeValidator(required_by_default=False)
         validator.validate(self.as_dict(), schema)
 
-    # from/to dict
-
-    @classmethod
-    def from_dict(cls, db_obj):
-        db_obj = db_obj.copy()
-        _type = db_obj.pop('_type')
-
-        # hack to get location set correctly since constructor mangles it
-        if _type == 'event':
-            location = db_obj.pop('location')
-            db_obj['location'] = None
-
-        if _type == 'vote':
-            # Hack to deal with Vote mangling. We abstract away the
-            # counts so that scrapers don't have to deal with it. This
-            # isn't great, but kinda needed.
-            counts = db_obj['vote_counts']
-            for count in counts:
-                db_obj[{
-                    "yes": "yes_count",
-                    "no": "no_count",
-                    "other": "other_count"
-                }[count['vote_type']]] = count['count']
-
-        try:
-            newobj = cls(**db_obj)
-        except TypeError:
-            # OK. Let's try to save some good debug information.
-            print("Error: Signature doesn't match object on disk.")
-            print("We're trying to create a: %s" % (cls.__name__))
-            print("Dump of keys from object:")
-            for key in db_obj.keys():
-                print("  %s" % (key))
-            print("This can mean that you have a stale scraped_data folder")
-            print("Please remove it and re-try the scrape.")
-            print("")
-            print("Object in question:")
-            print("  %s" % (db_obj.get('_id')))
-            print("")
-            raise
-
-        # set correct location object after creation
-        if _type == 'event':
-            newobj.location = location
-
-        return newobj
-
     def as_dict(self):
         d = {}
         for attr in self._schema['properties'].keys():
             if hasattr(self, attr):
                 d[attr] = getattr(self, attr)
-        d['_type'] = self._type
+        d['_id'] = self._id
         return d
 
     # operators

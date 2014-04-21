@@ -1,4 +1,21 @@
 import os
+import dj_database_url
+
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgres://pupa:pupa@localhost/opencivicdata')
+SECRET_KEY = 'non-secret'
+INSTALLED_APPS = ('pupa',)
+
+# data enumerations
+
+ORGANIZATION_CLASSIFICATIONS = ['legislature', 'party', 'committee', 'commission']
+BILL_TYPES = ['bill', 'resolution', 'concurrent resolution', 'joint resolution', 'memorial']
+BILL_ACTION_TYPES = ['introduced', 'reading:1', 'reading:2', 'reading:3']
+BILL_RELATION_TYPES = ["companion", "other-session", "replaced-by", "replaces"]
+VERSION_TYPES = []
+DOCUMENT_TYPES = []
+CONTACT_TYPES = ['address', 'email', 'fax', 'voice']
+
+# scrape settings
 
 SCRAPELIB_RPM = 60
 SCRAPELIB_TIMEOUT = 60
@@ -12,15 +29,11 @@ ENABLE_ELASTICSEARCH = False
 ELASTICSEARCH_HOST = 'localhost'
 ELASTICSEARCH_TIMEOUT = 2
 
-ORGANIZATION_CLASSIFICATIONS = ['legislature', 'party', 'committee', 'commission']
-BILL_TYPES = ['bill', 'resolution', 'concurrent resolution', 'joint resolution', 'memorial']
-BILL_ACTION_TYPES = ['introduced', 'reading:1', 'reading:2', 'reading:3']
-BILL_RELATION_TYPES = ["companion", "other-session", "replaced-by", "replaces"]
-VERSION_TYPES = []
-DOCUMENT_TYPES = []
-CONTACT_TYPES = ['address', 'email', 'fax', 'voice']
+# Django settings
+DEBUG = False
+TEMPLATE_DEBUG = False
 
-LOGGING_CONFIG = {
+LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
@@ -49,3 +62,12 @@ LOGGING_CONFIG = {
         },
     },
 }
+
+try:
+    from pupa_settings import *     # NOQA
+except ImportError:
+    print('no pupa_settings on path, using defaults')
+    pass
+
+
+DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}

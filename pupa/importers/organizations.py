@@ -1,18 +1,25 @@
-from pupa.scrape.models import Organization
+from pupa.models import (Organization, OrganizationIdentifier, OrganizationName,
+                         OrganizationContactDetail, OrganizationLink, OrganizationSource)
 from .base import BaseImporter
 
 
 class OrganizationImporter(BaseImporter):
     _type = 'organization'
-    _model_class = Organization
+    model_class = Organization
+    related_models = {'identifiers': OrganizationIdentifier,
+                      'other_names': OrganizationName,
+                      'contact_details': OrganizationContactDetail,
+                      'links': OrganizationLink,
+                      'sources': OrganizationSource}
 
-    def get_db_spec(self, org):
-        spec = {'classification': org.classification,
-                'name': org.name,
-                'parent_id': org.parent_id}
+    def get_fingerprint(self, org):
+        spec = {'classification': org['classification'],
+                'name': org['name'],
+                'parent_id': org['parent_id']}
 
-        if org.classification not in ("party", ):  # just party for now
-            spec['jurisdiction_id'] = org.jurisdiction_id
+        # add jurisdiction_id unless this is a party
+        if org['classification'] != 'party':
+            spec['jurisdiction_id'] = org.get('jurisdiction_id')
 
         return spec
 
@@ -20,36 +27,19 @@ class OrganizationImporter(BaseImporter):
         """
         This is used by the other importers to match an org based on ``chamber`` if it exists.
         """
+        org = Organization.objects.get(classification='legislature',
+                                       jurisdiction_id=jurisdiction_id, chamber=chamber)
 
-        orgs = db.organizations.find({
-            "classification": "legislature",
-            "jurisdiction_id": jurisdiction_id,
-            "chamber": chamber
-        })
-
-        if orgs.count() == 1:
-            return orgs[0]  # Neato! We found one!
-        elif orgs.count() == 0:
-            raise ValueError("Chamber '%s' isn't giving us an org in '%s'" % (
-                chamber, jurisdiction_id
-            ))
-        else:
-            raise ValueError("Chamber '%s' isn't a unique org in '%s'" % (
-                chamber, jurisdiction_id
-            ))
 
     def resolve_json_id(self, json_id):
         # handle special party:* and jurisdiction:* ids first
         for type_, key in (('party', 'name'), ('jurisdiction', 'jurisdiction_id')):
             if json_id.startswith(type_ + ':'):
                 id_piece = json_id.split(':', 1)[1]
-                org = db.organizations.find_one(
-                    {'classification': type_, key: id_piece})
-                if not org:
-                    raise ValueError('attempt to create membership to unknown '
-                                     + type_ + ': ' + id_piece)
-                else:
-                    return org['_id']
+                try:
+                    return Organization.objects.get(**{'classification': type_, key: id_piece}).id
+                except Organization.DoesNotExist:
+                    raise ValueError('attempt to create membership to unknown id: ' + json_id)
 
-        # just resolve the normal way
+        # or just resolve the normal way
         return super(OrganizationImporter, self).resolve_json_id(json_id)
