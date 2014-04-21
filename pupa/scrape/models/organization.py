@@ -10,7 +10,6 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin):
 
     _type = 'organization'
     _schema = schema
-    _collection = 'organizations'
 
     def __init__(self, name, **kwargs):
         """

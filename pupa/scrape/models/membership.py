@@ -9,7 +9,6 @@ class Membership(BaseModel, ContactDetailMixin, LinkMixin):
 
     _type = 'membership'
     _schema = schema
-    _collection = 'memberships'
 
     def __init__(self, person_id, organization_id, **kwargs):
         """

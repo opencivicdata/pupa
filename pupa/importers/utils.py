@@ -1,6 +1,3 @@
-from pupa.core import db
-
-
 def collection_by_jurisdiction(jurisdiction_id, collection, field):
     """ Find all things in a jurisdiction """
     ids = getattr(db, collection).find({

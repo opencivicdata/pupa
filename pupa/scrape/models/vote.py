@@ -8,7 +8,6 @@ class Vote(BaseModel):
     """
     _type = 'vote'
     _schema = schema
-    _collection = 'votes'
 
     def __init__(self, organization, session, date, motion, type, passed,
                  yes_count, no_count, other_count=0, organization_id=None,

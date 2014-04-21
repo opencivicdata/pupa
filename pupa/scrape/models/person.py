@@ -10,7 +10,6 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin):
 
     _type = 'person'
     _schema = schema
-    _collection = 'people'
 
     def __init__(self, name, **kwargs):
         super(Person, self).__init__()

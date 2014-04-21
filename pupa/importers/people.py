@@ -1,5 +1,5 @@
 from pupa.scrape.models import Person
-from .base import BaseImporter, db
+from .base import BaseImporter
 
 
 class PersonImporter(BaseImporter):

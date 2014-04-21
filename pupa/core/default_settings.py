@@ -1,8 +1,5 @@
 import os
 
-MONGO_HOST = 'mongodb://localhost:27017/'
-MONGO_DATABASE = 'opencivicdata'
-
 SCRAPELIB_RPM = 60
 SCRAPELIB_TIMEOUT = 60
 SCRAPELIB_RETRY_ATTEMPTS = 3

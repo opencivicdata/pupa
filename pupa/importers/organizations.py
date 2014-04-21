@@ -1,4 +1,3 @@
-from pupa.core import db
 from pupa.scrape.models import Organization
 from .base import BaseImporter
 
@@ -41,8 +40,7 @@ class OrganizationImporter(BaseImporter):
 
     def resolve_json_id(self, json_id):
         # handle special party:* and jurisdiction:* ids first
-        for type_, key in (('party', 'name'),
-                           ('jurisdiction', 'jurisdiction_id')):
+        for type_, key in (('party', 'name'), ('jurisdiction', 'jurisdiction_id')):
             if json_id.startswith(type_ + ':'):
                 id_piece = json_id.split(':', 1)[1]
                 org = db.organizations.find_one(

@@ -2,7 +2,6 @@ from __future__ import print_function
 from contextlib import contextmanager
 import json
 import os
-from pupa.core import db
 from .base import BaseCommand
 from pupa.utils import JSONEncoderPlus
 

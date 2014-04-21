@@ -7,7 +7,6 @@ class Jurisdiction(BaseModel):
 
     _type = 'jurisdiction'
     _schema = schema
-    _collection = 'jurisdictions'
 
     # schema objects
     name = None
@@ -41,10 +40,11 @@ class Jurisdiction(BaseModel):
         self.jurisdiction_id = val
 
     def as_dict(self):
-        return {'_type': self._type, '_id': self._id, '_meta': self._meta,
-                'name': self.name, 'url': self.url,
-                'sessions': self.sessions, 'feature_flags': self.feature_flags,
-                'building_maps': self.building_maps}
+        return {'id': self._id, 'name': self.name, 'url': self.url,
+                'sessions': self.sessions,
+                #'feature_flags': self.feature_flags,
+                #'building_maps': self.building_maps
+               }
 
     def get_organization(self, chamber=None, party=None):
         if chamber:

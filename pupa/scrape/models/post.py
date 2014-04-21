@@ -9,7 +9,6 @@ class Post(BaseModel, LinkMixin):
 
     _type = 'post'
     _schema = schema
-    _collection = 'posts'
 
     def __init__(self, label, role, **kwargs):
         super(Post, self).__init__()

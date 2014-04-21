@@ -20,7 +20,6 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
 
     _type = 'bill'
     _schema = schema
-    _collection = 'bills'
 
     def __init__(self, name, session, title, organization=None, type=None, **kwargs):
         super(Bill, self).__init__()

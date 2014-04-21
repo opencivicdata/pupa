@@ -44,7 +44,6 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     """
     _type = 'event'
     _schema = schema
-    _collection = 'events'
 
     def __init__(self, name, when, location, **kwargs):
         super(Event, self).__init__()

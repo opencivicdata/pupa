@@ -4,9 +4,16 @@ import glob
 import importlib
 from collections import OrderedDict
 
+import django
+from django.conf import settings as djsettings
+
 from .base import BaseCommand, CommandError
 from pupa import utils
 from pupa.core import settings
+
+# configure Django before model imports
+os.environ['DJANGO_SETTINGS_MODULE'] = 'pupa.core.django_settings'
+django.setup()
 
 from pupa.importers.bills import BillImporter
 from pupa.importers.events import EventImporter
@@ -104,23 +111,23 @@ class Command(BaseCommand):
         datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
 
         juris_importer = JurisdictionImporter(juris.jurisdiction_id)
-        org_importer = OrganizationImporter(juris.jurisdiction_id)
-        person_importer = PersonImporter(juris.jurisdiction_id)
-        membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
-                                                 org_importer)
-        bill_importer = BillImporter(juris.jurisdiction_id, org_importer)
-        vote_importer = VoteImporter(juris.jurisdiction_id, person_importer, org_importer,
-                                     bill_importer)
-        event_importer = EventImporter(juris.jurisdiction_id)
+        #org_importer = OrganizationImporter(juris.jurisdiction_id)
+        #person_importer = PersonImporter(juris.jurisdiction_id)
+        #membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
+        #                                         org_importer)
+        #bill_importer = BillImporter(juris.jurisdiction_id, org_importer)
+        #vote_importer = VoteImporter(juris.jurisdiction_id, person_importer, org_importer,
+        #                             bill_importer)
+        #event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
-        report.update(juris_importer.import_from_json(datadir))
-        report.update(org_importer.import_from_json(datadir))
-        report.update(person_importer.import_from_json(datadir))
-        report.update(membership_importer.import_from_json(datadir))
-        report.update(bill_importer.import_from_json(datadir))
-        report.update(event_importer.import_from_json(datadir))
-        report.update(vote_importer.import_from_json(datadir))
+        report.update(juris_importer.import_directory(datadir))
+        #report.update(org_importer.import_from_json(datadir))
+        #report.update(person_importer.import_from_json(datadir))
+        #report.update(membership_importer.import_from_json(datadir))
+        #report.update(bill_importer.import_from_json(datadir))
+        #report.update(event_importer.import_from_json(datadir))
+        #report.update(vote_importer.import_from_json(datadir))
 
         return report
 

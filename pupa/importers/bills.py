@@ -1,4 +1,3 @@
-from pupa.core import db
 from pupa.utils import fix_bill_id
 from pupa.scrape.models import Bill
 from .base import BaseImporter

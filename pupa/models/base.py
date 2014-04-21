@@ -4,7 +4,7 @@ from django.db import models
 class CommonBase(models.Model):
     """ common base fields across all top-level models """
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeFIeld(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True

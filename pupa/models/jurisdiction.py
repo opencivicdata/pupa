@@ -3,6 +3,7 @@ from .base import CommonBase
 
 
 class Jurisdiction(CommonBase):
+    id = models.CharField(max_length=500, primary_key=True)
     name = models.CharField(max_length=300)
     url = models.URLField()
     # TODO: division_id link
