@@ -1,5 +1,6 @@
 from .base import BaseModel, Scraper
 from .schemas.jurisdiction import schema
+from .organization import Organization
 
 
 class Jurisdiction(BaseModel):
@@ -43,8 +44,9 @@ class Jurisdiction(BaseModel):
     def as_dict(self):
         return {'_id': self._id, 'id': self._id, 'name': self.name, 'url': self.url,
                 'sessions': self.sessions,
-                #'feature_flags': self.feature_flags,
-                #'building_maps': self.building_maps
+                # TODO
+                # 'feature_flags': self.feature_flags,
+                # 'building_maps': self.building_maps
                }
 
     def get_organization(self, chamber=None, party=None):

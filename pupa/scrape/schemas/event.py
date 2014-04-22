@@ -227,7 +227,8 @@ schema = {
                     "note": {
                         "description": ('Human-readable name of the link. Something'
                                         ' like "Historical precedent for popsicle procurement"'),
-                        "type": ["string", "null"]
+                        "type": "string",
+                        "blank": True,
                     },
 
                     "url": {

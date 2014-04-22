@@ -48,6 +48,7 @@ class MembershipImporter(BaseImporter):
         if membership['post_id']:
             spec['post_id'] = membership['post_id']
 
+        # TODO: unmatched here
         #if membership._unmatched_legislator:
         #    spec['_unmatched_legislator'] = membership._unmatched_legislator
         #    unmatched_name = membership._unmatched_legislator['name']

@@ -4,7 +4,6 @@ import time
 import json
 import datetime
 import subprocess
-from bson import ObjectId
 
 
 def makedirs(dname):
@@ -26,16 +25,13 @@ def fix_bill_id(bill_id):
 
 class JSONEncoderPlus(json.JSONEncoder):
     """
-    JSONEncoder that encodes datetime objects as Unix timestamps and mongo
-    ObjectIds as strings.
+    JSONEncoder that encodes datetime objects as Unix timestamps.
     """
     def default(self, obj, **kwargs):
         if isinstance(obj, datetime.datetime):
             return time.mktime(obj.utctimetuple())
         elif isinstance(obj, datetime.date):
             return time.mktime(obj.timetuple())
-        elif isinstance(obj, ObjectId):
-            return str(obj)
 
         return super(JSONEncoderPlus, self).default(obj, **kwargs)
 

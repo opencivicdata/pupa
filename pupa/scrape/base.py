@@ -122,7 +122,6 @@ class BaseBillScraper(Scraper):
                 continue
 
 
-
 class BaseModel(object):
     """
     This is the base class for all the Open Civic objects. This contains
