@@ -55,25 +55,8 @@ class Scraper(scrapelib.Scraper):
         self.critical = self.logger.critical
 
     def save_object(self, obj):
-        if hasattr(obj, '_is_legislator'):
-            from .membership import Membership
-            membership = Membership(
-                obj._id,
-                # placeholder id is jurisdiction:chamber:id
-                'jurisdiction:' + (obj._chamber or '') + ':' + self.jurisdiction.jurisdiction_id,
-                # post placeholder id is district:chamber:name
-                post_id='district:' + (obj._chamber or '') + ':' + obj._district,
-                contact_details=obj._contact_details,
-                role=obj._role)
-            # remove placeholder _contact_details
-            del obj._contact_details
-            del obj._role
-            obj._related.append(membership)
-
-            # create a party membership
-            if obj._party:
-                membership = Membership(obj._id, 'party:' + obj.party, role='member')
-                obj._related.append(membership)
+        if hasattr(obj, 'prepare'):
+            obj.prepare(self.jurisdiction.jurisdiction_id)
 
         filename = '{0}_{1}.json'.format(obj._type, obj._id).replace('/', '-')
 

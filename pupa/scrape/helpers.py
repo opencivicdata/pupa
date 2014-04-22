@@ -5,8 +5,6 @@ from .membership import Membership
 
 
 class Legislator(Person):
-    _is_legislator = True
-
     def __init__(self, name, district, party=None, chamber=None, role='member', **kwargs):
         super(Legislator, self).__init__(name, **kwargs)
         self._district = district
@@ -23,6 +21,25 @@ class Legislator(Person):
         self.add_membership(org, role=role)
         org.sources = self.sources
         self._related.append(org)
+
+    def prepare(self, jurisdiction_id):
+        membership = Membership(
+            self._id,
+            # placeholder id is jurisdiction:chamber:id
+            'jurisdiction:' + (self._chamber or '') + ':' + jurisdiction_id,
+            # post placeholder id is district:chamber:name
+            post_id='district:' + (self._chamber or '') + ':' + self._district,
+            contact_details=self._contact_details,
+            role=self._role)
+        # remove placeholder _contact_details
+        del self._contact_details
+        del self._role
+        self._related.append(membership)
+
+        # create a party membership
+        if self._party:
+            membership = Membership(self._id, 'party:' + self.party, role='member')
+            self._related.append(membership)
 
 
 class Committee(Organization):
