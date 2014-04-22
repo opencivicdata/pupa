@@ -12,6 +12,7 @@ logger = logging.getLogger('pupa')
 
 COMMAND_MODULES = (
     'pupa.cli.commands.init',
+    'pupa.cli.commands.dbinit',
     'pupa.cli.commands.update',
 )
 
