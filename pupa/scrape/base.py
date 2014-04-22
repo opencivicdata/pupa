@@ -8,7 +8,6 @@ from collections import defaultdict, OrderedDict
 import scrapelib
 
 from pupa import utils, settings
-from .utils import DatetimeValidator
 
 
 class ScrapeError(Exception):
@@ -157,7 +156,7 @@ class BaseModel(object):
         if schema is None:
             schema = self._schema
 
-        validator = DatetimeValidator(required_by_default=False)
+        validator = utils.DatetimeValidator(required_by_default=False)
         validator.validate(self.as_dict(), schema)
 
     def as_dict(self):

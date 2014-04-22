@@ -4,6 +4,7 @@ import time
 import json
 import datetime
 import subprocess
+from validictory.validator import SchemaValidator
 
 
 def makedirs(dname):
@@ -21,6 +22,13 @@ def fix_bill_id(bill_id):
     if _mi_bill_id_re.match(bill_id):
         return _mi_bill_id_re.sub(r'\1 \2', bill_id, 1).strip()
     return _bill_id_re.sub(r'\1 \2', bill_id, 1).strip()
+
+
+class DatetimeValidator(SchemaValidator):
+    """ add 'datetime' type that verifies that it has a datetime instance """
+
+    def validate_type_datetime(self, x):
+        return isinstance(x, (datetime.date, datetime.datetime))
 
 
 class JSONEncoderPlus(json.JSONEncoder):
