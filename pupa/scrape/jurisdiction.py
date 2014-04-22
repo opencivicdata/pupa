@@ -1,4 +1,4 @@
-from .base import BaseModel
+from .base import BaseModel, Scraper
 from .schemas.jurisdiction import schema
 
 
@@ -69,3 +69,28 @@ class Jurisdiction(BaseModel):
     def __str__(self):
         return self.name
     __unicode__ = __str__
+
+
+class JurisdictionScraper(Scraper):
+    def scrape(self):
+        # yield a single Jurisdiction object
+        yield self.jurisdiction
+
+        # if organizations weren't specified yield one top-level org
+        if not self.jurisdiction.organizations:
+            org = Organization(name=self.jurisdiction.name, classification='legislature',
+                               jurisdiction_id=self.jurisdiction.jurisdiction_id)
+            org.add_source(self.jurisdiction.url)
+            yield org
+        else:
+            for org in self.jurisdiction.organizations:
+                org.add_source(self.jurisdiction.url)
+                yield org
+
+        for party in self.jurisdiction.parties:
+            org = Organization(classification='party', name=party['name'])
+            org.add_source(self.jurisdiction.url)
+            yield org
+
+        for post in self.jurisdiction.posts:
+            yield post

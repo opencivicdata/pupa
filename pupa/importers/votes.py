@@ -1,4 +1,4 @@
-from pupa.scrape.models import Vote
+from pupa.scrape import Vote
 from .utils import (people_by_jurisdiction_and_name,
                     orgs_by_jurisdiction_and_name,
                     bills_by_jurisdiction_and_name)

@@ -1,5 +1,5 @@
 import datetime
-from pupa.scrape.models import Event
+from pupa.scrape import Event
 from .base import BaseImporter
 
 

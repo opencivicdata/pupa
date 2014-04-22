@@ -1,6 +1,6 @@
 import pytest
 import datetime
-from pupa.scrape.models import Event
+from pupa.scrape import Event
 
 
 def event_obj():

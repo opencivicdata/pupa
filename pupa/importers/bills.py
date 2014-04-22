@@ -1,5 +1,5 @@
 from pupa.utils import fix_bill_id
-from pupa.scrape.models import Bill
+from pupa.scrape import Bill
 from .base import BaseImporter
 
 

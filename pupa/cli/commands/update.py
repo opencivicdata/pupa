@@ -10,8 +10,7 @@ from pupa import settings
 
 from pupa.importers import (JurisdictionImporter, OrganizationImporter, PersonImporter,
                             PostImporter, MembershipImporter)
-from pupa.scrape.base import JurisdictionScraper
-from pupa.scrape.models import Jurisdiction
+from pupa.scrape import Jurisdiction, JurisdictionScraper
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')

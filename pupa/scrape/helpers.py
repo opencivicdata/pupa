@@ -1,5 +1,7 @@
 """ these are helper classes for object creation during the scrape """
-from pupa.scrape.models import Person, Organization, Membership
+from .person import Person
+from .organization import Organization
+from .membership import Membership
 
 
 class Legislator(Person):

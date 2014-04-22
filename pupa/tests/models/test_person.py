@@ -1,5 +1,5 @@
 import pytest
-from pupa.scrape.models import Person
+from pupa.scrape import Person
 from validictory import ValidationError
 
 
