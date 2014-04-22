@@ -1,6 +1,6 @@
 from .base import BaseModel, Scraper
 from .schemas.jurisdiction import schema
-from .organization import Organization
+from .popolo import Organization
 
 
 class Jurisdiction(BaseModel):
@@ -60,7 +60,7 @@ class Jurisdiction(BaseModel):
                 if org['name'] == party:
                     return org
             return ValueError('no such party: ' + party)
-        pass
+
 
     def get_session_list(self):
         raise NotImplementedError('get_session_list is not implemented')

@@ -1,7 +1,5 @@
 """ these are helper classes for object creation during the scrape """
-from .person import Person
-from .organization import Organization
-from .membership import Membership
+from .popolo import Person, Organization, Membership
 
 
 class Legislator(Person):
