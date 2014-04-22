@@ -7,21 +7,17 @@ from django.db.models import Model
 from pupa.utils.topsort import Network
 
 
-def _hash(obj):
+def omnihash(obj):
     """ recursively hash unhashable objects """
     if isinstance(obj, (set, tuple, list)):
-        return hash(tuple(_hash(e) for e in obj))
+        return hash(tuple(omnihash(e) for e in obj))
     elif isinstance(obj, dict):
-        return hash(frozenset((k, _hash(v)) for k, v in obj.items()))
+        return hash(frozenset((k, omnihash(v)) for k, v in obj.items()))
     elif isinstance(obj, Model):
-        return _hash(frozenset((k, getattr(obj, k)) for k in obj._meta.get_all_field_names()
-                               if k != 'id'))
+        return omnihash(frozenset((k, getattr(obj, k)) for k in obj._meta.get_all_field_names()
+                                  if k != 'id'))
     else:
         return hash(obj)
-
-
-def make_id(type_):
-    return 'ocd-{0}/{1}'.format(type_, uuid.uuid1())
 
 
 class BaseImporter(object):
@@ -44,13 +40,6 @@ class BaseImporter(object):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
-    def dedupe_json_id(self, jid):
-        # TODO: is this needed? aren't duplicates all pointing to first now?
-        nid = self.duplicates.get(jid, jid)
-        if nid != jid:
-            return self.dedupe_json_id(nid)
-        return jid
-
     def resolve_json_id(self, json_id):
         """
             Given an id found in scraped JSON, return a DB id for the object.
@@ -67,7 +56,8 @@ class BaseImporter(object):
         if not json_id:
             return None
 
-        json_id = self.dedupe_json_id(json_id)
+        # get the id that the duplicate points to, or use self
+        json_id = self.duplicates.get(json_id, json_id)
 
         try:
             return self.json_to_db_id[json_id]
@@ -90,7 +80,7 @@ class BaseImporter(object):
             with open(fname) as f:
                 data = json.load(f)
                 json_id = data.pop('_id')
-                objhash = _hash(data)
+                objhash = omnihash(data)
                 if objhash not in seen_hashes:
                     seen_hashes[objhash] = json_id
                     data_by_id[json_id] = data
@@ -179,7 +169,7 @@ class BaseImporter(object):
                 dbitems = getattr(obj, field).all()
                 dbdicts = [{k: getattr(item, k) for k in keys} for item in dbitems]
                 # if the hashes differ, update what & delete existing set, then replace it
-                if _hash(items) != _hash(dbdicts):
+                if omnihash(items) != omnihash(dbdicts):
                     what = 'update'
                     getattr(obj, field).all().delete()
                     for item in items:
@@ -190,7 +180,7 @@ class BaseImporter(object):
 
         except self.model_class.DoesNotExist:
             if 'id' not in data:
-                data['id'] = make_id(self._type)
+                data['id'] = 'ocd-{0}/{1}'.format(self._type, uuid.uuid1())
             obj = self.model_class.objects.create(**data)
             what = 'insert'
 
