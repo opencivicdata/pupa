@@ -11,7 +11,6 @@ class Organization(CommonBase):
     jurisdiction = models.ForeignKey(Jurisdiction, related_name='organizations')
     classification = models.CharField(max_length=100, blank=True)   # enum
     chamber = models.CharField(max_length=10, blank=True)
-    # TODO: division_id link
     founding_date = models.CharField(max_length=10, blank=True)     # YYYY[-MM[-DD]]
     dissolution_date = models.CharField(max_length=10, blank=True)  # YYYY[-MM[-DD]]
 

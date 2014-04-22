@@ -2,6 +2,7 @@ from django.db import models
 from djorm_pgarray.fields import ArrayField
 
 from .base import CommonBase, LinkBase
+from .divisions import Division
 
 
 class Jurisdiction(CommonBase):
@@ -9,7 +10,7 @@ class Jurisdiction(CommonBase):
     name = models.CharField(max_length=300)
     url = models.URLField()
     feature_flags = ArrayField(dbtype="text")
-    # TODO: division_id link
+    division = models.ForeignKey(Division, related_name='jurisdictions')
 
 
 class JurisdictionSession(CommonBase):
