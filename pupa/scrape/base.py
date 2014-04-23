@@ -54,6 +54,11 @@ class Scraper(scrapelib.Scraper):
         self.critical = self.logger.critical
 
     def save_object(self, obj):
+        """
+            Save object to disk as JSON.
+
+            Generally shouldn't be called directly.
+        """
         if hasattr(obj, 'prepare'):
             obj.prepare(self.jurisdiction.jurisdiction_id)
 
