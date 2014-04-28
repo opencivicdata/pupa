@@ -45,25 +45,21 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     _type = 'event'
     _schema = schema
 
-    def __init__(self, name, when, location, **kwargs):
+    def __init__(self, name, when, location, all_day=False, description=None, end=None,
+                 status="confirmed", event_type="event"):
         super(Event, self).__init__()
         self.when = when
         self.name = name
-        self.all_day = False
-        self.documents = []
-        self.description = None
-        self.end = None
+        self.all_day = all_day
+        self.description = description
+        self.end = end
+        self.status = status
+        self.type = event_type
         self.location = {"name": location, "note": None, "coordinates": None}
+        self.documents = []
         self.participants = []
         self.media = []
         self.agenda = []
-        self.sources = []
-        self.status = "confirmed"
-        self.type = "event"
-        self._related = []
-
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
     def __str__(self):
         return u'{0} {1}'.format(self.when, self.name.strip())

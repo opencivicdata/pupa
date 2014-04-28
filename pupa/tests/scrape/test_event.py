@@ -40,6 +40,18 @@ def test_agenda_add_person():
     e.validate()
 
 
+def test_agenda_add_subject():
+    e = event_obj()
+    agenda = e.add_agenda_item("foo bar")
+
+    agenda.add_subject('test')
+    assert e.agenda[0]['subjects'] == ['test']
+    agenda.add_subject('test2')
+    assert e.agenda[0]['subjects'] == ['test', 'test2']
+
+    e.validate()
+
+
 def test_add_committee():
     e = event_obj()
     agenda = e.add_agenda_item("foo bar")
@@ -66,6 +78,22 @@ def test_add_document():
     assert o['name'] == 'hello'
     assert o['links'] == [{'url': 'http://example.com', 'mimetype': 'text/html'}]
     e.validate()
+
+
+def test_participants():
+    e = event_obj()
+    e.add_participant('Committee of the Whole', type='committee', note='everyone')
+    assert len(e.participants) == 1
+    assert e.participants[0]['name'] == 'Committee of the Whole'
+    assert e.participants[0]['type'] == 'committee'
+    assert e.participants[0]['note'] == 'everyone'
+
+    # and add_person, which is a shortcut
+    e.add_person('Bill Stevenson')
+    assert len(e.participants) == 2
+    assert e.participants[1]['name'] == 'Bill Stevenson'
+    assert e.participants[1]['type'] == 'person'
+    assert e.participants[1]['note'] == 'participant'
 
 
 def test_add_media():

@@ -82,7 +82,7 @@ class Scraper(scrapelib.Scraper):
                 raise ve
 
         # after saving and validating, save subordinate objects
-        for obj in getattr(obj, '_related', []):
+        for obj in obj._related:
             self.save_object(obj)
 
     def do_scrape(self, **kwargs):
