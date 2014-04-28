@@ -21,7 +21,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     _type = 'bill'
     _schema = schema
 
-    def __init__(self, name, session, title, organization=None, type=None, **kwargs):
+    def __init__(self, name, session, title, organization=None, type=None):
         super(Bill, self).__init__()
 
         self.name = name
@@ -40,9 +40,6 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.subject = []
         self.summaries = []
         self.versions = []
-
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
     def add_action(self, description, actor, date, type=None, related_entities=None):
         self.actions.append({
