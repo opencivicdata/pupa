@@ -210,35 +210,35 @@ class LinkMixin(object):
 
 
 class AssociatedLinkMixin(object):
-    def _add_associated_link(self, collection, name, url, type, mimetype, on_duplicate, date=None,
-                             offset=None, document_id=None):
+    def _add_associated_link(self, collection, name, url, mimetype, on_duplicate,
+                             type=None, date=None, offset=None, document_id=None):
         if on_duplicate not in ['error', 'ignore']:
             raise ValueError("on_duplicate must be 'error' or 'ignore'")
 
         try:
-            versions = getattr(self, collection)
+            associated = getattr(self, collection)
         except AttributeError:
-            versions = self[collection]
+            associated = self[collection]
 
         ver = {'name': name, 'links': [], 'date': date, 'offset': offset, 'type': type,
                'document_id': document_id}
 
+        # keep a list of the links we've seen, we need to iterate over whole list on each add
+        # unfortunately this means adds are O(n)
         seen_links = set()
-        # We iterate over everything anyway. Meh. Storing
-        # as an instance var is actually non-trivial, since we abuse __slots__
-        # for as_dict, and it's otherwise read-only or shared set() instance.
 
         matches = 0
-        for version in versions:
-            for link in version['links']:
+        for item in associated:
+            for link in item['links']:
                 seen_links.add(link['url'])
 
-            if all(ver.get(x) == version.get(x) for x in ["name", "type", "date"]):
+            if all(ver.get(x) == item.get(x) for x in ["name", "type", "date"]):
                 matches = matches + 1
-                ver = version
+                ver = item
 
-        if matches > 1:
-            raise ValueError("multiple matches found in _add_associated_link")
+        # it should be impossible to have multiple matches found unless someone is bypassing
+        # _add_associated_link
+        assert matches <= 1, "multiple matches found in _add_associated_link"
 
         if url in seen_links:
             if on_duplicate == 'error':
@@ -262,6 +262,6 @@ class AssociatedLinkMixin(object):
             # in the event we've got a new entry; let's just insert it into
             # the versions on this object. Otherwise it'll get thrown in
             # automagically.
-            versions.append(ver)
+            associated.append(ver)
 
         return ver
