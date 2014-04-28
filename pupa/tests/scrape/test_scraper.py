@@ -5,6 +5,7 @@ from pupa.scrape.base import Scraper, ScrapeError, BaseBillScraper
 
 
 def test_save_object_basics():
+    # ensure that save object dumps a file
     s = Scraper('jurisdiction', '/tmp/')
     p = Person('Michael Jordan')
     p.add_source('http://example.com')
@@ -12,13 +13,13 @@ def test_save_object_basics():
     with mock.patch('json.dump') as json_dump:
         s.save_object(p)
 
-    # saved in right place
+    # ensure object is saved in right place
     filename = 'person_' + p._id + '.json'
     assert filename in s.output_names['person']
     json_dump.assert_called_once_with(p.as_dict(), mock.ANY, cls=mock.ANY)
 
 
-def test_save_invalid_object():
+def test_save_object_invalid():
     s = Scraper('jurisdiction', '/tmp/')
     p = Person('Michael Jordan')
     # no source, won't validate
@@ -42,7 +43,7 @@ def test_save_related():
                                     mock.call(o.as_dict(), mock.ANY, cls=mock.ANY)]
 
 
-def test_simple_do_scrape():
+def test_simple_scrape():
     class FakeScraper(Scraper):
         def scrape(self):
             p = Person('Michael Jordan')
@@ -82,7 +83,15 @@ def test_no_objects():
             pass
 
     with pytest.raises(ScrapeError):
-        NullScraper('jurisdiction', '/tmp/').do_scrape()
+        NullScraper('jurisdiction', '/tmp/', fastmode=True).do_scrape()
+
+
+def test_no_scrape():
+    class NonScraper(Scraper):
+        pass
+
+    with pytest.raises(NotImplementedError):
+        NonScraper('jurisdiction', '/tmp/').do_scrape()
 
 
 def test_bill_scraper():

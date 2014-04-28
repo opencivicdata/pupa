@@ -5,3 +5,5 @@ scrape_cache
 *egg-info*
 .tox
 dist
+.coverage
+htmlcov/

@@ -35,14 +35,3 @@ def test_add_post():
     assert orga.identifiers[-1]['scheme'] == "kruft"
     assert orga.identifiers[0]['identifier'] == "id10t"
     assert not hasattr(orga.identifiers[0], "scheme")
-
-
-def test_add_contact():
-    """ test we can add a contact detail to an org """
-    orga = Organization("name")
-    orga.add_source(url='foo')
-    orga.validate()
-
-    orga.add_contact_detail(type='voice', value='555-393-2821', note='nothing')
-
-    orga.validate()

@@ -22,14 +22,6 @@ def test_bad_event():
         e.validate()
 
 
-def test_add_link():
-    e = event_obj()
-    e.add_link("http://foobar.baz")
-    e.add_link("http://foobar.baz", note="foo")
-    assert len(e.links) == 2
-    e.validate()
-
-
 def test_basic_agenda():
     e = event_obj()
     agenda = e.add_agenda_item("foo bar")

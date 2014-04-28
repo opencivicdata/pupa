@@ -179,24 +179,15 @@ class BaseModel(object):
             raise ValueError('property "{}" not in {} schema'.format(key, self._type))
         super(BaseModel, self).__setattr__(key, val)
 
-    def __eq__(self, other):
-        """ equality requires all fields to be equal except for the _id """
-        sd = self.as_dict()
-        od = other.as_dict()
-        sd.pop('_id')
-        od.pop('_id')
-        return sd == od
-
 
 class SourceMixin(object):
     def __init__(self):
         super(SourceMixin, self).__init__()
         self.sources = []
 
-    def add_source(self, url, note='', **kwargs):
+    def add_source(self, url, note=''):
         """ Add a source URL from which data was collected """
-        new = kwargs.copy()
-        new.update({'url': url, 'note': note})
+        new = {'url': url, 'note': note}
         self.sources.append(new)
 
 

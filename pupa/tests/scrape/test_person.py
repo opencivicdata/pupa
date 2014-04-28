@@ -28,13 +28,6 @@ def test_magic_methods():
     bob.add_source(url='foo')
     bob.validate()
 
-    bob.add_link("http://twitter.com/ev", "Twitter Account")
-
-    assert bob.links == [
-        {"note": "Twitter Account",
-         "url": "http://twitter.com/ev"}
-    ]
-
     bob.add_name("Thiston", note="What my friends call me")
 
     assert bob.other_names == [
@@ -55,18 +48,3 @@ def test_magic_methods():
          "start_date": "1920-01",
          "end_date": "1949-12-31"}
     ]
-
-
-def test_add_contact_information():
-    """ Test that we can add contact information """
-    bob = Person("John Q. Public, Esq.",
-                 gender="male", image="http://example.com/john.jpg",
-                 summary="Some person")
-    bob.add_source(url='foo')
-    bob.validate()
-
-    bob.add_contact_detail(type='voice',
-                           value='876-5309',
-                           note='Jenny Cell')
-
-    bob.validate()
