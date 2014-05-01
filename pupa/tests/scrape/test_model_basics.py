@@ -1,10 +1,11 @@
 import pytest
 from pupa.scrape.schemas.person import schema
 from pupa.scrape.base import (BaseModel, SourceMixin, ContactDetailMixin, LinkMixin,
-                              AssociatedLinkMixin)
+                              AssociatedLinkMixin, OtherNameMixin, IdentifierMixin)
 
 
-class GenericModel(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, AssociatedLinkMixin):
+class GenericModel(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, AssociatedLinkMixin,
+                   OtherNameMixin, IdentifierMixin):
     """ a generic model used for testing the base and mixins """
 
     _type = "generic"
@@ -96,3 +97,33 @@ def test_add_associated_link_on_duplicate_ignore():
     assert len(m._associated) == 1
     assert len(m._associated[0]['links']) == 1
     assert m._associated[0]['name'] == 'something'
+
+
+def test_add_name():
+    m = GenericModel()
+
+    m.add_name("Thiston", note="What my friends call me")
+
+    assert m.other_names == [{"name": "Thiston", "note": "What my friends call me"}]
+
+    m.add_name("Johnseph Q. Publico", note="Birth name", start_date="1920-01",
+               end_date="1949-12-31")
+
+    assert m.other_names == [
+        {"name": "Thiston", "note": "What my friends call me"},
+        {"name": "Johnseph Q. Publico", "note": "Birth name", "start_date": "1920-01",
+         "end_date": "1949-12-31"}
+    ]
+
+
+def test_add_identifier():
+    g = GenericModel()
+
+    with pytest.raises(TypeError):
+        g.add_identifier("id10t", foo="bar")
+
+    g.add_identifier("id10t")
+    g.add_identifier("l0l", scheme="kruft")
+
+    assert g.identifiers[-1]['scheme'] == "kruft"
+    assert g.identifiers[0]['identifier'] == "id10t"

@@ -13,6 +13,10 @@ def test_basic_event():
     e = event_obj()
     e.validate()
 
+def test_event_str():
+    e = event_obj()
+    assert e.name in str(e)
+
 
 def test_bad_event():
     e = event_obj()

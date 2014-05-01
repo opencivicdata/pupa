@@ -1,9 +1,14 @@
+import copy
 from .base import (BaseModel, SourceMixin, LinkMixin, ContactDetailMixin, OtherNameMixin,
                    IdentifierMixin)
 from .schemas.post import schema as post_schema
 from .schemas.person import schema as person_schema
 from .schemas.membership import schema as membership_schema
 from .schemas.organization import schema as org_schema
+
+# a copy of the org schema without sources
+org_schema_no_sources = copy.deepcopy(org_schema)
+org_schema_no_sources['properties'].pop('sources')
 
 
 class Post(BaseModel, LinkMixin, ContactDetailMixin):
@@ -98,12 +103,6 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         return self.name
     __unicode__ = __str__
 
-    def __repr__(self):
-        as_dict = self.as_dict()
-        list(map(as_dict.pop, ('_type', '_id', 'name')))
-        args = (self.__class__.__name__, self.name, as_dict)
-        return '%s(name=%r, **%r)' % args
-
 
 class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMixin,
                    OtherNameMixin):
@@ -131,31 +130,19 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         return self.name
     __unicode__ = __str__
 
-    def __repr__(self):
-        as_dict = self.as_dict()
-        list(map(as_dict.pop, ('_id', 'name')))
-        args = (self.__class__.__name__, self.name, as_dict)
-        return '%s(name=%r, **%r)' % args
-
     def validate(self):
         schema = None
         if self.classification in ['party']:
-            # Parties are funny objects. They don't need sources, since
-            # they're really not something we scrape directly (well, ever).
-            # As a result, we're not going to enforce placing sources on a
-            # party object.
-            schema = self._schema.copy()
-            schema['properties'] = schema['properties'].copy()
-            schema['properties'].pop('sources')
+            schema = org_schema_no_sources
         return super(Organization, self).validate(schema=schema)
 
-    @property
-    def parent(self):
-        return self.parent_id
+    #@property
+    #def parent(self):
+    #    return self.parent_id
 
-    @parent.setter
-    def parent(self, val):
-        self.parent_id = val._id
+    #@parent.setter
+    #def parent(self, val):
+    #    self.parent_id = val._id
 
     def add_post(self, label, role, **kwargs):
         post = Post(label=label, role=role, organization_id=self._id, **kwargs)

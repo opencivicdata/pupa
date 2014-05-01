@@ -144,3 +144,8 @@ def test_versions():
 
     # still validates
     b.validate()
+
+
+def test_str():
+    b = toy_bill()
+    assert b.name in str(b)
