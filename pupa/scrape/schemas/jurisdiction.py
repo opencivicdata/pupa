@@ -1,4 +1,4 @@
-from .common import sources, extras
+from .common import extras
 
 
 schema = {
@@ -54,7 +54,6 @@ schema = {
             }},
             "description": ("Links to image/PDF maps of the building."), },
 
-        "sources": sources,
         "extras": extras,
     }
 }
