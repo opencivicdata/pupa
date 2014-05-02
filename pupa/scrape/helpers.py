@@ -8,11 +8,11 @@ class Legislator(Person):
         self._district = district
         self._party = party
         self._chamber = chamber
-        self.contact_details = []
+        self._contact_details = []
         self._role = role
 
     def add_membership_contact(self, type, value, note):
-        self.contact_details.append({'type': type, 'value': value, 'note': note})
+        self._contact_details.append({'type': type, 'value': value, 'note': note})
 
     def add_committee_membership(self, com_name, role='member'):
         org = Organization(com_name, classification='committee')
@@ -27,12 +27,10 @@ class Legislator(Person):
             'jurisdiction:' + (self._chamber or '') + ':' + jurisdiction_id,
             # post placeholder id is district:chamber:name
             post_id='district:' + (self._chamber or '') + ':' + self._district,
-            # contact_details=self._contact_details,
-            # XXX: Removed since we're moving contact_details to the top
-            #      level.
+            contact_details=self._contact_details,
             role=self._role)
         # remove placeholder _contact_details
-        # del self._contact_details
+        del self._contact_details
         del self._role
         self._related.append(membership)
 
