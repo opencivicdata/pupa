@@ -113,9 +113,8 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
     _type = 'organization'
     _schema = org_schema
 
-    def __init__(self, name, jurisdiction_id=None, classification=None,
-                 parent_id=None, founding_date='', dissolution_date='',
-                 image=''):
+    def __init__(self, name, classification=None, parent_id=None, founding_date='',
+                 dissolution_date='', image=''):
         """
         Constructor for the Organization object.
         """
@@ -126,9 +125,6 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         self.dissolution_date = dissolution_date
         self.parent_id = parent_id
         self.image = image
-
-        if jurisdiction_id:
-            self.jurisdiction_id = jurisdiction_id
 
     def __str__(self):
         return self.name
