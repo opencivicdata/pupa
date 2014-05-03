@@ -1,1 +1,1 @@
-export PYTHONPATH=.; py.test --cov pupa #--cov-report html
+export PYTHONPATH=.; py.test --cov pupa --cov-report html
