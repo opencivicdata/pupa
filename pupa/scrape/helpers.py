@@ -21,16 +21,12 @@ class Legislator(Person):
             'legislature:' + (self._chamber or '') + ':' + jurisdiction_id,
             # post placeholder id is district:chamber:name
             post_id='district:' + (self._chamber or '') + ':' + self._district,
-            contact_details=self._contact_details,
             role=self._role)
-        # remove placeholder _contact_details
-        del self._contact_details
-        del self._role
         self._related.append(membership)
 
         # create a party membership
         if self._party:
-            membership = Membership(self._id, 'party:' + self.party, role='member')
+            membership = Membership(self._id, 'party:' + self._party, role='member')
             self._related.append(membership)
 
 
@@ -45,7 +41,8 @@ class Committee(Organization):
 
     def pre_save(self, jurisdiction_id):
         # before saving set parent to the chamber
-        self.parent_id = 'legislature:' + (self.chamber or '') + ':' + jurisdiction_id
+        if not self.parent_id:
+            self.parent_id = 'legislature:' + (self.chamber or '') + ':' + jurisdiction_id
 
     def add_member(self, name_or_person, role='member', **kwargs):
         if isinstance(name_or_person, Person):
@@ -53,5 +50,5 @@ class Committee(Organization):
                                     role=role, **kwargs)
         else:
             membership = Membership(person_id=None, organization_id=self._id, role=role,
-                                    _unmatched_legislator={'name': name}, **kwargs)
+                                    unmatched_legislator={'name': name_or_person}, **kwargs)
         self._related.append(membership)
