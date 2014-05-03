@@ -1,6 +1,6 @@
 from django.db.models import Q
-from pupa.models import (Person, PersonIdentifier, PersonName, PersonContactDetail, PersonLink,
-                         PersonSource)
+from opencivicdata.models import (Person, PersonIdentifier, PersonName, PersonContactDetail,
+                                  PersonLink, PersonSource)
 from .base import BaseImporter
 
 

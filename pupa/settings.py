@@ -3,7 +3,7 @@ import dj_database_url
 
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgres://pupa:pupa@localhost/opencivicdata')
 SECRET_KEY = 'non-secret'
-INSTALLED_APPS = ('pupa',)
+INSTALLED_APPS = ('opencivicdata', 'pupa',)
 
 # data enumerations
 

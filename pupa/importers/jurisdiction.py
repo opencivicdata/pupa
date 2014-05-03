@@ -1,4 +1,4 @@
-from pupa.models import Jurisdiction, JurisdictionSession
+from opencivicdata.models import Jurisdiction, JurisdictionSession
 from .base import BaseImporter
 
 

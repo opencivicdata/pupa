@@ -1,4 +1,4 @@
-from pupa.models import Post, PostContactDetail, PostLinks
+from opencivicdata.models import Post, PostContactDetail, PostLinks
 from .base import BaseImporter
 
 

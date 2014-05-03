@@ -1,5 +1,5 @@
-from pupa.models import (Organization, OrganizationIdentifier, OrganizationName,
-                         OrganizationContactDetail, OrganizationLink, OrganizationSource)
+from opencivicdata.models import (Organization, OrganizationIdentifier, OrganizationName,
+                                  OrganizationContactDetail, OrganizationLink, OrganizationSource)
 from .base import BaseImporter
 
 
