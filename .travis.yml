@@ -4,7 +4,7 @@ python:
     - "3.3"
     - "3.4"
 install: pip install six pytest pytest-cov mock validictory scrapelib Django dj_database_url coveralls --use-mirrors
-script: py.test --cov pupa
+script: ./run-tests.sh
 after_success:
     - coveralls
 notifications:
