@@ -3,8 +3,10 @@ python:
     - "2.7"
     - "3.3"
     - "3.4"
-install: pip install six pytest mock validictory scrapelib Django dj_database_url --use-mirrors
-script: py.test
+install: pip install six pytest pytest-cov mock validictory scrapelib Django dj_database_url coveralls --use-mirrors
+script: py.test --cov pupa
+after_success:
+    - coveralls
 notifications:
     email:
         - jturk@sunlightfoundation.com
