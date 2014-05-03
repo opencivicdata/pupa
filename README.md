@@ -1,5 +1,9 @@
 # Pupa: A legislative data scraping framework
 
+[![Build Status](https://travis-ci.org/opencivicdata/pupa.svg?branch=master)](https://travis-ci.org/opencivicdata/pupa)
+[![Coverage Status](https://coveralls.io/repos/opencivicdata/pupa/badge.png?branch=master)](https://coveralls.io/r/opencivicdata/pupa?branch=master)
+
+
 The latest stable version of pupa is 0.3.0, which can be obtained via ``pip install pupa`` or by grabbing the tag 0.3.0.
 
 The master branch is in an experimental state at the moment, and usage is not recommended.
