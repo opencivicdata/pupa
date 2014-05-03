@@ -59,8 +59,7 @@ class Scraper(scrapelib.Scraper):
 
             Generally shouldn't be called directly.
         """
-        if hasattr(obj, 'prepare'):
-            obj.prepare(self.jurisdiction.jurisdiction_id)
+        obj.pre_save(self.jurisdiction.jurisdiction_id)
 
         filename = '{0}_{1}.json'.format(obj._type, obj._id).replace('/', '-')
 
@@ -163,6 +162,9 @@ class BaseModel(object):
 
         validator = utils.DatetimeValidator(required_by_default=False)
         validator.validate(self.as_dict(), schema)
+
+    def pre_save(self, jurisdiction_id):
+        pass
 
     def as_dict(self):
         d = {}

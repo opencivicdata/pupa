@@ -1,12 +1,16 @@
 import mock
 import pytest
-from pupa.scrape import Person, Organization, Bill
+from pupa.scrape import Person, Organization, Bill, Jurisdiction
 from pupa.scrape.base import Scraper, ScrapeError, BaseBillScraper
+
+class FakeJurisdiction(Jurisdiction):
+    jurisdiction_id = 'jurisdiction'
+juris = FakeJurisdiction()
 
 
 def test_save_object_basics():
     # ensure that save object dumps a file
-    s = Scraper('jurisdiction', '/tmp/')
+    s = Scraper(juris, '/tmp/')
     p = Person('Michael Jordan')
     p.add_source('http://example.com')
 
@@ -20,7 +24,7 @@ def test_save_object_basics():
 
 
 def test_save_object_invalid():
-    s = Scraper('jurisdiction', '/tmp/')
+    s = Scraper(juris, '/tmp/')
     p = Person('Michael Jordan')
     # no source, won't validate
 
@@ -29,7 +33,7 @@ def test_save_object_invalid():
 
 
 def test_save_related():
-    s = Scraper('jurisdiction', '/tmp/')
+    s = Scraper(juris, '/tmp/')
     p = Person('Michael Jordan')
     p.add_source('http://example.com')
     o = Organization('Chicago Bulls')
@@ -51,7 +55,7 @@ def test_simple_scrape():
             yield p
 
     with mock.patch('json.dump') as json_dump:
-        record = FakeScraper('jurisdiction', '/tmp/').do_scrape()
+        record = FakeScraper(juris, '/tmp/').do_scrape()
 
     assert len(json_dump.mock_calls) == 1
     assert record['objects']['person'] == 1
@@ -71,7 +75,7 @@ def test_double_iter():
             yield p
 
     with mock.patch('json.dump') as json_dump:
-        record = IterScraper('jurisdiction', '/tmp/').do_scrape()
+        record = IterScraper(juris, '/tmp/').do_scrape()
 
     assert len(json_dump.mock_calls) == 1
     assert record['objects']['person'] == 1
@@ -83,7 +87,7 @@ def test_no_objects():
             pass
 
     with pytest.raises(ScrapeError):
-        NullScraper('jurisdiction', '/tmp/', fastmode=True).do_scrape()
+        NullScraper(juris, '/tmp/', fastmode=True).do_scrape()
 
 
 def test_no_scrape():
@@ -91,7 +95,7 @@ def test_no_scrape():
         pass
 
     with pytest.raises(NotImplementedError):
-        NonScraper('jurisdiction', '/tmp/').do_scrape()
+        NonScraper(juris, '/tmp/').do_scrape()
 
 
 def test_bill_scraper():
@@ -111,7 +115,7 @@ def test_bill_scraper():
                 b.add_source('http;//example.com')
                 return b
 
-    bs = BillScraper('jurisdiction', '/tmp/')
+    bs = BillScraper(juris, '/tmp/')
     with mock.patch('json.dump') as json_dump:
         record = bs.do_scrape(session='2020')
 

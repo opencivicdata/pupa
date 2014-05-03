@@ -29,7 +29,7 @@ scrape.Scraper - base class for all scrapers
     self.critical
 
     self.save_object(obj) - given a scrape object saves it to disk
-        calls obj.prepare(jid), obj.as_dict(), and obj.validate()
+        calls obj.pre_save(jid), obj.as_dict(), and obj.validate()
 
     self.do_scrape(**kwargs) - the workhorse of the scraper, runs a scrape by calling self.scrape()
         passed on all arbitrary args to scrape, which can use them for discrimination
