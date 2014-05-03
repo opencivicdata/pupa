@@ -57,7 +57,7 @@ schema = {
             "blank": True,
         },
         'chamber': {
-            "enum": ["upper", "lower"], "type": ["string", "null"],
+            "enum": ["upper", "lower", ""], "type": ["string"], "blank": True,
             "description": ("chamber (if legislature is bicameral, otherwise null)"),
         },
         "sources": sources,

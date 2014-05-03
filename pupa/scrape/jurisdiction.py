@@ -49,24 +49,23 @@ class Jurisdiction(BaseModel):
                 'feature_flags': self.feature_flags,
                 'building_maps': self.building_maps}
 
-    def get_organization(self, chamber=None, party=None):
-        if chamber:
-            for org in self.organizations:
-                if org['chamber'] == chamber:
-                    return org
-            raise ValueError('no such chamber: ' + chamber)
-        if party:
-            for org in self.parties:
-                if org['name'] == party:
-                    return org
-            return ValueError('no such party: ' + party)
-
+    #def get_organization(self, chamber=None, party=None):
+    #    if chamber:
+    #        for org in self.organizations:
+    #            if org.chamber == chamber:
+    #                return org
+    #        raise ValueError('no such chamber: ' + chamber)
+    #    if party:
+    #        for pname in self.parties:
+    #            if p['name'] == party:
+    #                return org
+    #        raise ValueError('no such party: ' + party)
 
     def get_session_list(self):
-        raise NotImplementedError('get_session_list is not implemented')
+        raise NotImplementedError('get_session_list is not implemented')    # pragma: no cover
 
     def extract_text(self):
-        raise NotImplementedError('extract_text is not implemented')
+        raise NotImplementedError('extract_text is not implemented')        # pragma: no cover
 
     def __str__(self):
         return self.name
@@ -80,8 +79,7 @@ class JurisdictionScraper(Scraper):
 
         # if organizations weren't specified yield one top-level org
         if not self.jurisdiction.organizations:
-            org = Organization(name=self.jurisdiction.name, classification='legislature',
-                               jurisdiction_id=self.jurisdiction.jurisdiction_id)
+            org = Organization(name=self.jurisdiction.name, classification='legislature')
             org.add_source(self.jurisdiction.url)
             yield org
         else:
