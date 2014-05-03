@@ -1,3 +1,6 @@
+from .common import extras
+
+
 schema = {
     "description": "Information about a jurisdiction, including session, chamber, etc.",
     "type": "object",
@@ -49,6 +52,8 @@ schema = {
                 "name": {"type": "string", "description": "Name of map (e.g. Floor 1)"},
                 "url": {"type": "string", "description": "URL to map image/PDF"}
             }},
-            "description": ("Links to image/PDF maps of the building."), }
+            "description": ("Links to image/PDF maps of the building."), },
+
+        "extras": extras,
     }
 }
