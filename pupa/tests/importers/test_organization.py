@@ -57,13 +57,13 @@ def test_deduplication_similar_but_different():
     assert Organization.objects.count() == 5
 
 
-#@pytest.mark.django_db
-#def test_deduplication_parties():
-#    party = ScrapeOrganization('Wild', classification='party')
-#    OrganizationImporter('jurisdiction-id').import_data([party])
-#    assert Organization.objects.count() == 1
+@pytest.mark.django_db
+def test_deduplication_parties():
+    party = ScrapeOrganization('Wild', classification='party')
+    OrganizationImporter('jurisdiction-id').import_data([party])
+    assert Organization.objects.count() == 1
 
-#    # parties shouldn't get jurisdiction id attached, so don't differ on import
-#    party = ScrapeOrganization('Wild', classification='party')
-#    OrganizationImporter('new-jurisdiction-id').import_data([party])
-#    assert Organization.objects.count() == 1
+    # parties shouldn't get jurisdiction id attached, so don't differ on import
+    party = ScrapeOrganization('Wild', classification='party')
+    OrganizationImporter('new-jurisdiction-id').import_data([party])
+    assert Organization.objects.count() == 1
