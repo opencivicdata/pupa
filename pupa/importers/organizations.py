@@ -23,7 +23,7 @@ class OrganizationImporter(BaseImporter):
 
         return self.model_class.objects.get(**spec)
 
-    def prepare_data(self, data):
+    def prepare_for_db(self, data):
         data['jurisdiction_id'] = self.jurisdiction_id
         return data
 

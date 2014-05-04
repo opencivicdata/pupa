@@ -11,7 +11,7 @@ class PostImporter(BaseImporter):
         super(PostImporter, self).__init__(jurisdiction_id)
         self.org_importer = org_importer
 
-    def prepare_data(self, data):
+    def prepare_for_db(self, data):
         data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
         return data
 

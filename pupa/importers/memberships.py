@@ -109,7 +109,7 @@ class MembershipImporter(BaseImporter):
 
         return self.model_class.objects.get(**spec)
 
-    def prepare_data(self, data):
+    def prepare_for_db(self, data):
         data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
         data['person_id'] = self.person_importer.resolve_json_id(data['person_id'])
         data['post_id'] = self.post_importer.resolve_json_id(data['post_id'])
