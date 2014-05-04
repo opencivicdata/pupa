@@ -7,6 +7,7 @@ class TestJurisdiction(Jurisdiction):
     jurisdiction_id = 'test'
     name = 'Test'
     url = 'http://example.com'
+    division_id = 'division'
 
     organizations = [Organization('House', chamber='lower'),
                      Organization('Senate', chamber='upper')]

@@ -23,10 +23,12 @@ class BaseImporter(object):
     """ BaseImporter
 
     Override:
-        prepare_data(data) [optional]
+        prepare_for_db(data) [optional]
         get_object(data)
     """
     _type = None
+    model_class = None
+    related_models = {}
 
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
@@ -64,7 +66,7 @@ class BaseImporter(object):
         except KeyError:
             raise ValueError('cannot resolve id: {0}'.format(json_id))
 
-    def prepare_data(self, data):
+    def prepare_for_db(self, data):
         # no-op to be overridden
         return data
 
@@ -132,7 +134,7 @@ class BaseImporter(object):
                 # parent imported first - which we asserted is true via
                 # the topological sort)
                 data['parent_id'] = self.resolve_json_id(parent_id)
-            obj, what = self.import_json(data)
+            obj, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj.id
             self.results[what] += 1
 
@@ -143,7 +145,7 @@ class BaseImporter(object):
         updated = False
 
         # add fields/etc.
-        data = self.prepare_data(data)
+        data = self.prepare_for_db(data)
 
         # TODO: add a JSON field for extras
         data.pop('extras', None)

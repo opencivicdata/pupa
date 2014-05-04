@@ -10,5 +10,9 @@ class JurisdictionImporter(BaseImporter):
     def __init__(self, jurisdiction_id):
         super(JurisdictionImporter, self).__init__(jurisdiction_id)
 
+    def prepare_for_db(self, data):
+        data.pop('building_maps')   # TODO: drop this if we start importing building_maps
+        return data
+
     def get_object(self, data):
         return self.model_class.objects.get(id=data['id'])

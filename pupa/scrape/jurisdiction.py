@@ -45,9 +45,10 @@ class Jurisdiction(BaseModel):
 
     def as_dict(self):
         return {'_id': self._id, 'id': self._id, 'name': self.name, 'url': self.url,
-                'sessions': self.sessions,
+                'division_id': self.division_id, 'sessions': self.sessions,
                 'feature_flags': self.feature_flags,
-                'building_maps': self.building_maps}
+                'building_maps': self.building_maps
+               }
 
     #def get_organization(self, chamber=None, party=None):
     #    if chamber:
