@@ -9,13 +9,12 @@ from pupa.utils.topsort import Network
 
 def omnihash(obj):
     """ recursively hash unhashable objects """
-    if isinstance(obj, (set, tuple, list)):
+    if isinstance(obj, set):
+        return hash(frozenset(omnihash(e) for e in obj))
+    elif isinstance(obj, (tuple, list)):
         return hash(tuple(omnihash(e) for e in obj))
     elif isinstance(obj, dict):
         return hash(frozenset((k, omnihash(v)) for k, v in obj.items()))
-    elif isinstance(obj, Model):
-        return omnihash(frozenset((k, getattr(obj, k)) for k in obj._meta.get_all_field_names()
-                                  if k != 'id'))
     else:
         return hash(obj)
 
@@ -27,6 +26,7 @@ class BaseImporter(object):
         prepare_data(data) [optional]
         get_object(data)
     """
+    _type = None
 
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
@@ -70,22 +70,31 @@ class BaseImporter(object):
 
     def import_directory(self, datadir):
         """ import a JSON directory into the database """
+        dicts = []
+
+        # load all json, mapped by json_id
+        for fname in glob.glob(os.path.join(datadir, self._type + '_*.json')):
+            with open(fname) as f:
+                dicts.append(json.load(f))
+
+        self.import_data(dicts)
+
+    def import_data(self, dicts):
+        """ import a bunch of dicts together """
         # id: json
         data_by_id = {}
         # hash(json): id
         seen_hashes = {}
 
         # load all json, mapped by json_id
-        for fname in glob.glob(os.path.join(datadir, self._type + '_*.json')):
-            with open(fname) as f:
-                data = json.load(f)
-                json_id = data.pop('_id')
-                objhash = omnihash(data)
-                if objhash not in seen_hashes:
-                    seen_hashes[objhash] = json_id
-                    data_by_id[json_id] = data
-                else:
-                    self.duplicates[json_id] = seen_hashes[objhash]
+        for data in dicts:
+            json_id = data.pop('_id')
+            objhash = omnihash(data)
+            if objhash not in seen_hashes:
+                seen_hashes[objhash] = json_id
+                data_by_id[json_id] = data
+            else:
+                self.duplicates[json_id] = seen_hashes[objhash]
 
         # toposort the nodes so parents are imported first
         network = Network()
@@ -129,7 +138,7 @@ class BaseImporter(object):
 
         return {self._type: self.results}
 
-    def import_json(self, data):
+    def import_item(self, data):
         what = None
         updated = False
 
