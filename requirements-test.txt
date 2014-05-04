@@ -1,0 +1,11 @@
+six
+validictory
+scrapelib
+http://www.djangoproject.com/download/1.7b3/tarball/
+dj_database_url
+-e git+https://github.com/opencivicdata/python-opencivicdata.git#egg=opencivicdata 
+mock
+pytest
+pytest-cov
+pytest-django
+coveralls
