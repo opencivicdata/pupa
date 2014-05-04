@@ -3,7 +3,9 @@ python:
     - "2.7"
     - "3.3"
     - "3.4"
-install: pip install six pytest pytest-cov mock validictory scrapelib Django dj_database_url coveralls --use-mirrors
+install: pip install six pytest pytest-cov pytest-django mock validictory scrapelib Django dj_database_url coveralls --use-mirrors
+before_script:
+    - psql -c "CREATE USER test with PASSWORD 'test' CREATEDB;" -U postgres
 script: ./run-tests.sh
 after_success:
     - coveralls
