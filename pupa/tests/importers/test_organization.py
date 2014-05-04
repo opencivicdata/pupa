@@ -67,3 +67,15 @@ def test_deduplication_parties():
     party = ScrapeOrganization('Wild', classification='party')
     OrganizationImporter('new-jurisdiction-id').import_data([party.as_dict()])
     assert Organization.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_deduplication_prevents_identical():
+    org1 = ScrapeOrganization('United Nations', classification='international')
+    org2 = ScrapeOrganization('United Nations', classification='international',
+                              founding_date='1945')
+    OrganizationImporter('jurisdiction-id').import_data([org1.as_dict()])
+    assert Organization.objects.count() == 1
+
+    OrganizationImporter('jurisdiction-id').import_data([org2.as_dict()])
+    assert Organization.objects.count() == 1
