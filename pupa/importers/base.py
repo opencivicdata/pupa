@@ -134,13 +134,14 @@ class BaseImporter(object):
                 # parent imported first - which we asserted is true via
                 # the topological sort)
                 data['parent_id'] = self.resolve_json_id(parent_id)
-            obj, what = self.import_item(data)
+            obj, what = self._import_item(data)
             self.json_to_db_id[json_id] = obj.id
             self.results[what] += 1
 
         return {self._type: self.results}
 
-    def import_item(self, data):
+    def _import_item(self, data):
+        """ internal function used by import_data """
         what = None
         updated = False
 
