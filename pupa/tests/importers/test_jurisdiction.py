@@ -12,7 +12,7 @@ class TestJurisdiction(JurisdictionBase):
 
 
 @pytest.mark.django_db
-def test_jurisdiction_data():
+def test_jurisdiction_import():
     tj = TestJurisdiction()
     juris_dict = tj.as_dict()
     JurisdictionImporter('jurisdiction-id').import_data([juris_dict])

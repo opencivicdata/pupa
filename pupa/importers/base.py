@@ -151,14 +151,18 @@ class BaseImporter(object):
         # TODO: add a JSON field for extras
         data.pop('extras', None)
 
+        try:
+            obj = self.get_object(data)
+        except self.model_class.DoesNotExist:
+            obj = None
+
         # pull related fields off
         related = {}
         for field in self.related_models:
             related[field] = data.pop(field)
 
-        try:
-            obj = self.get_object(data)
-
+        # obj existed, attempt to update
+        if obj:
             for key, value in data.items():
                 # TODO: avoid updating locked fields
                 if getattr(obj, key) != value:
@@ -177,20 +181,21 @@ class BaseImporter(object):
                     # get keys to compare (assumes all objects have same keys)
                     keys = sorted(items[0].keys())
 
-                # get items from database
-                dbitems = getattr(obj, field).all()
-                dbdicts = [{k: getattr(item, k) for k in keys} for item in dbitems]
-                # if the hashes differ, update what & delete existing set, then replace it
-                if omnihash(items) != omnihash(dbdicts):
-                    what = 'update'
-                    getattr(obj, field).all().delete()
-                    for item in items:
-                        try:
-                            getattr(obj, field).create(**item)
-                        except TypeError as e:
-                            raise TypeError(str(e) + ' while importing ' + str(item))
+                    # get items from database
+                    dbitems = getattr(obj, field).all()
+                    dbdicts = [{k: getattr(item, k) for k in keys} for item in dbitems]
+                    # if the hashes differ, update what & delete existing set, then replace it
+                    if omnihash(items) != omnihash(dbdicts):
+                        what = 'update'
+                        getattr(obj, field).all().delete()
+                        for item in items:
+                            try:
+                                getattr(obj, field).create(**item)
+                            except TypeError as e:
+                                raise TypeError(str(e) + ' while importing ' + str(item))
 
-        except self.model_class.DoesNotExist:
+        # need to create the data
+        else:
             if 'id' not in data:
                 data['id'] = 'ocd-{0}/{1}'.format(self._type, uuid.uuid1())
             obj = self.model_class.objects.create(**data)

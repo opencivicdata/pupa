@@ -216,7 +216,7 @@ class IdentifierMixin(object):
         super(IdentifierMixin, self).__init__()
         self.identifiers = []
 
-    def add_identifier(self, identifier, scheme=None):
+    def add_identifier(self, identifier, scheme=''):
         self.identifiers.append({"identifier": identifier, "scheme": scheme})
 
 
@@ -225,7 +225,7 @@ class OtherNameMixin(object):
         super(OtherNameMixin, self).__init__()
         self.other_names = []
 
-    def add_name(self, name, start_date=None, end_date=None, note=None):
+    def add_name(self, name, start_date='', end_date='', note=''):
         other_name = {'name': name}
         if start_date:
             other_name['start_date'] = start_date
