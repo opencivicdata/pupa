@@ -35,3 +35,35 @@ def test_full_organization():
     assert o.links.all()[0].url == 'http://example.com/link'
     assert o.sources.all()[0].url == 'http://example.com/source'
 
+
+@pytest.mark.django_db
+def test_deduplication_similar_but_different():
+    o1 = ScrapeOrganization('United Nations', classification='international')
+    # different classification
+    o2 = ScrapeOrganization('United Nations', classification='global')
+    # different name
+    o3 = ScrapeOrganization('United Nations of Earth', classification='international')
+    # has a parent
+    o4 = ScrapeOrganization('United Nations', classification='international', parent_id=o1._id)
+
+    # similar, but no duplicates
+    orgs = [o1.as_dict(), o2.as_dict(), o3.as_dict(), o4.as_dict()]
+    OrganizationImporter('jurisdiction-id').import_data(orgs)
+    assert Organization.objects.count() == 4
+
+    # should get a new one  when jurisdiction_id changes
+    o5 = ScrapeOrganization('United Nations', classification='international')
+    OrganizationImporter('new-jurisdiction-id').import_data([o5.as_dict()])
+    assert Organization.objects.count() == 5
+
+
+#@pytest.mark.django_db
+#def test_deduplication_parties():
+#    party = ScrapeOrganization('Wild', classification='party')
+#    OrganizationImporter('jurisdiction-id').import_data([party])
+#    assert Organization.objects.count() == 1
+
+#    # parties shouldn't get jurisdiction id attached, so don't differ on import
+#    party = ScrapeOrganization('Wild', classification='party')
+#    OrganizationImporter('new-jurisdiction-id').import_data([party])
+#    assert Organization.objects.count() == 1

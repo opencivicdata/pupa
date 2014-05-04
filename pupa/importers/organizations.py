@@ -18,8 +18,9 @@ class OrganizationImporter(BaseImporter):
                 'parent_id': org['parent_id']}
 
         # add jurisdiction_id unless this is a party
-        if org['classification'] != 'party':
-            spec['jurisdiction_id'] = org.get('jurisdiction_id')
+        jid = org.get('jurisdiction_id')
+        if jid:
+            spec['jurisdiction_id'] = jid
 
         return self.model_class.objects.get(**spec)
 
