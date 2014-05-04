@@ -65,9 +65,8 @@ LOGGING = {
 
 try:
     from pupa_settings import *     # NOQA
-except ImportError:
+except ImportError:         # pragma: no cover
     print('no pupa_settings on path, using defaults')
-    pass
 
 
 DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
