@@ -1,4 +1,5 @@
 import random
+import pytest
 from pupa.utils.topsort import Network, CyclicGraphError
 
 
@@ -85,10 +86,9 @@ def test_cyclic_graph_error_simple():
     network.add_node("B")
     network.add_edge("A", "B")
     network.add_edge("B", "A")
-    try:
-        assert list(network.sort()) is None, "Sort returned - expected CyclicGraphError"
-    except CyclicGraphError:
-        pass
+
+    with pytest.raises(CyclicGraphError):
+        list(network.sort())
 
 
 def test_cyclic_graph_error_indirect():
@@ -100,10 +100,9 @@ def test_cyclic_graph_error_indirect():
     network.add_edge("A", "B")
     network.add_edge("B", "C")
     network.add_edge("C", "A")
-    try:
-        assert list(network.sort()) is None, "Sort returned - expected CyclicGraphError"
-    except CyclicGraphError:
-        pass
+
+    with pytest.raises(CyclicGraphError):
+        list(network.sort())
 
 
 def test_cyclic_graph_error_massive():
@@ -114,7 +113,5 @@ def test_cyclic_graph_error_massive():
         network.add_node(e)
         network.add_edge(e, entries[1 + i])
 
-    try:
-        assert list(network.sort()) is None, "Sort returned - expected CyclicGraphError"
-    except CyclicGraphError:
-        pass
+    with pytest.raises(CyclicGraphError):
+        list(network.sort())
