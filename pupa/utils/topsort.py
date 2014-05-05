@@ -82,3 +82,14 @@ class Network(object):
                 yield node
             if not iterated:
                 raise CyclicGraphError("Sorting has found a cyclic graph.")
+
+    def dot(self):
+        """
+        Return a buffer that represents something dot(1) can render.
+        """
+        buff = "digraph graphname {"
+        for fro in self.edges:
+            for to in self.edges[fro]:
+                buff += "%s -> %s;" % (fro, to)
+        buff += "}"
+        return buff

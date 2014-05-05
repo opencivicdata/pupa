@@ -69,6 +69,9 @@ def test_sort_order_staged():
     network.add_edge("A1", "C2")
     network.add_edge("A1", "C3")
 
+    # with open("/home/tag/debug.dot", 'w') as fd:
+    #     fd.write(network.dot())
+
     sorted_order = list(network.sort())
 
     assert sorted_order.pop(0) == "C1"
