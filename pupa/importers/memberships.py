@@ -1,6 +1,5 @@
 from opencivicdata.models import Membership, MembershipContactDetail, MembershipLink
 from .base import BaseImporter
-from .utils import people_by_jurisdiction_and_name
 
 
 def match_membership(membership, people=None):
