@@ -1,3 +1,4 @@
+import json
 from opencivicdata.models import Post, PostContactDetail, PostLinks
 from .base import BaseImporter
 
@@ -20,8 +21,11 @@ class PostImporter(BaseImporter):
                                             label=data['label'])
 
     def resolve_json_id(self, json_id):
-        if json_id.startswith('district:'):
-            _, chamber, id_piece = json_id.split(':', 2)
-            return Post.objects.get(organization__chamber=chamber, label=id_piece).id
+        # handle special psuedo-ids
+        if json_id.startswith('~'):
+            spec = json.loads(json_id[1:])
+            spec['organization__jurisdiction_id'] = self.jurisdiction_id
+            return Post.objects.get(**spec).id
 
+        # or just resolve the normal way
         return super(PostImporter, self).resolve_json_id(json_id)
