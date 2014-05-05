@@ -42,7 +42,6 @@ def test_committee_pre_save():
     # simplest case
     c = Committee('Defense')
     c.pre_save('jurisdiction-id')
-    print(c.parent_id)
     assert get_psuedo_id(c.parent_id) == {'classification': 'legislature', 'chamber': ''}
     assert c.classification == 'committee'
 

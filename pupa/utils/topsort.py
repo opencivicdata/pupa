@@ -34,13 +34,6 @@ class Network(object):
 
             `network.add_edge('foo', 'bar')`
         """
-
-        if fro not in self.nodes:
-            self.add_node(fro)
-
-        if to not in self.nodes:
-            self.add_node(to)
-
         self.edges[fro].add(to)
 
     def leaf_nodes(self):

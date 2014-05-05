@@ -105,16 +105,12 @@ class BaseImporter(object):
 
         for json_id, data in data_by_id.items():
             parent_id = data.get('parent_id', None)
+            network.add_node(json_id)
             if parent_id:
                 # Right. There's an import dep. We need to add the edge from
                 # the parent to the current node, so that we import the parent
                 # before the current node.
                 network.add_edge(parent_id, json_id)
-            else:
-                # Otherwise, there is no parent, and we just need to add it to
-                # the network to add whenever we feel like it during the import
-                # phase.
-                network.add_node(json_id)
 
         # resolve the sorted import order
         for jid in network.sort():
