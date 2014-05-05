@@ -4,11 +4,12 @@ import shutil
 import tempfile
 import mock
 import pytest
+from pupa.scrape import Person as ScrapePerson
 from pupa.importers.base import omnihash, BaseImporter
+from pupa.importers import PersonImporter
 from opencivicdata.models import Person
 
-
-class TestImporter(BaseImporter):
+class FakeImporter(BaseImporter):
     _type = 'test'
 
 
@@ -33,7 +34,7 @@ def test_import_directory():
     open(os.path.join(datadir, 'test_b.json'), 'w').write(json.dumps(dictb))
 
     # simply ensure that import directory calls import_data with all dicts
-    ti = TestImporter('jurisdiction-id')
+    ti = FakeImporter('jurisdiction-id')
     with mock.patch.object(ti, attribute='import_data') as mockobj:
         ti.import_directory(datadir)
 
@@ -49,3 +50,59 @@ def test_import_directory():
 
     # clean up datadir
     shutil.rmtree(datadir)
+
+
+# doing these next few tests just on a Person because it is the same code that handles it
+# but for completeness maybe it is better to do these on each type?
+
+
+@pytest.mark.django_db
+def test_deduplication_identical_object():
+    p1 = ScrapePerson('Dwayne').as_dict()
+    p2 = ScrapePerson('Dwayne').as_dict()
+    PersonImporter('jid').import_data([p1, p2])
+
+    assert Person.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_resolve_json_id():
+    p1 = ScrapePerson('Dwayne').as_dict()
+    p2 = ScrapePerson('Dwayne').as_dict()
+    pi = PersonImporter('jid')
+
+    # do import and get database id
+    p1_id = p1['_id']
+    p2_id = p2['_id']
+    pi.import_data([p1, p2])
+    db_id = Person.objects.get().id
+
+    # simplest case
+    assert pi.resolve_json_id(p1_id) == db_id
+    # duplicate should resolve to same id
+    assert pi.resolve_json_id(p2_id) == db_id
+    # a null id should map to None
+    assert pi.resolve_json_id(None) == None
+    # no such id
+    with pytest.raises(ValueError):
+        pi.resolve_json_id('this-is-invalid')
+
+
+@pytest.mark.django_db
+def test_invalid_fields():
+    p1 = ScrapePerson('Dwayne').as_dict()
+    p1['newfield'] = "shouldn't happen"
+
+    with pytest.raises(TypeError):
+        PersonImporter('jid').import_data([p1])
+
+
+@pytest.mark.django_db
+def test_invalid_fields_related_item():
+    p1 = ScrapePerson('Dwayne')
+    p1.add_link('http://example.com')
+    p1 = p1.as_dict()
+    p1['links'][0]['test'] = 3
+
+    with pytest.raises(TypeError):
+        PersonImporter('jid').import_data([p1])
