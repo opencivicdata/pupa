@@ -50,18 +50,6 @@ class Jurisdiction(BaseModel):
                 'building_maps': self.building_maps
                }
 
-    #def get_organization(self, chamber=None, party=None):
-    #    if chamber:
-    #        for org in self.organizations:
-    #            if org.chamber == chamber:
-    #                return org
-    #        raise ValueError('no such chamber: ' + chamber)
-    #    if party:
-    #        for pname in self.parties:
-    #            if p['name'] == party:
-    #                return org
-    #        raise ValueError('no such party: ' + party)
-
     def get_session_list(self):
         raise NotImplementedError('get_session_list is not implemented')    # pragma: no cover
 

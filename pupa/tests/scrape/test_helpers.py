@@ -1,4 +1,5 @@
 from pupa.scrape import Legislator, Committee, Person
+from pupa.scrape.helpers import get_psuedo_id
 
 
 def test_legislator_related_district():
@@ -7,7 +8,8 @@ def test_legislator_related_district():
 
     assert len(l._related) == 1
     assert l._related[0].person_id == l._id
-    assert l._related[0].organization_id == 'legislature::jurisdiction-id'
+    assert get_psuedo_id(l._related[0].organization_id) == {'chamber': '',
+                                                            'classification': 'legislature'}
     assert l._related[0].post_id == 'district::1'
     assert l._related[0].role == 'member'
 
@@ -18,7 +20,8 @@ def test_legislator_related_chamber_district():
 
     assert len(l._related) == 1
     assert l._related[0].person_id == l._id
-    assert l._related[0].organization_id == 'legislature:upper:jurisdiction-id'
+    assert get_psuedo_id(l._related[0].organization_id) == {'chamber': 'upper',
+                                                            'classification': 'legislature'}
     assert l._related[0].post_id == 'district:upper:1'
     assert l._related[0].role == 'member'
 
@@ -30,7 +33,8 @@ def test_legislator_related_party():
     # a party membership
     assert len(l._related) == 2
     assert l._related[1].person_id == l._id
-    assert l._related[1].organization_id == 'party:Democratic-Republican'
+    assert get_psuedo_id(l._related[1].organization_id) == {'classification': 'party',
+                                                            'name': 'Democratic-Republican'}
     assert l._related[1].role == 'member'
 
 
@@ -38,13 +42,14 @@ def test_committee_pre_save():
     # simplest case
     c = Committee('Defense')
     c.pre_save('jurisdiction-id')
-    assert c.parent_id == 'legislature::jurisdiction-id'
+    print(c.parent_id)
+    assert get_psuedo_id(c.parent_id) == {'classification': 'legislature', 'chamber': ''}
     assert c.classification == 'committee'
 
     # with chamber
     c = Committee('Appropriations', chamber='upper')
     c.pre_save('jurisdiction-id')
-    assert c.parent_id == 'legislature:upper:jurisdiction-id'
+    assert get_psuedo_id(c.parent_id) == {'classification': 'legislature', 'chamber': 'upper'}
 
     # don't override set parent_id
     c2 = Committee('Farm Subsidies', parent_id=c._id)
