@@ -115,3 +115,18 @@ def test_cyclic_graph_error_massive():
 
     with pytest.raises(CyclicGraphError):
         list(network.sort())
+
+
+def test_link_before_nodes():
+    network = Network()
+
+    network.add_edge("A", "B")
+    network.add_edge("B", "C")
+    network.add_edge("C", "D")
+
+    network.add_node("A")
+    network.add_node("B")
+    network.add_node("C")
+    network.add_node("D")
+
+    assert list(network.sort()) == ["A", "B", "C", "D"]
