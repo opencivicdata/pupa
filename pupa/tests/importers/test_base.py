@@ -9,6 +9,7 @@ from pupa.importers.base import omnihash, BaseImporter
 from pupa.importers import PersonImporter
 from opencivicdata.models import Person
 
+
 class FakeImporter(BaseImporter):
     _type = 'test'
 

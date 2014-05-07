@@ -68,7 +68,6 @@ def test_committee_add_member_person():
 def test_committee_add_member_name():
     c = Committee('Defense')
     c.add_member('John Adams')
-    assert c._related[0].person_id == None
-    assert c._related[0]._unmatched_legislator == {'name': 'John Adams'}
+    assert get_psuedo_id(c._related[0].person_id) == {'name': 'John Adams'}
     assert c._related[0].organization_id == c._id
     assert c._related[0].role == 'member'

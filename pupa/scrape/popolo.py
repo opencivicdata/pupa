@@ -41,9 +41,7 @@ class Membership(BaseModel, ContactDetailMixin, LinkMixin):
     _schema = membership_schema
 
     def __init__(self, person_id, organization_id, post_id=None,
-                 role='', label='', start_date='', end_date='', on_behalf_of_id=None,
-                 unmatched_legislator=None
-                ):
+                 role='', label='', start_date='', end_date='', on_behalf_of_id=None):
         """
         Constructor for the Membership object.
 
@@ -60,13 +58,9 @@ class Membership(BaseModel, ContactDetailMixin, LinkMixin):
         self.role = role
         self.label = label
         self.on_behalf_of_id = on_behalf_of_id
-        self._unmatched_legislator = unmatched_legislator
 
     def __str__(self):
-        if self.person_id:
-            return self.person_id + ' membership in ' + self.organization_id
-        else:
-            return (self._unmatched_legislator['name'] + ' membership in ' + self.organization_id)
+        return self.person_id + ' membership in ' + self.organization_id
     __unicode__ = __str__
 
 

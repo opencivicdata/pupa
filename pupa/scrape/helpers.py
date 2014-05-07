@@ -62,6 +62,6 @@ class Committee(Organization):
             membership = Membership(person_id=name_or_person._id, organization_id=self._id,
                                     role=role, **kwargs)
         else:
-            membership = Membership(person_id=None, organization_id=self._id, role=role,
-                                    unmatched_legislator={'name': name_or_person}, **kwargs)
+            membership = Membership(person_id=make_psuedo_id(name=name_or_person),
+                                    organization_id=self._id, role=role, **kwargs)
         self._related.append(membership)

@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/opencivicdata/pupa.svg?branch=master)](https://travis-ci.org/opencivicdata/pupa)
 [![Coverage Status](https://coveralls.io/repos/opencivicdata/pupa/badge.png?branch=master)](https://coveralls.io/r/opencivicdata/pupa?branch=master)
-[![Latest Version](https://pypip.in/version/pupa/badge.png)](https://pypi.python.org/pypi/pupa/)
-[![Download Format](https://pypip.in/format/pupa/badge.png)](https://pypi.python.org/pypi/pupa/)
+[![Latest Version](https://pypip.in/version/pupa/badge.svg)](https://pypi.python.org/pypi/pupa/)
+[![Download Format](https://pypip.in/format/pupa/badge.svg)](https://pypi.python.org/pypi/pupa/)
 
 
 The latest stable version of pupa is 0.3.0, which can be obtained via ``pip install pupa`` or by grabbing the tag 0.3.0.
