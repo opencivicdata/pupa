@@ -13,4 +13,4 @@ RUN pip3 install -e /opt/sunlightfoundation.com/pupa/
 RUN mkdir -p /tmp/pupa
 WORKDIR /tmp/pupa
 
-ENTRYPOINT ["pupa", "update"]
+ENTRYPOINT ["pupa"]
