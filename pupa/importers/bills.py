@@ -40,7 +40,6 @@ class BillImporter(BaseImporter):
         # TODO: stop this
         data.pop('actions')
         data.pop('organization')
-        data.pop('_type')
         data.pop('chamber')
         data.pop('subject')
         return data

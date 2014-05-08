@@ -9,7 +9,7 @@ schema = {
     "description": "bill data",
     "type": "object",
     "_order": (
-        ('Basics', ('_type', 'organization', 'organization_id', 'session', 'name', 'chamber',
+        ('Basics', ('organization', 'organization_id', 'session', 'name', 'chamber',
                     'title', 'type', 'subject', 'summaries')),
         ('Common Fields', ['updated_at', 'created_at', 'sources']),
         ('Other/Related Bills', ('other_titles', 'other_names', 'related_bills')),
@@ -17,9 +17,6 @@ schema = {
         ('Documents and Versions', ('documents', 'versions')),
     ),
     "properties": {
-
-        "_type": {"enum": ["bill"], "type": "string",
-                  "description": "All bills have a _type field set to bill."},
 
         "organization": {"type": ["string", "null"],
                          "description": "name of the legislative body that this bill belongs to"},

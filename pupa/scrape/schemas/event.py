@@ -66,19 +66,12 @@ schema = {
     "description": "event data",
 
     "_order": (
-        ('Basics', ('_type', 'name', 'description', 'when', 'end', 'status', 'location')),
+        ('Basics', ('name', 'description', 'when', 'end', 'status', 'location')),
         ('Linked Entities', ('media', 'links', 'participants', 'agenda', 'documents',)),
         ('Common Fields', ['updated_at', 'created_at', 'sources']),
     ),
 
     "properties": {
-        "_type": {
-            "enum": ["event"],
-            "type": "string",
-            "description": ("All events must have a _type field set to one of"
-                            " the entries in the enum below."),
-        },
-
         "name": {
             "type": "string",
             "description": ('A simple name of the event, such as "Fiscal'
