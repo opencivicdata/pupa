@@ -192,17 +192,35 @@ class BaseImporter(object):
 
         # need to create the data
         else:
+            what = 'insert'
             if 'id' not in data:
                 data['id'] = 'ocd-{0}/{1}'.format(self._type, uuid.uuid1())
             obj = self.model_class.objects.create(**data)
-            what = 'insert'
 
-            # for each field add related
-            for field, items in related.items():
-                for item in items:
-                    try:
-                        getattr(obj, field).create(**item)
-                    except TypeError as e:
-                            raise TypeError(str(e) + ' while importing ' + str(item))
+            self._create_related(obj, related)
 
         return obj, what
+
+
+    def _create_related(self, obj, related, subfield_dict=None):
+        # obj is a base object to create related
+        # related is a dict mapping field names to lists of related objects
+        # subfield_list is where to get the next layer of subfields
+        if not subfield_dict:
+            subfield_dict = self.related_models
+
+        # for each field add related
+        for field, items in related.items():
+            for item in items:
+
+                # pull off 'subrelated' (things that are related to this obj)
+                subrelated = {}
+                for subfield in subfield_dict[field]:
+                    subrelated[subfield] = item.pop(subfield)
+
+                try:
+                    subobj = getattr(obj, field).create(**item)
+                except TypeError as e:
+                    raise TypeError(str(e) + ' while importing ' + str(item))
+
+                self._create_related(subobj, subrelated, subfield_dict[field])

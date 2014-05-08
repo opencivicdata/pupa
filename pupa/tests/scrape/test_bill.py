@@ -6,7 +6,7 @@ from pupa.scrape import Bill
 def toy_bill():
     b = Bill(name="HB 2017", session="2012A",
              title="A bill for an act to raise the cookie budget by 200%",
-             organization="Foo Senate", type="bill")
+             organization="Foo Senate", classification="bill")
     b.add_source("http://uri.example.com/", note="foo")
     return b
 
@@ -19,19 +19,21 @@ def test_basic_valid_bill():
 def test_bill_type_setting():
     # default
     b = Bill(name="some bill", session="session", title="the title")
-    assert b.type == ["bill"]
+    assert b.classification == ["bill"]
 
     # string -> list
-    b = Bill(name="some bill", session="session", title="the title", type="string")
-    assert b.type == ["string"]
+    b = Bill(name="some bill", session="session", title="the title", classification="string")
+    assert b.classification == ["string"]
 
     # list unmodified
-    b = Bill(name="some bill", session="session", title="the title", type=["two", "items"])
-    assert b.type == ["two", "items"]
+    b = Bill(name="some bill", session="session", title="the title",
+             classification=["two", "items"])
+    assert b.classification == ["two", "items"]
 
     # tuple -> list
-    b = Bill(name="some bill", session="session", title="the title", type=("two", "items"))
-    assert b.type == ["two", "items"]
+    b = Bill(name="some bill", session="session", title="the title",
+             classification=("two", "items"))
+    assert b.classification == ["two", "items"]
 
 
 def test_basic_invalid_bill():
@@ -56,19 +58,20 @@ def test_add_action():
 def test_add_related_bill():
     """ Make sure related bills work """
     b = toy_bill()
-    b.add_related_bill(name="HB 2020", session="2011A", chamber="upper", relation="companion")
+    b.add_related_bill(name="HB 2020", session="2011A", chamber="upper",
+                       classification="companion")
     assert len(b.related_bills) == 1
     assert b.related_bills[0] == {'name': 'HB 2020', 'session': '2011A', 'chamber': 'upper',
-                                  'relation_type': 'companion'}
+                                  'classification': 'companion'}
     b.validate()
 
 
 def test_add_sponsor():
     b = toy_bill()
-    b.add_sponsor(name="Joe Bleu", sponsorship_type="Author", entity_type="person", primary=True,
+    b.add_sponsor(name="Joe Bleu", classification="Author", entity_type="person", primary=True,
                   chamber="upper")
     assert len(b.sponsors) == 1
-    assert b.sponsors[0] == {'id': None, 'name': 'Joe Bleu', 'sponsorship_type': 'Author',
+    assert b.sponsors[0] == {'id': None, 'name': 'Joe Bleu', 'classification': 'Author',
                              '_type': 'person', 'primary': True, 'chamber': 'upper'}
     b.validate()
 

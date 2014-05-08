@@ -7,11 +7,11 @@ from .base import BaseImporter
 class PersonImporter(BaseImporter):
     _type = 'person'
     model_class = Person
-    related_models = {'identifiers': PersonIdentifier,
-                      'other_names': PersonName,
-                      'contact_details': PersonContactDetail,
-                      'links': PersonLink,
-                      'sources': PersonSource}
+    related_models = {'identifiers': {},
+                      'other_names': {},
+                      'contact_details': {},
+                      'links': {},
+                      'sources': {}}
 
     def get_object(self, person):
         all_names = [person['name']] + [o['name'] for o in person['other_names']]

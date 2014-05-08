@@ -237,8 +237,8 @@ class OtherNameMixin(object):
 
 
 class AssociatedLinkMixin(object):
-    def _add_associated_link(self, collection, name, url, mimetype, on_duplicate,
-                             type=None, date=None, offset=None, document_id=None):
+    def _add_associated_link(self, collection, name, url, mimetype, on_duplicate, type='',
+                             date=''):
         if on_duplicate not in ['error', 'ignore']:
             raise ValueError("on_duplicate must be 'error' or 'ignore'")
 
@@ -247,8 +247,7 @@ class AssociatedLinkMixin(object):
         except AttributeError:
             associated = self[collection]
 
-        ver = {'name': name, 'links': [], 'date': date, 'offset': offset, 'type': type,
-               'document_id': document_id}
+        ver = {'name': name, 'links': [], 'date': date, 'type': type}
 
         # keep a list of the links we've seen, we need to iterate over whole list on each add
         # unfortunately this means adds are O(n)

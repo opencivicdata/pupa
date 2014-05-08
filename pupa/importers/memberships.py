@@ -5,8 +5,7 @@ from .base import BaseImporter
 class MembershipImporter(BaseImporter):
     _type = 'membership'
     model_class = Membership
-    related_models = {'contact_details': MembershipContactDetail,
-                      'links': MembershipLink}
+    related_models = {'contact_details': {}, 'links': {}}
 
     def __init__(self, jurisdiction_id, person_importer, org_importer, post_importer):
         super(MembershipImporter, self).__init__(jurisdiction_id)

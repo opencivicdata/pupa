@@ -24,8 +24,8 @@ media_schema = {
             },
 
             "date": {
-                "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
-                "type": ["string", "null"],
+                "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
+                "type": "string", "blank": True,
                 "description": "date of the recording.",
             },
 

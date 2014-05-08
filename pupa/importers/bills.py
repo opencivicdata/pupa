@@ -1,47 +1,46 @@
 from pupa.utils import fix_bill_id
-from pupa.scrape import Bill
+from opencivicdata.models import (Bill, BillSummary, BillTitle, BillName, RelatedBill,
+                                  BillSponsor, BillDocument, BillVersion, BillDocumentLink,
+                                  BillVersionLink, BillSource, JurisdictionSession)
 from .base import BaseImporter
 
 
 class BillImporter(BaseImporter):
     _type = 'bill'
-    _model_class = Bill
+    model_class = Bill
+    related_models = {'summaries': {},
+                      'other_titles': {},
+                      'other_names': {},
+                      'related_bills': {},
+                      'sponsors': {},
+                      'sources': {},
+                      'documents': {'links': {}},
+                      'versions': {'links': {}},
+                     }
 
     def __init__(self, jurisdiction_id, org_importer):
         super(BillImporter, self).__init__(jurisdiction_id)
         self.org_importer = org_importer
 
-    def get_db_spec(self, bill):
-        spec = {'jurisdiction_id': bill.jurisdiction_id,
-                'session': bill.session,
-                'name': bill.name}
+    def get_object(self, bill):
+        spec = {
+            'session__name': bill['session'],
+            'session__jurisdiction_id': self.jurisdiction_id,
+            'name': bill['name'],
+        }
 
-        if hasattr(bill, 'chamber') and bill.chamber is not None:
-            spec['chamber'] = bill.chamber
+        # TODO: handle from_organization
 
-        return spec
+        return self.model_class.objects.get(**spec)
 
-    def prepare_object_from_json(self, obj):
-        obj['name'] = fix_bill_id(obj['name'])
-        org = self.org_importer._resolve_org_by_chamber(self.jurisdiction_id, obj['organization'])
-
-        obj['organization'] = org['_id']
-
-        if 'alternate_bill_ids' in obj:
-            obj['alternate_bill_ids'] = [fix_bill_id(bid) for bid in obj['alternate_bill_ids']]
-
-        # XXX: subject categorizer
-        # XXX: action categorizer
-
-        for rel in obj['related_bills']:
-            rel['bill_id'] = fix_bill_id(rel['bill_id'])
-            spec = rel.copy()
-            spec['jurisdiction_id'] = obj['jurisdiction_id']
-            rel_obj = db.bills.find_one(spec)
-            if rel_obj:
-                rel['internal_id'] = rel_obj['_id']
-            else:
-                self.logger.warning('Unknown related bill: {chamber} '
-                                    '{session} {bill_id}'.format(**rel))
-
-        return obj
+    def prepare_for_db(self, data):
+        data['name'] = fix_bill_id(data['name'])
+        data['session'] = JurisdictionSession.objects.get(jurisdiction_id=self.jurisdiction_id,
+                                                          name=data['session'])
+        # TODO: stop this
+        data.pop('actions')
+        data.pop('organization')
+        data.pop('_type')
+        data.pop('chamber')
+        data.pop('subject')
+        return data

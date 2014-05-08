@@ -7,11 +7,12 @@ from .base import BaseImporter
 class OrganizationImporter(BaseImporter):
     _type = 'organization'
     model_class = Organization
-    related_models = {'identifiers': OrganizationIdentifier,
-                      'other_names': OrganizationName,
-                      'contact_details': OrganizationContactDetail,
-                      'links': OrganizationLink,
-                      'sources': OrganizationSource}
+    related_models = {'identifiers': {},
+                      'other_names': {},
+                      'contact_details': {},
+                      'links': {},
+                      'sources': {}
+                     }
 
     def get_object(self, org):
         spec = {'classification': org['classification'],

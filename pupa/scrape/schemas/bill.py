@@ -48,8 +48,10 @@ schema = {
 
         "title": {"type": "string", "description": "primary display title for the bill"},
 
-        "type": {"items": {"type": "string", "enum": settings.BILL_TYPES}, "type": "array",
-                 "description": "array of types (e.g. bill, resolution)"},
+        "classification": {"items":
+                           {"type": "string", "enum": settings.BILL_TYPES}, "type": "array",
+                           "description": "array of types (e.g. bill, resolution)"
+                          },
 
         "subject": {
             "items": {"type": "string"},
@@ -135,7 +137,7 @@ schema = {
         "sponsors": {
             "items": {
                 "properties": {
-                    "sponsorship_type": {
+                    "classification": {
                         "type": "string",
                         "description": "Type of sponsorship, via upstream source."
                     },
@@ -145,9 +147,6 @@ schema = {
                     },
                     "name": {"type": "string",
                              "description": "Name of sponsor, as given by source.", },
-                    # TODO: convert to hint object?
-                    "chamber": {"enum": ["upper", "lower"], "type": ["string", "null"],
-                                "description": "Chamber of sponsor.", },
                     "id": {"type": ["string", "null"],
                            "description": ("ID of entity if the sponsor has been resolved to "
                                            "another entity in the database."), },
@@ -173,7 +172,8 @@ schema = {
                         "description": "name for the actor (e.g. 'upper', 'lower', etc.)"
                     },
                     "date": {
-                        "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$", "type": "string",
+                        "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
+                        "type": "string",
                         "description": "date of action"
                     },
                     "type": {
@@ -219,17 +219,18 @@ schema = {
             "items": {
                 "properties": {
                     "name": {"type": "string", "description": "Name of version"},
-                    "type": {"type": ["string", "null"], "enum": settings.VERSION_TYPES,
+                    "type": {"type": "string", "blank": True,
+                             "enum": [''] + settings.VERSION_TYPES,
                              "description": "Type of version"},
                     "date": {
-                        "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
-                        "type": ["string", "null"],
+                        "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
+                        "type": "string", "blank": True,
                         "description": "Version posting date",
                     },
                     "links": {
                         "items": {
                             "properties": {
-                                "mimetype": {"type": ["string", "null"],
+                                "mimetype": {"type": "string", "blank": True,
                                              "description": "mimetype of document"},
                                 "url": {"type": "string", "description": "URL to document"}
                             },
@@ -248,17 +249,18 @@ schema = {
             "items": {
                 "properties": {
                     "name": {"type": "string", "description": "Name of document"},
-                    "type": {"type": ["string", "null"], "enum": settings.DOCUMENT_TYPES,
+                    "type": {"type": "string", "blank": True,
+                             "enum": [''] + settings.DOCUMENT_TYPES,
                              "description": "Type of document"},
                     "date": {
-                        "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",
-                        "type": ["string", "null"],
+                        "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
+                        "type": "string", "blank": True,
                         "description": "Document posting date",
                     },
                     "links": {
                         "items": {
                             "properties": {
-                                "mimetype": {"type": ["string", "null"],
+                                "mimetype": {"type": "string", "blank": True,
                                              "description": "mimetype of document"},
                                 "url": {"type": "string", "description": "URL to document"}
                             },
