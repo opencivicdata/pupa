@@ -27,7 +27,8 @@ def main():
     subparsers = parser.add_subparsers(dest='subcommand')
 
     # configure Django before model imports
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'pupa.settings'
+    if os.environ.get("DJANGO_SETTINGS_MODULE") is None:
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'pupa.settings'
     django.setup()
 
     subcommands = {}
