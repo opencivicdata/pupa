@@ -58,11 +58,10 @@ def test_add_action():
 def test_add_related_bill():
     """ Make sure related bills work """
     b = toy_bill()
-    b.add_related_bill(name="HB 2020", session="2011A", chamber="upper",
-                       classification="companion")
+    b.add_related_bill(name="HB 2020", session="2011A", relation_type="companion")
     assert len(b.related_bills) == 1
-    assert b.related_bills[0] == {'name': 'HB 2020', 'session': '2011A', 'chamber': 'upper',
-                                  'classification': 'companion'}
+    assert b.related_bills[0] == {'name': 'HB 2020', 'session': '2011A',
+                                  'relation_type': 'companion'}
     b.validate()
 
 

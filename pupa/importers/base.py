@@ -70,6 +70,10 @@ class BaseImporter(object):
         # no-op to be overridden
         return data
 
+    def prepare_subobj_for_db(self, field_name, data):
+        # no-op to be overriden
+        return data
+
     def import_directory(self, datadir):
         """ import a JSON directory into the database """
         dicts = []
@@ -197,26 +201,27 @@ class BaseImporter(object):
                 data['id'] = 'ocd-{0}/{1}'.format(self._type, uuid.uuid1())
             obj = self.model_class.objects.create(**data)
 
-            self._create_related(obj, related)
+            self._create_related(obj, related, self.related_models)
 
         return obj, what
 
 
-    def _create_related(self, obj, related, subfield_dict=None):
-        # obj is a base object to create related
-        # related is a dict mapping field names to lists of related objects
-        # subfield_list is where to get the next layer of subfields
-        if not subfield_dict:
-            subfield_dict = self.related_models
-
-        # for each field add related
+    def _create_related(self, obj, related, subfield_dict):
+        """
+        create DB objects related to a base object
+            obj:            a base object to create related
+            related:        dict mapping field names to lists of related objects
+            subfield_list:  where to get the next layer of subfields
+        """
         for field, items in related.items():
             for item in items:
-
                 # pull off 'subrelated' (things that are related to this obj)
                 subrelated = {}
                 for subfield in subfield_dict[field]:
                     subrelated[subfield] = item.pop(subfield)
+
+                # do any transformations on subobject
+                item = self.prepare_subobj_for_db(field, item)
 
                 try:
                     subobj = getattr(obj, field).create(**item)

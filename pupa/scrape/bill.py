@@ -50,12 +50,11 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
             "related_entities": related_entities or []  # validate
         })
 
-    def add_related_bill(self, name, session, chamber, classification):
+    def add_related_bill(self, name, session, relation_type):
         self.related_bills.append({
             "name": name,
             "session": session,
-            "chamber": chamber,
-            "classification": classification  # enum
+            "relation_type": relation_type  # enum
         })
 
     def add_sponsor(self, name, classification, entity_type, primary,
