@@ -9,7 +9,7 @@ schema = {
     "description": "bill data",
     "type": "object",
     "_order": (
-        ('Basics', ('organization', 'organization_id', 'session', 'name', 'chamber',
+        ('Basics', ('from_organization', 'session', 'name', 'chamber',
                     'title', 'type', 'subject', 'summaries')),
         ('Common Fields', ['updated_at', 'created_at', 'sources']),
         ('Other/Related Bills', ('other_titles', 'other_names', 'related_bills')),
@@ -18,11 +18,8 @@ schema = {
     ),
     "properties": {
 
-        "organization": {"type": ["string", "null"],
+        "from_organization": {"type": ["string", "null"],
                          "description": "name of the legislative body that this bill belongs to"},
-
-        "organization_id": {"type": ["string", "null"],
-                            "description": "ID of legislative body that this bill belongs to"},
 
         "session": {"type": "string",
                     "description": "associated with one of the jurisdiction's sessions"},

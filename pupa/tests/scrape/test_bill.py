@@ -6,7 +6,7 @@ from pupa.scrape import Bill
 def toy_bill():
     b = Bill(name="HB 2017", session="2012A",
              title="A bill for an act to raise the cookie budget by 200%",
-             organization="Foo Senate", classification="bill")
+             from_organization="Foo Senate", classification="bill")
     b.add_source("http://uri.example.com/", note="foo")
     return b
 

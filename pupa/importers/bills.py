@@ -29,7 +29,7 @@ class BillImporter(BaseImporter):
             'name': bill['name'],
         }
 
-        # TODO: handle from_organization
+        # TODO: use  from_org
 
         return self.model_class.objects.get(**spec)
 
@@ -37,9 +37,12 @@ class BillImporter(BaseImporter):
         data['name'] = fix_bill_id(data['name'])
         data['session'] = JurisdictionSession.objects.get(jurisdiction_id=self.jurisdiction_id,
                                                           name=data['session'])
-        # TODO: stop this
+
+        if data['from_organization']:
+            data['from_organization_id'] = self.org_importer.resolve_json_id(
+                data.pop('from_organization'))
+        # TODO: stop doing this
         data.pop('actions')
-        data.pop('organization')
         data.pop('chamber')
         return data
 

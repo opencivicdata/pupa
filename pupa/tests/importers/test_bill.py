@@ -1,7 +1,14 @@
 import pytest
 from pupa.scrape import Bill as ScrapeBill
-from pupa.importers import BillImporter, OrganizationImporter
-from opencivicdata.models import Bill, Jurisdiction, JurisdictionSession, Person
+from pupa.importers import BillImporter
+from opencivicdata.models import Bill, Jurisdiction, JurisdictionSession, Person, Organization
+
+
+class DumbMockImporter(object):
+    """ this is a mock importer that implements a resolve_json_id that is just a pass-through """
+
+    def resolve_json_id(self, json_id):
+        return json_id
 
 
 @pytest.mark.django_db
@@ -10,10 +17,13 @@ def test_full_bill():
     j.sessions.create(name='1899')
     j.sessions.create(name='1900')
     person = Person.objects.create(id='person-id', name='Adam Smith')
+    org = Organization.objects.create(id='org-id', name='House', chamber='lower')
 
-    oldbill = ScrapeBill('HB 99', '1899', 'Axe & Tack Tax Act', classification='tax bill')
+    oldbill = ScrapeBill('HB 99', '1899', 'Axe & Tack Tax Act',
+                         classification='tax bill', from_organization=org.id)
 
-    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act', classification='tax bill')
+    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act',
+                      classification='tax bill', from_organization=org.id)
     bill.subject = ['taxes', 'axes']
     bill.add_name('SB 9')
     bill.add_title('Tack & Axe Tax Act')
@@ -29,13 +39,14 @@ def test_full_bill():
     bill.add_source('http://example.com/source')
 
     # import bill
-    oi = OrganizationImporter('jid')
+    oi = DumbMockImporter()
     # import like this so we're sure oldbill gets imported first
     BillImporter('jid', oi).import_data([oldbill.as_dict()])
     BillImporter('jid', oi).import_data([bill.as_dict()])
 
     # get bill from db and assert it imported correctly
     b = Bill.objects.get(name='HB 1')
+    assert b.from_organization.chamber == 'lower'
     assert b.name == bill.name
     assert b.title == bill.title
     assert b.classification == bill.classification

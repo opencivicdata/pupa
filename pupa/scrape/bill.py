@@ -21,7 +21,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     _type = 'bill'
     _schema = schema
 
-    def __init__(self, name, session, title, organization=None, classification=None):
+    def __init__(self, name, session, title, from_organization=None, classification=None):
         super(Bill, self).__init__()
 
         self.name = name
@@ -29,7 +29,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.title = title
         self.chamber = None
         self.classification = _cleanup_list(classification, ['bill'])
-        self.organization = organization
+        self.from_organization = from_organization
 
         self.actions = []
         self.other_names = []
