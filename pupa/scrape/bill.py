@@ -63,11 +63,11 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         ret = {
             "name": name,
             "classification": classification,
-            "_type": entity_type,
+            "entity_type": entity_type,
             "primary": primary,
-            "id": entity_id,
-            "chamber": chamber,
         }
+        if entity_type:
+            ret[entity_type + '_id'] = entity_id
         self.sponsors.append(ret)
 
     def add_subject(self, subject):

@@ -71,8 +71,8 @@ def test_add_sponsor():
     b.add_sponsor(name="Joe Bleu", classification="Author", entity_type="person", primary=True,
                   chamber="upper")
     assert len(b.sponsors) == 1
-    assert b.sponsors[0] == {'id': None, 'name': 'Joe Bleu', 'classification': 'Author',
-                             '_type': 'person', 'primary': True, 'chamber': 'upper'}
+    assert b.sponsors[0] == {'person_id': None, 'name': 'Joe Bleu', 'classification': 'Author',
+                             'entity_type': 'person', 'primary': True}
     b.validate()
 
 
