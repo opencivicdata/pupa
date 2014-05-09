@@ -11,8 +11,7 @@ def test_full_bill():
     person = Person.objects.create(id='person-id', name='Adam Smith')
 
     bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act', classification='tax bill')
-    bill.add_subject('taxes')
-    bill.add_subject('axes')
+    bill.subject = ['taxes', 'axes']
     #bill.add_name('SB 9')
     #bill.add_title('Tack & Axe Tax Act')
     bill.add_sponsor('Adam Smith', classification='extra sponsor', entity_type='person',
@@ -34,7 +33,7 @@ def test_full_bill():
     assert b.name == bill.name
     assert b.title == bill.title
     assert b.classification == bill.classification
-    #assert b.subjects == ['taxes', 'axes']
+    assert b.subject == ['taxes', 'axes']
     assert b.summaries.get().note == 'official'
 
     # titles

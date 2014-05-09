@@ -41,5 +41,4 @@ class BillImporter(BaseImporter):
         data.pop('actions')
         data.pop('organization')
         data.pop('chamber')
-        data.pop('subject')
         return data
