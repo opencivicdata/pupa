@@ -30,7 +30,9 @@ def test_full_bill():
 
     # import bill
     oi = OrganizationImporter('jid')
-    BillImporter('jid', oi).import_data([oldbill.as_dict(), bill.as_dict()])
+    # import like this so we're sure oldbill gets imported first
+    BillImporter('jid', oi).import_data([oldbill.as_dict()])
+    BillImporter('jid', oi).import_data([bill.as_dict()])
 
     # get bill from db and assert it imported correctly
     b = Bill.objects.get(name='HB 1')
