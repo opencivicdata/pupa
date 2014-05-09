@@ -12,13 +12,13 @@ def test_full_bill():
 
     bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act', classification='tax bill')
     bill.subject = ['taxes', 'axes']
-    #bill.add_name('SB 9')
-    #bill.add_title('Tack & Axe Tax Act')
+    bill.add_name('SB 9')
+    bill.add_title('Tack & Axe Tax Act')
     bill.add_sponsor('Adam Smith', classification='extra sponsor', entity_type='person',
                      primary=False, entity_id=person.id)
     bill.add_sponsor('Jane Smith', classification='lead sponsor', entity_type='person',
                      primary=True)
-    bill.add_summary('official', 'This is an act about axes and taxes and tacks.')
+    bill.add_summary('This is an act about axes and taxes and tacks.', note="official")
     bill.add_document_link('Fiscal Note', 'http://example.com/fn.pdf', mimetype='application/pdf')
     bill.add_document_link('Fiscal Note', 'http://example.com/fn.html', mimetype='text/html')
     bill.add_version_link('Fiscal Note', 'http://example.com/v/1', mimetype='text/html')
@@ -36,8 +36,9 @@ def test_full_bill():
     assert b.subject == ['taxes', 'axes']
     assert b.summaries.get().note == 'official'
 
-    # titles
-    # names
+    # other_title, other_name
+    assert b.other_titles.get().text == 'Tack & Axe Tax Act'
+    assert b.other_names.get().name == 'SB 9'
 
     # related_bills
     sponsors = b.sponsors.all()

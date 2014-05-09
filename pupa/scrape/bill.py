@@ -73,8 +73,14 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     def add_subject(self, subject):
         self.subject.append(subject)
 
-    def add_summary(self, note, text):
+    def add_summary(self, text, note):
         self.summaries.append({"note": note, "text": text})
+
+    def add_title(self, text, note=''):
+        self.other_titles.append({"note": note, "text": text})
+
+    def add_name(self, name, note=''):
+        self.other_names.append({"note": note, "name": name})
 
     def add_document_link(self, name, url, date='', type='', mimetype='', on_duplicate='error'):
         return self._add_associated_link(collection='documents', name=name, url=url, date=date,

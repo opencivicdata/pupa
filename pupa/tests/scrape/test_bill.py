@@ -86,8 +86,8 @@ def test_subjects():
 
 def test_summaries():
     b = toy_bill()
-    b.add_summary('K-5', 'this bill is stupid')
-    b.add_summary('6-12', 'this legislative document is ignorant')
+    b.add_summary('this bill is stupid', 'K-5')
+    b.add_summary('this legislative document is ignorant', '6-12')
     assert b.summaries == [{'note': 'K-5', 'text': 'this bill is stupid'},
                            {'note': '6-12', 'text': 'this legislative document is ignorant'}]
 
