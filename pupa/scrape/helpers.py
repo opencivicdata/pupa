@@ -17,11 +17,20 @@ class Legislator(Person):
 
     def pre_save(self, jurisdiction_id):
         # before saving create a membership to the current jurisdiction
+
+        #post_id='district:' + (self._chamber or '') + ':' + self._district,
+        post_kwargs = {
+            "label": self._district,
+        }
+        if self._chamber:
+            post_kwargs['chamber'] = self._chamber
+
         membership = Membership(
             person_id=self._id,
             organization_id=make_psuedo_id(classification="legislature", chamber=self._chamber),
             # post placeholder id is district:chamber:name
-            post_id='district:' + (self._chamber or '') + ':' + self._district,
+            #post_id='district:' + (self._chamber or '') + ':' + self._district,
+            post_id=make_psuedo_id(**post_kwargs),
             role=self._role)
         self._related.append(membership)
 
