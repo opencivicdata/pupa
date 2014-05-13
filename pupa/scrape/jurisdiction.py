@@ -27,12 +27,6 @@ class Jurisdiction(BaseModel):
     parent_id = None
     ignored_scraped_sessions = []
 
-    def __init__(self, **kwargs):
-        super(Jurisdiction, self).__init__()
-
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
     # add _id property to mimic other types without a user-set ID
 
     @property
