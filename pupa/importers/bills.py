@@ -11,12 +11,14 @@ class BillImporter(BaseImporter):
     related_models = {'summaries': {},
                       'other_titles': {},
                       'other_names': {},
+                      'actions': {'related_entities': {}},
                       'related_bills': {},
                       'sponsors': {},
                       'sources': {},
                       'documents': {'links': {}},
                       'versions': {'links': {}},
                      }
+    preserve_order = {'actions'}
 
     def __init__(self, jurisdiction_id, org_importer):
         super(BillImporter, self).__init__(jurisdiction_id)
@@ -42,7 +44,6 @@ class BillImporter(BaseImporter):
             data['from_organization_id'] = self.org_importer.resolve_json_id(
                 data.pop('from_organization'))
         # TODO: stop doing this
-        data.pop('actions')
         data.pop('chamber')
         return data
 

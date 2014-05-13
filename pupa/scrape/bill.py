@@ -13,6 +13,18 @@ def _cleanup_list(obj, default):
     return obj
 
 
+class Action(dict):
+
+    def add_related_entity(self, name, entity_type, entity_id=None):
+        ent = {
+            'name': name,
+            'entity_type': entity_type,
+            entity_type + '_id': entity_id,
+        }
+        self['related_entities'].append(ent)
+        return ent
+
+
 class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     """
     An Open Civic Data bill.
@@ -41,14 +53,12 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.summaries = []
         self.versions = []
 
-    def add_action(self, description, actor, date, type=None, related_entities=None):
-        self.actions.append({
-            "description": description,
-            "actor": actor,
-            "date": date,
-            "type": _cleanup_list(type, []),
-            "related_entities": related_entities or []  # validate
-        })
+    def add_action(self, description, actor, date, classification=None,
+                   related_entities=None):
+        action = Action(description=description, actor=actor, date=date,
+                        classification=_cleanup_list(classification, []), related_entities=[])
+        self.actions.append(action)
+        return action
 
     def add_related_bill(self, name, session, relation_type):
         self.related_bills.append({
@@ -59,15 +69,14 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
 
     def add_sponsor(self, name, classification, entity_type, primary,
                     chamber=None, entity_id=None):
-        ret = {
+        sp = {
             "name": name,
             "classification": classification,
             "entity_type": entity_type,
             "primary": primary,
+            entity_type + '_id': entity_id,
         }
-        if entity_type:
-            ret[entity_type + '_id'] = entity_id
-        self.sponsors.append(ret)
+        self.sponsors.append(sp)
 
     def add_subject(self, subject):
         self.subject.append(subject)

@@ -170,7 +170,7 @@ schema = {
                         "type": "string",
                         "description": "date of action"
                     },
-                    "type": {
+                    "classification": {
                         "items": {
                             "type": "string",
                             "enum": settings.BILL_ACTION_TYPES,
@@ -183,11 +183,12 @@ schema = {
                             "properties": {
                                 "name": {"type": "string",
                                          "description": "Name of entity given by source data"},
-                                "_type": {"enum": ["organization", "person"],
-                                          "type": ["string", "null"],
-                                          "description": ("Type of entity if the sponsor has been "
-                                                          "resolved to another entity in the "
-                                                          "database."), },
+                                "entity_type": {
+                                    "enum": ["organization", "person"],
+                                    "type": ["string", "null"],
+                                    "description": ("Type of entity if the sponsor has been "
+                                                    "resolved to another entity in the "
+                                                    "database."), },
                                 "id": {"type": ["string", "null"],
                                        "description": ("ID of entity if the sponsor has been "
                                                        "resolved to another entity in the "

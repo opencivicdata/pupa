@@ -29,6 +29,7 @@ class BaseImporter(object):
     _type = None
     model_class = None
     related_models = {}
+    preserve_order = {}
 
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
@@ -214,7 +215,7 @@ class BaseImporter(object):
             subfield_list:  where to get the next layer of subfields
         """
         for field, items in related.items():
-            for item in items:
+            for order, item in enumerate(items):
                 # pull off 'subrelated' (things that are related to this obj)
                 subrelated = {}
                 for subfield in subfield_dict[field]:
@@ -222,6 +223,9 @@ class BaseImporter(object):
 
                 # do any transformations on subobject
                 item = self.prepare_subobj_for_db(field, item)
+
+                if field in self.preserve_order:
+                    item['order'] = order
 
                 try:
                     subobj = getattr(obj, field).create(**item)

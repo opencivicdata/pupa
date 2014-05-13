@@ -18,6 +18,7 @@ def test_full_bill():
     j.sessions.create(name='1900')
     person = Person.objects.create(id='person-id', name='Adam Smith')
     org = Organization.objects.create(id='org-id', name='House', chamber='lower')
+    com = Organization.objects.create(id='com-id', name='Arbitrary Committee', parent=org)
 
     oldbill = ScrapeBill('HB 99', '1899', 'Axe & Tack Tax Act',
                          classification='tax bill', from_organization=org.id)
@@ -27,6 +28,9 @@ def test_full_bill():
     bill.subject = ['taxes', 'axes']
     bill.add_name('SB 9')
     bill.add_title('Tack & Axe Tax Act')
+    bill.add_action('introduced in house', 'house', '1900-04-01')
+    act = bill.add_action('sent to arbitrary committee', 'senate', '1900-04-04')
+    act.add_related_entity('arbitrary committee', 'organization', 'com-id')
     bill.add_related_bill("HB 99", session="1899", relation_type="prior-session")
     bill.add_sponsor('Adam Smith', classification='extra sponsor', entity_type='person',
                      primary=False, entity_id=person.id)
@@ -56,6 +60,14 @@ def test_full_bill():
     # other_title, other_name added
     assert b.other_titles.get().text == 'Tack & Axe Tax Act'
     assert b.other_names.get().name == 'SB 9'
+
+    # actions
+    actions = list(b.actions.all())
+    assert len(actions) == 2
+    # ensure order was preserved (if this breaks it'll be intermittent)
+    assert actions[0].description == "introduced in house"
+    assert actions[1].description == "sent to arbitrary committee"
+    assert actions[1].related_entities.get().organization == com
 
     # related_bills were added
     assert b.related_bills.all()[0].related_bill.name == 'HB 99'
