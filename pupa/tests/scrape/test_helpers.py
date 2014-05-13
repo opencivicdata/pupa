@@ -10,7 +10,9 @@ def test_legislator_related_district():
     assert l._related[0].person_id == l._id
     assert get_psuedo_id(l._related[0].organization_id) == {'chamber': '',
                                                             'classification': 'legislature'}
-    assert l._related[0].post_id == 'district::1'
+    assert get_psuedo_id(l._related[0].post_id) == {
+        "label": "1"
+    }
     assert l._related[0].role == 'member'
 
 
@@ -22,7 +24,10 @@ def test_legislator_related_chamber_district():
     assert l._related[0].person_id == l._id
     assert get_psuedo_id(l._related[0].organization_id) == {'chamber': 'upper',
                                                             'classification': 'legislature'}
-    assert l._related[0].post_id == 'district:upper:1'
+    assert get_psuedo_id(l._related[0].post_id) == {
+        "chamber": "upper",
+        "label": "1"
+    }
     assert l._related[0].role == 'member'
 
 
