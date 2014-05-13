@@ -1,16 +1,5 @@
-from six import string_types
-from .base import BaseModel, SourceMixin, AssociatedLinkMixin, make_psuedo_id
+from .base import BaseModel, SourceMixin, AssociatedLinkMixin, make_psuedo_id, cleanup_list
 from .schemas.bill import schema
-
-
-def _cleanup_list(obj, default):
-    if not obj:
-        obj = default
-    elif isinstance(obj, string_types):
-        obj = [obj]
-    elif not isinstance(obj, list):
-        obj = list(obj)
-    return obj
 
 
 class Action(dict):
@@ -40,7 +29,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.name = name
         self.session = session
         self.title = title
-        self.classification = _cleanup_list(classification, ['bill'])
+        self.classification = cleanup_list(classification, ['bill'])
 
         if from_organization and chamber:
             raise ValueError('cannot specify both chamber and from_organization')
@@ -65,7 +54,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     def add_action(self, description, actor, date, classification=None,
                    related_entities=None):
         action = Action(description=description, actor=actor, date=date,
-                        classification=_cleanup_list(classification, []), related_entities=[])
+                        classification=cleanup_list(classification, []), related_entities=[])
         self.actions.append(action)
         return action
 
