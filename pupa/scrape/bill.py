@@ -1,5 +1,5 @@
 from six import string_types
-from .base import BaseModel, SourceMixin, AssociatedLinkMixin
+from .base import BaseModel, SourceMixin, AssociatedLinkMixin, make_psuedo_id
 from .schemas.bill import schema
 
 
@@ -33,15 +33,24 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     _type = 'bill'
     _schema = schema
 
-    def __init__(self, name, session, title, from_organization=None, classification=None):
+    def __init__(self, name, session, title, chamber=None, from_organization=None,
+                 classification=None):
         super(Bill, self).__init__()
 
         self.name = name
         self.session = session
         self.title = title
-        self.chamber = None
         self.classification = _cleanup_list(classification, ['bill'])
-        self.from_organization = from_organization
+
+        if from_organization and chamber:
+            raise ValueError('cannot specify both chamber and from_organization')
+        elif chamber:
+            self.from_organization = make_psuedo_id(classification='legislature', chamber=chamber)
+        elif from_organization:
+            self.from_organization = from_organization
+        else:
+            # neither specified
+            self.from_organization = make_psuedo_id(classification='legislature')
 
         self.actions = []
         self.other_names = []
