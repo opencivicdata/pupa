@@ -1,17 +1,7 @@
 """ these are helper classes for object creation during the scrape """
 import json
+from .base import make_psuedo_id, get_psuedo_id
 from .popolo import Person, Organization, Membership
-
-
-def make_psuedo_id(**kwargs):
-    """ psuedo ids are just JSON """
-    return '~' + json.dumps(kwargs)
-
-
-def get_psuedo_id(pid):
-    if pid[0] != '~':
-        raise ValueError("psuedo id doesn't start with ~")
-    return json.loads(pid[1:])
 
 
 class Legislator(Person):

@@ -43,8 +43,7 @@ class BillImporter(BaseImporter):
         if data['from_organization']:
             data['from_organization_id'] = self.org_importer.resolve_json_id(
                 data.pop('from_organization'))
-        # TODO: stop doing this
-        data.pop('chamber')
+
         return data
 
     def prepare_subobj_for_db(self, field_name, data):

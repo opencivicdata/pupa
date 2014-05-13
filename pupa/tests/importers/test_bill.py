@@ -1,6 +1,6 @@
 import pytest
 from pupa.scrape import Bill as ScrapeBill
-from pupa.importers import BillImporter
+from pupa.importers import BillImporter, OrganizationImporter
 from opencivicdata.models import Bill, Jurisdiction, JurisdictionSession, Person, Organization
 
 
@@ -92,3 +92,20 @@ def test_full_bill():
 
     # sources
     assert b.sources.count() == 1
+
+
+@pytest.mark.django_db
+def test_bill_chamber_param():
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    j.sessions.create(name='1900')
+    org = Organization.objects.create(id='org-id', name='House', chamber='lower',
+                                      classification='legislature', jurisdiction_id='jid')
+
+    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act',
+                      classification='tax bill', chamber='lower')
+
+    oi = OrganizationImporter('jid')
+    BillImporter('jid', oi).import_data([bill.as_dict()])
+
+    assert Bill.objects.get().from_organization_id == org.id
+
