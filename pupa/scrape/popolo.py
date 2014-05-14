@@ -85,7 +85,6 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         self.gender = gender
         self.national_identity = national_identity
 
-
     def add_membership(self, organization, role='member', **kwargs):
         """
             add a membership in an organization and return the membership

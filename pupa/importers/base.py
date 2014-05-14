@@ -24,13 +24,15 @@ class BaseImporter(object):
     """ BaseImporter
 
     Override:
-        prepare_for_db(data) [optional]
         get_object(data)
+        limit_spec(spec)        [optional, required if psuedo_ids are used]
+        prepare_for_db(data)    [optional]
+        prepare_subobj_for_db   [optional]
     """
     _type = None
     model_class = None
     related_models = {}
-    preserve_order = {}
+    preserve_order = set()
 
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
@@ -45,9 +47,6 @@ class BaseImporter(object):
         self.critical = self.logger.critical
 
     # no-ops to be overriden
-    def limit_spec(self, spec):
-        return spec
-
     def prepare_for_db(self, data):
         return data
 

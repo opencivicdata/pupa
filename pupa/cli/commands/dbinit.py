@@ -1,12 +1,9 @@
 from __future__ import print_function
-import os
-import csv
-from subprocess import check_call
 
-from django.db import transaction, connection
+from django.db import connection
 from django.core.management import call_command
 
-from .base import BaseCommand, CommandError
+from .base import BaseCommand
 
 
 def drop_tables():

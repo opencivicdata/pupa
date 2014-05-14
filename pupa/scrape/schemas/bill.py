@@ -18,8 +18,10 @@ schema = {
     ),
     "properties": {
 
-        "from_organization": {"type": ["string", "null"],
-                         "description": "name of the legislative body that this bill belongs to"},
+        "from_organization": {
+            "type": ["string", "null"],
+            "description": "name of the legislative body that this bill belongs to"
+        },
 
         "session": {"type": "string",
                     "description": "associated with one of the jurisdiction's sessions"},
@@ -42,10 +44,9 @@ schema = {
 
         "title": {"type": "string", "description": "primary display title for the bill"},
 
-        "classification": {"items":
-                           {"type": "string", "enum": settings.BILL_TYPES}, "type": "array",
-                           "description": "array of types (e.g. bill, resolution)"
-                          },
+        "classification": {"items": {"type": "string", "enum": settings.BILL_TYPES},
+                           "type": "array",
+                           "description": "array of types (e.g. bill, resolution)"},
 
         "subject": {
             "items": {"type": "string"},
