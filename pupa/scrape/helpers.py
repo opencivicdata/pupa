@@ -1,5 +1,5 @@
 """ these are helper classes for object creation during the scrape """
-from .base import make_psuedo_id
+from ..utils import make_psuedo_id
 from .popolo import Person, Organization, Membership
 
 

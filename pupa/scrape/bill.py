@@ -1,4 +1,5 @@
-from .base import BaseModel, SourceMixin, AssociatedLinkMixin, make_psuedo_id, cleanup_list
+from ..utils import make_psuedo_id
+from .base import BaseModel, SourceMixin, AssociatedLinkMixin, cleanup_list
 from .schemas.bill import schema
 
 

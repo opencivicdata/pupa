@@ -4,7 +4,7 @@ import json
 import uuid
 import logging
 from django.db.models import Model
-from pupa.scrape.base import get_psuedo_id
+from pupa.utils import get_psuedo_id
 from pupa.utils.topsort import Network
 
 

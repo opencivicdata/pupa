@@ -1,7 +1,7 @@
 import pytest
 from validictory import ValidationError
 from pupa.scrape import Vote, Bill, Organization
-from pupa.scrape.base import get_psuedo_id
+from pupa.utils import get_psuedo_id
 
 
 def toy_vote():

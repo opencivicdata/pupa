@@ -1,4 +1,5 @@
-from .base import BaseModel, make_psuedo_id, cleanup_list, SourceMixin
+from ..utils import make_psuedo_id
+from .base import BaseModel, cleanup_list, SourceMixin
 from .bill import Bill
 from .popolo import Organization
 from .schemas.vote import schema

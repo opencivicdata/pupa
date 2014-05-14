@@ -1,5 +1,5 @@
 from pupa.scrape import Legislator, Committee, Person
-from pupa.scrape.helpers import get_psuedo_id
+from pupa.utils import get_psuedo_id
 
 
 def test_legislator_related_district():

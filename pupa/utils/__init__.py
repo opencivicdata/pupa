@@ -7,6 +7,17 @@ import subprocess
 from validictory.validator import SchemaValidator
 
 
+def make_psuedo_id(**kwargs):
+    """ psuedo ids are just JSON """
+    return '~' + json.dumps(kwargs)
+
+
+def get_psuedo_id(pid):
+    if pid[0] != '~':
+        raise ValueError("psuedo id doesn't start with ~")
+    return json.loads(pid[1:])
+
+
 def makedirs(dname):
     if not os.path.isdir(dname):
         os.makedirs(dname)
