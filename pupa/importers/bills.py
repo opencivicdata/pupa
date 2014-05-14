@@ -32,6 +32,10 @@ class BillImporter(BaseImporter):
 
         return self.model_class.objects.get(**spec)
 
+    def limit_spec(self, spec):
+        spec['session__jurisdiction_id'] = self.jurisdiction_id
+        return spec
+
     def prepare_for_db(self, data):
         data['name'] = fix_bill_id(data['name'])
         data['session'] = JurisdictionSession.objects.get(jurisdiction_id=self.jurisdiction_id,

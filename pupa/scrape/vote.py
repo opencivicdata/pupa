@@ -51,12 +51,13 @@ class Vote(BaseModel, SourceMixin):
                 raise ValueError("set_bill takes no arguments when using a `Bill` object")
             self.bill = bill_or_name._id
         else:
-            self.bill = make_psuedo_id(name=bill_or_name,
-                                       from_organization__classification='legislature',
-                                       from_organization__chamber=chamber)
+            kwargs = {'name': bill_or_name, 'from_organization__classification': 'legislature'}
+            if chamber:
+                kwargs['from_organization__chamber'] = chamber
+            self.bill = make_psuedo_id(**kwargs)
 
     def vote(self, option, voter):
-        self.votes.append({"option": option, "voter": voter})
+        self.votes.append({"option": option, "voter_name": voter})
 
     def yes(self, name, id=None):
         return self.vote('yes', name)
@@ -64,11 +65,10 @@ class Vote(BaseModel, SourceMixin):
     def no(self, name, id=None):
         return self.vote('no', name)
 
-    def set_count(self, option, count):
-        print(self.counts)
+    def set_count(self, option, value):
         for co in self.counts:
             if co['option'] == option:
-                co['count'] = count
+                co['value'] = value
                 break
         else:
-            self.counts.append({'option': option, 'count': count})
+            self.counts.append({'option': option, 'value': value})

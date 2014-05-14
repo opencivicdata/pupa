@@ -57,7 +57,7 @@ def test_set_count():
     v.set_count('yes', 2)
     v.set_count('no', 100)
     v.set_count('yes', 0)
-    assert v.counts == [{'option': 'yes', 'count': 0}, {'option': 'no', 'count': 100}]
+    assert v.counts == [{'option': 'yes', 'value': 0}, {'option': 'no', 'value': 100}]
 
 
 def test_set_bill_obj():
