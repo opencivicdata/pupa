@@ -21,7 +21,7 @@ schema = {
         ('Vote Counts', ["vote_counts", "roll_call"])
     ),
     "properties": {
-        'identifier': {"type": ["string", "null"], "description": "An issued identifier"},
+        'identifier': {"type": "string", "blank": True, "description": "An issued identifier"},
 
         'motion': {"type": "string",
                    "description": "description of motion (from upstream source)"},

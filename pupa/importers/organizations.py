@@ -31,13 +31,7 @@ class OrganizationImporter(BaseImporter):
             data['jurisdiction_id'] = self.jurisdiction_id
         return data
 
-    def resolve_json_id(self, json_id):
-        # handle special psuedo-ids
-        if json_id.startswith('~'):
-            spec = json.loads(json_id[1:])
-            if spec.get('classification') != 'party':
-                spec['jurisdiction_id'] = self.jurisdiction_id
-            return Organization.objects.get(**spec).id
-
-        # or just resolve the normal way
-        return super(OrganizationImporter, self).resolve_json_id(json_id)
+    def limit_spec(self, spec):
+        if spec.get('classification') != 'party':
+            spec['jurisdiction_id'] = self.jurisdiction_id
+        return spec

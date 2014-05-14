@@ -1,13 +1,13 @@
-from pupa.scrape import Vote
-from .utils import (people_by_jurisdiction_and_name,
-                    orgs_by_jurisdiction_and_name,
-                    bills_by_jurisdiction_and_name)
 from .base import BaseImporter
-
+from opencivicdata.models import VoteEvent, JurisdictionSession
 
 class VoteImporter(BaseImporter):
     _type = 'vote'
-    _model_class = Vote
+    model_class = VoteEvent
+    related_models = {'counts': {},
+                      'votes': {},
+                      'sources': {},
+                     }
 
     def __init__(self, jurisdiction_id,
                  person_importer, org_importer, bill_importer):
@@ -17,14 +17,21 @@ class VoteImporter(BaseImporter):
         self.bill_importer = bill_importer
         self.org_importer = org_importer
 
-    def get_db_spec(self, vote):
+    def get_object(self, vote):
         spec = {
-            "motion": vote.motion,
-            "chamber": vote.chamber,
-            "date": vote.date,
-            "jurisdiction_id": vote.jurisdiction_id,
+            'identifier': vote['identifier'],
+            'session__name': vote['session'],
+            'session__jurisdiction_id': self.jurisdiction_id,
         }
-        return spec
+        # TODO: use bill, session, etc.
+        return self.model_class.objects.get(**spec)
+
+    def prepare_for_db(self, data):
+        data['session'] = JurisdictionSession.objects.get(name=data.pop('session'),
+                                                          jurisdiction_id=self.jurisdiction_id)
+        data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
+        data['bill_id'] = self.bill_importer.resolve_json_id(data.pop('bill'))
+        return data
 
     def prepare_object_from_json(self, obj):
         bill = obj.get('bill', None)

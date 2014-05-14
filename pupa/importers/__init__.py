@@ -5,3 +5,4 @@ from .people import PersonImporter
 from .posts import PostImporter
 from .memberships import MembershipImporter
 from .bills import BillImporter
+from .votes import VoteImporter

@@ -8,8 +8,8 @@ class Vote(BaseModel, SourceMixin):
     _type = 'vote'
     _schema = schema
 
-    def __init__(self, session, motion, start_date, classification, outcome, bill=None,
-                 organization=None, chamber=None, **kwargs):
+    def __init__(self, session, motion, start_date, classification, outcome,
+                 identifier='', bill=None, organization=None, chamber=None, **kwargs):
         super(Vote, self).__init__()
 
         self.session = session
@@ -17,6 +17,7 @@ class Vote(BaseModel, SourceMixin):
         self.start_date = start_date
         self.classification = cleanup_list(classification, [])
         self.outcome = outcome
+        self.identifier = identifier
         self.organization = organization
 
         self.set_bill(bill)
@@ -42,15 +43,16 @@ class Vote(BaseModel, SourceMixin):
     __unicode__ = __str__
 
     def set_bill(self, bill_or_name, chamber=None):
-        # either set to bill's id or use a psuedo-id
-        if isinstance(bill_or_name, Bill):
+        if not bill_or_name:
+            self.bill = None
+        elif isinstance(bill_or_name, Bill):
             if chamber:
                 raise ValueError("set_bill takes no arguments when using a `Bill` object")
             self.bill = bill_or_name._id
         else:
             self.bill = make_psuedo_id(name=bill_or_name,
-                                       bill__from_organization_classification='legislature',
-                                       bill__from_organization_chamber=chamber)
+                                       from_organization__classification='legislature',
+                                       from_organization__chamber=chamber)
 
     def vote(self, option, voter):
         self.votes.append({"option": option, "voter": voter})

@@ -21,6 +21,7 @@ def test_simple_vote():
     assert len(v.votes) == 3
     assert len(v.counts) == 1
     assert get_psuedo_id(v.organization) == {'classification': 'legislature'}
+    assert v.bill == None
 
     v.validate()
     assert 'we get here'
@@ -79,8 +80,8 @@ def test_set_bill_psuedo_id():
     v = toy_vote()
     v.set_bill('HB 1', chamber='lower')
     assert get_psuedo_id(v.bill) == {'name': 'HB 1',
-                                     'bill__from_organization_classification': 'legislature',
-                                     'bill__from_organization_chamber': 'lower'
+                                     'from_organization__classification': 'legislature',
+                                     'from_organization__chamber': 'lower'
                                     }
 
 

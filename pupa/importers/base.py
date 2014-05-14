@@ -4,6 +4,7 @@ import json
 import uuid
 import logging
 from django.db.models import Model
+from pupa.scrape.base import get_psuedo_id
 from pupa.utils.topsort import Network
 
 
@@ -43,6 +44,16 @@ class BaseImporter(object):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
+    # no-ops to be overriden
+    def limit_spec(self, spec):
+        return spec
+
+    def prepare_for_db(self, data):
+        return data
+
+    def prepare_subobj_for_db(self, field_name, data):
+        return data
+
     def resolve_json_id(self, json_id):
         """
             Given an id found in scraped JSON, return a DB id for the object.
@@ -59,6 +70,11 @@ class BaseImporter(object):
         if not json_id:
             return None
 
+        if json_id.startswith('~'):
+            spec = get_psuedo_id(json_id)
+            spec = self.limit_spec(spec)
+            return self.model_class.objects.get(**spec).id
+
         # get the id that the duplicate points to, or use self
         json_id = self.duplicates.get(json_id, json_id)
 
@@ -67,13 +83,6 @@ class BaseImporter(object):
         except KeyError:
             raise ValueError('cannot resolve id: {0}'.format(json_id))
 
-    def prepare_for_db(self, data):
-        # no-op to be overridden
-        return data
-
-    def prepare_subobj_for_db(self, field_name, data):
-        # no-op to be overriden
-        return data
 
     def import_directory(self, datadir):
         """ import a JSON directory into the database """

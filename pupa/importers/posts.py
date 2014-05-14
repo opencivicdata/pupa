@@ -20,12 +20,6 @@ class PostImporter(BaseImporter):
         return self.model_class.objects.get(organization_id=data['organization_id'],
                                             label=data['label'])
 
-    def resolve_json_id(self, json_id):
-        # handle special psuedo-ids
-        if json_id.startswith('~'):
-            spec = json.loads(json_id[1:])
-            spec['organization__jurisdiction_id'] = self.jurisdiction_id
-            return Post.objects.get(**spec).id
-
-        # or just resolve the normal way
-        return super(PostImporter, self).resolve_json_id(json_id)
+    def limit_spec(self, spec):
+        spec['organization__jurisdiction_id'] = self.jurisdiction_id
+        return spec
