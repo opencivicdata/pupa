@@ -1,6 +1,5 @@
 from django.db.models import Q
-from opencivicdata.models import (Person, PersonIdentifier, PersonName, PersonContactDetail,
-                                  PersonLink, PersonSource)
+from opencivicdata.models import Person
 from .base import BaseImporter
 
 

@@ -83,7 +83,7 @@ def test_add_associated_link_on_duplicate_error():
                            mimetype='text/html', on_duplicate='error')
 
     with pytest.raises(ValueError):
-        m._add_associated_link('_associated', 'something else', 'http://example.com', 
+        m._add_associated_link('_associated', 'something else', 'http://example.com',
                                mimetype='text/html', on_duplicate='error')
 
 
@@ -91,7 +91,7 @@ def test_add_associated_link_on_duplicate_ignore():
     m = GenericModel()
     m._add_associated_link('_associated', 'something', 'http://example.com',
                            mimetype='text/html', on_duplicate='ignore')
-    m._add_associated_link('_associated', 'something else', 'http://example.com', 
+    m._add_associated_link('_associated', 'something else', 'http://example.com',
                            mimetype='text/html', on_duplicate='ignore')
     # one 'document' added, single link for it, keeps first name
     assert len(m._associated) == 1

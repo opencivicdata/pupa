@@ -1,4 +1,4 @@
-from opencivicdata.models import Jurisdiction, JurisdictionSession
+from opencivicdata.models import Jurisdiction
 from .base import BaseImporter
 
 

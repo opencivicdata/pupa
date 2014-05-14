@@ -1,5 +1,4 @@
 import pytest
-from validictory import ValidationError
 from pupa.scrape import Vote, Bill, Organization
 from pupa.utils import get_psuedo_id
 
@@ -21,7 +20,7 @@ def test_simple_vote():
     assert len(v.votes) == 3
     assert len(v.counts) == 1
     assert get_psuedo_id(v.organization) == {'classification': 'legislature'}
-    assert v.bill == None
+    assert v.bill is None
 
     v.validate()
     assert 'we get here'
@@ -42,7 +41,6 @@ def test_vote_org_dict():
 
 
 def test_vote_org_chamber():
-    o = Organization('something')
     v = Vote(session="2009", motion="passage of the bill", start_date="2009-01-07",
              outcome='pass', classification='passage', chamber='upper')
     assert get_psuedo_id(v.organization) == {'classification': 'legislature', 'chamber': 'upper'}
@@ -50,8 +48,8 @@ def test_vote_org_chamber():
 
 def test_org_and_chamber_conflict():
     with pytest.raises(ValueError):
-        v = Vote(session="2009", motion="passage of the bill", start_date="2009-01-07",
-                 outcome='pass', classification='passage', organization='test', chamber='lower')
+        Vote(session="2009", motion="passage of the bill", start_date="2009-01-07",
+             outcome='pass', classification='passage', organization='test', chamber='lower')
 
 
 def test_set_count():
@@ -81,8 +79,7 @@ def test_set_bill_psuedo_id():
     v.set_bill('HB 1', chamber='lower')
     assert get_psuedo_id(v.bill) == {'name': 'HB 1',
                                      'from_organization__classification': 'legislature',
-                                     'from_organization__chamber': 'lower'
-                                    }
+                                     'from_organization__chamber': 'lower'}
 
 
 def test_str():

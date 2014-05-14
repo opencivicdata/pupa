@@ -1,18 +1,12 @@
-import json
-from opencivicdata.models import (Organization, OrganizationIdentifier, OrganizationName,
-                                  OrganizationContactDetail, OrganizationLink, OrganizationSource)
+from opencivicdata.models import Organization
 from .base import BaseImporter
 
 
 class OrganizationImporter(BaseImporter):
     _type = 'organization'
     model_class = Organization
-    related_models = {'identifiers': {},
-                      'other_names': {},
-                      'contact_details': {},
-                      'links': {},
-                      'sources': {}
-                     }
+    related_models = {'identifiers': {}, 'other_names': {}, 'contact_details': {}, 'links': {},
+                      'sources': {}}
 
     def get_object(self, org):
         spec = {'classification': org['classification'],

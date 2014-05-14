@@ -2,6 +2,7 @@ import pytest
 from pupa.scrape import Person, Organization, Membership, Post
 from validictory import ValidationError
 
+
 def test_basic_post():
     post = Post('1', 'Representative', 'fake_org')
     assert '1' in str(post)

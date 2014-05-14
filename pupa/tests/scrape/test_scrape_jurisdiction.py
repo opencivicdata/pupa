@@ -1,5 +1,4 @@
 from collections import defaultdict
-import pytest
 from pupa.scrape import Jurisdiction, Organization, JurisdictionScraper
 
 

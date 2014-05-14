@@ -1,5 +1,4 @@
-import json
-from opencivicdata.models import Post, PostContactDetail, PostLinks
+from opencivicdata.models import Post
 from .base import BaseImporter
 
 

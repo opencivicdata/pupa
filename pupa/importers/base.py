@@ -3,7 +3,6 @@ import glob
 import json
 import uuid
 import logging
-from django.db.models import Model
 from pupa.utils import get_psuedo_id
 from pupa.utils.topsort import Network
 
@@ -81,7 +80,6 @@ class BaseImporter(object):
             return self.json_to_db_id[json_id]
         except KeyError:
             raise ValueError('cannot resolve id: {0}'.format(json_id))
-
 
     def import_directory(self, datadir):
         """ import a JSON directory into the database """
@@ -213,7 +211,6 @@ class BaseImporter(object):
             self._create_related(obj, related, self.related_models)
 
         return obj, what
-
 
     def _create_related(self, obj, related, subfield_dict):
         """

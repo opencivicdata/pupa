@@ -3,6 +3,7 @@ import pytest
 from pupa.scrape import Person, Organization, Bill, Jurisdiction
 from pupa.scrape.base import Scraper, ScrapeError, BaseBillScraper
 
+
 class FakeJurisdiction(Jurisdiction):
     jurisdiction_id = 'jurisdiction'
 juris = FakeJurisdiction()

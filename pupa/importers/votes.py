@@ -1,13 +1,11 @@
 from .base import BaseImporter
 from opencivicdata.models import VoteEvent, JurisdictionSession
 
+
 class VoteImporter(BaseImporter):
     _type = 'vote'
     model_class = VoteEvent
-    related_models = {'counts': {},
-                      'votes': {},
-                      'sources': {},
-                     }
+    related_models = {'counts': {}, 'votes': {}, 'sources': {}}
 
     def __init__(self, jurisdiction_id,
                  person_importer, org_importer, bill_importer):

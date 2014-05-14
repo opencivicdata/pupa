@@ -1,4 +1,4 @@
-from opencivicdata.models import Membership, MembershipContactDetail, MembershipLink
+from opencivicdata.models import Membership
 from .base import BaseImporter
 
 
@@ -18,8 +18,7 @@ class MembershipImporter(BaseImporter):
                 'person_id': membership['person_id'],
                 'label': membership['label'],
                 # if this is a historical role, only update historical roles
-                'end_date': membership['end_date']
-               }
+                'end_date': membership['end_date']}
 
         # post_id is optional - might exist in DB but not scraped here?
         if membership['post_id']:

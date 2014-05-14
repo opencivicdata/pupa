@@ -1,7 +1,5 @@
 from pupa.utils import fix_bill_id
-from opencivicdata.models import (Bill, BillSummary, BillTitle, BillName, RelatedBill,
-                                  BillSponsor, BillDocument, BillVersion, BillDocumentLink,
-                                  BillVersionLink, BillSource, JurisdictionSession)
+from opencivicdata.models import Bill, JurisdictionSession
 from .base import BaseImporter
 
 
@@ -16,8 +14,7 @@ class BillImporter(BaseImporter):
                       'sponsors': {},
                       'sources': {},
                       'documents': {'links': {}},
-                      'versions': {'links': {}},
-                     }
+                      'versions': {'links': {}}}
     preserve_order = {'actions'}
 
     def __init__(self, jurisdiction_id, org_importer):
