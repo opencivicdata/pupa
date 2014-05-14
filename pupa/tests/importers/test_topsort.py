@@ -1,4 +1,3 @@
-import random
 import pytest
 from pupa.utils.topsort import Network, CyclicGraphError
 

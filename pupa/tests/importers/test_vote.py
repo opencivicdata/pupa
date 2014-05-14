@@ -1,7 +1,7 @@
 import pytest
 from pupa.scrape import Vote as ScrapeVote
 from pupa.importers import VoteImporter, BillImporter
-from opencivicdata.models import VoteEvent, Jurisdiction, JurisdictionSession, Person, Organization
+from opencivicdata.models import VoteEvent, Jurisdiction, Person, Organization
 
 
 class DumbMockImporter(object):
@@ -26,3 +26,5 @@ def test_full_vote():
     bi = BillImporter('jid', dmi)
 
     VoteImporter('jid', dmi, dmi, bi).import_data([vote.as_dict()])
+
+    assert VoteEvent.objects.count() == 1

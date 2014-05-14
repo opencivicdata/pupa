@@ -1,7 +1,7 @@
 import pytest
 from pupa.scrape import Bill as ScrapeBill
 from pupa.importers import BillImporter, OrganizationImporter
-from opencivicdata.models import Bill, Jurisdiction, JurisdictionSession, Person, Organization
+from opencivicdata.models import Bill, Jurisdiction, Person, Organization
 
 
 class DumbMockImporter(object):
@@ -77,8 +77,8 @@ def test_full_bill():
     assert len(sponsors) == 2
     for sponsor in sponsors:
         if sponsor.primary:
-            assert sponsor.person == None
-            assert sponsor.organization == None
+            assert sponsor.person is None
+            assert sponsor.organization is None
         else:
             assert sponsor.person == person
 
@@ -108,4 +108,3 @@ def test_bill_chamber_param():
     BillImporter('jid', oi).import_data([bill.as_dict()])
 
     assert Bill.objects.get().from_organization_id == org.id
-

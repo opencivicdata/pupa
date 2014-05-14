@@ -83,7 +83,7 @@ def test_resolve_json_id():
     # duplicate should resolve to same id
     assert pi.resolve_json_id(p2_id) == db_id
     # a null id should map to None
-    assert pi.resolve_json_id(None) == None
+    assert pi.resolve_json_id(None) is None
     # no such id
     with pytest.raises(ValueError):
         pi.resolve_json_id('this-is-invalid')

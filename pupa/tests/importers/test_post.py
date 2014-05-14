@@ -33,10 +33,10 @@ def test_full_post():
 
 @pytest.mark.django_db
 def test_deduplication():
-    us = Organization.objects.create(id='us', name="United States Executive Branch",
-                                     classification="executive", jurisdiction_id="us")
-    nc = Organization.objects.create(id='nc', name="North Carolina Executive Branch",
-                                      classification="executive", jurisdiction_id="nc")
+    Organization.objects.create(id='us', name="United States Executive Branch",
+                                classification="executive", jurisdiction_id="us")
+    Organization.objects.create(id='nc', name="North Carolina Executive Branch",
+                                classification="executive", jurisdiction_id="nc")
     pres = ScrapePost('executive', 'President', '~{"classification": "executive"}')
     vp = ScrapePost('vice-executive', 'Vice President', '~{"classification": "executive"}')
     gov = ScrapePost('executive', 'Governor', '~{"classification": "executive"}')

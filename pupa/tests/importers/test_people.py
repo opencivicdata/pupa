@@ -43,7 +43,7 @@ def create_person():
     p = Person.objects.create(name='Dwayne Johnson')
     p.other_names.create(name='Rocky')
     o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
-    m = Membership.objects.create(person=p, organization=o)
+    Membership.objects.create(person=p, organization=o)
 
 
 @pytest.mark.django_db
@@ -55,6 +55,7 @@ def test_deduplication_same_name():
     PersonImporter('jurisdiction-id').import_data([pd])
     assert Person.objects.all().count() == 1
 
+
 @pytest.mark.django_db
 def test_deduplication_other_name_exists():
     create_person()
@@ -63,6 +64,7 @@ def test_deduplication_other_name_exists():
     pd = person.as_dict()
     PersonImporter('jurisdiction-id').import_data([pd])
     assert Person.objects.all().count() == 1
+
 
 @pytest.mark.django_db
 def test_deduplication_other_name_overlaps():
@@ -74,6 +76,7 @@ def test_deduplication_other_name_overlaps():
     PersonImporter('jurisdiction-id').import_data([pd])
     assert Person.objects.all().count() == 1
 
+
 @pytest.mark.django_db
 def test_deduplication_no_name_overlap():
     create_person()
@@ -82,6 +85,7 @@ def test_deduplication_no_name_overlap():
     pd = person.as_dict()
     PersonImporter('jurisdiction-id').import_data([pd])
     assert Person.objects.all().count() == 2
+
 
 @pytest.mark.django_db
 def test_deduplication_no_jurisdiction_overlap():

@@ -1,7 +1,7 @@
 import pytest
 from pupa.scrape import Membership as ScrapeMembership
-from pupa.importers import MembershipImporter, PersonImporter, PostImporter, OrganizationImporter
-from opencivicdata.models import Organization, Post, Person, Membership
+from pupa.importers import MembershipImporter
+from opencivicdata.models import Organization, Post, Person
 
 
 class DumbMockImporter(object):
@@ -25,7 +25,8 @@ def test_full_membership():
     m1.add_link('http://example.com/link')
 
     # add a membership direct to an organization
-    m2 = ScrapeMembership(person_id=robot.id, organization_id=org.id, label='member', role='member')
+    m2 = ScrapeMembership(person_id=robot.id, organization_id=org.id, label='member',
+                          role='member')
 
     dumb_imp = DumbMockImporter()
     memimp = MembershipImporter('fnd-jid', dumb_imp, dumb_imp, dumb_imp)
