@@ -14,6 +14,7 @@ def toy_bill():
 def test_basic_valid_bill():
     b = toy_bill()
     b.validate()
+    assert 'we got here'
 
 
 def test_bill_type_setting():

@@ -4,7 +4,7 @@ from pupa.importers import JurisdictionImporter
 from opencivicdata.models import Jurisdiction
 
 
-class TestJurisdiction(JurisdictionBase):
+class FakeJurisdiction(JurisdictionBase):
     jurisdiction_id = 'jurisdiction-id'
     division_id = 'division-id'
     name = 'test'
@@ -13,7 +13,7 @@ class TestJurisdiction(JurisdictionBase):
 
 @pytest.mark.django_db
 def test_jurisdiction_import():
-    tj = TestJurisdiction()
+    tj = FakeJurisdiction()
     juris_dict = tj.as_dict()
     JurisdictionImporter('jurisdiction-id').import_data([juris_dict])
 

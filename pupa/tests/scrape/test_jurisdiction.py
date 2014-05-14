@@ -3,7 +3,7 @@ import pytest
 from pupa.scrape import Jurisdiction, Organization, JurisdictionScraper
 
 
-class TestJurisdiction(Jurisdiction):
+class FakeJurisdiction(Jurisdiction):
     jurisdiction_id = 'test'
     name = 'Test'
     url = 'http://example.com'
@@ -17,7 +17,7 @@ class TestJurisdiction(Jurisdiction):
 
 def test_basics():
     # id property and string
-    j = TestJurisdiction()
+    j = FakeJurisdiction()
 
     j.jurisdiction_id = 'test'
     assert j._id == 'test'
@@ -28,7 +28,7 @@ def test_basics():
 
 
 def test_as_dict():
-    j = TestJurisdiction()
+    j = FakeJurisdiction()
     d = j.as_dict()
 
     assert d['_id'] == j._id
@@ -52,6 +52,7 @@ def test_as_dict():
 #    with pytest.raises(ValueError):
 #        j.get_organization(party='Green')
 
+
 def test_jurisdiction_unicam_scrape():
     class UnicameralJurisdiction(Jurisdiction):
         jurisdiction_id = 'unicam'
@@ -73,7 +74,7 @@ def test_jurisdiction_unicam_scrape():
 
 
 def test_jurisdiction_bicameral_scrape():
-    j = TestJurisdiction()
+    j = FakeJurisdiction()
     js = JurisdictionScraper(j, '/tmp/')
     objects = list(js.scrape())
     obj_names = set()
@@ -85,5 +86,5 @@ def test_jurisdiction_bicameral_scrape():
 
     # ensure Jurisdiction and 4 organizations were found
     assert obj_names == {'Test', 'House', 'Senate', 'Democratic', 'Republican'}
-    assert obj_types[TestJurisdiction] == 1
+    assert obj_types[FakeJurisdiction] == 1
     assert obj_types[Organization] == 4

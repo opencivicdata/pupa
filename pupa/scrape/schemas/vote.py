@@ -5,13 +5,13 @@
 from .common import sources, extras
 
 
-VOTE_TYPES = ['passage', 'amendment', 'reading:2', 'reading:3',
-              'veto_override', 'other']
+VOTE_TYPES = ['passage', 'amendment', 'reading:2', 'reading:3', 'veto_override', 'other']
 ROLLCALL_TYPES = ['yes', 'no', 'abstain', 'not-voting', 'other']
+VOTE_OUTCOMES = ['pass', 'fail']
 
 
 schema = {
-    "description": "schema for vote data",
+    "description": "schema for vote data (based on Popolo VoteEvent)",
     "type": "object",
     "_order": (
         ('Basic Fields', ["organization", "organization_id", "_type", "session",
@@ -21,63 +21,23 @@ schema = {
         ('Vote Counts', ["vote_counts", "roll_call"])
     ),
     "properties": {
-
-        'organization': {"type": ["string", "null"],
-                         "description": "name of the voting organization"},
-
-        'organization_id': {"type": ["string", "null"],
-                            "description": "id of the voting organization"},
-
-        '_type': {"enum": ["vote"], "type": "string",
-                  "description": "All vote objects must have a _type field set to vote."},
-
-        'session': {"type": "string",
-                    "description": "Associated with one of the jurisdiction's sessions"},
-
-        'updated_at': {"type": ["string", "datetime"], "required": False,
-                       "description": "the time that the object was last updated"},
-
-        'created_at': {"type": ["string", "datetime"], "required": False,
-                       "description": "the time that this object was first created"},
-
-        'chamber': {
-            "enum": ["upper", "lower", "joint"], "type": ["string", "null"],
-            "description": ("chamber vote took place in (if legislature is bicameral, "
-                            "otherwise null)"), },
-
-        'date': {"pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$", "type": "string",
-                 "description": "date of the action"},
+        'identifier': {"type": ["string", "null"], "description": "An issued identifier"},
 
         'motion': {"type": "string",
                    "description": "description of motion (from upstream source)"},
 
-        'type': {"items": {"type": "string", "enum": VOTE_TYPES}, "type": "array",
-                 "description": "array of types"},
 
-        'passed': {"type": "boolean", "description": "boolean indicating if vote passed"},
+        'start_date': {"pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$", "type": "string",
+                       "description": "date of the action"},
+        'end_date': {"pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$", "type": "string",
+                     "description": "date of the action"},
 
-        'bill': {
-            "type": ["object", "null"],
-            "properties": {
-                "id": {"type": ["string", "null"],
-                       "description": ("bill's internal id if bill was matched with an object in "
-                                       "the database")},
-                "name": {"type": "string", "description": "bill name (e.g. HB 21)"},
-                "chamber": {
-                    "enum": ["upper", "lower"], "type": ["string", "null"],
-                    "description": ("bill's chamber if vote was on a bill "
-                                    "(if legislature is bicameral, otherwise null)")},
-            },
-            "description": ("Related bill, votes will have a non-null bill object if"
-                            "they are related to a bill. Bills will have the following fields:"),
-        },
-
-        'vote_counts': {
+        'counts': {
             "items": {
                 "properties": {
-                    "vote_type": {"type": "string", "enum": ROLLCALL_TYPES,
-                                  "description": "(e.g. yes, no, not-voting)"},
-                    "count": {"type": "integer", "minimum": 0,
+                    "option": {"type": "string", "enum": ROLLCALL_TYPES,
+                               "description": "(e.g. yes, no, not-voting)"},
+                    "value": {"type": "integer", "minimum": 0,
                               "description": "number of people voting this way"}
                 },
                 "type": "object"
@@ -85,31 +45,38 @@ schema = {
             "description": ("list of objects with vote_type and count properties"),
         },
 
-        'roll_call': {
+        'votes': {
             "items": {
                 "type": "object",
                 "properties": {
-                    "vote_type": {"type": "string", "enum": ROLLCALL_TYPES,
-                                  "description": "(e.g. yes, no, not-voting)"},
-
-                    #     * **name** - person's name as provided by source
-                    #     * **id** - person's internal id if they've been
-                    #       matched to an entity in the database
-                    "person": {
-                        "type": "object",
-                        "properties": {
-                            "name": {"type": "string",
-                                     "description": "person's name as provided by the source"},
-                            "id": {"type": ["string", "null"],
-                                   "description": ("person's internal id if they've been matched "
-                                                   "to an entity in the database")},
-                        },
-                        "description": "person object representing the voter",
-                    }
+                    "option": {"type": "string", "enum": ROLLCALL_TYPES,
+                               "description": "(e.g. yes, no, not-voting)"},
+                    "voter": {"type": "string", "description": "name of voter"},
+                    # TODO: can add the party, role, weight, pairing info
                 },
             },
             "description": "list of individual legislator votes",
         },
+
+        # added fields
+        'classification': {"items": {"type": "string", "enum": VOTE_TYPES}, "type": "array",
+                           "description": "array of types"},
+        'outcome': {"type": "string", "enum": VOTE_OUTCOMES,
+                    "description": "outcome of vote (e.g. pass, fail)"},
+        'organization': {"type": ["string", "null"],
+                         "description": "name of the voting organization"},
+        'bill': {"type": ["string", "null"],
+                 "description": "related bill (optional)"},
+        'session': {"type": "string",
+                    "description": "Associated with one of the jurisdiction's sessions"},
+
+
+        # common fields
+        'updated_at': {"type": ["string", "datetime"], "required": False,
+                       "description": "the time that the object was last updated"},
+
+        'created_at': {"type": ["string", "datetime"], "required": False,
+                       "description": "the time that this object was first created"},
 
         'sources': sources,
         'extras': extras,

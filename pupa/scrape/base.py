@@ -4,6 +4,7 @@ import uuid
 import logging
 import datetime
 from collections import defaultdict, OrderedDict
+from six import string_types
 
 import scrapelib
 
@@ -12,6 +13,16 @@ from pupa import utils, settings
 
 class ScrapeError(Exception):
     pass
+
+
+def cleanup_list(obj, default):
+    if not obj:
+        obj = default
+    elif isinstance(obj, string_types):
+        obj = [obj]
+    elif not isinstance(obj, list):
+        obj = list(obj)
+    return obj
 
 
 def make_psuedo_id(**kwargs):
