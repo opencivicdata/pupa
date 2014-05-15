@@ -26,7 +26,6 @@ class BaseImporter(object):
         get_object(data)
         limit_spec(spec)                [optional, required if psuedo_ids are used]
         prepare_for_db(data)            [optional]
-        prepare_subobj_for_db           [optional]
         postimport()                    [optional]
     """
     _type = None
@@ -47,9 +46,6 @@ class BaseImporter(object):
 
     # no-ops to be overriden
     def prepare_for_db(self, data):
-        return data
-
-    def prepare_subobj_for_db(self, field_name, data):
         return data
 
     def postimport(self):
@@ -237,9 +233,6 @@ class BaseImporter(object):
                 subrelated = {}
                 for subfield in subfield_dict[field]:
                     subrelated[subfield] = item.pop(subfield)
-
-                # do any transformations on subobject
-                item = self.prepare_subobj_for_db(field, item)
 
                 if field in self.preserve_order:
                     item['order'] = order
