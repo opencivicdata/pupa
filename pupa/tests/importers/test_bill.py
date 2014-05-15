@@ -70,8 +70,9 @@ def test_full_bill():
     # related_bills were added
     rb = b.related_bills.get()
     assert rb.name == 'HB 99'
-    # TODO: reinstate this test once resolvers exist
-    #assert rb.related_bill.name == 'HB 99'
+
+    # and bill got resolved
+    assert rb.related_bill.name == 'HB 99'
 
     # sponsors added, linked & unlinked
     sponsors = b.sponsors.all()

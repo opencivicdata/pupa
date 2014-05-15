@@ -24,9 +24,10 @@ class BaseImporter(object):
 
     Override:
         get_object(data)
-        limit_spec(spec)        [optional, required if psuedo_ids are used]
-        prepare_for_db(data)    [optional]
-        prepare_subobj_for_db   [optional]
+        limit_spec(spec)                [optional, required if psuedo_ids are used]
+        prepare_for_db(data)            [optional]
+        prepare_subobj_for_db           [optional]
+        postimport()                    [optional]
     """
     _type = None
     model_class = None
@@ -51,7 +52,7 @@ class BaseImporter(object):
     def prepare_subobj_for_db(self, field_name, data):
         return data
 
-    def postprocess_objects(self, objects):
+    def postimport(self):
         pass
 
     def resolve_json_id(self, json_id):
@@ -153,8 +154,8 @@ class BaseImporter(object):
             if what != 'noop':
                 new_or_modified.append(obj)
 
-        # all objects are loaded, a perfect time to do inter-object resolution
-        self.postprocess_objects(new_or_modified)
+        # all objects are loaded, a perfect time to do inter-object resolution and other tasks
+        self.postimport()
 
         return {self._type: results}
 

@@ -1,5 +1,5 @@
 from pupa.utils import fix_bill_id
-from opencivicdata.models import Bill, JurisdictionSession
+from opencivicdata.models import Bill, JurisdictionSession, RelatedBill
 from .base import BaseImporter
 
 
@@ -46,3 +46,18 @@ class BillImporter(BaseImporter):
                 data.pop('from_organization'))
 
         return data
+
+    def postimport(self):
+        # go through all RelatedBill objs that are attached to a bill in this jurisdiction and
+        # are currently unresolved
+        for rb in RelatedBill.objects.filter(bill__session__jurisdiction_id=self.jurisdiction_id,
+                                             related_bill=None):
+            candidates = list(Bill.objects.filter(session__name=rb.session,
+                                                  session__jurisdiction_id=self.jurisdiction_id,
+                                                  name=rb.name))
+            if len(candidates) == 1:
+                rb.related_bill = candidates[0]
+                rb.save()
+            elif len(candidates) > 1:
+                # if we ever see this, we need to add additional fields on the relation
+                raise RuntimeError('multiple related_bill candidates found for {}'.format(rb))
