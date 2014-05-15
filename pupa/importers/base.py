@@ -163,8 +163,8 @@ class BaseImporter(object):
         # add fields/etc.
         data = self.prepare_for_db(data)
 
-        # TODO: add a JSON field for extras
-        data.pop('extras', None)
+        # convert extras to JSON
+        data['extras'] = json.dumps(data['extras'])
 
         try:
             obj = self.get_object(data)

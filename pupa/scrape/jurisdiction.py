@@ -15,6 +15,7 @@ class Jurisdiction(BaseModel):
     sessions = []
     feature_flags = []
     building_maps = []
+    extras = {}
     other_names = []
     _meta = {}
 
@@ -41,7 +42,9 @@ class Jurisdiction(BaseModel):
         return {'_id': self._id, 'id': self._id, 'name': self.name, 'url': self.url,
                 'division_id': self.division_id, 'sessions': self.sessions,
                 'feature_flags': self.feature_flags,
-                'building_maps': self.building_maps}
+                'building_maps': self.building_maps,
+                'extras': self.extras,
+               }
 
     def get_session_list(self):
         raise NotImplementedError('get_session_list is not implemented')    # pragma: no cover
