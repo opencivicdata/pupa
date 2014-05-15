@@ -35,7 +35,6 @@ class BaseImporter(object):
 
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
-        self.results = {'insert': 0, 'update': 0, 'noop': 0}
         self.json_to_db_id = {}
         self.duplicates = {}
         self.logger = logging.getLogger("pupa")
@@ -51,6 +50,9 @@ class BaseImporter(object):
 
     def prepare_subobj_for_db(self, field_name, data):
         return data
+
+    def postprocess_objects(self, objects):
+        pass
 
     def resolve_json_id(self, json_id):
         """
@@ -98,6 +100,10 @@ class BaseImporter(object):
         data_by_id = {}
         # hash(json): id
         seen_hashes = {}
+        # counts of each
+        results = {'insert': 0, 'update': 0, 'noop': 0}
+        # list of all new or modified objects
+        new_or_modified = []
 
         # load all json, mapped by json_id
         for data in dicts:
@@ -143,9 +149,14 @@ class BaseImporter(object):
                 data['parent_id'] = self.resolve_json_id(parent_id)
             obj, what = self._import_item(data)
             self.json_to_db_id[json_id] = obj.id
-            self.results[what] += 1
+            results[what] += 1
+            if what != 'noop':
+                new_or_modified.append(obj)
 
-        return {self._type: self.results}
+        # all objects are loaded, a perfect time to do inter-object resolution
+        self.postprocess_objects(new_or_modified)
+
+        return {self._type: results}
 
     def _import_item(self, data):
         """ internal function used by import_data """

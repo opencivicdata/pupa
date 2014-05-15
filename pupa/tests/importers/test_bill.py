@@ -44,9 +44,7 @@ def test_full_bill():
 
     # import bill
     oi = DumbMockImporter()
-    # import like this so we're sure oldbill gets imported first
-    BillImporter('jid', oi).import_data([oldbill.as_dict()])
-    BillImporter('jid', oi).import_data([bill.as_dict()])
+    BillImporter('jid', oi).import_data([oldbill.as_dict(), bill.as_dict()])
 
     # get bill from db and assert it imported correctly
     b = Bill.objects.get(name='HB 1')
@@ -70,7 +68,10 @@ def test_full_bill():
     assert actions[1].related_entities.get().organization == com
 
     # related_bills were added
-    assert b.related_bills.all()[0].related_bill.name == 'HB 99'
+    rb = b.related_bills.get()
+    assert rb.name == 'HB 99'
+    # TODO: reinstate this test once resolvers exist
+    #assert rb.related_bill.name == 'HB 99'
 
     # sponsors added, linked & unlinked
     sponsors = b.sponsors.all()

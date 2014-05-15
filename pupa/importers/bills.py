@@ -46,11 +46,3 @@ class BillImporter(BaseImporter):
                 data.pop('from_organization'))
 
         return data
-
-    def prepare_subobj_for_db(self, field_name, data):
-        if field_name == 'related_bills':
-            newdata = {'relation_type': data['relation_type']}
-            newdata['related_bill'] = self.get_object(data)
-            return newdata
-
-        return data

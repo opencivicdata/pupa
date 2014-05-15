@@ -60,6 +60,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         return action
 
     def add_related_bill(self, name, session, relation_type):
+        # will we need jurisdiction, organization?
         self.related_bills.append({
             "name": name,
             "session": session,
