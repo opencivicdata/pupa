@@ -212,10 +212,7 @@ class BaseImporter(object):
         # need to create the data
         else:
             what = 'insert'
-            if 'id' not in data:
-                data['id'] = 'ocd-{0}/{1}'.format(self._type, uuid.uuid1())
             obj = self.model_class.objects.create(**data)
-
             self._create_related(obj, related, self.related_models)
 
         return obj, what
