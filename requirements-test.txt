@@ -1,7 +1,7 @@
 six
 validictory
 scrapelib
-http://www.djangoproject.com/download/1.7b4/tarball/
+http://www.djangoproject.com/download/1.7b3/tarball/
 psycopg2
 djorm-ext-pgarray
 jsonfield
