@@ -64,7 +64,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.related_bills.append({
             "name": name,
             "session": session,
-            "relation_type": relation_type  # enum
+            "relation_type": relation_type
         })
 
     def add_sponsor(self, name, classification, entity_type, primary,

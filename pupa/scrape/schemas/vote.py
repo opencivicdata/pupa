@@ -3,11 +3,7 @@
 """
 
 from .common import sources, extras
-
-
-VOTE_TYPES = ['passage', 'amendment', 'reading:2', 'reading:3', 'veto_override', 'other']
-ROLLCALL_TYPES = ['yes', 'no', 'abstain', 'not-voting', 'other']
-VOTE_OUTCOMES = ['pass', 'fail']
+from opencivicdata import common
 
 
 schema = {
@@ -35,7 +31,7 @@ schema = {
         'counts': {
             "items": {
                 "properties": {
-                    "option": {"type": "string", "enum": ROLLCALL_TYPES,
+                    "option": {"type": "string", "enum": common.VOTE_OPTIONS,
                                "description": "(e.g. yes, no, not-voting)"},
                     "value": {"type": "integer", "minimum": 0,
                               "description": "number of people voting this way"}
@@ -49,7 +45,7 @@ schema = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "option": {"type": "string", "enum": ROLLCALL_TYPES,
+                    "option": {"type": "string", "enum": common.VOTE_OPTIONS,
                                "description": "(e.g. yes, no, not-voting)"},
                     "voter": {"type": "string", "description": "name of voter"},
                     # TODO: can add the party, role, weight, pairing info
@@ -59,9 +55,9 @@ schema = {
         },
 
         # added fields
-        'classification': {"items": {"type": "string", "enum": VOTE_TYPES}, "type": "array",
-                           "description": "array of types"},
-        'outcome': {"type": "string", "enum": VOTE_OUTCOMES,
+        'classification': {"items": {"type": "string", "enum": common.VOTE_CLASSIFICATIONS},
+                           "type": "array", "description": "array of types"},
+        'outcome': {"type": "string", "enum": common.VOTE_OUTCOMES,
                     "description": "outcome of vote (e.g. pass, fail)"},
         'organization': {"type": ["string", "null"],
                          "description": "name of the voting organization"},

@@ -1,5 +1,5 @@
 from .common import links, contact_details, identifiers, other_names, sources, extras
-from pupa import settings
+from opencivicdata import common
 
 schema = {
     "properties": {
@@ -10,7 +10,7 @@ schema = {
         "classification": {
             "description": "An organization category, e.g. committee",
             "type": ["string", "null"],
-            "enum": settings.ORGANIZATION_CLASSIFICATIONS,
+            "enum": common.ORGANIZATION_CLASSIFICATIONS,
         },
         "division_id": {
             "description": "Linked geospatial ID in OCD division ID format",

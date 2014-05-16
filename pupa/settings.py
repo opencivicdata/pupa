@@ -5,16 +5,6 @@ DATABASE_URL = os.environ.get('DATABASE_URL', 'postgres://pupa:pupa@localhost/op
 SECRET_KEY = 'non-secret'
 INSTALLED_APPS = ('opencivicdata', 'pupa',)
 
-# data enumerations
-
-ORGANIZATION_CLASSIFICATIONS = ['legislature', 'party', 'committee', 'commission']
-BILL_TYPES = ['bill', 'resolution', 'concurrent resolution', 'joint resolution', 'memorial']
-BILL_ACTION_TYPES = ['introduced', 'reading:1', 'reading:2', 'reading:3']
-BILL_RELATION_TYPES = ["companion", "other-session", "replaced-by", "replaces"]
-VERSION_TYPES = []
-DOCUMENT_TYPES = []
-CONTACT_TYPES = ['address', 'email', 'fax', 'voice']
-
 # scrape settings
 
 SCRAPELIB_RPM = 60

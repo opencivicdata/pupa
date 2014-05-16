@@ -3,7 +3,7 @@
 """
 
 from .common import sources, extras
-from pupa import settings
+from opencivicdata import common
 
 schema = {
     "description": "bill data",
@@ -37,14 +37,9 @@ schema = {
         'created_at': {"type": ["string", "datetime"], "required": False,
                        "description": "the time that this object was first created", },
 
-        'chamber': {
-            "enum": ["upper", "lower", "joint"], "type": ["string", "null"],
-            "description": ("chamber vote took place in (if legislature is bicameral, "
-                            "otherwise null)"), },
-
         "title": {"type": "string", "description": "primary display title for the bill"},
 
-        "classification": {"items": {"type": "string", "enum": settings.BILL_TYPES},
+        "classification": {"items": {"type": "string", "enum": common.BILL_CLASSIFICATIONS},
                            "type": "array",
                            "description": "array of types (e.g. bill, resolution)"},
 
@@ -108,7 +103,7 @@ schema = {
                     "session": {"type": "string", "description": "Session of related bill."},
                     "name": {"type": "string", "description": "Name of related bill."},
                     "relation_type": {
-                        "enum": settings.BILL_RELATION_TYPES,
+                        "enum": common.BILL_RELATION_TYPES,
                         "type": "string",
                         "description": (
                             """
@@ -174,7 +169,7 @@ schema = {
                     "classification": {
                         "items": {
                             "type": "string",
-                            "enum": settings.BILL_ACTION_TYPES,
+                            "enum": common.BILL_ACTION_TYPES,
                         },
                         "type": "array",
                         "description": "array of normalized action types",
@@ -216,7 +211,6 @@ schema = {
                 "properties": {
                     "name": {"type": "string", "description": "Name of version"},
                     "type": {"type": "string", "blank": True,
-                             "enum": [''] + settings.VERSION_TYPES,
                              "description": "Type of version"},
                     "date": {
                         "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
@@ -246,7 +240,6 @@ schema = {
                 "properties": {
                     "name": {"type": "string", "description": "Name of document"},
                     "type": {"type": "string", "blank": True,
-                             "enum": [''] + settings.DOCUMENT_TYPES,
                              "description": "Type of document"},
                     "date": {
                         "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",

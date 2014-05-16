@@ -5,7 +5,7 @@ from pupa.utils import get_psuedo_id
 
 def toy_vote():
     v = Vote(session="2009", motion="passage of the bill", start_date="2009-01-07",
-             outcome='pass', classification='passage')
+             outcome='pass', classification='passage:bill')
     v.add_source("http://uri.example.com/", note="foo")
     return v
 
@@ -29,20 +29,20 @@ def test_simple_vote():
 def test_vote_org_obj():
     o = Organization('something')
     v = Vote(session="2009", motion="passage of the bill", start_date="2009-01-07",
-             outcome='pass', classification='passage', organization=o)
+             outcome='pass', classification='passage:bill', organization=o)
     assert v.organization == o._id
 
 
 def test_vote_org_dict():
     odict = {'name': 'Random Committee', 'classification': 'committee'}
     v = Vote(session="2009", motion="passage of the bill", start_date="2009-01-07",
-             outcome='pass', classification='passage', organization=odict)
+             outcome='pass', classification='passage:bill', organization=odict)
     assert get_psuedo_id(v.organization) == odict
 
 
 def test_vote_org_chamber():
     v = Vote(session="2009", motion="passage of the bill", start_date="2009-01-07",
-             outcome='pass', classification='passage', chamber='upper')
+             outcome='pass', classification='passage:bill', chamber='upper')
     assert get_psuedo_id(v.organization) == {'classification': 'legislature', 'chamber': 'upper'}
 
 

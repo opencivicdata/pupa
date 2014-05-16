@@ -22,7 +22,7 @@ def test_full_vote():
     com = Organization.objects.create(id='com-id', name='Arbitrary Committee', parent=org)
 
     vote = ScrapeVote(session='1900', motion='passage', start_date='1900-04-01',
-                      classification='passage', outcome='pass', bill=bill.name)
+                      classification='passage:bill', outcome='pass', bill=bill.name)
     vote.set_count('yes', 20)
     vote.yes('John Smith')
     vote.no('Adam Smith')
@@ -35,7 +35,7 @@ def test_full_vote():
     assert VoteEvent.objects.count() == 1
     ve = VoteEvent.objects.get()
     assert ve.session_id == session.id
-    assert ve.classification == ['passage']
+    assert ve.classification == ['passage:bill']
     assert ve.bill_id == bill.id
     count = ve.counts.get()
     assert count.option == 'yes'
