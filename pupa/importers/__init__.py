@@ -1,4 +1,4 @@
-# flake8: NOQA
+# flake8: noqa
 from .jurisdiction import JurisdictionImporter
 from .organizations import OrganizationImporter
 from .people import PersonImporter
