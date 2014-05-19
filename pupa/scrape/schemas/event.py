@@ -83,7 +83,7 @@ schema = {
             "description": ("Indicates if the event is an all-day event"),
         },
 
-        "type": {
+        "classification": {
             "type": ["string"],
             "description": ("type of event"),
         },
@@ -109,13 +109,13 @@ schema = {
                             ' served".'),
         },
 
-        "when": {
+        "start_time": {
             "type": ["datetime"],
             "description": ("Starting date / time of the event. This should be"
                             " fully timezone qualified."),
         },
 
-        "end": {
+        "end_time": {
             "type": ["datetime", "null"],
             "description": ("Ending date / time of the event. This should"
                             " be fully timezone qualified."),
