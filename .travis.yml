@@ -5,7 +5,9 @@ python:
     - "3.4"
 install: pip install -r requirements-test.txt
 before_script:
-    - psql -c "CREATE USER test with PASSWORD 'test' CREATEDB;" -U postgres
+    - psql -c "CREATE USER test with PASSWORD 'test' CREATEDB SUPERUSER;" -U postgres
+    - psql -c "CREATE DATABASE test;" -U postgres
+    - psql -c "CREATE EXTENSION postgis;" -U postgres -d test
 script: ./run-tests.sh
 after_success:
     - coveralls
