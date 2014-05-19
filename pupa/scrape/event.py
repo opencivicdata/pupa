@@ -11,7 +11,7 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
             "related_entities": [],
             "subjects": [],
             "media": [],
-            "notes": [],
+            "notes": "",
             "order": None,
         })
         self.event = event
@@ -43,24 +43,24 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     _type = 'event'
     _schema = schema
 
-    def __init__(self, name, when, location, all_day=False, description=None, end=None,
-                 status="confirmed", event_type="event"):
+    def __init__(self, name, start_time, location, all_day=False, description="", end_time=None,
+                 status="confirmed", classification="event"):
         super(Event, self).__init__()
-        self.when = when
-        self.name = name
+        self.start_time = start_time
         self.all_day = all_day
+        self.end_time = end_time
+        self.name = name
         self.description = description
-        self.end = end
         self.status = status
-        self.type = event_type
-        self.location = {"name": location, "note": None, "coordinates": None}
+        self.classification = classification
+        self.location = {"name": location, "note": "", "coordinates": None}
         self.documents = []
         self.participants = []
         self.media = []
         self.agenda = []
 
     def __str__(self):
-        return u'{0} {1}'.format(self.when, self.name.strip())
+        return u'{0} {1}'.format(self.start_time, self.name.strip())
     __unicode__ = __str__
 
     def add_participant(self, name, type, note='participant', chamber=None, id=None):

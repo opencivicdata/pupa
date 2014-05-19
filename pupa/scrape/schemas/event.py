@@ -102,7 +102,7 @@ schema = {
         },
 
         "description": {
-            "type": ["string", "null"],
+            "type": "string", "blank": True,
             "description": ('A longer description describing the event. As an'
                             ' example, "Topics for discussion include this that'
                             ' and the other thing. In addition, lunch will be'
@@ -123,7 +123,7 @@ schema = {
 
 
         "status": {
-            "type": ["string", "null"],
+            "type": "string", "blank": True,
             "enum": ["cancelled", "tentative", "confirmed", "passed"],
             "description": ("String that denotes the status of the meeting."
                             " This is useful for showing the meeting is cancelled"
@@ -144,7 +144,7 @@ schema = {
                 },
 
                 "note": {
-                    "type": ["string", "null"],
+                    "type": "string", "blank": True,
                     "description": ('human readable notes regarding the location,'
                                     ' something like "The meeting will take place'
                                     ' at the Minority Whip\'s desk on the floor"')
@@ -241,11 +241,6 @@ schema = {
                             " or people who are attending."),
             "items": {
                 "properties": {
-                    "chamber": {
-                        "type": ["string", "null"],
-                        "description": ("Optional field storing the chamber of"
-                                        " the related participant."),
-                    },
 
                     "name": {
                         "type": "string",
@@ -312,19 +307,9 @@ schema = {
                     "media": media_schema,
 
                     "notes": {
-                        "description": ("List of notes taken during this agenda"
+                        "description": ("Notes taken during this agenda"
                                         " item, may be used to construct meeting minutes."),
-                        "items": {
-                            "properties": {
-                                "description": {
-                                    "type": "string",
-                                    "description": ("simple string containing the"
-                                                    " content of the note."),
-                                },
-                            },
-                            "type": "object"
-                        },
-                        "type": "array"
+                        "type": "string", "blank": True,
                     },
 
                     "related_entities": {
