@@ -14,7 +14,6 @@ class Jurisdiction(BaseModel):
     url = None
     sessions = []
     feature_flags = []
-    building_maps = []
     extras = {}
     other_names = []
     _meta = {}
@@ -42,7 +41,6 @@ class Jurisdiction(BaseModel):
         return {'_id': self._id, 'id': self._id, 'name': self.name, 'url': self.url,
                 'division_id': self.division_id, 'sessions': self.sessions,
                 'feature_flags': self.feature_flags,
-                'building_maps': self.building_maps,
                 'extras': self.extras,
                }
 

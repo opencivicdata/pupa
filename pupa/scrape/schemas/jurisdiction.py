@@ -5,10 +5,6 @@ from opencivicdata import common
 schema = {
     "description": "Information about a jurisdiction, including session, chamber, etc.",
     "type": "object",
-    "_order": (
-        ('Basic Details', ('name', 'url', 'sessions')),
-        ('Additional Metadata', ('feature_flags', 'building_maps')),
-    ),
     "properties": {
         "name": {"type": "string",
                  "description": "Name of jurisdiction (e.g. North Carolina General Assembly)"},

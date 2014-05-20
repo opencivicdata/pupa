@@ -35,7 +35,6 @@ def test_as_dict():
     assert d['url'] == j.url
     assert d['sessions'] == []
     assert d['feature_flags'] == []
-    assert d['building_maps'] == []
 
 
 #def test_get_organization_by_chamber():
