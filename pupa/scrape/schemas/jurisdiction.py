@@ -1,4 +1,5 @@
 from .common import extras
+from opencivicdata import common
 
 
 schema = {
@@ -29,13 +30,10 @@ schema = {
             "description": "ID of the jurisdiction",
             "type": ["string"],
         },
-        "updated_at": {
-            "description": "The time at which the resource was last modified",
-            "type": ["string", "datetime", "null"],
-        },
-        "created_at": {
-            "description": "The time at which the resource was created",
-            "type": ["string", "datetime", "null"],
+        "jurisdiction_id": {
+            "description": "ID of the jurisdiction",
+            "type": "string",
+            "enum": common.JURISDICTION_CLASSIFICATIONS,
         },
         "division_id": {
             "description": "Linked geospatial ID in OCD division ID format",
@@ -47,13 +45,6 @@ schema = {
             "description": ("A way to mark certain features as available on a per-jurisdiction "
                             "basis."),
         },
-        "building_maps": {
-            "type": "array", "items": {"type": "object", "properties": {
-                "name": {"type": "string", "description": "Name of map (e.g. Floor 1)"},
-                "url": {"type": "string", "description": "URL to map image/PDF"}
-            }},
-            "description": ("Links to image/PDF maps of the building."), },
-
         "extras": extras,
     }
 }

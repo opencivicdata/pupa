@@ -169,7 +169,7 @@ schema = {
                     "classification": {
                         "items": {
                             "type": "string",
-                            "enum": common.BILL_ACTION_TYPES,
+                            "enum": common.BILL_ACTION_CLASSIFICATIONS,
                         },
                         "type": "array",
                         "description": "array of normalized action types",
