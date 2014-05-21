@@ -91,16 +91,11 @@ class BaseImporter(object):
 
         self.import_data(dicts)
 
-    def import_data(self, dicts):
-        """ import a bunch of dicts together """
+    def _order_imports(self, dicts):
         # id: json
         data_by_id = {}
         # hash(json): id
         seen_hashes = {}
-        # counts of each
-        results = {'insert': 0, 'update': 0, 'noop': 0}
-        # list of all new or modified objects
-        new_or_modified = []
 
         # load all json, mapped by json_id
         for data in dicts:
@@ -135,7 +130,15 @@ class BaseImporter(object):
         if in_network != set(data_by_id.keys()):
             raise Exception("import is missing nodes in network set")
 
-        # time to actually do the import
+        return import_order
+
+    def import_data(self, dicts):
+        """ import a bunch of dicts together """
+        # keep counts of all actions
+        results = {'insert': 0, 'update': 0, 'noop': 0}
+
+        import_order = self._order_imports(dicts)
+
         for json_id, data in import_order:
             parent_id = data.get('parent_id', None)
             if parent_id:
@@ -147,8 +150,6 @@ class BaseImporter(object):
             obj, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj.id
             results[what] += 1
-            if what != 'noop':
-                new_or_modified.append(obj)
 
         # all objects are loaded, a perfect time to do inter-object resolution and other tasks
         self.postimport()
@@ -157,14 +158,10 @@ class BaseImporter(object):
 
     def import_item(self, data):
         """ function used by import_data """
-        what = None
-        updated = False
+        what = 'noop'
 
         # add fields/etc.
         data = self.prepare_for_db(data)
-
-        # convert extras to JSON
-        data['extras'] = json.dumps(data['extras'])
 
         try:
             obj = self.get_object(data)
@@ -176,38 +173,17 @@ class BaseImporter(object):
         for field in self.related_models:
             related[field] = data.pop(field)
 
-        # obj existed, attempt to update
+        # obj existed, check if we need to do an update
         if obj:
+            # check base object for changes
             for key, value in data.items():
-                # TODO: avoid updating locked fields
                 if getattr(obj, key) != value:
                     setattr(obj, key, value)
-                    updated = True
-
-            if updated:
+                    what = 'update'
+            if what == 'update':
                 obj.save()
-                what = 'update'
-            else:
-                what = 'noop'
 
-            # for each related field - check if there are notable differences
-            for field, items in related.items():
-                if items:
-                    # get keys to compare (assumes all objects have same keys)
-                    keys = sorted(items[0].keys())
-
-                    # get items from database
-                    dbitems = getattr(obj, field).all()
-                    dbdicts = [{k: getattr(item, k) for k in keys} for item in dbitems]
-                    # if the hashes differ, update what & delete existing set, then replace it
-                    if omnihash(items) != omnihash(dbdicts):
-                        what = 'update'
-                        getattr(obj, field).all().delete()
-                        for item in items:
-                            try:
-                                getattr(obj, field).create(**item)
-                            except TypeError as e:
-                                raise TypeError(str(e) + ' while importing ' + str(item))
+            self._update_related(obj, related, self.related_models)
 
         # need to create the data
         else:
@@ -216,6 +192,34 @@ class BaseImporter(object):
             self._create_related(obj, related, self.related_models)
 
         return obj, what
+
+
+    def _update_related(self, obj, related, subfield_dict):
+        """
+        update DB objects related to a base object
+            obj:            a base object to create related
+            related:        dict mapping field names to lists of related objects
+            subfield_list:  where to get the next layer of subfields
+        """
+        # for each related field - check if there are differences
+        for field, items in related.items():
+            for order, item in enumerate(items):
+                # get keys to compare (assumes all objects have same keys)
+                keys = sorted(items[0].keys())
+
+                # get items from database
+                dbitems = getattr(obj, field).all()
+                dbdicts = [{k: getattr(item, k) for k in keys} for item in dbitems]
+                # if the hashes differ, update what & delete existing set, then replace it
+                if omnihash(items) != omnihash(dbdicts):
+                    what = 'update'
+                    getattr(obj, field).all().delete()
+                    for item in items:
+                        try:
+                            getattr(obj, field).create(**item)
+                        except TypeError as e:
+                            raise TypeError(str(e) + ' while importing ' + str(item))
+
 
     def _create_related(self, obj, related, subfield_dict):
         """
