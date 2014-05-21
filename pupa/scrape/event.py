@@ -63,23 +63,22 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         return u'{0} {1}'.format(self.start_time, self.name.strip())
     __unicode__ = __str__
 
-    def add_participant(self, name, type, note='participant', chamber=None, id=None):
-        self.participants.append({"chamber": chamber, "type": type, "note": note, "name": name,
-                                  "id": id})
+    def add_participant(self, name, type, note='participant'):
+        self.participants.append({"entity_type": type, "note": note, "name": name})
 
-    def add_person(self, name, note='participant', chamber=None, id=None):
-        return self.add_participant(name=name, type='person', chamber=chamber, note=note)
+    def add_person(self, name, note='participant'):
+        return self.add_participant(name=name, type='person', note=note)
 
     def add_agenda_item(self, description):
         obj = EventAgendaItem(description, self)
         self.agenda.append(obj)
         return obj
 
-    def add_media_link(self, name, url, type='media', mimetype=None, on_duplicate='error'):
+    def add_media_link(self, name, url, type='media', mimetype='', on_duplicate='error'):
         return self._add_associated_link(collection='media', name=name, url=url, type=type,
                                          mimetype=mimetype, on_duplicate=on_duplicate)
 
-    def add_document(self, name, url, mimetype=None, on_duplicate='error'):
+    def add_document(self, name, url, mimetype='', on_duplicate='error'):
         return self._add_associated_link(collection='documents', name=name, url=url,
                                          type='document', mimetype=mimetype,
                                          on_duplicate=on_duplicate)

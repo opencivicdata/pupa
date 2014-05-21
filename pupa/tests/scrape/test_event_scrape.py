@@ -90,14 +90,14 @@ def test_participants():
     e.add_participant('Committee of the Whole', type='committee', note='everyone')
     assert len(e.participants) == 1
     assert e.participants[0]['name'] == 'Committee of the Whole'
-    assert e.participants[0]['type'] == 'committee'
+    assert e.participants[0]['entity_type'] == 'committee'
     assert e.participants[0]['note'] == 'everyone'
 
     # and add_person, which is a shortcut
     e.add_person('Bill Stevenson')
     assert len(e.participants) == 2
     assert e.participants[1]['name'] == 'Bill Stevenson'
-    assert e.participants[1]['type'] == 'person'
+    assert e.participants[1]['entity_type'] == 'person'
     assert e.participants[1]['note'] == 'participant'
 
 
