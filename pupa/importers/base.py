@@ -203,22 +203,31 @@ class BaseImporter(object):
         """
         # for each related field - check if there are differences
         for field, items in related.items():
-            for order, item in enumerate(items):
-                # get keys to compare (assumes all objects have same keys)
-                keys = sorted(items[0].keys())
+            # get items from database
+            dbitems = getattr(obj, field).all()
+            dbitems_count = dbitems.count()
 
-                # get items from database
-                dbitems = getattr(obj, field).all()
-                dbdicts = [{k: getattr(item, k) for k in keys} for item in dbitems]
-                # if the hashes differ, update what & delete existing set, then replace it
-                if omnihash(items) != omnihash(dbdicts):
-                    what = 'update'
-                    getattr(obj, field).all().delete()
-                    for item in items:
-                        try:
-                            getattr(obj, field).create(**item)
-                        except TypeError as e:
-                            raise TypeError(str(e) + ' while importing ' + str(item))
+            # default to doing nothing
+            do_delete = do_update = False
+
+            if items and dbitems_count:         # we have items, so does db, check for conflict
+                keys = sorted(items[0].keys())
+                dbset = {frozenset((k, getattr(item, k)) for k in keys) for item in dbitems}
+                itemset = {frozenset(item.items()) for item in items}
+                do_delete = do_update = (dbset != itemset)
+            elif items and not dbitems_count:   # we have items, db doesn't, just update
+                do_update = True
+            elif not items and dbitems_count:   # db has items, we don't, just delete
+                do_delete = True
+            # otherwise: no items or dbitems, so nothing is done
+
+            if do_delete:
+                what = 'update'
+                getattr(obj, field).all().delete()
+
+            if do_update:
+                what = 'update'
+                self._create_related(obj, {field: items}, subfield_dict)
 
 
     def _create_related(self, obj, related, subfield_dict):
