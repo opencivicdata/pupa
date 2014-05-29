@@ -160,6 +160,9 @@ class BaseImporter(object):
         """ function used by import_data """
         what = 'noop'
 
+        # remove the JSON _id (may still be there if called directly)
+        data.pop('_id', None)
+
         # add fields/etc.
         data = self.prepare_for_db(data)
 

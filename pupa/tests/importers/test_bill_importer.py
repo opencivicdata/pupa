@@ -11,11 +11,15 @@ class DumbMockImporter(object):
         return json_id
 
 
-@pytest.mark.django_db
-def test_full_bill():
+def create_jurisdiction():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     j.sessions.create(name='1899')
     j.sessions.create(name='1900')
+
+
+@pytest.mark.django_db
+def test_full_bill():
+    create_jurisdiction()
     person = Person.objects.create(id='person-id', name='Adam Smith')
     org = Organization.objects.create(id='org-id', name='House', chamber='lower')
     com = Organization.objects.create(id='com-id', name='Arbitrary Committee', parent=org)
@@ -98,8 +102,7 @@ def test_full_bill():
 
 @pytest.mark.django_db
 def test_bill_chamber_param():
-    j = Jurisdiction.objects.create(id='jid', division_id='did')
-    j.sessions.create(name='1900')
+    create_jurisdiction()
     org = Organization.objects.create(id='org-id', name='House', chamber='lower',
                                       classification='legislature', jurisdiction_id='jid')
 
@@ -110,3 +113,29 @@ def test_bill_chamber_param():
     BillImporter('jid', oi).import_data([bill.as_dict()])
 
     assert Bill.objects.get().from_organization_id == org.id
+
+
+@pytest.mark.django_db
+def test_bill_update():
+    create_jurisdiction()
+    org = Organization.objects.create(id='org-id', name='House', chamber='lower',
+                                      classification='legislature', jurisdiction_id='jid')
+
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+
+    oi = OrganizationImporter('jid')
+    _, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'insert'
+    _, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'noop'
+
+    # ensure no new object was created
+    assert Bill.objects.count() == 1
+
+    # test basic update
+    bill = ScrapeBill('HB 1', '1900', '1st Bill')
+    _, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'update'
+    assert Bill.objects.get().title == '1st Bill'
+
+

@@ -23,12 +23,11 @@ class BillImporter(BaseImporter):
 
     def get_object(self, bill):
         spec = {
-            'session__name': bill['session'],
-            'session__jurisdiction_id': self.jurisdiction_id,
+            'session': bill['session'],
             'name': bill['name'],
         }
-
-        # TODO: use  from_org
+        if 'from_organization_id' in bill:
+            spec['from_organization_id'] = bill['from_organization_id']
 
         return self.model_class.objects.get(**spec)
 
