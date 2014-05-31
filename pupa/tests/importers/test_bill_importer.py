@@ -17,11 +17,16 @@ def create_jurisdiction():
     j.sessions.create(name='1900')
 
 
+def create_org():
+    return Organization.objects.create(id='org-id', name='House', chamber='lower',
+                                       classification='legislature', jurisdiction_id='jid')
+
+
 @pytest.mark.django_db
 def test_full_bill():
     create_jurisdiction()
+    org = create_org()
     person = Person.objects.create(id='person-id', name='Adam Smith')
-    org = Organization.objects.create(id='org-id', name='House', chamber='lower')
     com = Organization.objects.create(id='com-id', name='Arbitrary Committee', parent=org)
 
     oldbill = ScrapeBill('HB 99', '1899', 'Axe & Tack Tax Act',
@@ -103,8 +108,7 @@ def test_full_bill():
 @pytest.mark.django_db
 def test_bill_chamber_param():
     create_jurisdiction()
-    org = Organization.objects.create(id='org-id', name='House', chamber='lower',
-                                      classification='legislature', jurisdiction_id='jid')
+    org = create_org()
 
     bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act',
                       classification='tax bill', chamber='lower')
@@ -118,8 +122,7 @@ def test_bill_chamber_param():
 @pytest.mark.django_db
 def test_bill_update():
     create_jurisdiction()
-    org = Organization.objects.create(id='org-id', name='House', chamber='lower',
-                                      classification='legislature', jurisdiction_id='jid')
+    create_org()
 
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
 
@@ -139,3 +142,28 @@ def test_bill_update():
     assert Bill.objects.get().title == '1st Bill'
 
 
+@pytest.mark.django_db
+def test_bill_update_new_subitem():
+    create_jurisdiction()
+    org = Organization.objects.create(id='org-id', name='House', chamber='lower',
+                                      classification='legislature', jurisdiction_id='jid')
+    oi = OrganizationImporter('jid')
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+
+    # initial bill
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_action('this is an action', actor='lower', date='1900-01-01')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+
+    assert what == 'insert'
+    assert obj.actions.count() == 1
+
+    # now let's make sure we get updated when there are second actions
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_action('this is an action', actor='lower', date='1900-01-01')
+    bill.add_action('this is a second action', actor='lower', date='1900-01-02')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+
+    assert what == 'update'
+    assert Bill.objects.count() == 1
+    assert obj.actions.count() == 2

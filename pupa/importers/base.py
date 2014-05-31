@@ -186,7 +186,9 @@ class BaseImporter(object):
             if what == 'update':
                 obj.save()
 
-            self._update_related(obj, related, self.related_models)
+            updated = self._update_related(obj, related, self.related_models)
+            if updated:
+                what = 'update'
 
         # need to create the data
         else:
@@ -197,6 +199,31 @@ class BaseImporter(object):
         return obj, what
 
 
+    def _list_to_set(self, items, keys, subfield_dict):
+        if isinstance(items[0], dict):
+            get = lambda a, b: a[b]
+        else:
+            get = getattr
+        all_items = set()
+        for item in items:
+            # pull off subrelated fields
+            subrelated = {}
+            for subfield in subfield_dict:
+                subrelated[subfield] = get(item, subfield)
+
+            # put all k,v pairs into iset
+            iset = set()
+            for k in keys - set(subfield_dict):
+                itemval = get(item, k)
+                if isinstance(itemval, list):
+                    itemval = tuple(itemval)
+                iset.add((k, itemval))
+
+            all_items.add(frozenset(iset))
+
+        return all_items
+
+
     def _update_related(self, obj, related, subfield_dict):
         """
         update DB objects related to a base object
@@ -204,6 +231,7 @@ class BaseImporter(object):
             related:        dict mapping field names to lists of related objects
             subfield_list:  where to get the next layer of subfields
         """
+        updated = False
         # for each related field - check if there are differences
         for field, items in related.items():
             # get items from database
@@ -214,9 +242,9 @@ class BaseImporter(object):
             do_delete = do_update = False
 
             if items and dbitems_count:         # we have items, so does db, check for conflict
-                keys = sorted(items[0].keys())
-                dbset = {frozenset((k, getattr(item, k)) for k in keys) for item in dbitems}
-                itemset = {frozenset(item.items()) for item in items}
+                keys = set(items[0].keys())
+                dbset = self._list_to_set(dbitems, keys, subfield_dict[field])
+                itemset = self._list_to_set(items, keys, subfield_dict[field])
                 do_delete = do_update = (dbset != itemset)
             elif items and not dbitems_count:   # we have items, db doesn't, just update
                 do_update = True
@@ -225,12 +253,14 @@ class BaseImporter(object):
             # otherwise: no items or dbitems, so nothing is done
 
             if do_delete:
-                what = 'update'
+                updated = True
                 getattr(obj, field).all().delete()
 
             if do_update:
-                what = 'update'
+                updated = True
                 self._create_related(obj, {field: items}, subfield_dict)
+
+        return updated
 
 
     def _create_related(self, obj, related, subfield_dict):
