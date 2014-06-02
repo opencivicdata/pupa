@@ -143,7 +143,7 @@ def test_bill_update():
 
 
 @pytest.mark.django_db
-def test_bill_update_new_subitem():
+def test_bill_update_because_of_subitem():
     create_jurisdiction()
     org = Organization.objects.create(id='org-id', name='House', chamber='lower',
                                       classification='legislature', jurisdiction_id='jid')
@@ -167,3 +167,35 @@ def test_bill_update_new_subitem():
     assert what == 'update'
     assert Bill.objects.count() == 1
     assert obj.actions.count() == 2
+
+    # same 2 actions, noop
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_action('this is an action', actor='lower', date='1900-01-01')
+    bill.add_action('this is a second action', actor='lower', date='1900-01-02')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'noop'
+    assert Bill.objects.count() == 1
+    assert obj.actions.count() == 2
+
+    # delete an action, update
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_action('this is a second action', actor='lower', date='1900-01-02')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'update'
+    assert Bill.objects.count() == 1
+    assert obj.actions.count() == 1
+
+    # delete all actions, update
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'update'
+    assert Bill.objects.count() == 1
+    assert obj.actions.count() == 0
+
+    # and back to initial status, update
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_action('this is an action', actor='lower', date='1900-01-01')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'update'
+    assert Bill.objects.count() == 1
+    assert obj.actions.count() == 1

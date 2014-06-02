@@ -57,6 +57,6 @@ class BillImporter(BaseImporter):
             if len(candidates) == 1:
                 rb.related_bill = candidates[0]
                 rb.save()
-            elif len(candidates) > 1:
+            elif len(candidates) > 1:    # pragma: no cover
                 # if we ever see this, we need to add additional fields on the relation
                 raise RuntimeError('multiple related_bill candidates found for {}'.format(rb))
