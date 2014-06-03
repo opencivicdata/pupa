@@ -145,16 +145,13 @@ def test_bill_update():
 @pytest.mark.django_db
 def test_bill_update_because_of_subitem():
     create_jurisdiction()
-    org = Organization.objects.create(id='org-id', name='House', chamber='lower',
-                                      classification='legislature', jurisdiction_id='jid')
+    create_org()
     oi = OrganizationImporter('jid')
-    bill = ScrapeBill('HB 1', '1900', 'First Bill')
 
     # initial bill
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
     bill.add_action('this is an action', actor='lower', date='1900-01-01')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
-
     assert what == 'insert'
     assert obj.actions.count() == 1
 
@@ -163,7 +160,6 @@ def test_bill_update_because_of_subitem():
     bill.add_action('this is an action', actor='lower', date='1900-01-01')
     bill.add_action('this is a second action', actor='lower', date='1900-01-02')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
-
     assert what == 'update'
     assert Bill.objects.count() == 1
     assert obj.actions.count() == 2
@@ -199,3 +195,25 @@ def test_bill_update_because_of_subitem():
     assert what == 'update'
     assert Bill.objects.count() == 1
     assert obj.actions.count() == 1
+
+
+@pytest.mark.django_db
+def test_bill_update_subsubitem():
+    create_jurisdiction()
+    create_org()
+    oi = OrganizationImporter('jid')
+
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'insert'
+    assert obj.versions.count() == 1
+    assert obj.versions.get().links.count() == 1
+
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
+    bill.add_version_link('printing', 'http://example.com/test.text', mimetype='text/plain')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'update'
+    assert obj.versions.count() == 1
+    assert obj.versions.get().links.count() == 2
