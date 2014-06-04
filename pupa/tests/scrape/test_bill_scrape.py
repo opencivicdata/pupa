@@ -1,6 +1,7 @@
 import pytest
 from validictory import ValidationError
 from pupa.scrape import Bill
+from pupa.utils.generic import get_psuedo_id
 
 
 def toy_bill():
@@ -43,6 +44,22 @@ def test_basic_invalid_bill():
     b.name = None
     with pytest.raises(ValueError):
         b.validate()
+
+
+def test_from_organization():
+    # none set
+    assert ((get_psuedo_id(Bill('HB 1', '2014', 'Some Bill').from_organization) ==
+             {'classification': 'legislature'}))
+
+    # chamber set
+    assert (get_psuedo_id(Bill('HB 1', '2014', 'Some Bill', chamber='upper').from_organization) ==
+            {'chamber': 'upper', 'classification': 'legislature'})
+    # org direct set
+    assert Bill('HB 1', '2014', 'Some Bill', from_organization='test').from_organization == 'test'
+
+    # can't set both
+    with pytest.raises(ValueError):
+        Bill('HB 1', '2014', 'Some Bill', from_organization='upper', chamber='upper')
 
 
 def test_add_action():
