@@ -19,7 +19,7 @@ class Post(BaseModel, LinkMixin, ContactDetailMixin):
     _type = 'post'
     _schema = post_schema
 
-    def __init__(self, label, role, organization_id, start_date='', end_date=''):
+    def __init__(self, *, label, role, organization_id, start_date='', end_date=''):
         super(Post, self).__init__()
         self.label = label
         self.role = role
@@ -40,8 +40,8 @@ class Membership(BaseModel, ContactDetailMixin, LinkMixin):
     _type = 'membership'
     _schema = membership_schema
 
-    def __init__(self, person_id, organization_id, post_id=None,
-                 role='', label='', start_date='', end_date='', on_behalf_of_id=None):
+    def __init__(self, *, person_id, organization_id, post_id=None, role='', label='',
+                 start_date='', end_date='', on_behalf_of_id=None):
         """
         Constructor for the Membership object.
 
@@ -73,7 +73,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
     _type = 'person'
     _schema = person_schema
 
-    def __init__(self, name, birth_date='', death_date='', biography='', summary='', image='',
+    def __init__(self, name, *, birth_date='', death_date='', biography='', summary='', image='',
                  gender='', national_identity=''):
         super(Person, self).__init__()
         self.name = name
@@ -90,7 +90,8 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
             add a membership in an organization and return the membership
             object in case there are more details to add
         """
-        membership = Membership(self._id, organization._id, role=role, **kwargs)
+        membership = Membership(person_id=self._id, organization_id=organization._id,
+                                role=role, **kwargs)
         self._related.append(membership)
         return membership
 
@@ -108,7 +109,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
     _type = 'organization'
     _schema = org_schema
 
-    def __init__(self, name, classification=None, parent_id=None, chamber='',
+    def __init__(self, name, *, classification=None, parent_id=None, chamber='',
                  founding_date='', dissolution_date='', image=''):
         """
         Constructor for the Organization object.

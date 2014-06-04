@@ -9,7 +9,7 @@ class Vote(BaseModel, SourceMixin):
     _type = 'vote'
     _schema = schema
 
-    def __init__(self, session, motion, start_date, classification, outcome,
+    def __init__(self, *, session, motion, start_date, classification, outcome,
                  identifier='', bill=None, organization=None, chamber=None, **kwargs):
         super(Vote, self).__init__()
 
@@ -43,7 +43,7 @@ class Vote(BaseModel, SourceMixin):
 
     __unicode__ = __str__
 
-    def set_bill(self, bill_or_name, chamber=None):
+    def set_bill(self, bill_or_name, *, chamber=None):
         if not bill_or_name:
             self.bill = None
         elif isinstance(bill_or_name, Bill):
@@ -59,10 +59,10 @@ class Vote(BaseModel, SourceMixin):
     def vote(self, option, voter):
         self.votes.append({"option": option, "voter_name": voter})
 
-    def yes(self, name, id=None):
+    def yes(self, name, *, id=None):
         return self.vote('yes', name)
 
-    def no(self, name, id=None):
+    def no(self, name, *, id=None):
         return self.vote('no', name)
 
     def set_count(self, option, value):

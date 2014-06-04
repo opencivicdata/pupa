@@ -19,20 +19,20 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
     def add_subject(self, what):
         self['subjects'].append(what)
 
-    def add_committee(self, committee, id=None, note='participant'):
+    def add_committee(self, committee, *, id=None, note='participant'):
         self.add_entity(name=committee, type='committee', id=id, note=note)
 
-    def add_bill(self, bill, id=None, note='consideration'):
+    def add_bill(self, bill, *, id=None, note='consideration'):
         self.add_entity(name=bill, type='bill', id=id, note=note)
 
-    def add_person(self, person, id=None, note='participant'):
+    def add_person(self, person, *, id=None, note='participant'):
         self.add_entity(name=person, type='person', id=id, note=note)
 
-    def add_media_link(self, name, url, type='media', mimetype=None, on_duplicate='error'):
+    def add_media_link(self, name, url, *, type='media', mimetype=None, on_duplicate='error'):
         return self._add_associated_link(collection='media', name=name, url=url, type=type,
                                          mimetype=mimetype, on_duplicate=on_duplicate)
 
-    def add_entity(self, name, type, id, note):
+    def add_entity(self, name, type, *, id, note):
         self['related_entities'].append({"name": name, "type": type, "id": id, "note": note})
 
 
@@ -43,7 +43,7 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     _type = 'event'
     _schema = schema
 
-    def __init__(self, name, start_time, location, all_day=False, description="", end_time=None,
+    def __init__(self, name, start_time, location, *, all_day=False, description="", end_time=None,
                  status="confirmed", classification="event"):
         super(Event, self).__init__()
         self.start_time = start_time
@@ -63,10 +63,10 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         return u'{0} {1}'.format(self.start_time, self.name.strip())
     __unicode__ = __str__
 
-    def add_participant(self, name, type, note='participant'):
+    def add_participant(self, name, type, *, note='participant'):
         self.participants.append({"entity_type": type, "note": note, "name": name})
 
-    def add_person(self, name, note='participant'):
+    def add_person(self, name, *, note='participant'):
         return self.add_participant(name=name, type='person', note=note)
 
     def add_agenda_item(self, description):
@@ -74,11 +74,11 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         self.agenda.append(obj)
         return obj
 
-    def add_media_link(self, name, url, type='media', mimetype='', on_duplicate='error'):
+    def add_media_link(self, name, url, *, type='media', mimetype='', on_duplicate='error'):
         return self._add_associated_link(collection='media', name=name, url=url, type=type,
                                          mimetype=mimetype, on_duplicate=on_duplicate)
 
-    def add_document(self, name, url, mimetype='', on_duplicate='error'):
+    def add_document(self, name, url, *, mimetype='', on_duplicate='error'):
         return self._add_associated_link(collection='documents', name=name, url=url,
                                          type='document', mimetype=mimetype,
                                          on_duplicate=on_duplicate)

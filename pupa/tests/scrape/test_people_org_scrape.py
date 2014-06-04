@@ -4,24 +4,24 @@ from validictory import ValidationError
 
 
 def test_basic_post():
-    post = Post('1', 'Representative', 'fake_org')
+    post = Post(label='1', role='Representative', organization_id='fake_org')
     assert '1' in str(post)
     post.validate()
 
 
 def test_basic_invalid_post():
-    post = Post(1, 'Representative', 'fake_org')
+    post = Post(label=1, role='Representative', organization_id='fake_org')
     with pytest.raises(ValueError):
         post.validate()
 
 
 def test_basic_membership():
-    m = Membership('person', 'org')
+    m = Membership(person_id='person', organization_id='org')
     assert 'person' in str(m) and 'org' in str(m)
 
 
 def test_basic_invalid_membership():
-    membership = Membership(33, "orga_id")
+    membership = Membership(person_id=33, organization_id="orga_id")
     with pytest.raises(ValueError):
         membership.validate()
 
@@ -48,7 +48,7 @@ def test_person_add_membership():
     p = Person('Bob B. Bear')
     p.add_source('http://example.com')
     o = Organization('test org')
-    p.add_membership(o, 'member', start_date='2007')
+    p.add_membership(o, role='member', start_date='2007')
     assert len(p._related) == 1
     p._related[0].validate()
     assert p._related[0].person_id == p._id

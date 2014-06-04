@@ -23,7 +23,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     _type = 'bill'
     _schema = schema
 
-    def __init__(self, name, session, title, chamber=None, from_organization=None,
+    def __init__(self, name, session, title, *, chamber=None, from_organization=None,
                  classification=None):
         super(Bill, self).__init__()
 
@@ -52,8 +52,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.summaries = []
         self.versions = []
 
-    def add_action(self, description, actor, date, classification=None,
-                   related_entities=None):
+    def add_action(self, description, actor, date, *, classification=None, related_entities=None):
         action = Action(description=description, actor=actor, date=date,
                         classification=cleanup_list(classification, []), related_entities=[])
         self.actions.append(action)
@@ -67,8 +66,8 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
             "relation_type": relation_type
         })
 
-    def add_sponsor(self, name, classification, entity_type, primary,
-                    chamber=None, entity_id=None):
+    def add_sponsor(self, name, classification, entity_type, primary, *, chamber=None,
+                    entity_id=None):
         sp = {
             "name": name,
             "classification": classification,
@@ -90,11 +89,11 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     def add_name(self, name, note=''):
         self.other_names.append({"note": note, "name": name})
 
-    def add_document_link(self, name, url, date='', type='', mimetype='', on_duplicate='error'):
+    def add_document_link(self, name, url, *, date='', type='', mimetype='', on_duplicate='error'):
         return self._add_associated_link(collection='documents', name=name, url=url, date=date,
                                          type=type, mimetype=mimetype, on_duplicate=on_duplicate)
 
-    def add_version_link(self, name, url, date='', type='', mimetype='', on_duplicate='error'):
+    def add_version_link(self, name, url, *, date='', type='', mimetype='', on_duplicate='error'):
         return self._add_associated_link(collection='versions', name=name, url=url, date=date,
                                          type=type, mimetype=mimetype, on_duplicate=on_duplicate)
 

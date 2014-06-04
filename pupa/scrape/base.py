@@ -27,7 +27,7 @@ def cleanup_list(obj, default):
 class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
 
-    def __init__(self, jurisdiction, datadir, strict_validation=True, fastmode=False):
+    def __init__(self, jurisdiction, datadir, *, strict_validation=True, fastmode=False):
         super(Scraper, self).__init__()
 
         # set options
@@ -247,7 +247,7 @@ class OtherNameMixin(object):
 
 
 class AssociatedLinkMixin(object):
-    def _add_associated_link(self, collection, name, url, mimetype, on_duplicate, type='',
+    def _add_associated_link(self, collection, name, url, *, mimetype, on_duplicate, type='',
                              date=''):
         if on_duplicate not in ['error', 'ignore']:
             raise ValueError("on_duplicate must be 'error' or 'ignore'")
