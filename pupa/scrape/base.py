@@ -4,7 +4,6 @@ import uuid
 import logging
 import datetime
 from collections import defaultdict, OrderedDict
-from six import string_types
 
 import scrapelib
 
@@ -18,7 +17,7 @@ class ScrapeError(Exception):
 def cleanup_list(obj, default):
     if not obj:
         obj = default
-    elif isinstance(obj, string_types):
+    elif isinstance(obj, str):
         obj = [obj]
     elif not isinstance(obj, list):
         obj = list(obj)

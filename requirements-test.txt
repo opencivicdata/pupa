@@ -1,4 +1,3 @@
-six
 validictory
 scrapelib
 http://www.djangoproject.com/download/1.7b3/tarball/
