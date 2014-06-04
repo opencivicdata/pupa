@@ -129,3 +129,38 @@ def test_link_before_nodes():
     network.add_node("D")
 
     assert list(network.sort()) == ["A", "B", "C", "D"]
+
+
+def test_internal_node_removal():
+    network = Network()
+
+    network.add_node("A")
+    network.add_node("B")
+    network.add_node("C")
+    network.add_node("D")
+
+    network.add_edge("A", "B")
+    network.add_edge("B", "C")
+    network.add_edge("C", "D")
+
+    # Ensure that we can't remove an internal node without a ValueError
+    # by default.
+    with pytest.raises(ValueError):
+        network.prune_node("B")
+
+    # OK. Now that we know that works, let's prune it harder.
+    network.prune_node("B", remove_backrefs=True)
+
+    # And make sure "B" is gone.
+    assert list(network.sort()) == ["A", "C", "D"]
+
+
+def test_dot_debug():
+    network = Network()
+
+    network.add_node("A")
+    network.add_node("B")
+    network.add_edge("A", "B")
+
+    dot = network.dot()
+    assert dot == "digraph graphname {A -> B;}"

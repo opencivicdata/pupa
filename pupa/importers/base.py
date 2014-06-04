@@ -139,7 +139,7 @@ class BaseImporter(object):
             with open(fname) as f:
                 dicts.append(json.load(f))
 
-        self.import_data(dicts)
+        return self.import_data(dicts)
 
     def _order_imports(self, dicts):
         # id: json
