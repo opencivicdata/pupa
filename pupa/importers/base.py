@@ -176,8 +176,8 @@ class BaseImporter(object):
             import_order.append((jid, data_by_id[jid]))
             in_network.add(jid)
 
-        # ensure all data made it into network
-        if in_network != set(data_by_id.keys()):
+        # ensure all data made it into network (paranoid check, should never fail)
+        if in_network != set(data_by_id.keys()):    # pragma: no cover
             raise Exception("import is missing nodes in network set")
 
         return import_order
