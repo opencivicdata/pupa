@@ -173,6 +173,15 @@ def test_bill_update_because_of_subitem():
     assert Bill.objects.count() == 1
     assert obj.actions.count() == 2
 
+    # different 2 actions, update
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_action('this is an action', actor='lower', date='1900-01-01')
+    bill.add_action('this is a different second action', actor='lower', date='1900-01-02')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'update'
+    assert Bill.objects.count() == 1
+    assert obj.actions.count() == 2
+
     # delete an action, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
     bill.add_action('this is a second action', actor='lower', date='1900-01-02')
@@ -203,6 +212,7 @@ def test_bill_update_subsubitem():
     create_org()
     oi = OrganizationImporter('jid')
 
+    # initial sub-subitem
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
     bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
@@ -210,6 +220,7 @@ def test_bill_update_subsubitem():
     assert obj.versions.count() == 1
     assert obj.versions.get().links.count() == 1
 
+    # a second subsubitem, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
     bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
     bill.add_version_link('printing', 'http://example.com/test.text', mimetype='text/plain')
@@ -217,3 +228,29 @@ def test_bill_update_subsubitem():
     assert what == 'update'
     assert obj.versions.count() == 1
     assert obj.versions.get().links.count() == 2
+
+    # same thing, noop
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
+    bill.add_version_link('printing', 'http://example.com/test.text', mimetype='text/plain')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'noop'
+    assert obj.versions.count() == 1
+    assert obj.versions.get().links.count() == 2
+
+    # different link for second one, update
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
+    bill.add_version_link('printing', 'http://example.com/test.txt', mimetype='text/plain')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'update'
+    assert obj.versions.count() == 1
+    assert obj.versions.get().links.count() == 2
+
+    # delete one, update
+    bill = ScrapeBill('HB 1', '1900', 'First Bill')
+    bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
+    obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    assert what == 'update'
+    assert obj.versions.count() == 1
+    assert obj.versions.get().links.count() == 1
