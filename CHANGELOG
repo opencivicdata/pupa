@@ -1,9 +1,9 @@
 0.4.0 - in development
 ======================
-* drop terms and session_details in favor of sessions
-* BUGFIX: remove Python 3 'unhashable object' error
-* BUGFIX: no error if pupa is run without commands
+* sweeping Postgres refactor
+* drop Python 2 support so we can demand kwargs by name
+* drastically increase test coverage
 
 0.3.0 - March 27 2014
 =====================
-* initial tagged release, after several internal untagged revisions
+* obsolete MongoDB version that was more a proof of concept based on lessons learned from billy
