@@ -241,7 +241,7 @@ def test_bill_update_subsubitem():
     # different link for second one, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
     bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
-    bill.add_version_link('printing', 'http://example.com/test.txt', mimetype='text/plain')
+    bill.add_version_link('printing', 'http://example.com/diff-link.txt', mimetype='text/plain')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'update'
     assert obj.versions.count() == 1

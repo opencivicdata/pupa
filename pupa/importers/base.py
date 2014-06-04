@@ -36,15 +36,14 @@ def items_differ(jsonitems, dbitems, subfield_dict):
 
     # go over dbitems looking for matches
     for dbitem in dbitems:
-        to_remove = None
+        match = None
         for i, jsonitem in enumerate(jsonitems):
-            print('jsonitem: ', jsonitem)
-            # if everything is equal, remove this item from jsonitems
+            # check if all keys (excluding subfields) match
             for k in keys:
                 if k not in subfield_dict and getattr(dbitem, k) != jsonitem[k]:
                     break
             else:
-                # for loop didn't break, meaning we're likely equal, just check subfields now
+                # all fields match so far, possibly equal, just check subfields now
                 for k in subfield_dict:
                     jsonsubitems = jsonitem[k]
                     dbsubitems = list(getattr(dbitem, k).all())
@@ -52,21 +51,23 @@ def items_differ(jsonitems, dbitems, subfield_dict):
                         break
                 else:
                     # these items are equal, so let's mark it for removal
-                    to_remove = i
+                    match = i
+                    break
 
-        if to_remove is not None:
-            # exists in both
-            jsonitems.pop(to_remove)
+        if match is not None:
+            # item exists in both, remove from jsonitems
+            jsonitems.pop(match)
+            print(jsonitems)
         else:
             # exists in db but not json
             return True
 
-    # something wasn't removed from jsonitems
-    if jsonitems:
+    # if we get here, jsonitems has to be empty because we asserted that the length was
+    # the same and we found a match for each thing in dbitems, here's a safety check just in case
+    if jsonitems:       # pragma: no cover
         return True
 
     return False
-
 
 
 class BaseImporter(object):
