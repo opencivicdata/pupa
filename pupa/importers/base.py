@@ -1,4 +1,5 @@
 import os
+import copy
 import glob
 import json
 import uuid
@@ -17,6 +18,55 @@ def omnihash(obj):
         return hash(frozenset((k, omnihash(v)) for k, v in obj.items()))
     else:
         return hash(obj)
+
+
+def items_differ(jsonitems, dbitems, subfield_dict):
+    """ check whether or not jsonitems and dbitems differ """
+
+    # short circuit common cases
+    if len(jsonitems) == len(dbitems) == 0:
+        # both are empty
+        return False
+    elif len(jsonitems) != len(dbitems):
+        # if lengths differ, they're definitely different
+        return True
+
+    jsonitems = copy.deepcopy(jsonitems)
+    keys = jsonitems[0].keys()
+
+    # go over dbitems looking for matches
+    for dbitem in dbitems:
+        to_remove = None
+        for i, jsonitem in enumerate(jsonitems):
+            print('jsonitem: ', jsonitem)
+            # if everything is equal, remove this item from jsonitems
+            for k in keys:
+                if k not in subfield_dict and getattr(dbitem, k) != jsonitem[k]:
+                    break
+            else:
+                # for loop didn't break, meaning we're likely equal, just check subfields now
+                for k in subfield_dict:
+                    jsonsubitems = jsonitem[k]
+                    dbsubitems = list(getattr(dbitem, k).all())
+                    if items_differ(jsonsubitems, dbsubitems, subfield_dict[k]):
+                        break
+                else:
+                    # these items are equal, so let's mark it for removal
+                    to_remove = i
+
+        if to_remove is not None:
+            # exists in both
+            jsonitems.pop(to_remove)
+        else:
+            # exists in db but not json
+            return True
+
+    # something wasn't removed from jsonitems
+    if jsonitems:
+        return True
+
+    return False
+
 
 
 class BaseImporter(object):
@@ -199,30 +249,6 @@ class BaseImporter(object):
         return obj, what
 
 
-    def _list_to_set(self, items, keys, subfield_dict):
-        if isinstance(items[0], dict):
-            get = lambda a, b: a[b]
-        else:
-            get = getattr
-        all_items = set()
-        for item in items:
-            # pull off subrelated fields
-            subrelated = {}
-            for subfield in subfield_dict:
-                subrelated[subfield] = get(item, subfield)
-
-            # put all k,v pairs into iset
-            iset = set()
-            for k in keys - set(subfield_dict):
-                itemval = get(item, k)
-                if isinstance(itemval, list):
-                    itemval = tuple(itemval)
-                iset.add((k, itemval))
-
-            all_items.add(frozenset(iset))
-
-        return all_items
-
 
     def _update_related(self, obj, related, subfield_dict):
         """
@@ -231,7 +257,9 @@ class BaseImporter(object):
             related:        dict mapping field names to lists of related objects
             subfield_list:  where to get the next layer of subfields
         """
+        # keep track of whether or not anything was updated
         updated = False
+
         # for each related field - check if there are differences
         for field, items in related.items():
             # get items from database
@@ -242,10 +270,7 @@ class BaseImporter(object):
             do_delete = do_update = False
 
             if items and dbitems_count:         # we have items, so does db, check for conflict
-                keys = set(items[0].keys())
-                dbset = self._list_to_set(dbitems, keys, subfield_dict[field])
-                itemset = self._list_to_set(items, keys, subfield_dict[field])
-                do_delete = do_update = (dbset != itemset)
+                do_delete = do_update = items_differ(items, dbitems, subfield_dict[field])
             elif items and not dbitems_count:   # we have items, db doesn't, just update
                 do_update = True
             elif not items and dbitems_count:   # db has items, we don't, just delete
@@ -255,7 +280,6 @@ class BaseImporter(object):
             if do_delete:
                 updated = True
                 getattr(obj, field).all().delete()
-
             if do_update:
                 updated = True
                 self._create_related(obj, {field: items}, subfield_dict)
