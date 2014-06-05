@@ -67,7 +67,7 @@ class Command(BaseCommand):
         module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
             # ensure we're sealing with a subclass of Jurisdiction
-            if getattr(obj, 'jurisdiction_id', None) and issubclass(obj, Jurisdiction):
+            if getattr(obj, 'division_id', None) and issubclass(obj, Jurisdiction):
                 return obj()
 
         raise CommandError('unable to import Jurisdiction subclass from ' + module_name)
@@ -84,12 +84,14 @@ class Command(BaseCommand):
         report = {}
 
         # do jurisdiction
-        jscraper = JurisdictionScraper(juris, datadir, args.strict, args.fastmode)
+        jscraper = JurisdictionScraper(juris, datadir, strict_validation=args.strict,
+                                       fastmode=args.fastmode)
         report['jurisdiction'] = jscraper.do_scrape()
 
         for scraper_name, scrape_args in scrapers.items():
             ScraperCls = juris.scrapers[scraper_name]
-            scraper = ScraperCls(juris, datadir, args.strict, args.fastmode)
+            scraper = ScraperCls(juris, datadir, strict_validation=args.strict,
+                                 fastmode=args.fastmode)
             report[scraper_name] = scraper.do_scrape(**scrape_args)
 
         return report
