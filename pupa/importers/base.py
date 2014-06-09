@@ -121,7 +121,11 @@ class BaseImporter(object):
         if json_id.startswith('~'):
             spec = get_psuedo_id(json_id)
             spec = self.limit_spec(spec)
-            return self.model_class.objects.get(**spec).id
+            try:
+                return self.model_class.objects.get(**spec).id
+            except self.model_class.DoesNotExist:
+                raise ValueError('cannot resolve psuedo-id to {}: {}'.format(
+                    self.model_class.__name__, json_id))
 
         # get the id that the duplicate points to, or use self
         json_id = self.duplicates.get(json_id, json_id)
@@ -129,7 +133,7 @@ class BaseImporter(object):
         try:
             return self.json_to_db_id[json_id]
         except KeyError:
-            raise ValueError('cannot resolve id: {0}'.format(json_id))
+            raise ValueError('cannot resolve id: {}'.format(json_id))
 
     def import_directory(self, datadir):
         """ import a JSON directory into the database """
