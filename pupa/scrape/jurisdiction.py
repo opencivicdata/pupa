@@ -39,6 +39,8 @@ class Jurisdiction(BaseModel):
         return '{}/{}'.format(self.division_id.replace('ocd-division', 'ocd-jurisdiction'),
                               self.classification)
 
+    _id = jurisdiction_id
+
     def as_dict(self):
         return {'_id': self.jurisdiction_id, 'id': self.jurisdiction_id,
                 'name': self.name, 'url': self.url, 'division_id': self.division_id,

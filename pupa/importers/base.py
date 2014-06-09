@@ -57,7 +57,6 @@ def items_differ(jsonitems, dbitems, subfield_dict):
         if match is not None:
             # item exists in both, remove from jsonitems
             jsonitems.pop(match)
-            print(jsonitems)
         else:
             # exists in db but not json
             return True
