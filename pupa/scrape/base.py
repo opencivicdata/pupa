@@ -208,7 +208,7 @@ class ContactDetailMixin(object):
         super(ContactDetailMixin, self).__init__()
         self.contact_details = []
 
-    def add_contact_detail(self, *, type, value, note):
+    def add_contact_detail(self, *, type, value, note=''):
         self.contact_details.append({"type": type, "value": value, "note": note})
 
 
