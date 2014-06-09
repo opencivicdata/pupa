@@ -10,6 +10,7 @@ class Jurisdiction(BaseModel):
     _schema = schema
 
     # schema objects
+    classification = None
     name = None
     url = None
     sessions = []
@@ -39,10 +40,9 @@ class Jurisdiction(BaseModel):
 
     def as_dict(self):
         return {'_id': self._id, 'id': self._id, 'name': self.name, 'url': self.url,
-                'division_id': self.division_id, 'sessions': self.sessions,
-                'feature_flags': self.feature_flags,
-                'extras': self.extras,
-               }
+                'division_id': self.division_id, 'classification': self.classification,
+                'sessions': self.sessions, 'feature_flags': self.feature_flags,
+                'extras': self.extras, }
 
     def get_session_list(self):
         raise NotImplementedError('get_session_list is not implemented')    # pragma: no cover

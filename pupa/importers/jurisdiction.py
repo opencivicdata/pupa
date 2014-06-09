@@ -8,4 +8,5 @@ class JurisdictionImporter(BaseImporter):
     related_models = {'sessions': {}}
 
     def get_object(self, data):
-        return self.model_class.objects.get(id=data['id'])
+        return self.model_class.objects.get(division_id=data['division_id'],
+                                            classification=data['classification'])

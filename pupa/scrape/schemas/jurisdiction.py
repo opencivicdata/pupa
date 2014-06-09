@@ -6,6 +6,8 @@ schema = {
     "description": "Information about a jurisdiction, including session, chamber, etc.",
     "type": "object",
     "properties": {
+        "classification": {"type": "string",
+                 "description": "Jurisidction's type (e.g. government or school board)"},
         "name": {"type": "string",
                  "description": "Name of jurisdiction (e.g. North Carolina General Assembly)"},
         "url": {"type": "string", "description": "URL pointing to jurisdiction's website.", },

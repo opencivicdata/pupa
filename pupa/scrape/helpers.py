@@ -18,7 +18,8 @@ class Legislator(Person):
         # before saving create a membership to the current jurisdiction
         post_kwargs = {"label": self._district}
         if self._chamber:
-            post_kwargs['chamber'] = self._chamber
+            post_kwargs['organization__chamber'] = self._chamber
+            post_kwargs['organization__classification'] = 'legislature'
 
         membership = Membership(
             person_id=self._id,

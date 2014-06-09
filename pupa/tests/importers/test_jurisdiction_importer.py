@@ -5,10 +5,10 @@ from opencivicdata.models import Jurisdiction
 
 
 class FakeJurisdiction(JurisdictionBase):
-    jurisdiction_id = 'jurisdiction-id'
     division_id = 'division-id'
     name = 'test'
     url = 'http://example.com'
+    classification = 'government'
 
 
 @pytest.mark.django_db
@@ -22,3 +22,12 @@ def test_jurisdiction_import():
     assert dbj.division_id == tj.division_id
     assert dbj.name == tj.name
     assert dbj.url == tj.url
+
+
+@pytest.mark.django_db
+def test_jurisdiction_no_duplicates():
+    tj = FakeJurisdiction()
+    ji = JurisdictionImporter('jurisdiction-id')
+    ji.import_data([tj.as_dict()])
+    ji.import_data([tj.as_dict()])
+    assert Jurisdiction.objects.count() == 1
