@@ -96,7 +96,7 @@ def test_psuedo_ids():
     assert oi1.resolve_json_id('~{"classification":"legislature", "chamber":"lower"}') == house.id
     assert oi1.resolve_json_id('~{"classification":"party", "name":"Wild"}') == wild.id
 
-    with pytest.raises(Organization.DoesNotExist):
+    with pytest.raises(ValueError):
         oi1.resolve_json_id('~{"classification":"international", "name":"United Nations"}')
 
     oi2 = OrganizationImporter('jid2')
