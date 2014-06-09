@@ -1,7 +1,7 @@
 dj_database_url
 django-uuidfield
 djorm-ext-pgarray
-http://www.djangoproject.com/download/1.7b4/tarball/
+http://www.djangoproject.com/download/1.7b3/tarball/
 jsonfield
 opencivicdata
 psycopg2
