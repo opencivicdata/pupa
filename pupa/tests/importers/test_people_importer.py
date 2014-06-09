@@ -9,7 +9,7 @@ def test_full_person():
     person = ScrapePerson('Tom Sawyer')
     person.add_identifier('1')
     person.add_name('Tommy', start_date='1880')
-    person.add_contact_detail('phone', '555-555-1234', 'this is fake')
+    person.add_contact_detail(type='phone', value='555-555-1234', note='this is fake')
     person.add_link('http://example.com/link')
     person.add_source('http://example.com/source')
 

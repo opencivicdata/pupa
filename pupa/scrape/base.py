@@ -197,7 +197,7 @@ class SourceMixin(object):
         super(SourceMixin, self).__init__()
         self.sources = []
 
-    def add_source(self, url, note=''):
+    def add_source(self, url, *, note=''):
         """ Add a source URL from which data was collected """
         new = {'url': url, 'note': note}
         self.sources.append(new)
@@ -208,7 +208,7 @@ class ContactDetailMixin(object):
         super(ContactDetailMixin, self).__init__()
         self.contact_details = []
 
-    def add_contact_detail(self, type, value, note):
+    def add_contact_detail(self, *, type, value, note):
         self.contact_details.append({"type": type, "value": value, "note": note})
 
 
@@ -217,7 +217,7 @@ class LinkMixin(object):
         super(LinkMixin, self).__init__()
         self.links = []
 
-    def add_link(self, url, note=''):
+    def add_link(self, url, *, note=''):
         self.links.append({"note": note, "url": url})
 
 
@@ -226,7 +226,7 @@ class IdentifierMixin(object):
         super(IdentifierMixin, self).__init__()
         self.identifiers = []
 
-    def add_identifier(self, identifier, scheme=''):
+    def add_identifier(self, identifier, *, scheme=''):
         self.identifiers.append({"identifier": identifier, "scheme": scheme})
 
 
@@ -235,7 +235,7 @@ class OtherNameMixin(object):
         super(OtherNameMixin, self).__init__()
         self.other_names = []
 
-    def add_name(self, name, start_date='', end_date='', note=''):
+    def add_name(self, name, *, start_date='', end_date='', note=''):
         other_name = {'name': name}
         if start_date:
             other_name['start_date'] = start_date

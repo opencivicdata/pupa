@@ -9,7 +9,7 @@ def test_full_organization():
     org = ScrapeOrganization('United Nations', classification='international')
     org.add_identifier('un')
     org.add_name('UN', start_date='1945')
-    org.add_contact_detail('phone', '555-555-1234', 'this is fake')
+    org.add_contact_detail(type='phone', value='555-555-1234', note='this is fake')
     org.add_link('http://example.com/link')
     org.add_source('http://example.com/source')
 

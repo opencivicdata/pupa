@@ -11,7 +11,7 @@ def test_full_post():
                                       jurisdiction_id="jurisdiction-id")
     post = ScrapePost(label='executive', role='President',
                       organization_id='~{"classification": "executive"}')
-    post.add_contact_detail('phone', '555-555-1234', 'this is fake')
+    post.add_contact_detail(type='phone', value='555-555-1234', note='this is fake')
     post.add_link('http://example.com/link')
 
     # import post
