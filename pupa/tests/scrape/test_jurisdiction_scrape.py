@@ -3,10 +3,10 @@ from pupa.scrape import Jurisdiction, Organization, JurisdictionScraper
 
 
 class FakeJurisdiction(Jurisdiction):
-    jurisdiction_id = 'test'
+    division_id = 'ocd-division/test'
+    classification = 'government'
     name = 'Test'
     url = 'http://example.com'
-    division_id = 'division'
 
     organizations = [Organization('House', chamber='lower'),
                      Organization('Senate', chamber='upper')]
@@ -17,12 +17,7 @@ class FakeJurisdiction(Jurisdiction):
 def test_basics():
     # id property and string
     j = FakeJurisdiction()
-
-    j.jurisdiction_id = 'test'
-    assert j._id == 'test'
-    j._id = 'new'
-    assert j.jurisdiction_id == 'new'
-
+    assert j.jurisdiction_id == 'ocd-jurisdiction/test/government'
     assert j.name in str(j)
 
 
@@ -30,7 +25,7 @@ def test_as_dict():
     j = FakeJurisdiction()
     d = j.as_dict()
 
-    assert d['_id'] == j._id
+    assert d['_id'] == j.jurisdiction_id
     assert d['name'] == j.name
     assert d['url'] == j.url
     assert d['sessions'] == []

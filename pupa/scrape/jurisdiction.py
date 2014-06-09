@@ -28,19 +28,21 @@ class Jurisdiction(BaseModel):
     parent_id = None
     ignored_scraped_sessions = []
 
-    # add _id property to mimic other types without a user-set ID
+    def __init__(self):
+        super(BaseModel, self).__init__()
+        self._related = []
+        self._meta = {}
+        self.extras = {}
 
     @property
-    def _id(self):
-        return self.jurisdiction_id
-
-    @_id.setter
-    def _id(self, val):
-        self.jurisdiction_id = val
+    def jurisdiction_id(self):
+        return '{}/{}'.format(self.division_id.replace('ocd-division', 'ocd-jurisdiction'),
+                              self.classification)
 
     def as_dict(self):
-        return {'_id': self._id, 'id': self._id, 'name': self.name, 'url': self.url,
-                'division_id': self.division_id, 'classification': self.classification,
+        return {'_id': self.jurisdiction_id, 'id': self.jurisdiction_id,
+                'name': self.name, 'url': self.url, 'division_id': self.division_id,
+                'classification': self.classification,
                 'sessions': self.sessions, 'feature_flags': self.feature_flags,
                 'extras': self.extras, }
 
