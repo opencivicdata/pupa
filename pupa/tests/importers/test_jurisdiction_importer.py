@@ -25,9 +25,18 @@ def test_jurisdiction_import():
 
 
 @pytest.mark.django_db
-def test_jurisdiction_no_duplicates():
+def test_jurisdiction_update():
     tj = FakeJurisdiction()
     ji = JurisdictionImporter('jurisdiction-id')
-    ji.import_data([tj.as_dict()])
-    ji.import_data([tj.as_dict()])
+    _, what = ji.import_item(tj.as_dict())
+    assert what == 'insert'
+
+    _, what = ji.import_item(tj.as_dict())
+    assert what == 'noop'
     assert Jurisdiction.objects.count() == 1
+
+    tj.name = 'different name'
+    obj, what = ji.import_item(tj.as_dict())
+    assert what == 'update'
+    assert Jurisdiction.objects.count() == 1
+    assert obj.name == 'different name'
