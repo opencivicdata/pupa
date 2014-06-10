@@ -41,9 +41,8 @@ class Network(object):
         Return an interable of nodes with no edges pointing at them. This is
         helpful to find all nodes without dependencies.
         """
-        deps = set([
-            item for sublist in self.edges.values() for item in sublist
-        ])  # Now contains all nodes that contain dependencies.
+        deps = { item for sublist in self.edges.values() for item in sublist }
+        # Now contains all nodes that contain dependencies.
         return (x for x in self.nodes if x not in deps)  # Generator that
         # contains all nodes *without* any dependencies (leaf nodes)
 
