@@ -95,3 +95,21 @@ def test_deduplication_no_jurisdiction_overlap():
     pd = person.as_dict()
     PersonImporter('new-jurisdiction-id').import_data([pd])
     assert Person.objects.all().count() == 2
+
+
+@pytest.mark.django_db
+def test_multiple_memberships():
+    # there was a bug where two or more memberships to the same jurisdiction
+    # would cause an ORM error, this test ensures that it is fixed
+    p = Person.objects.create(name='Dwayne Johnson')
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    Membership.objects.create(person=p, organization=o)
+    o = Organization.objects.create(name='WWF', jurisdiction_id='jurisdiction-id')
+    Membership.objects.create(person=p, organization=o)
+
+    person = ScrapePerson('Dwayne Johnson')
+    pd = person.as_dict()
+    PersonImporter('jurisdiction-id').import_data([pd])
+
+    # deduplication should still work
+    assert Person.objects.all().count() == 1
