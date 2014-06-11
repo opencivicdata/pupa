@@ -21,12 +21,12 @@ class Network(object):
     """
 
     def __init__(self):
-        self.nodes = []
+        self.nodes = set()
         self.edges = defaultdict(set)
 
     def add_node(self, node):
         """ Add a node to the graph (with no edges) """
-        self.nodes.append(node)
+        self.nodes.add(node)
 
     def add_edge(self, fro, to):
         """
@@ -38,6 +38,8 @@ class Network(object):
         Committee on Finance -> Subcommittee of the Finance Committee on Budget
                             \-> Subcommittee of the Finance Committee on Roads
         """
+        self.add_node(fro)
+        self.add_node(to)
         self.edges[fro].add(to)
 
     def leaf_nodes(self):
@@ -45,17 +47,17 @@ class Network(object):
         Return an interable of nodes with no edges pointing at them. This is
         helpful to find all nodes without dependencies.
         """
-        deps = { item for sublist in self.edges.values() for item in sublist }
         # Now contains all nodes that contain dependencies.
-        return (x for x in self.nodes if x not in deps)  # Generator that
+        deps = { item for sublist in self.edges.values() for item in sublist }
         # contains all nodes *without* any dependencies (leaf nodes)
+        return self.nodes - deps
 
     def prune_node(self, node, remove_backrefs=False):
         """
         remove node `node` from the network (including any edges that may
         have been pointing at `node`).
         """
-        self.nodes = [x for x in self.nodes if x != node]
+        self.nodes.remove(node)
         if node in self.edges:
             # Remove add edges from this node if we're pruning it.
             self.edges.pop(node)
@@ -77,7 +79,7 @@ class Network(object):
         Return an iterable of nodes, toplogically sorted to correctly import
         dependencies before leaf nodes.
         """
-        while self.nodes != []:
+        while self.nodes:
             iterated = False
             for node in self.leaf_nodes():
                 iterated = True
