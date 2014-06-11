@@ -4,9 +4,19 @@ from pupa.utils.topsort import Network, CyclicGraphError
 
 def chash(cycles):
     """
-    Hash a cycle, useful for comparing cycles.
+    Hash a cycle, useful for comparing sets of cycles.
+
+    This checks the sorted set of each of the nodes in the cycle. This
+    is *not* a perfect check, but it's useful so that we can create a set
+    of these hashes, and check that they all match.
+
+    It's not perfect, since D -> A -> B will be the same as B -> A -> D,
+    but since this is only used in the testing logic, we can ensure
+    that we handle it correctly in the testcases.
+
+    (Implicit warning: Don't use this anywhere important.)
     """
-    return {"".join(set(x)) for x in cycles}
+    return {"".join(sorted(set(x))) for x in cycles}
 
 
 def test_sort_order_basic():
@@ -200,6 +210,9 @@ def test_cycles_complex():
     network.add_edge("D", "C")
     network.add_edge("C", "B")
     network.add_edge("B", "D")
+
+    # with open("/home/tag/debug.dot", 'w') as fd:
+    #     fd.write(network.dot())
 
     assert chash(network.cycles()) == chash([
         ('B', 'C', 'B'),
