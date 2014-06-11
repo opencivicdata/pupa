@@ -164,3 +164,26 @@ def test_dot_debug():
 
     dot = network.dot()
     assert dot == "digraph graphname {A -> B;}"
+
+
+def test_cycles_simple():
+    network = Network()
+    network.add_node("A")
+    network.add_node("B")
+    network.add_edge("A", "B")
+    network.add_edge("B", "A")
+    assert list(network.cycles()) == [("A", "B", "A")]
+
+
+def test_cycles_complex():
+    network = Network()
+    network.add_node("A")
+    network.add_node("B")
+    network.add_node("C")
+    network.add_node("D")
+
+    network.add_edge("A", "B")
+    network.add_edge("B", "C")
+    network.add_edge("C", "D")
+    network.add_edge("D", "A")
+    assert list(network.cycles()) == [("A", "B", "C", "D", "A")]
