@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import chain
 
 
 class CyclicGraphError(ValueError):
@@ -92,3 +93,40 @@ class Network(object):
                 buff += "%s -> %s;" % (fro, to)
         buff += "}"
         return buff
+
+    def cycles(self):
+        """
+        Fairly expensive cycle detection algorithm. This method
+        will return the shortest unique cycles that were detected.
+        """
+
+        def walk_node(node, seen):
+            """
+            Walk each top-level node we know about, and recurse
+            along the graph.
+            """
+            if node in seen:
+                yield (node,)
+                return
+            seen.add(node)
+            for edge in self.edges[node]:
+                for cycle in walk_node(edge, set(seen)):
+                    yield (node,) + cycle
+
+        # First, let's get a iterable of all known cycles.
+        cycles = chain.from_iterable(
+            (walk_node(node, set()) for node in self.nodes))
+
+        shortest = set()
+        hash_ = lambda x: "".join(sorted(set(x)))
+        # Now, let's go through and sift through the cycles, finding
+        # the shortest unique cycle known, ignoring cycles which contain
+        # already known cycles.
+        for cycle in sorted(cycles, key=len):
+            for el in shortest:
+                if hash_(el) in hash_(cycle):
+                    break
+            else:
+                shortest.add(cycle)
+        # And return that unique list.
+        return shortest
