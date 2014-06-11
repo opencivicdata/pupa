@@ -57,6 +57,15 @@ class Network(object):
         remove node `node` from the network (including any edges that may
         have been pointing at `node`).
         """
+        if not remove_backrefs:
+            for fro, connections in self.edges.items():
+                if node in self.edges[fro]:
+                    raise ValueError("""Attempting to remove a node with
+                                     backrefs. You may consider setting
+                                     `remove_backrefs` to true.""")
+
+        # OK. Otherwise, let's do our removal.
+
         self.nodes.remove(node)
         if node in self.edges:
             # Remove add edges from this node if we're pruning it.
@@ -65,14 +74,8 @@ class Network(object):
         for fro, connections in self.edges.items():
             # Remove any links to this node (if they exist)
             if node in self.edges[fro]:
-                if remove_backrefs:
-                    # If we should remove backrefs:
-                    self.edges[fro].remove(node)
-                else:
-                    # Let's raise an Exception
-                    raise ValueError("""Attempting to remove a node with
-                                     backrefs. You may consider setting
-                                     `remove_backrefs` to true.""")
+                # If we should remove backrefs:
+                self.edges[fro].remove(node)
 
     def sort(self):
         """
@@ -129,7 +132,7 @@ class Network(object):
             (walk_node(node, set()) for node in self.nodes))
 
         shortest = set()
-        hash_ = lambda x: "".join(sorted(set(x)))
+        hash_ = lambda x: "".join(set(x))
         # Now, let's go through and sift through the cycles, finding
         # the shortest unique cycle known, ignoring cycles which contain
         # already known cycles.

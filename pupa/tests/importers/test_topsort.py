@@ -2,6 +2,13 @@ import pytest
 from pupa.utils.topsort import Network, CyclicGraphError
 
 
+def chash(cycles):
+    """
+    Hash a cycle, useful for comparing cycles.
+    """
+    return {"".join(set(x)) for x in cycles}
+
+
 def test_sort_order_basic():
     network = Network()
     network.add_node("A")
@@ -11,7 +18,6 @@ def test_sort_order_basic():
     network.add_edge("A", "B")
     network.add_edge("B", "C")
 
-    # A => B => C
     assert (list(network.sort())) == ["A", "B", "C"]
 
 
@@ -76,7 +82,9 @@ def test_sort_order_staged():
 
     assert sorted_order.pop(0) == "C1"
     assert sorted_order.pop(0) == "B1"
-    assert sorted_order.pop(0) == "A1"
+    assert sorted_order.pop(0) in ("A1", "B2")
+    #                          ^^ This makes more sense after you dot debug it
+    assert sorted_order.pop(0) in ("A1", "B2")
 
 
 def test_cyclic_graph_error_simple():
@@ -142,6 +150,8 @@ def test_internal_node_removal():
     network.add_edge("A", "B")
     network.add_edge("B", "C")
     network.add_edge("C", "D")
+    network.add_edge("A", "C")  # Useful for ensuring the ending list
+    # is deterministic.
 
     # Ensure that we can't remove an internal node without a ValueError
     # by default.
@@ -172,7 +182,7 @@ def test_cycles_simple():
     network.add_node("B")
     network.add_edge("A", "B")
     network.add_edge("B", "A")
-    assert list(network.cycles()) == [("A", "B", "A")]
+    assert chash(network.cycles()) == chash([("A", "B", "A")])
 
 
 def test_cycles_complex():
@@ -191,7 +201,7 @@ def test_cycles_complex():
     network.add_edge("C", "B")
     network.add_edge("B", "D")
 
-    assert network.cycles() == set([
+    assert chash(network.cycles()) == chash([
         ('B', 'C', 'B'),
         ('C', 'D', 'C'),
         ('A', 'B', 'D', 'A')
