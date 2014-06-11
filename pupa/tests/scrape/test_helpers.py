@@ -44,24 +44,6 @@ def test_legislator_related_party():
     assert l._related[1].role == 'member'
 
 
-def test_committee_pre_save():
-    # simplest case
-    c = Committee('Defense')
-    c.pre_save('jurisdiction-id')
-    assert get_psuedo_id(c.parent_id) == {'classification': 'legislature', 'chamber': ''}
-    assert c.classification == 'committee'
-
-    # with chamber
-    c = Committee('Appropriations', chamber='upper')
-    c.pre_save('jurisdiction-id')
-    assert get_psuedo_id(c.parent_id) == {'classification': 'legislature', 'chamber': 'upper'}
-
-    # don't override set parent_id
-    c2 = Committee('Farm Subsidies', parent_id=c._id)
-    c2.pre_save('jurisdiction-id')
-    assert c2.parent_id == c._id
-
-
 def test_committee_add_member_person():
     c = Committee('Defense')
     p = Person('John Adams')
