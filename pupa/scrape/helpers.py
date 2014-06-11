@@ -46,11 +46,6 @@ class Committee(Organization):
         super(Committee, self).__init__(name=name, classification='committee', chamber=chamber,
                                         **kwargs)
 
-    def pre_save(self, jurisdiction_id):
-        # before saving set parent to the chamber
-        if not self.parent_id:
-            self.parent_id = make_psuedo_id(classification='legislature', chamber=self.chamber)
-
     def add_member(self, name_or_person, role='member', **kwargs):
         if isinstance(name_or_person, Person):
             membership = Membership(person_id=name_or_person._id, organization_id=self._id,
