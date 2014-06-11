@@ -98,6 +98,12 @@ class Network(object):
         """
         Fairly expensive cycle detection algorithm. This method
         will return the shortest unique cycles that were detected.
+
+        Debug usage may look something like:
+
+        print("The following cycles were found:")
+        for cycle in network.cycles():
+            print("    ", " -> ".join(cycle))
         """
 
         def walk_node(node, seen):
