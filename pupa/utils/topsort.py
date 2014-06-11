@@ -132,13 +132,12 @@ class Network(object):
             (walk_node(node, set()) for node in self.nodes))
 
         shortest = set()
-        hash_ = lambda x: "".join(set(x))
         # Now, let's go through and sift through the cycles, finding
         # the shortest unique cycle known, ignoring cycles which contain
         # already known cycles.
         for cycle in sorted(cycles, key=len):
             for el in shortest:
-                if hash_(el) in hash_(cycle):
+                if set(el).issubset(set(cycle)):
                     break
             else:
                 shortest.add(cycle)
