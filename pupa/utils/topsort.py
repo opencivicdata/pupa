@@ -30,11 +30,6 @@ class Network(object):
 
     def add_edge(self, fro, to):
         """
-        Add an edge from node `fro` to node `to`. For instance, to say that
-        `foo` depends on `bar`, you'd say::
-
-            `network.add_edge('foo', 'bar')`
-
         When doing topological sorting, the semantics of the edge mean that
         the depedency runs from the parent to the child - which is to say that
         the parent is required to be sorted *before* the child.
