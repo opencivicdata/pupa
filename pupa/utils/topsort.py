@@ -34,6 +34,14 @@ class Network(object):
         `foo` depends on `bar`, you'd say::
 
             `network.add_edge('foo', 'bar')`
+
+        When doing topological sorting, the semantics of the edge mean that
+        the depedency runs from the parent to the child - which is to say that
+        the parent is required to be sorted *before* the child.
+
+                  [ FROM ] ------> [ TO ]
+        Committee on Finance -> Subcommittee of the Finance Committee on Budget
+                            \-> Subcommittee of the Finance Committee on Roads
         """
         self.edges[fro].add(to)
 
