@@ -186,4 +186,13 @@ def test_cycles_complex():
     network.add_edge("B", "C")
     network.add_edge("C", "D")
     network.add_edge("D", "A")
-    assert list(network.cycles()) == [("A", "B", "C", "D", "A")]
+
+    network.add_edge("D", "C")
+    network.add_edge("C", "B")
+    network.add_edge("B", "D")
+
+    assert network.cycles() == set([
+        ('B', 'C', 'B'),
+        ('C', 'D', 'C'),
+        ('A', 'B', 'D', 'A')
+    ])
