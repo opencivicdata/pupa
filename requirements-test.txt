@@ -1,6 +1,6 @@
 dj_database_url
 django-uuidfield
-djorm-ext-pgarray
+djorm-pgarray
 http://www.djangoproject.com/download/1.7b3/tarball/
 jsonfield
 opencivicdata
