@@ -13,8 +13,8 @@ class DumbMockImporter(object):
 
 def create_jurisdiction():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
-    j.sessions.create(name='1899')
-    j.sessions.create(name='1900')
+    j.legislative_sessions.create(name='1899')
+    j.legislative_sessions.create(name='1900')
 
 
 def create_org():

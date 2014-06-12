@@ -13,7 +13,7 @@ class Jurisdiction(BaseModel):
     classification = None
     name = None
     url = None
-    sessions = []
+    legislative_sessions = []
     feature_flags = []
     extras = {}
     other_names = []
@@ -45,8 +45,8 @@ class Jurisdiction(BaseModel):
         return {'_id': self.jurisdiction_id, 'id': self.jurisdiction_id,
                 'name': self.name, 'url': self.url, 'division_id': self.division_id,
                 'classification': self.classification,
-                'sessions': self.sessions, 'feature_flags': self.feature_flags,
-                'extras': self.extras, }
+                'legislative_sessions': self.legislative_sessions,
+                'feature_flags': self.feature_flags, 'extras': self.extras, }
 
     def get_session_list(self):
         raise NotImplementedError('get_session_list is not implemented')    # pragma: no cover

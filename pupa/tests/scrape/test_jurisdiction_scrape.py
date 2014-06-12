@@ -28,7 +28,7 @@ def test_as_dict():
     assert d['_id'] == j.jurisdiction_id
     assert d['name'] == j.name
     assert d['url'] == j.url
-    assert d['sessions'] == []
+    assert d['legislative_sessions'] == []
     assert d['feature_flags'] == []
 
 

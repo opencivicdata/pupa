@@ -11,7 +11,7 @@ schema = {
         "name": {"type": "string",
                  "description": "Name of jurisdiction (e.g. North Carolina General Assembly)"},
         "url": {"type": "string", "description": "URL pointing to jurisdiction's website.", },
-        "sessions": {
+        "legislative_sessions": {
             "type": "array", "items": {"type": "object", "properties": {
                 "name": {"type": "string", "description": "Name of session."},
                 "type": {"type": "string", "required": False,
