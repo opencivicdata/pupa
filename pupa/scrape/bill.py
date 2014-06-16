@@ -57,9 +57,9 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
             return make_psuedo_id(classification='legislature')
 
 
-    def add_action(self, description, date, *, organization=None, chamber=None,
+    def add_action(self, text, date, *, organization=None, chamber=None,
                    classification=None, related_entities=None):
-        action = Action(description=description, date=date,
+        action = Action(text=text, date=date,
                         organization_id=self._set_organization(organization, chamber),
                         classification=cleanup_list(classification, []), related_entities=[])
         self.actions.append(action)

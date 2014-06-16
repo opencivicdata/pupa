@@ -69,8 +69,8 @@ def test_full_bill():
     assert len(actions) == 2
     # ensure order was preserved (if this breaks it'll be intermittent)
     assert actions[0].organization == Organization.objects.get(classification='legislature')
-    assert actions[0].description == "introduced in house"
-    assert actions[1].description == "sent to arbitrary committee"
+    assert actions[0].text == "introduced in house"
+    assert actions[1].text == "sent to arbitrary committee"
     assert (actions[1].related_entities.get().organization ==
             Organization.objects.get(classification='committee'))
 

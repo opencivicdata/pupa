@@ -153,7 +153,7 @@ schema = {
         "actions": {
             "items": {
                 "properties": {
-                    "description": {
+                    "text": {
                         "type": "string",
                         "description": "description of the action taken as given by source"
                     },
