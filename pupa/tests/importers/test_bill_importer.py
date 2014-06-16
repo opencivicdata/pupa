@@ -1,14 +1,8 @@
 import pytest
 from pupa.scrape import Bill as ScrapeBill
+from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import BillImporter, OrganizationImporter
 from opencivicdata.models import Bill, Jurisdiction, Person, Organization
-
-
-class DumbMockImporter(object):
-    """ this is a mock importer that implements a resolve_json_id that is just a pass-through """
-
-    def resolve_json_id(self, json_id):
-        return json_id
 
 
 def create_jurisdiction():
@@ -25,21 +19,22 @@ def create_org():
 @pytest.mark.django_db
 def test_full_bill():
     create_jurisdiction()
-    org = create_org()
     person = Person.objects.create(id='person-id', name='Adam Smith')
-    com = Organization.objects.create(id='com-id', name='Arbitrary Committee', parent=org)
+    org = ScrapeOrganization(name='House', chamber='lower', classification='legislature')
+    com = ScrapeOrganization(name='Arbitrary Committee', classification='committee',
+                             parent_id=org._id)
 
     oldbill = ScrapeBill('HB 99', '1899', 'Axe & Tack Tax Act',
-                         classification='tax bill', from_organization=org.id)
+                         classification='tax bill', from_organization=org._id)
 
     bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act',
-                      classification='tax bill', from_organization=org.id)
+                      classification='tax bill', from_organization=org._id)
     bill.subject = ['taxes', 'axes']
     bill.add_name('SB 9')
     bill.add_title('Tack & Axe Tax Act')
-    bill.add_action('introduced in house', 'house', '1900-04-01')
-    act = bill.add_action('sent to arbitrary committee', 'senate', '1900-04-04')
-    act.add_related_entity('arbitrary committee', 'organization', 'com-id')
+    bill.add_action('introduced in house', '1900-04-01', chamber='lower')
+    act = bill.add_action('sent to arbitrary committee', '1900-04-04', chamber='lower')
+    act.add_related_entity('arbitrary committee', 'organization', com._id)
     bill.add_related_bill("HB 99", session="1899", relation_type="prior-session")
     bill.add_sponsor('Adam Smith', classification='extra sponsor', entity_type='person',
                      primary=False, entity_id=person.id)
@@ -52,7 +47,8 @@ def test_full_bill():
     bill.add_source('http://example.com/source')
 
     # import bill
-    oi = DumbMockImporter()
+    oi = OrganizationImporter('jid')
+    oi.import_data([org.as_dict(), com.as_dict()])
     BillImporter('jid', oi).import_data([oldbill.as_dict(), bill.as_dict()])
 
     # get bill from db and assert it imported correctly
@@ -72,9 +68,11 @@ def test_full_bill():
     actions = list(b.actions.all())
     assert len(actions) == 2
     # ensure order was preserved (if this breaks it'll be intermittent)
+    assert actions[0].organization == Organization.objects.get(classification='legislature')
     assert actions[0].description == "introduced in house"
     assert actions[1].description == "sent to arbitrary committee"
-    assert actions[1].related_entities.get().organization == com
+    assert (actions[1].related_entities.get().organization ==
+            Organization.objects.get(classification='committee'))
 
     # related_bills were added
     rb = b.related_bills.get()
@@ -150,15 +148,15 @@ def test_bill_update_because_of_subitem():
 
     # initial bill
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_action('this is an action', actor='lower', date='1900-01-01')
+    bill.add_action('this is an action', chamber='lower', date='1900-01-01')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'insert'
     assert obj.actions.count() == 1
 
     # now let's make sure we get updated when there are second actions
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_action('this is an action', actor='lower', date='1900-01-01')
-    bill.add_action('this is a second action', actor='lower', date='1900-01-02')
+    bill.add_action('this is an action', chamber='lower', date='1900-01-01')
+    bill.add_action('this is a second action', chamber='lower', date='1900-01-02')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'update'
     assert Bill.objects.count() == 1
@@ -166,8 +164,8 @@ def test_bill_update_because_of_subitem():
 
     # same 2 actions, noop
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_action('this is an action', actor='lower', date='1900-01-01')
-    bill.add_action('this is a second action', actor='lower', date='1900-01-02')
+    bill.add_action('this is an action', chamber='lower', date='1900-01-01')
+    bill.add_action('this is a second action', chamber='lower', date='1900-01-02')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'noop'
     assert Bill.objects.count() == 1
@@ -175,8 +173,8 @@ def test_bill_update_because_of_subitem():
 
     # different 2 actions, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_action('this is an action', actor='lower', date='1900-01-01')
-    bill.add_action('this is a different second action', actor='lower', date='1900-01-02')
+    bill.add_action('this is an action', chamber='lower', date='1900-01-01')
+    bill.add_action('this is a different second action', chamber='lower', date='1900-01-02')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'update'
     assert Bill.objects.count() == 1
@@ -184,7 +182,7 @@ def test_bill_update_because_of_subitem():
 
     # delete an action, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_action('this is a second action', actor='lower', date='1900-01-02')
+    bill.add_action('this is a second action', chamber='lower', date='1900-01-02')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'update'
     assert Bill.objects.count() == 1
@@ -199,7 +197,7 @@ def test_bill_update_because_of_subitem():
 
     # and back to initial status, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_action('this is an action', actor='lower', date='1900-01-01')
+    bill.add_action('this is an action', chamber='lower', date='1900-01-01')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'update'
     assert Bill.objects.count() == 1

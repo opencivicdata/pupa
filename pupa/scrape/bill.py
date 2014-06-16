@@ -31,16 +31,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.session = session
         self.title = title
         self.classification = cleanup_list(classification, ['bill'])
-
-        if from_organization and chamber:
-            raise ValueError('cannot specify both chamber and from_organization')
-        elif chamber:
-            self.from_organization = make_psuedo_id(classification='legislature', chamber=chamber)
-        elif from_organization:
-            self.from_organization = from_organization
-        else:
-            # neither specified
-            self.from_organization = make_psuedo_id(classification='legislature')
+        self.from_organization = self._set_organization(from_organization, chamber)
 
         self.actions = []
         self.other_names = []
@@ -52,8 +43,24 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.summaries = []
         self.versions = []
 
-    def add_action(self, description, actor, date, *, classification=None, related_entities=None):
-        action = Action(description=description, actor=actor, date=date,
+
+    def _set_organization(self, organization, chamber):
+        """ helper for setting an appropriate ID for organizations """
+        if organization and chamber:
+            raise ValueError('cannot specify both chamber and organization')
+        elif chamber:
+            return make_psuedo_id(classification='legislature', chamber=chamber)
+        elif organization:
+            return organization
+        else:
+            # neither specified
+            return make_psuedo_id(classification='legislature')
+
+
+    def add_action(self, description, date, *, organization=None, chamber=None,
+                   classification=None, related_entities=None):
+        action = Action(description=description, date=date,
+                        organization_id=self._set_organization(organization, chamber),
                         classification=cleanup_list(classification, []), related_entities=[])
         self.actions.append(action)
         return action

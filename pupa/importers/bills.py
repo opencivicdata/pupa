@@ -44,6 +44,13 @@ class BillImporter(BaseImporter):
             data['from_organization_id'] = self.org_importer.resolve_json_id(
                 data.pop('from_organization'))
 
+        for action in data['actions']:
+            action['organization_id'] = self.org_importer.resolve_json_id(
+                action['organization_id'])
+            for entity in action['related_entities']:
+                entity['organization_id'] = self.org_importer.resolve_json_id(
+                    entity['organization_id'])
+
         return data
 
     def postimport(self):
