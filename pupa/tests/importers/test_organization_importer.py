@@ -9,7 +9,7 @@ def test_full_organization():
     org = ScrapeOrganization('United Nations', classification='international')
     org.add_identifier('un')
     org.add_name('UN', start_date='1945')
-    org.add_contact_detail('phone', '555-555-1234', 'this is fake')
+    org.add_contact_detail(type='phone', value='555-555-1234', note='this is fake')
     org.add_link('http://example.com/link')
     org.add_source('http://example.com/source')
 
@@ -96,7 +96,7 @@ def test_psuedo_ids():
     assert oi1.resolve_json_id('~{"classification":"legislature", "chamber":"lower"}') == house.id
     assert oi1.resolve_json_id('~{"classification":"party", "name":"Wild"}') == wild.id
 
-    with pytest.raises(Organization.DoesNotExist):
+    with pytest.raises(ValueError):
         oi1.resolve_json_id('~{"classification":"international", "name":"United Nations"}')
 
     oi2 = OrganizationImporter('jid2')

@@ -23,7 +23,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     _type = 'bill'
     _schema = schema
 
-    def __init__(self, name, session, title, chamber=None, from_organization=None,
+    def __init__(self, name, session, title, *, chamber=None, from_organization=None,
                  classification=None):
         super(Bill, self).__init__()
 
@@ -31,16 +31,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.session = session
         self.title = title
         self.classification = cleanup_list(classification, ['bill'])
-
-        if from_organization and chamber:
-            raise ValueError('cannot specify both chamber and from_organization')
-        elif chamber:
-            self.from_organization = make_psuedo_id(classification='legislature', chamber=chamber)
-        elif from_organization:
-            self.from_organization = from_organization
-        else:
-            # neither specified
-            self.from_organization = make_psuedo_id(classification='legislature')
+        self.from_organization = self._set_organization(from_organization, chamber)
 
         self.actions = []
         self.other_names = []
@@ -52,9 +43,24 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.summaries = []
         self.versions = []
 
-    def add_action(self, description, actor, date, classification=None,
-                   related_entities=None):
-        action = Action(description=description, actor=actor, date=date,
+
+    def _set_organization(self, organization, chamber):
+        """ helper for setting an appropriate ID for organizations """
+        if organization and chamber:
+            raise ValueError('cannot specify both chamber and organization')
+        elif chamber:
+            return make_psuedo_id(classification='legislature', chamber=chamber)
+        elif organization:
+            return organization
+        else:
+            # neither specified
+            return make_psuedo_id(classification='legislature')
+
+
+    def add_action(self, text, date, *, organization=None, chamber=None,
+                   classification=None, related_entities=None):
+        action = Action(text=text, date=date,
+                        organization_id=self._set_organization(organization, chamber),
                         classification=cleanup_list(classification, []), related_entities=[])
         self.actions.append(action)
         return action
@@ -67,8 +73,8 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
             "relation_type": relation_type
         })
 
-    def add_sponsor(self, name, classification, entity_type, primary,
-                    chamber=None, entity_id=None):
+    def add_sponsor(self, name, classification, entity_type, primary, *, chamber=None,
+                    entity_id=None):
         sp = {
             "name": name,
             "classification": classification,
@@ -90,11 +96,11 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     def add_name(self, name, note=''):
         self.other_names.append({"note": note, "name": name})
 
-    def add_document_link(self, name, url, date='', type='', mimetype='', on_duplicate='error'):
+    def add_document_link(self, name, url, *, date='', type='', mimetype='', on_duplicate='error'):
         return self._add_associated_link(collection='documents', name=name, url=url, date=date,
                                          type=type, mimetype=mimetype, on_duplicate=on_duplicate)
 
-    def add_version_link(self, name, url, date='', type='', mimetype='', on_duplicate='error'):
+    def add_version_link(self, name, url, *, date='', type='', mimetype='', on_duplicate='error'):
         return self._add_associated_link(collection='versions', name=name, url=url, date=date,
                                          type=type, mimetype=mimetype, on_duplicate=on_duplicate)
 

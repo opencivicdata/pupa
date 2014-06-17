@@ -21,7 +21,7 @@ def test_full_membership():
 
     # add a membership through a post
     m1 = ScrapeMembership(person_id=hari.id, organization_id=org.id, post_id=post.id)
-    m1.add_contact_detail('phone', '555-555-1234', 'this is fake')
+    m1.add_contact_detail(type='phone', value='555-555-1234', note='this is fake')
     m1.add_link('http://example.com/link')
 
     # add a membership direct to an organization

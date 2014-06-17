@@ -4,7 +4,6 @@ import uuid
 import logging
 import datetime
 from collections import defaultdict, OrderedDict
-from six import string_types
 
 import scrapelib
 
@@ -18,7 +17,7 @@ class ScrapeError(Exception):
 def cleanup_list(obj, default):
     if not obj:
         obj = default
-    elif isinstance(obj, string_types):
+    elif isinstance(obj, str):
         obj = [obj]
     elif not isinstance(obj, list):
         obj = list(obj)
@@ -28,7 +27,7 @@ def cleanup_list(obj, default):
 class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
 
-    def __init__(self, jurisdiction, datadir, strict_validation=True, fastmode=False):
+    def __init__(self, jurisdiction, datadir, *, strict_validation=True, fastmode=False):
         super(Scraper, self).__init__()
 
         # set options
@@ -198,7 +197,7 @@ class SourceMixin(object):
         super(SourceMixin, self).__init__()
         self.sources = []
 
-    def add_source(self, url, note=''):
+    def add_source(self, url, *, note=''):
         """ Add a source URL from which data was collected """
         new = {'url': url, 'note': note}
         self.sources.append(new)
@@ -209,7 +208,7 @@ class ContactDetailMixin(object):
         super(ContactDetailMixin, self).__init__()
         self.contact_details = []
 
-    def add_contact_detail(self, type, value, note):
+    def add_contact_detail(self, *, type, value, note=''):
         self.contact_details.append({"type": type, "value": value, "note": note})
 
 
@@ -218,7 +217,7 @@ class LinkMixin(object):
         super(LinkMixin, self).__init__()
         self.links = []
 
-    def add_link(self, url, note=''):
+    def add_link(self, url, *, note=''):
         self.links.append({"note": note, "url": url})
 
 
@@ -227,7 +226,7 @@ class IdentifierMixin(object):
         super(IdentifierMixin, self).__init__()
         self.identifiers = []
 
-    def add_identifier(self, identifier, scheme=''):
+    def add_identifier(self, identifier, *, scheme=''):
         self.identifiers.append({"identifier": identifier, "scheme": scheme})
 
 
@@ -236,7 +235,7 @@ class OtherNameMixin(object):
         super(OtherNameMixin, self).__init__()
         self.other_names = []
 
-    def add_name(self, name, start_date='', end_date='', note=''):
+    def add_name(self, name, *, start_date='', end_date='', note=''):
         other_name = {'name': name}
         if start_date:
             other_name['start_date'] = start_date
@@ -248,7 +247,7 @@ class OtherNameMixin(object):
 
 
 class AssociatedLinkMixin(object):
-    def _add_associated_link(self, collection, name, url, mimetype, on_duplicate, type='',
+    def _add_associated_link(self, collection, name, url, *, mimetype, on_duplicate, type='',
                              date=''):
         if on_duplicate not in ['error', 'ignore']:
             raise ValueError("on_duplicate must be 'error' or 'ignore'")

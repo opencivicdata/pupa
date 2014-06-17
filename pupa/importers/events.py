@@ -1,67 +1,32 @@
 import datetime
-from pupa.scrape import Event
 from .base import BaseImporter
+from opencivicdata.models import Event, EventLocation
 
 
 class EventImporter(BaseImporter):
     _type = 'event'
-    _model_class = Event
+    model_class = Event
+    related_models = {'sources': {}, 'documents': {}, 'links': {}, 'participants': {},
+                      'media': {'links': {}},
+                      'agenda': {'related_entities': {}, 'media': {}, 'links': {}}}
 
-    def get_db_spec(self, event):
+    def get_object(self, event):
         spec = {
-            "description": event.description,
-            "when": event.when,
-            'jurisdiction_id': event.jurisdiction_id,
+            'name': event['name'],
+            'start_time': event['start_time'],
+            'jurisdiction_id': self.jurisdiction_id
         }
-        return spec
+        return self.model_class.objects.get(**spec)
 
-    def prepare_object_from_json(self, obj):
 
-        def person(obj, what):
-            spec = {}
-            if 'chamber' in what:
-                spec['chamber'] = what['chamber']
-            spec['name'] = what['name']
-            return spec
-
-        def bill(obj, what):
-            spec = {}
-            if 'chamber' in what:
-                spec['chamber'] = what['chamber']
-            spec['bill_id'] = what['name']
-            return spec
-
-        def org(obj, what):
-            spec = {}
-            if 'chamber' in what:
-                spec['chamber'] = what['chamber']
-            spec['name'] = what['name']
-            return spec
-
-        spec_generators = {
-            "person": person,
-            "bill": bill,
-            "organization": org,
-        }
-
-        # XXX participants
-
-        for item in obj['agenda']:
-            for entity in item['related_entities']:
-                handler = spec_generators[entity['type']]
-                spec = handler(obj, entity)
-                spec['jurisdiction_id'] = obj['jurisdiction_id']
-                rel_obj = db.events.find_one(spec)
-                if rel_obj:
-                    entity['id'] = rel_obj['_id']
-                else:
-                    self.logger.warning('Unknown related entity: {name} '
-                                        '({type})'.format(**entity))
-
-        # update time
-        obj['when'] = datetime.datetime.fromtimestamp(obj['when'])
-        if obj.get('end'):
-            obj['end'] = datetime.datetime.fromtimestamp(obj['end'])
-        # TODO: handle timezones better
-
+    def get_location(self, location_data):
+        obj, created = EventLocation.objects.get_or_create(name=location_data['name'],
+                                                           url=location_data.get('url', ''),
+                                                           jurisdiction_id=self.jurisdiction_id)
+        # TODO: geocode here?
         return obj
+
+    def prepare_for_db(self, data):
+        data['jurisdiction_id'] = self.jurisdiction_id
+        data['location'] = self.get_location(data['location'])
+        return data

@@ -9,8 +9,9 @@ def test_full_post():
     org = Organization.objects.create(name="United States Executive Branch",
                                       classification="executive",
                                       jurisdiction_id="jurisdiction-id")
-    post = ScrapePost('executive', 'President', '~{"classification": "executive"}')
-    post.add_contact_detail('phone', '555-555-1234', 'this is fake')
+    post = ScrapePost(label='executive', role='President',
+                      organization_id='~{"classification": "executive"}')
+    post.add_contact_detail(type='phone', value='555-555-1234', note='this is fake')
     post.add_link('http://example.com/link')
 
     # import post
@@ -37,9 +38,12 @@ def test_deduplication():
                                 classification="executive", jurisdiction_id="us")
     Organization.objects.create(id='nc', name="North Carolina Executive Branch",
                                 classification="executive", jurisdiction_id="nc")
-    pres = ScrapePost('executive', 'President', '~{"classification": "executive"}')
-    vp = ScrapePost('vice-executive', 'Vice President', '~{"classification": "executive"}')
-    gov = ScrapePost('executive', 'Governor', '~{"classification": "executive"}')
+    pres = ScrapePost(label='executive', role='President',
+                      organization_id='~{"classification": "executive"}')
+    vp = ScrapePost(label='vice-executive', role='Vice President',
+                    organization_id='~{"classification": "executive"}')
+    gov = ScrapePost(label='executive', role='Governor',
+                     organization_id='~{"classification": "executive"}')
 
     # ensure pres, vp and gov are all imported
     #   pres & gov - same label, different jurisdiction

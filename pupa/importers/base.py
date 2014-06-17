@@ -1,4 +1,5 @@
 import os
+import copy
 import glob
 import json
 import uuid
@@ -17,6 +18,55 @@ def omnihash(obj):
         return hash(frozenset((k, omnihash(v)) for k, v in obj.items()))
     else:
         return hash(obj)
+
+
+def items_differ(jsonitems, dbitems, subfield_dict):
+    """ check whether or not jsonitems and dbitems differ """
+
+    # short circuit common cases
+    if len(jsonitems) == len(dbitems) == 0:
+        # both are empty
+        return False
+    elif len(jsonitems) != len(dbitems):
+        # if lengths differ, they're definitely different
+        return True
+
+    jsonitems = copy.deepcopy(jsonitems)
+    keys = jsonitems[0].keys()
+
+    # go over dbitems looking for matches
+    for dbitem in dbitems:
+        match = None
+        for i, jsonitem in enumerate(jsonitems):
+            # check if all keys (excluding subfields) match
+            for k in keys:
+                if k not in subfield_dict and getattr(dbitem, k) != jsonitem[k]:
+                    break
+            else:
+                # all fields match so far, possibly equal, just check subfields now
+                for k in subfield_dict:
+                    jsonsubitems = jsonitem[k]
+                    dbsubitems = list(getattr(dbitem, k).all())
+                    if items_differ(jsonsubitems, dbsubitems, subfield_dict[k]):
+                        break
+                else:
+                    # these items are equal, so let's mark it for removal
+                    match = i
+                    break
+
+        if match is not None:
+            # item exists in both, remove from jsonitems
+            jsonitems.pop(match)
+        else:
+            # exists in db but not json
+            return True
+
+    # if we get here, jsonitems has to be empty because we asserted that the length was
+    # the same and we found a match for each thing in dbitems, here's a safety check just in case
+    if jsonitems:       # pragma: no cover
+        return True
+
+    return False
 
 
 class BaseImporter(object):
@@ -70,7 +120,11 @@ class BaseImporter(object):
         if json_id.startswith('~'):
             spec = get_psuedo_id(json_id)
             spec = self.limit_spec(spec)
-            return self.model_class.objects.get(**spec).id
+            try:
+                return self.model_class.objects.get(**spec).id
+            except self.model_class.DoesNotExist:
+                raise ValueError('cannot resolve psuedo-id to {}: {}'.format(
+                    self.model_class.__name__, json_id))
 
         # get the id that the duplicate points to, or use self
         json_id = self.duplicates.get(json_id, json_id)
@@ -78,7 +132,7 @@ class BaseImporter(object):
         try:
             return self.json_to_db_id[json_id]
         except KeyError:
-            raise ValueError('cannot resolve id: {0}'.format(json_id))
+            raise ValueError('cannot resolve id: {}'.format(json_id))
 
     def import_directory(self, datadir):
         """ import a JSON directory into the database """
@@ -89,18 +143,13 @@ class BaseImporter(object):
             with open(fname) as f:
                 dicts.append(json.load(f))
 
-        self.import_data(dicts)
+        return self.import_data(dicts)
 
-    def import_data(self, dicts):
-        """ import a bunch of dicts together """
+    def _order_imports(self, dicts):
         # id: json
         data_by_id = {}
         # hash(json): id
         seen_hashes = {}
-        # counts of each
-        results = {'insert': 0, 'update': 0, 'noop': 0}
-        # list of all new or modified objects
-        new_or_modified = []
 
         # load all json, mapped by json_id
         for data in dicts:
@@ -131,11 +180,19 @@ class BaseImporter(object):
             import_order.append((jid, data_by_id[jid]))
             in_network.add(jid)
 
-        # ensure all data made it into network
-        if in_network != set(data_by_id.keys()):
+        # ensure all data made it into network (paranoid check, should never fail)
+        if in_network != set(data_by_id.keys()):    # pragma: no cover
             raise Exception("import is missing nodes in network set")
 
-        # time to actually do the import
+        return import_order
+
+    def import_data(self, dicts):
+        """ import a bunch of dicts together """
+        # keep counts of all actions
+        results = {'insert': 0, 'update': 0, 'noop': 0}
+
+        import_order = self._order_imports(dicts)
+
         for json_id, data in import_order:
             parent_id = data.get('parent_id', None)
             if parent_id:
@@ -147,8 +204,6 @@ class BaseImporter(object):
             obj, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj.id
             results[what] += 1
-            if what != 'noop':
-                new_or_modified.append(obj)
 
         # all objects are loaded, a perfect time to do inter-object resolution and other tasks
         self.postimport()
@@ -157,14 +212,13 @@ class BaseImporter(object):
 
     def import_item(self, data):
         """ function used by import_data """
-        what = None
-        updated = False
+        what = 'noop'
+
+        # remove the JSON _id (may still be there if called directly)
+        data.pop('_id', None)
 
         # add fields/etc.
         data = self.prepare_for_db(data)
-
-        # convert extras to JSON
-        data['extras'] = json.dumps(data['extras'])
 
         try:
             obj = self.get_object(data)
@@ -176,38 +230,19 @@ class BaseImporter(object):
         for field in self.related_models:
             related[field] = data.pop(field)
 
-        # obj existed, attempt to update
+        # obj existed, check if we need to do an update
         if obj:
+            # check base object for changes
             for key, value in data.items():
-                # TODO: avoid updating locked fields
                 if getattr(obj, key) != value:
                     setattr(obj, key, value)
-                    updated = True
-
-            if updated:
+                    what = 'update'
+            if what == 'update':
                 obj.save()
+
+            updated = self._update_related(obj, related, self.related_models)
+            if updated:
                 what = 'update'
-            else:
-                what = 'noop'
-
-            # for each related field - check if there are notable differences
-            for field, items in related.items():
-                if items:
-                    # get keys to compare (assumes all objects have same keys)
-                    keys = sorted(items[0].keys())
-
-                    # get items from database
-                    dbitems = getattr(obj, field).all()
-                    dbdicts = [{k: getattr(item, k) for k in keys} for item in dbitems]
-                    # if the hashes differ, update what & delete existing set, then replace it
-                    if omnihash(items) != omnihash(dbdicts):
-                        what = 'update'
-                        getattr(obj, field).all().delete()
-                        for item in items:
-                            try:
-                                getattr(obj, field).create(**item)
-                            except TypeError as e:
-                                raise TypeError(str(e) + ' while importing ' + str(item))
 
         # need to create the data
         else:
@@ -216,6 +251,45 @@ class BaseImporter(object):
             self._create_related(obj, related, self.related_models)
 
         return obj, what
+
+
+
+    def _update_related(self, obj, related, subfield_dict):
+        """
+        update DB objects related to a base object
+            obj:            a base object to create related
+            related:        dict mapping field names to lists of related objects
+            subfield_list:  where to get the next layer of subfields
+        """
+        # keep track of whether or not anything was updated
+        updated = False
+
+        # for each related field - check if there are differences
+        for field, items in related.items():
+            # get items from database
+            dbitems = getattr(obj, field).all()
+            dbitems_count = dbitems.count()
+
+            # default to doing nothing
+            do_delete = do_update = False
+
+            if items and dbitems_count:         # we have items, so does db, check for conflict
+                do_delete = do_update = items_differ(items, dbitems, subfield_dict[field])
+            elif items and not dbitems_count:   # we have items, db doesn't, just update
+                do_update = True
+            elif not items and dbitems_count:   # db has items, we don't, just delete
+                do_delete = True
+            # otherwise: no items or dbitems, so nothing is done
+
+            if do_delete:
+                updated = True
+                getattr(obj, field).all().delete()
+            if do_update:
+                updated = True
+                self._create_related(obj, {field: items}, subfield_dict)
+
+        return updated
+
 
     def _create_related(self, obj, related, subfield_dict):
         """

@@ -153,13 +153,13 @@ schema = {
         "actions": {
             "items": {
                 "properties": {
-                    "description": {
+                    "text": {
                         "type": "string",
                         "description": "description of the action taken as given by source"
                     },
-                    "actor": {
+                    "organization": {
                         "type": ["string", "null"],
-                        "description": "name for the actor (e.g. 'upper', 'lower', etc.)"
+                        "description": "organization the action took place in"
                     },
                     "date": {
                         "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$",

@@ -15,7 +15,7 @@ schema = {
         },
         "label": {
             "description": "A label describing the post",
-            "type": "string", "blank": True,
+            "type": "string",
         },
         "role": {
             "description": "The function that the holder of the post fulfills",

@@ -1,6 +1,7 @@
 import pytest
 from validictory import ValidationError
 from pupa.scrape import Bill
+from pupa.utils.generic import get_psuedo_id
 
 
 def toy_bill():
@@ -45,13 +46,30 @@ def test_basic_invalid_bill():
         b.validate()
 
 
+def test_from_organization():
+    # none set
+    assert ((get_psuedo_id(Bill('HB 1', '2014', 'Some Bill').from_organization) ==
+             {'classification': 'legislature'}))
+
+    # chamber set
+    assert (get_psuedo_id(Bill('HB 1', '2014', 'Some Bill', chamber='upper').from_organization) ==
+            {'chamber': 'upper', 'classification': 'legislature'})
+    # org direct set
+    assert Bill('HB 1', '2014', 'Some Bill', from_organization='test').from_organization == 'test'
+
+    # can't set both
+    with pytest.raises(ValueError):
+        Bill('HB 1', '2014', 'Some Bill', from_organization='upper', chamber='upper')
+
+
 def test_add_action():
     """ Make sure actions work """
     b = toy_bill()
-    b.add_action("Some dude liked it.", "some dude", "2013-04-29")
+    b.add_action("Some dude liked it.", "2013-04-29", chamber='lower')
     assert len(b.actions) == 1
-    assert b.actions[0]['description'] == 'Some dude liked it.'
-    assert b.actions[0]['actor'] == 'some dude'
+    assert b.actions[0]['text'] == 'Some dude liked it.'
+    assert get_psuedo_id(b.actions[0]['organization_id']) == {'classification': 'legislature',
+                                                              'chamber': 'lower'}
     assert b.actions[0]['date'] == '2013-04-29'
     b.validate()
 

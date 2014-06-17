@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import chain
 
 
 class CyclicGraphError(ValueError):
@@ -20,20 +21,25 @@ class Network(object):
     """
 
     def __init__(self):
-        self.nodes = []
+        self.nodes = set()
         self.edges = defaultdict(set)
 
     def add_node(self, node):
         """ Add a node to the graph (with no edges) """
-        self.nodes.append(node)
+        self.nodes.add(node)
 
     def add_edge(self, fro, to):
         """
-        Add an edge from node `fro` to node `to`. For instance, to say that
-        `foo` depends on `bar`, you'd say::
+        When doing topological sorting, the semantics of the edge mean that
+        the depedency runs from the parent to the child - which is to say that
+        the parent is required to be sorted *before* the child.
 
-            `network.add_edge('foo', 'bar')`
+                  [ FROM ] ------> [ TO ]
+        Committee on Finance -> Subcommittee of the Finance Committee on Budget
+                            \-> Subcommittee of the Finance Committee on Roads
         """
+        self.add_node(fro)
+        self.add_node(to)
         self.edges[fro].add(to)
 
     def leaf_nodes(self):
@@ -41,18 +47,26 @@ class Network(object):
         Return an interable of nodes with no edges pointing at them. This is
         helpful to find all nodes without dependencies.
         """
-        deps = set([
-            item for sublist in self.edges.values() for item in sublist
-        ])  # Now contains all nodes that contain dependencies.
-        return (x for x in self.nodes if x not in deps)  # Generator that
+        # Now contains all nodes that contain dependencies.
+        deps = { item for sublist in self.edges.values() for item in sublist }
         # contains all nodes *without* any dependencies (leaf nodes)
+        return self.nodes - deps
 
     def prune_node(self, node, remove_backrefs=False):
         """
         remove node `node` from the network (including any edges that may
         have been pointing at `node`).
         """
-        self.nodes = [x for x in self.nodes if x != node]
+        if not remove_backrefs:
+            for fro, connections in self.edges.items():
+                if node in self.edges[fro]:
+                    raise ValueError("""Attempting to remove a node with
+                                     backrefs. You may consider setting
+                                     `remove_backrefs` to true.""")
+
+        # OK. Otherwise, let's do our removal.
+
+        self.nodes.remove(node)
         if node in self.edges:
             # Remove add edges from this node if we're pruning it.
             self.edges.pop(node)
@@ -60,21 +74,15 @@ class Network(object):
         for fro, connections in self.edges.items():
             # Remove any links to this node (if they exist)
             if node in self.edges[fro]:
-                if remove_backrefs:
-                    # If we should remove backrefs:
-                    self.edges[fro].remove(node)
-                else:
-                    # Let's raise an Exception
-                    raise ValueError("""Attempting to remove a node with
-                                     backrefs. You may consider setting
-                                     `remove_backrefs` to true.""")
+                # If we should remove backrefs:
+                self.edges[fro].remove(node)
 
     def sort(self):
         """
         Return an iterable of nodes, toplogically sorted to correctly import
         dependencies before leaf nodes.
         """
-        while self.nodes != []:
+        while self.nodes:
             iterated = False
             for node in self.leaf_nodes():
                 iterated = True
@@ -93,3 +101,45 @@ class Network(object):
                 buff += "%s -> %s;" % (fro, to)
         buff += "}"
         return buff
+
+    def cycles(self):
+        """
+        Fairly expensive cycle detection algorithm. This method
+        will return the shortest unique cycles that were detected.
+
+        Debug usage may look something like:
+
+        print("The following cycles were found:")
+        for cycle in network.cycles():
+            print("    ", " -> ".join(cycle))
+        """
+
+        def walk_node(node, seen):
+            """
+            Walk each top-level node we know about, and recurse
+            along the graph.
+            """
+            if node in seen:
+                yield (node,)
+                return
+            seen.add(node)
+            for edge in self.edges[node]:
+                for cycle in walk_node(edge, set(seen)):
+                    yield (node,) + cycle
+
+        # First, let's get a iterable of all known cycles.
+        cycles = chain.from_iterable(
+            (walk_node(node, set()) for node in self.nodes))
+
+        shortest = set()
+        # Now, let's go through and sift through the cycles, finding
+        # the shortest unique cycle known, ignoring cycles which contain
+        # already known cycles.
+        for cycle in sorted(cycles, key=len):
+            for el in shortest:
+                if set(el).issubset(set(cycle)):
+                    break
+            else:
+                shortest.add(cycle)
+        # And return that unique list.
+        return shortest

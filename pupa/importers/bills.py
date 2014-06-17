@@ -23,12 +23,11 @@ class BillImporter(BaseImporter):
 
     def get_object(self, bill):
         spec = {
-            'session__name': bill['session'],
-            'session__jurisdiction_id': self.jurisdiction_id,
+            'session': bill['session'],
             'name': bill['name'],
         }
-
-        # TODO: use  from_org
+        if 'from_organization_id' in bill:
+            spec['from_organization_id'] = bill['from_organization_id']
 
         return self.model_class.objects.get(**spec)
 
@@ -45,6 +44,13 @@ class BillImporter(BaseImporter):
             data['from_organization_id'] = self.org_importer.resolve_json_id(
                 data.pop('from_organization'))
 
+        for action in data['actions']:
+            action['organization_id'] = self.org_importer.resolve_json_id(
+                action['organization_id'])
+            for entity in action['related_entities']:
+                entity['organization_id'] = self.org_importer.resolve_json_id(
+                    entity['organization_id'])
+
         return data
 
     def postimport(self):
@@ -58,6 +64,6 @@ class BillImporter(BaseImporter):
             if len(candidates) == 1:
                 rb.related_bill = candidates[0]
                 rb.save()
-            elif len(candidates) > 1:
+            elif len(candidates) > 1:    # pragma: no cover
                 # if we ever see this, we need to add additional fields on the relation
                 raise RuntimeError('multiple related_bill candidates found for {}'.format(rb))

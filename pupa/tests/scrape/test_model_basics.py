@@ -39,21 +39,21 @@ def test_setattr():
 def test_add_source():
     m = GenericModel()
     m.add_source('http://example.com/1')
-    m.add_source('http://example.com/2', 'xyz')
+    m.add_source('http://example.com/2', note='xyz')
     assert m.sources == [{'url': 'http://example.com/1', 'note': ''},
                          {'url': 'http://example.com/2', 'note': 'xyz'}]
 
 
 def test_add_contact_detail():
     m = GenericModel()
-    m.add_contact_detail('fax', '111-222-3333', 'office')
+    m.add_contact_detail(type='fax', value='111-222-3333', note='office')
     assert m.contact_details == [{'type': 'fax', 'value': '111-222-3333', 'note': 'office'}]
 
 
 def test_add_link():
     m = GenericModel()
     m.add_link('http://example.com/1')
-    m.add_link('http://example.com/2', 'xyz')
+    m.add_link('http://example.com/2', note='xyz')
     assert m.links == [{'url': 'http://example.com/1', 'note': ''},
                        {'url': 'http://example.com/2', 'note': 'xyz'}]
 

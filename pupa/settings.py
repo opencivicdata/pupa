@@ -1,7 +1,7 @@
 import os
 import dj_database_url
 
-DATABASE_URL = os.environ.get('DATABASE_URL', 'postgres://pupa:pupa@localhost/opencivicdata')
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgis://pupa:pupa@localhost/opencivicdata')
 SECRET_KEY = 'non-secret'
 INSTALLED_APPS = ('opencivicdata', 'pupa',)
 
