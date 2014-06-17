@@ -37,11 +37,11 @@ media_schema = {
 
             "links": {
                 "description": ("List of links to the same media item, each"
-                                " with a different MIME type."),
+                                " with a different media_type."),
                 "items": {
                     "properties": {
-                        "mimetype": {
-                            "description": ("Mimetype of the media, such"
+                        "media_type": {
+                            "description": ("media type of the media, such"
                                             " as video/mp4 or audio/webm"),
                             "type": ["string", "null"]
                         },
@@ -198,7 +198,7 @@ schema = {
                         "description": "URL where the content may be found.",
                     },
 
-                    "mimetype": {
+                    "media_type": {
                         "type": "string",
                         "description": "Mimetype of the document.",
                     },

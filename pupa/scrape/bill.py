@@ -96,13 +96,16 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     def add_name(self, name, note=''):
         self.other_names.append({"note": note, "name": name})
 
-    def add_document_link(self, name, url, *, date='', type='', mimetype='', on_duplicate='error'):
+    def add_document_link(self, name, url, *, date='', type='', media_type='',
+                          on_duplicate='error'):
         return self._add_associated_link(collection='documents', name=name, url=url, date=date,
-                                         type=type, mimetype=mimetype, on_duplicate=on_duplicate)
+                                         type=type, media_type=media_type,
+                                         on_duplicate=on_duplicate)
 
-    def add_version_link(self, name, url, *, date='', type='', mimetype='', on_duplicate='error'):
+    def add_version_link(self, name, url, *, date='', type='', media_type='', on_duplicate='error'):
         return self._add_associated_link(collection='versions', name=name, url=url, date=date,
-                                         type=type, mimetype=mimetype, on_duplicate=on_duplicate)
+                                         type=type, media_type=media_type,
+                                         on_duplicate=on_duplicate)
 
     def __str__(self):
         return self.name + ' in ' + self.session

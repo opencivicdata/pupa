@@ -247,7 +247,7 @@ class OtherNameMixin(object):
 
 
 class AssociatedLinkMixin(object):
-    def _add_associated_link(self, collection, name, url, *, mimetype, on_duplicate, type='',
+    def _add_associated_link(self, collection, name, url, *, media_type, on_duplicate, type='',
                              date=''):
         if on_duplicate not in ['error', 'ignore']:
             raise ValueError("on_duplicate must be 'error' or 'ignore'")
@@ -290,7 +290,7 @@ class AssociatedLinkMixin(object):
                 return None
 
         # OK. This is either new or old. Let's just go for it.
-        ret = {'url': url, 'mimetype': mimetype}
+        ret = {'url': url, 'media_type': media_type}
 
         ver['links'].append(ret)
 

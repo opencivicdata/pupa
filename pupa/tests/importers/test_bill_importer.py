@@ -41,9 +41,10 @@ def test_full_bill():
     bill.add_sponsor('Jane Smith', classification='lead sponsor', entity_type='person',
                      primary=True)
     bill.add_summary('This is an act about axes and taxes and tacks.', note="official")
-    bill.add_document_link('Fiscal Note', 'http://example.com/fn.pdf', mimetype='application/pdf')
-    bill.add_document_link('Fiscal Note', 'http://example.com/fn.html', mimetype='text/html')
-    bill.add_version_link('Fiscal Note', 'http://example.com/v/1', mimetype='text/html')
+    bill.add_document_link('Fiscal Note', 'http://example.com/fn.pdf',
+                           media_type='application/pdf')
+    bill.add_document_link('Fiscal Note', 'http://example.com/fn.html', media_type='text/html')
+    bill.add_version_link('Fiscal Note', 'http://example.com/v/1', media_type='text/html')
     bill.add_source('http://example.com/source')
 
     # import bill
@@ -212,7 +213,7 @@ def test_bill_update_subsubitem():
 
     # initial sub-subitem
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
+    bill.add_version_link('printing', 'http://example.com/test.pdf', media_type='application/pdf')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'insert'
     assert obj.versions.count() == 1
@@ -220,8 +221,8 @@ def test_bill_update_subsubitem():
 
     # a second subsubitem, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
-    bill.add_version_link('printing', 'http://example.com/test.text', mimetype='text/plain')
+    bill.add_version_link('printing', 'http://example.com/test.pdf', media_type='application/pdf')
+    bill.add_version_link('printing', 'http://example.com/test.text', media_type='text/plain')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'update'
     assert obj.versions.count() == 1
@@ -229,8 +230,8 @@ def test_bill_update_subsubitem():
 
     # same thing, noop
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
-    bill.add_version_link('printing', 'http://example.com/test.text', mimetype='text/plain')
+    bill.add_version_link('printing', 'http://example.com/test.pdf', media_type='application/pdf')
+    bill.add_version_link('printing', 'http://example.com/test.text', media_type='text/plain')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'noop'
     assert obj.versions.count() == 1
@@ -238,8 +239,8 @@ def test_bill_update_subsubitem():
 
     # different link for second one, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
-    bill.add_version_link('printing', 'http://example.com/diff-link.txt', mimetype='text/plain')
+    bill.add_version_link('printing', 'http://example.com/test.pdf', media_type='application/pdf')
+    bill.add_version_link('printing', 'http://example.com/diff-link.txt', media_type='text/plain')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'update'
     assert obj.versions.count() == 1
@@ -247,7 +248,7 @@ def test_bill_update_subsubitem():
 
     # delete one, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill')
-    bill.add_version_link('printing', 'http://example.com/test.pdf', mimetype='application/pdf')
+    bill.add_version_link('printing', 'http://example.com/test.pdf', media_type='application/pdf')
     obj, what = BillImporter('jid', oi).import_item(bill.as_dict())
     assert what == 'update'
     assert obj.versions.count() == 1

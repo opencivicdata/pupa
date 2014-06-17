@@ -220,8 +220,8 @@ schema = {
                     "links": {
                         "items": {
                             "properties": {
-                                "mimetype": {"type": "string", "blank": True,
-                                             "description": "mimetype of document"},
+                                "media_type": {"type": "string", "blank": True,
+                                             "description": "media type of document"},
                                 "url": {"type": "string", "description": "URL to document"}
                             },
                             "type": "object"
@@ -249,8 +249,8 @@ schema = {
                     "links": {
                         "items": {
                             "properties": {
-                                "mimetype": {"type": "string", "blank": True,
-                                             "description": "mimetype of document"},
+                                "media_type": {"type": "string", "blank": True,
+                                             "description": "media type of document"},
                                 "url": {"type": "string", "description": "URL to document"}
                             },
                             "type": "object"

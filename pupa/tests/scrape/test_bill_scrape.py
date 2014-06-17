@@ -115,7 +115,7 @@ def test_add_documents():
 
     # should only add one document since they all have same name
     b.add_document_link(name="Fiscal Impact", date="2013-04", url="http://hi.example.com/foo#bar",
-                        mimetype="text/html")
+                        media_type="text/html")
     b.add_document_link(name="Fiscal Impact", date="2013-04", url='http://foobar.baz')
     assert len(b.documents) == 1
 
@@ -127,7 +127,7 @@ def test_add_documents():
     b.validate()
 
     # an invalid document
-    b.add_document_link(name="Fiscal Impact", date="2013-04", url=None, mimetype='foo')
+    b.add_document_link(name="Fiscal Impact", date="2013-04", url=None, media_type='foo')
     with pytest.raises(ValidationError):
         b.validate()
 
