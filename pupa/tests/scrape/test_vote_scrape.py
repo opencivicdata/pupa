@@ -77,7 +77,7 @@ def test_set_bill_obj_no_extra_args():
 def test_set_bill_psuedo_id():
     v = toy_vote()
     v.set_bill('HB 1', chamber='lower')
-    assert get_psuedo_id(v.bill) == {'name': 'HB 1',
+    assert get_psuedo_id(v.bill) == {'identifier': 'HB 1',
                                      'from_organization__classification': 'legislature',
                                      'from_organization__chamber': 'lower'}
 

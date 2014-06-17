@@ -23,24 +23,24 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     _type = 'bill'
     _schema = schema
 
-    def __init__(self, name, session, title, *, chamber=None, from_organization=None,
+    def __init__(self, identifier, session, title, *, chamber=None, from_organization=None,
                  classification=None):
         super(Bill, self).__init__()
 
-        self.name = name
+        self.identifier = identifier
         self.session = session
         self.title = title
         self.classification = cleanup_list(classification, ['bill'])
         self.from_organization = self._set_organization(from_organization, chamber)
 
         self.actions = []
-        self.other_names = []
+        self.other_identifiers = []
         self.other_titles = []
         self.documents = []
         self.related_bills = []
-        self.sponsors = []
+        self.sponsorships = []
         self.subject = []
-        self.summaries = []
+        self.abstracts = []
         self.versions = []
 
 
@@ -65,16 +65,16 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.actions.append(action)
         return action
 
-    def add_related_bill(self, name, session, relation_type):
+    def add_related_bill(self, identifier, session, relation_type):
         # will we need jurisdiction, organization?
         self.related_bills.append({
-            "name": name,
+            "identifier": identifier,
             "session": session,
             "relation_type": relation_type
         })
 
-    def add_sponsor(self, name, classification, entity_type, primary, *, chamber=None,
-                    entity_id=None):
+    def add_sponsorship(self, name, classification, entity_type, primary, *, chamber=None,
+                        entity_id=None):
         sp = {
             "name": name,
             "classification": classification,
@@ -82,31 +82,28 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
             "primary": primary,
             entity_type + '_id': entity_id,
         }
-        self.sponsors.append(sp)
+        self.sponsorships.append(sp)
 
     def add_subject(self, subject):
         self.subject.append(subject)
 
-    def add_summary(self, text, note):
-        self.summaries.append({"note": note, "text": text})
+    def add_abstract(self, abstract, note):
+        self.abstracts.append({"note": note, "abstract": abstract})
 
-    def add_title(self, text, note=''):
-        self.other_titles.append({"note": note, "text": text})
+    def add_title(self, title, note=''):
+        self.other_titles.append({"note": note, "title": title})
 
-    def add_name(self, name, note=''):
-        self.other_names.append({"note": note, "name": name})
+    def add_identifier(self, identifier, note=''):
+        self.other_identifiers.append({"note": note, "identifier": identifier})
 
-    def add_document_link(self, name, url, *, date='', type='', media_type='',
-                          on_duplicate='error'):
-        return self._add_associated_link(collection='documents', name=name, url=url, date=date,
-                                         type=type, media_type=media_type,
-                                         on_duplicate=on_duplicate)
+    def add_document_link(self, note, url, *, date='', media_type='', on_duplicate='error'):
+        return self._add_associated_link(collection='documents', note=note, url=url, date=date,
+                                         media_type=media_type, on_duplicate=on_duplicate)
 
-    def add_version_link(self, name, url, *, date='', type='', media_type='', on_duplicate='error'):
-        return self._add_associated_link(collection='versions', name=name, url=url, date=date,
-                                         type=type, media_type=media_type,
-                                         on_duplicate=on_duplicate)
+    def add_version_link(self, note, url, *, date='', media_type='', on_duplicate='error'):
+        return self._add_associated_link(collection='versions', note=note, url=url, date=date,
+                                         media_type=media_type, on_duplicate=on_duplicate)
 
     def __str__(self):
-        return self.name + ' in ' + self.session
+        return self.identifier + ' in ' + self.session
     __unicode__ = __str__

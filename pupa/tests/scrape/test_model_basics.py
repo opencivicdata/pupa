@@ -96,7 +96,7 @@ def test_add_associated_link_on_duplicate_ignore():
     # one 'document' added, single link for it, keeps first name
     assert len(m._associated) == 1
     assert len(m._associated[0]['links']) == 1
-    assert m._associated[0]['name'] == 'something'
+    assert m._associated[0]['note'] == 'something'
 
 
 def test_add_name():

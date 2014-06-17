@@ -43,15 +43,16 @@ class Vote(BaseModel, SourceMixin):
 
     __unicode__ = __str__
 
-    def set_bill(self, bill_or_name, *, chamber=None):
-        if not bill_or_name:
+    def set_bill(self, bill_or_identifier, *, chamber=None):
+        if not bill_or_identifier:
             self.bill = None
-        elif isinstance(bill_or_name, Bill):
+        elif isinstance(bill_or_identifier, Bill):
             if chamber:
                 raise ValueError("set_bill takes no arguments when using a `Bill` object")
-            self.bill = bill_or_name._id
+            self.bill = bill_or_identifier._id
         else:
-            kwargs = {'name': bill_or_name, 'from_organization__classification': 'legislature'}
+            kwargs = {'identifier': bill_or_identifier,
+                      'from_organization__classification': 'legislature'}
             if chamber:
                 kwargs['from_organization__chamber'] = chamber
             self.bill = make_psuedo_id(**kwargs)

@@ -8,14 +8,6 @@ from opencivicdata import common
 schema = {
     "description": "bill data",
     "type": "object",
-    "_order": (
-        ('Basics', ('from_organization', 'session', 'name', 'chamber',
-                    'title', 'type', 'subject', 'summaries')),
-        ('Common Fields', ['updated_at', 'created_at', 'sources']),
-        ('Other/Related Bills', ('other_titles', 'other_names', 'related_bills')),
-        ('Sponsors and Actions', ('sponsors', 'actions')),
-        ('Documents and Versions', ('documents', 'versions')),
-    ),
     "properties": {
 
         "from_organization": {
@@ -26,10 +18,11 @@ schema = {
         "session": {"type": "string",
                     "description": "associated with one of the jurisdiction's sessions"},
 
-        "name": {"type": "string",
-                 "description": ("jurisdiction-assigned permanent name.  Must be unique within a "
-                                 "given session (e.g. HB 3).  Note: not to be confused with "
-                                 "``title``.")},
+        "identifier": {"type": "string",
+                       "description": (
+                           "jurisdiction-assigned permanent name.  Must be unique within a "
+                           "given session (e.g. HB 3)."
+                       )},
 
         'updated_at': {"type": ["string", "datetime"], "required": False,
                        "description": "the time that the object was last updated", },
@@ -49,10 +42,10 @@ schema = {
             "description": "List of related subjects.",
         },
 
-        "summaries": {
+        "abstracts": {
             "items": {
                 "properties": {
-                    "text": {"type": "string", "description": "Summary of bill."},
+                    "abstract": {"type": "string", "description": "Summary of bill."},
                     "note": {"type": ["string", "null"],
                              "description": "note describing source of summary"},
                 },
@@ -81,10 +74,10 @@ schema = {
                             "Each item in the list has a title and a note.")
         },
 
-        "other_names": {
+        "other_identifiers": {
             "items": {
                 "properties": {
-                    "name": {"type": "string", "description": "name (e.g. HB 22)"},
+                    "identifier": {"type": "string", "description": "name (e.g. HB 22)"},
                     "note": {"type": ["string", "null"],
                              "description": "note describing why this name is attached"},
                 },
@@ -101,7 +94,7 @@ schema = {
             "items": {
                 "properties": {
                     "session": {"type": "string", "description": "Session of related bill."},
-                    "name": {"type": "string", "description": "Name of related bill."},
+                    "identifier": {"type": "string", "description": "Name of related bill."},
                     "relation_type": {
                         "enum": common.BILL_RELATION_TYPES,
                         "type": "string",
@@ -124,7 +117,7 @@ schema = {
 
         },
 
-        "sponsors": {
+        "sponsorships": {
             "items": {
                 "properties": {
                     "classification": {
@@ -203,15 +196,10 @@ schema = {
             "description": "List of actions taken on the bill."
         },
 
-
-        # == Documents and Versions ==
-
         "versions": {
             "items": {
                 "properties": {
-                    "name": {"type": "string", "description": "Name of version"},
-                    "type": {"type": "string", "blank": True,
-                             "description": "Type of version"},
+                    "note": {"type": "string", "description": "Name of version"},
                     "date": {
                         "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
                         "type": "string", "blank": True,
@@ -238,9 +226,7 @@ schema = {
         "documents": {
             "items": {
                 "properties": {
-                    "name": {"type": "string", "description": "Name of document"},
-                    "type": {"type": "string", "blank": True,
-                             "description": "Type of document"},
+                    "note": {"type": "string", "description": "Name of document"},
                     "date": {
                         "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
                         "type": "string", "blank": True,

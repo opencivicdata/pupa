@@ -77,10 +77,10 @@ def test_add_bill():
 def test_add_document():
     e = event_obj()
     assert e.documents == []
-    e.add_document(name='hello', url='http://example.com', media_type="text/html")
+    e.add_document(note='hello', url='http://example.com', media_type="text/html")
     assert len(e.documents) == 1
     o = e.documents[0]
-    assert o['name'] == 'hello'
+    assert o['note'] == 'hello'
     assert o['links'] == [{'url': 'http://example.com', 'media_type': 'text/html'}]
     e.validate()
 
@@ -105,14 +105,14 @@ def test_add_media():
     e = event_obj()
     name = "Hello, World"
     a = e.add_agenda_item(description='foo')
-    a.add_media_link(name=name, url="http://pault.ag", type='media', media_type="text/html")
-    a.add_media_link(name=name, url="ftp://pault.ag", type='media', media_type="text/plain")
+    a.add_media_link(note=name, url="http://pault.ag", media_type="text/html")
+    a.add_media_link(note=name, url="ftp://pault.ag", media_type="text/plain")
     e.validate()
     assert len(e.agenda[0]['media']) == 1
     assert len(e.agenda[0]['media'][0]['links']) == 2
 
-    e.add_media_link(name=name, url="http://pault.ag", type='media', media_type="text/html")
-    e.add_media_link(name=name, url="ftp://pault.ag", type='media', media_type="text/plain")
+    e.add_media_link(note=name, url="http://pault.ag", media_type="text/html")
+    e.add_media_link(note=name, url="ftp://pault.ag", media_type="text/plain")
     e.validate()
     assert len(e.media) == 1
     assert len(e.media[0]['links']) == 2

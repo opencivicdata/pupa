@@ -30,17 +30,17 @@ def test_full_bill():
     bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act',
                       classification='tax bill', from_organization=org._id)
     bill.subject = ['taxes', 'axes']
-    bill.add_name('SB 9')
+    bill.add_identifier('SB 9')
     bill.add_title('Tack & Axe Tax Act')
     bill.add_action('introduced in house', '1900-04-01', chamber='lower')
     act = bill.add_action('sent to arbitrary committee', '1900-04-04', chamber='lower')
     act.add_related_entity('arbitrary committee', 'organization', com._id)
     bill.add_related_bill("HB 99", session="1899", relation_type="prior-session")
-    bill.add_sponsor('Adam Smith', classification='extra sponsor', entity_type='person',
-                     primary=False, entity_id=person.id)
-    bill.add_sponsor('Jane Smith', classification='lead sponsor', entity_type='person',
-                     primary=True)
-    bill.add_summary('This is an act about axes and taxes and tacks.', note="official")
+    bill.add_sponsorship('Adam Smith', classification='extra sponsor', entity_type='person',
+                         primary=False, entity_id=person.id)
+    bill.add_sponsorship('Jane Smith', classification='lead sponsor', entity_type='person',
+                         primary=True)
+    bill.add_abstract('This is an act about axes and taxes and tacks.', note="official")
     bill.add_document_link('Fiscal Note', 'http://example.com/fn.pdf',
                            media_type='application/pdf')
     bill.add_document_link('Fiscal Note', 'http://example.com/fn.html', media_type='text/html')
@@ -53,17 +53,17 @@ def test_full_bill():
     BillImporter('jid', oi).import_data([oldbill.as_dict(), bill.as_dict()])
 
     # get bill from db and assert it imported correctly
-    b = Bill.objects.get(name='HB 1')
+    b = Bill.objects.get(identifier='HB 1')
     assert b.from_organization.chamber == 'lower'
-    assert b.name == bill.name
+    assert b.identifier == bill.identifier
     assert b.title == bill.title
     assert b.classification == bill.classification
     assert b.subject == ['taxes', 'axes']
-    assert b.summaries.get().note == 'official'
+    assert b.abstracts.get().note == 'official'
 
-    # other_title, other_name added
-    assert b.other_titles.get().text == 'Tack & Axe Tax Act'
-    assert b.other_names.get().name == 'SB 9'
+    # other_title, other_identifier added
+    assert b.other_titles.get().title == 'Tack & Axe Tax Act'
+    assert b.other_identifiers.get().identifier == 'SB 9'
 
     # actions
     actions = list(b.actions.all())
@@ -77,20 +77,20 @@ def test_full_bill():
 
     # related_bills were added
     rb = b.related_bills.get()
-    assert rb.name == 'HB 99'
+    assert rb.identifier == 'HB 99'
 
     # and bill got resolved
-    assert rb.related_bill.name == 'HB 99'
+    assert rb.related_bill.identifier == 'HB 99'
 
     # sponsors added, linked & unlinked
-    sponsors = b.sponsors.all()
-    assert len(sponsors) == 2
-    for sponsor in sponsors:
-        if sponsor.primary:
-            assert sponsor.person is None
-            assert sponsor.organization is None
+    sponsorships = b.sponsorships.all()
+    assert len(sponsorships) == 2
+    for ss in sponsorships:
+        if ss.primary:
+            assert ss.person is None
+            assert ss.organization is None
         else:
-            assert sponsor.person == person
+            assert ss.person == person
 
     # versions & documents with their links
     versions = b.versions.all()
