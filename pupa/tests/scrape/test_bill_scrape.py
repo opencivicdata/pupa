@@ -67,7 +67,7 @@ def test_add_action():
     b = toy_bill()
     b.add_action("Some dude liked it.", "2013-04-29", chamber='lower')
     assert len(b.actions) == 1
-    assert b.actions[0]['text'] == 'Some dude liked it.'
+    assert b.actions[0]['description'] == 'Some dude liked it.'
     assert get_psuedo_id(b.actions[0]['organization_id']) == {'classification': 'legislature',
                                                               'chamber': 'lower'}
     assert b.actions[0]['date'] == '2013-04-29'
