@@ -9,15 +9,15 @@ class Vote(BaseModel, SourceMixin):
     _type = 'vote'
     _schema = schema
 
-    def __init__(self, *, session, motion, start_date, classification, outcome,
+    def __init__(self, *, session, motion_text, start_date, classification, result,
                  identifier='', bill=None, organization=None, chamber=None, **kwargs):
         super(Vote, self).__init__()
 
         self.session = session
-        self.motion = motion
+        self.motion_text = motion_text
         self.start_date = start_date
         self.classification = cleanup_list(classification, [])
-        self.outcome = outcome
+        self.result = result
         self.identifier = identifier
         self.organization = organization
 
@@ -39,7 +39,7 @@ class Vote(BaseModel, SourceMixin):
             self.organization = make_psuedo_id(classification='legislature')
 
     def __str__(self):
-        return u'{0} - {1} - {2}'.format(self.session, self.start_date, self.motion)
+        return u'{0} - {1} - {2}'.format(self.session, self.start_date, self.motion_text)
 
     __unicode__ = __str__
 

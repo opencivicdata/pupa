@@ -9,18 +9,11 @@ from opencivicdata import common
 schema = {
     "description": "schema for vote data (based on Popolo VoteEvent)",
     "type": "object",
-    "_order": (
-        ('Basic Fields', ["organization", "organization_id", "_type", "session",
-                          "chamber", "date", "motion", "type", "passed"]),
-        ('Common Fields', ['updated_at', 'created_at', 'sources', 'extras']),
-        ('Relationship to Bill', ["bill"]),
-        ('Vote Counts', ["vote_counts", "roll_call"])
-    ),
     "properties": {
         'identifier': {"type": "string", "blank": True, "description": "An issued identifier"},
 
-        'motion': {"type": "string",
-                   "description": "description of motion (from upstream source)"},
+        'motion_text': {"type": "string",
+                        "description": "description of motion (from upstream source)"},
 
 
         'start_date': {"pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$", "type": "string",
@@ -57,7 +50,7 @@ schema = {
         # added fields
         'classification': {"items": {"type": "string", "enum": common.VOTE_CLASSIFICATIONS},
                            "type": "array", "description": "array of types"},
-        'outcome': {"type": "string", "enum": common.VOTE_OUTCOMES,
+        'result': {"type": "string", "enum": common.VOTE_RESULTS,
                     "description": "outcome of vote (e.g. pass, fail)"},
         'organization': {"type": ["string", "null"],
                          "description": "name of the voting organization"},

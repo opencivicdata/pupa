@@ -22,8 +22,8 @@ def test_full_vote():
                                from_organization=org)
     com = Organization.objects.create(id='com-id', name='Arbitrary Committee', parent=org)
 
-    vote = ScrapeVote(session='1900', motion='passage', start_date='1900-04-01',
-                      classification='passage:bill', outcome='pass', bill=bill.identifier)
+    vote = ScrapeVote(session='1900', motion_text='passage', start_date='1900-04-01',
+                      classification='passage:bill', result='pass', bill=bill.identifier)
     vote.set_count('yes', 20)
     vote.yes('John Smith')
     vote.no('Adam Smith')
