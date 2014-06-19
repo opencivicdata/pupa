@@ -9,15 +9,15 @@ class Vote(BaseModel, SourceMixin):
     _type = 'vote'
     _schema = schema
 
-    def __init__(self, *, session, motion, start_date, classification, outcome,
+    def __init__(self, *, session, motion_text, start_date, classification, result,
                  identifier='', bill=None, organization=None, chamber=None, **kwargs):
         super(Vote, self).__init__()
 
         self.session = session
-        self.motion = motion
+        self.motion_text = motion_text
         self.start_date = start_date
         self.classification = cleanup_list(classification, [])
-        self.outcome = outcome
+        self.result = result
         self.identifier = identifier
         self.organization = organization
 
@@ -39,19 +39,20 @@ class Vote(BaseModel, SourceMixin):
             self.organization = make_psuedo_id(classification='legislature')
 
     def __str__(self):
-        return u'{0} - {1} - {2}'.format(self.session, self.start_date, self.motion)
+        return u'{0} - {1} - {2}'.format(self.session, self.start_date, self.motion_text)
 
     __unicode__ = __str__
 
-    def set_bill(self, bill_or_name, *, chamber=None):
-        if not bill_or_name:
+    def set_bill(self, bill_or_identifier, *, chamber=None):
+        if not bill_or_identifier:
             self.bill = None
-        elif isinstance(bill_or_name, Bill):
+        elif isinstance(bill_or_identifier, Bill):
             if chamber:
                 raise ValueError("set_bill takes no arguments when using a `Bill` object")
-            self.bill = bill_or_name._id
+            self.bill = bill_or_identifier._id
         else:
-            kwargs = {'name': bill_or_name, 'from_organization__classification': 'legislature'}
+            kwargs = {'identifier': bill_or_identifier,
+                      'from_organization__classification': 'legislature'}
             if chamber:
                 kwargs['from_organization__chamber'] = chamber
             self.bill = make_psuedo_id(**kwargs)

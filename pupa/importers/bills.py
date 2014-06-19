@@ -6,12 +6,12 @@ from .base import BaseImporter
 class BillImporter(BaseImporter):
     _type = 'bill'
     model_class = Bill
-    related_models = {'summaries': {},
+    related_models = {'abstracts': {},
                       'other_titles': {},
-                      'other_names': {},
+                      'other_identifiers': {},
                       'actions': {'related_entities': {}},
                       'related_bills': {},
-                      'sponsors': {},
+                      'sponsorships': {},
                       'sources': {},
                       'documents': {'links': {}},
                       'versions': {'links': {}}}
@@ -24,7 +24,7 @@ class BillImporter(BaseImporter):
     def get_object(self, bill):
         spec = {
             'session': bill['session'],
-            'name': bill['name'],
+            'identifier': bill['identifier'],
         }
         if 'from_organization_id' in bill:
             spec['from_organization_id'] = bill['from_organization_id']
@@ -36,7 +36,7 @@ class BillImporter(BaseImporter):
         return spec
 
     def prepare_for_db(self, data):
-        data['name'] = fix_bill_id(data['name'])
+        data['identifier'] = fix_bill_id(data['identifier'])
         data['session'] = JurisdictionSession.objects.get(jurisdiction_id=self.jurisdiction_id,
                                                           name=data['session'])
 
@@ -60,7 +60,7 @@ class BillImporter(BaseImporter):
                                              related_bill=None):
             candidates = list(Bill.objects.filter(session__name=rb.session,
                                                   session__jurisdiction_id=self.jurisdiction_id,
-                                                  name=rb.name))
+                                                  identifier=rb.identifier))
             if len(candidates) == 1:
                 rb.related_bill = candidates[0]
                 rb.save()
