@@ -13,6 +13,7 @@ def drop_tables():
         if table.startswith('opencivicdata_'):
             print('dropping table ' + table)
             cursor.execute("DROP TABLE IF EXISTS {} CASCADE;".format(table))
+        cursor.execute("DELETE FROM django_migrations WHERE app='opencivicdata';")
 
 
 class Command(BaseCommand):
