@@ -4,12 +4,6 @@ schema = {
     "$schema": "http://json-schema.org/draft-03/schema#",
     "description": "A real person, alive or dead",
     "id": "http://popoloproject.com/schemas/person.json#",
-    "_order": (
-        ('Basics', ('name', 'image', 'contact_details', 'links')),
-        ('Extended Details', ('gender', 'summary', 'biography', 'birth_date', 'death_date')),
-        ('Alternate Names/Identifiers', ('identifiers', 'other_names')),
-        ('Common Fields', ('updated_at', 'created_at', 'sources', 'extras')),
-    ),
     "properties": {
         "updated_at": {
             "description": "The time at which the resource was last modified",
@@ -18,6 +12,11 @@ schema = {
         "created_at": {
             "description": "The time at which the resource was created",
             "type": ["string", "datetime", "null"],
+        },
+        "sort_name": {
+            "description": "An extended account of a person's life",
+            "type": "string",
+            "blank": True,
         },
         "biography": {
             "description": "An extended account of a person's life",
