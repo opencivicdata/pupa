@@ -72,9 +72,14 @@ class Command(BaseCommand):
                     # We're looking at the imported Jurisdiction.
                     continue
                 if getattr(obj, 'division_id', None):
+                    if obj.classification is None:
+                        raise CommandError(
+                            "classification isn't set on '"
+                            + obj.__name__ + "'"
+                        )
                     return obj()
                 else:
-                    raise CommandError("Jurisdiction subclass '" + module_name
+                    raise CommandError("Jurisdiction subclass '" + obj.__name__
                                        + "' is missing a division_id")
         raise CommandError('unable to import Jurisdiction subclass from ' + module_name)
 
