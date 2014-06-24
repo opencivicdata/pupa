@@ -67,9 +67,20 @@ class Command(BaseCommand):
         module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
             # ensure we're sealing with a subclass of Jurisdiction
-            if getattr(obj, 'division_id', None) and issubclass(obj, Jurisdiction):
-                return obj()
-
+            if isinstance(obj, type) and issubclass(obj, Jurisdiction):
+                if obj == Jurisdiction:
+                    # We're looking at the imported Jurisdiction.
+                    continue
+                if getattr(obj, 'division_id', None):
+                    if obj.classification is None:
+                        raise CommandError(
+                            "classification isn't set on '"
+                            + obj.__name__ + "'"
+                        )
+                    return obj()
+                else:
+                    raise CommandError("Jurisdiction subclass '" + obj.__name__
+                                       + "' is missing a division_id")
         raise CommandError('unable to import Jurisdiction subclass from ' + module_name)
 
     def do_scrape(self, juris, args, scrapers):
