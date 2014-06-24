@@ -5,7 +5,7 @@ from pupa.utils.generic import get_psuedo_id
 
 
 def toy_bill():
-    b = Bill(identifier="HB 2017", session="2012A",
+    b = Bill(identifier="HB 2017", legislative_session="2012A",
              title="A bill for an act to raise the cookie budget by 200%",
              from_organization="Foo Senate", classification="bill")
     b.add_source("http://uri.example.com/", note="foo")
@@ -20,20 +20,20 @@ def test_basic_valid_bill():
 
 def test_bill_type_setting():
     # default
-    b = Bill(identifier="some bill", session="session", title="the title")
+    b = Bill(identifier="some bill", legislative_session="session", title="the title")
     assert b.classification == ["bill"]
 
     # string -> list
-    b = Bill(identifier="some bill", session="session", title="the title", classification="string")
+    b = Bill(identifier="some bill", legislative_session="session", title="the title", classification="string")
     assert b.classification == ["string"]
 
     # list unmodified
-    b = Bill(identifier="some bill", session="session", title="the title",
+    b = Bill(identifier="some bill", legislative_session="session", title="the title",
              classification=["two", "items"])
     assert b.classification == ["two", "items"]
 
     # tuple -> list
-    b = Bill(identifier="some bill", session="session", title="the title",
+    b = Bill(identifier="some bill", legislative_session="session", title="the title",
              classification=("two", "items"))
     assert b.classification == ["two", "items"]
 
@@ -77,9 +77,10 @@ def test_add_action():
 def test_add_related_bill():
     """ Make sure related bills work """
     b = toy_bill()
-    b.add_related_bill(identifier="HB 2020", session="2011A", relation_type="companion")
+    b.add_related_bill(identifier="HB 2020", legislative_session="2011A",
+                       relation_type="companion")
     assert len(b.related_bills) == 1
-    assert b.related_bills[0] == {'identifier': 'HB 2020', 'session': '2011A',
+    assert b.related_bills[0] == {'identifier': 'HB 2020', 'legislative_session': '2011A',
                                   'relation_type': 'companion'}
     b.validate()
 

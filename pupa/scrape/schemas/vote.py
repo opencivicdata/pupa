@@ -56,7 +56,7 @@ schema = {
                          "description": "name of the voting organization"},
         'bill': {"type": ["string", "null"],
                  "description": "related bill (optional)"},
-        'session': {"type": "string",
+        'legislative_session': {"type": "string",
                     "description": "Associated with one of the jurisdiction's sessions"},
 
 

@@ -15,7 +15,7 @@ schema = {
             "description": "name of the legislative body that this bill belongs to"
         },
 
-        "session": {"type": "string",
+        "legislative_session": {"type": "string",
                     "description": "associated with one of the jurisdiction's sessions"},
 
         "identifier": {"type": "string",
@@ -93,7 +93,8 @@ schema = {
         "related_bills": {
             "items": {
                 "properties": {
-                    "session": {"type": "string", "description": "Session of related bill."},
+                    "legislative_session": {
+                        "type": "string", "description": "Session of related bill."},
                     "identifier": {"type": "string", "description": "Name of related bill."},
                     "relation_type": {
                         "enum": common.BILL_RELATION_TYPES,

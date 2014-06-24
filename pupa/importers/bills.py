@@ -23,7 +23,7 @@ class BillImporter(BaseImporter):
 
     def get_object(self, bill):
         spec = {
-            'session': bill['session'],
+            'legislative_session': bill['legislative_session'],
             'identifier': bill['identifier'],
         }
         if 'from_organization_id' in bill:
@@ -32,13 +32,13 @@ class BillImporter(BaseImporter):
         return self.model_class.objects.get(**spec)
 
     def limit_spec(self, spec):
-        spec['session__jurisdiction_id'] = self.jurisdiction_id
+        spec['legislative_session__jurisdiction_id'] = self.jurisdiction_id
         return spec
 
     def prepare_for_db(self, data):
         data['identifier'] = fix_bill_id(data['identifier'])
-        data['session'] = JurisdictionSession.objects.get(jurisdiction_id=self.jurisdiction_id,
-                                                          name=data['session'])
+        data['legislative_session'] = JurisdictionSession.objects.get(
+            jurisdiction_id=self.jurisdiction_id, name=data['legislative_session'])
 
         if data['from_organization']:
             data['from_organization_id'] = self.org_importer.resolve_json_id(
@@ -56,11 +56,14 @@ class BillImporter(BaseImporter):
     def postimport(self):
         # go through all RelatedBill objs that are attached to a bill in this jurisdiction and
         # are currently unresolved
-        for rb in RelatedBill.objects.filter(bill__session__jurisdiction_id=self.jurisdiction_id,
-                                             related_bill=None):
-            candidates = list(Bill.objects.filter(session__name=rb.session,
-                                                  session__jurisdiction_id=self.jurisdiction_id,
-                                                  identifier=rb.identifier))
+        for rb in RelatedBill.objects.filter(
+                bill__legislative_session__jurisdiction_id=self.jurisdiction_id,
+                related_bill=None):
+            candidates = list(Bill.objects.filter(
+                legislative_session__name=rb.legislative_session,
+                legislative_session__jurisdiction_id=self.jurisdiction_id,
+                identifier=rb.identifier)
+            )
             if len(candidates) == 1:
                 rb.related_bill = candidates[0]
                 rb.save()

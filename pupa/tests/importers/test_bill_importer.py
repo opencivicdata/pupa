@@ -35,7 +35,7 @@ def test_full_bill():
     bill.add_action('introduced in house', '1900-04-01', chamber='lower')
     act = bill.add_action('sent to arbitrary committee', '1900-04-04', chamber='lower')
     act.add_related_entity('arbitrary committee', 'organization', com._id)
-    bill.add_related_bill("HB 99", session="1899", relation_type="prior-session")
+    bill.add_related_bill("HB 99", legislative_session="1899", relation_type="prior-session")
     bill.add_sponsorship('Adam Smith', classification='extra sponsor', entity_type='person',
                          primary=False, entity_id=person.id)
     bill.add_sponsorship('Jane Smith', classification='lead sponsor', entity_type='person',

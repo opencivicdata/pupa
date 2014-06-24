@@ -18,15 +18,15 @@ class VoteImporter(BaseImporter):
     def get_object(self, vote):
         spec = {
             'identifier': vote['identifier'],
-            'session__name': vote['session'],
-            'session__jurisdiction_id': self.jurisdiction_id,
+            'legislative_session__name': vote['legislative_session'],
+            'legislative_session__jurisdiction_id': self.jurisdiction_id,
         }
         # TODO: use bill, session, etc.
         return self.model_class.objects.get(**spec)
 
     def prepare_for_db(self, data):
-        data['session'] = JurisdictionSession.objects.get(name=data.pop('session'),
-                                                          jurisdiction_id=self.jurisdiction_id)
+        data['legislative_session'] = JurisdictionSession.objects.get(
+            name=data.pop('legislative_session'), jurisdiction_id=self.jurisdiction_id)
         data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
         data['bill_id'] = self.bill_importer.resolve_json_id(data.pop('bill'))
         return data
