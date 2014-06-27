@@ -14,7 +14,7 @@ def write_jurisdiction_template(dirname, short_name, jurisdiction_id, long_name,
     class_dict = {'events': 'Event', 'people': 'Person', 'bills': 'Bill', 'votes': 'Vote'}
 
     # write __init__
-    lines = ['from pupa.scrape import Jurisdiction']
+    lines = ['# encoding=utf-8','from pupa.scrape import Jurisdiction']
     for stype in scraper_types:
         lines.append('from .{} import {}{}Scraper'.format(stype, camel_case, class_dict[stype]))
     lines.append('')

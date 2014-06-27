@@ -23,12 +23,12 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     _type = 'bill'
     _schema = schema
 
-    def __init__(self, identifier, session, title, *, chamber=None, from_organization=None,
+    def __init__(self, identifier, legislative_session, title, *, chamber=None, from_organization=None,
                  classification=None):
         super(Bill, self).__init__()
 
         self.identifier = identifier
-        self.session = session
+        self.legislative_session = legislative_session
         self.title = title
         self.classification = cleanup_list(classification, ['bill'])
         self.from_organization = self._set_organization(from_organization, chamber)
@@ -65,11 +65,11 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.actions.append(action)
         return action
 
-    def add_related_bill(self, identifier, session, relation_type):
+    def add_related_bill(self, identifier, legislative_session, relation_type):
         # will we need jurisdiction, organization?
         self.related_bills.append({
             "identifier": identifier,
-            "session": session,
+            "legislative_session": legislative_session,
             "relation_type": relation_type
         })
 
@@ -105,5 +105,5 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
                                          media_type=media_type, on_duplicate=on_duplicate)
 
     def __str__(self):
-        return self.identifier + ' in ' + self.session
+        return self.identifier + ' in ' + self.legislative_session
     __unicode__ = __str__

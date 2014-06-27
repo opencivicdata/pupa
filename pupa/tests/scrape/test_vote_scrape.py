@@ -4,8 +4,8 @@ from pupa.utils import get_psuedo_id
 
 
 def toy_vote():
-    v = Vote(session="2009", motion_text="passage of the bill", start_date="2009-01-07",
-             result='pass', classification='passage:bill')
+    v = Vote(legislative_session="2009", motion_text="passage of the bill",
+             start_date="2009-01-07", result='pass', classification='passage:bill')
     v.add_source("http://uri.example.com/", note="foo")
     return v
 
@@ -28,28 +28,31 @@ def test_simple_vote():
 
 def test_vote_org_obj():
     o = Organization('something')
-    v = Vote(session="2009", motion_text="passage of the bill", start_date="2009-01-07",
-             result='pass', classification='passage:bill', organization=o)
+    v = Vote(legislative_session="2009", motion_text="passage of the bill",
+             start_date="2009-01-07", result='pass', classification='passage:bill', organization=o)
     assert v.organization == o._id
 
 
 def test_vote_org_dict():
     odict = {'name': 'Random Committee', 'classification': 'committee'}
-    v = Vote(session="2009", motion_text="passage of the bill", start_date="2009-01-07",
-             result='pass', classification='passage:bill', organization=odict)
+    v = Vote(legislative_session="2009", motion_text="passage of the bill",
+             start_date="2009-01-07", result='pass', classification='passage:bill',
+             organization=odict)
     assert get_psuedo_id(v.organization) == odict
 
 
 def test_vote_org_chamber():
-    v = Vote(session="2009", motion_text="passage of the bill", start_date="2009-01-07",
-             result='pass', classification='passage:bill', chamber='upper')
+    v = Vote(legislative_session="2009", motion_text="passage of the bill",
+             start_date="2009-01-07", result='pass', classification='passage:bill',
+             chamber='upper')
     assert get_psuedo_id(v.organization) == {'classification': 'legislature', 'chamber': 'upper'}
 
 
 def test_org_and_chamber_conflict():
     with pytest.raises(ValueError):
-        Vote(session="2009", motion_text="passage of the bill", start_date="2009-01-07",
-             result='pass', classification='passage', organization='test', chamber='lower')
+        Vote(legislative_session="2009", motion_text="passage of the bill",
+             start_date="2009-01-07", result='pass', classification='passage', organization='test',
+             chamber='lower')
 
 
 def test_set_count():
@@ -62,14 +65,14 @@ def test_set_count():
 
 def test_set_bill_obj():
     v = toy_vote()
-    b = Bill('HB 1', session='2009', title='fake bill')
+    b = Bill('HB 1', legislative_session='2009', title='fake bill')
     v.set_bill(b)
     assert v.bill == b._id
 
 
 def test_set_bill_obj_no_extra_args():
     v = toy_vote()
-    b = Bill('HB 1', session='2009', title='fake bill')
+    b = Bill('HB 1', legislative_session='2009', title='fake bill')
     with pytest.raises(ValueError):
         v.set_bill(b, chamber='lower')
 
@@ -85,5 +88,5 @@ def test_set_bill_psuedo_id():
 def test_str():
     v = toy_vote()
     s = str(v)
-    assert v.session in s
+    assert v.legislative_session in s
     assert v.motion_text in s
