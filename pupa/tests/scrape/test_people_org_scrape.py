@@ -57,7 +57,7 @@ def test_person_add_membership():
 
 
 def test_basic_organization():
-    org = Organization('some org')
+    org = Organization('some org', classification='committee')
     org.add_source('http://example.com')
     assert org.name in str(org)
     org.validate()
@@ -79,7 +79,7 @@ def test_basic_invalid_organization():
 
 def test_org_add_post():
     """ Test that we can hack posts in on the fly'"""
-    orga = Organization("name")
+    orga = Organization("name", classification="committee")
     orga.add_source(url='foo')
     orga.validate()
 

@@ -37,7 +37,7 @@ def test_save_related():
     s = Scraper(juris, '/tmp/')
     p = Person('Michael Jordan')
     p.add_source('http://example.com')
-    o = Organization('Chicago Bulls')
+    o = Organization('Chicago Bulls', classification='committee')
     o.add_source('http://example.com')
     p._related.append(o)
 
