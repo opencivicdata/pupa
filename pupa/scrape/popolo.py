@@ -109,7 +109,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
     _type = 'organization'
     _schema = org_schema
 
-    def __init__(self, name, *, classification=None, parent_id=None, chamber='',
+    def __init__(self, name, *, classification='', parent_id=None, chamber='',
                  founding_date='', dissolution_date='', image=''):
         """
         Constructor for the Organization object.
