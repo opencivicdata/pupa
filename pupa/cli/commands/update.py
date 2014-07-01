@@ -129,9 +129,9 @@ class Command(BaseCommand):
         report.update(person_importer.import_directory(datadir))
         report.update(post_importer.import_directory(datadir))
         report.update(membership_importer.import_directory(datadir))
-        report.update(bill_importer.import_from_json(datadir))
-        report.update(event_importer.import_from_json(datadir))
-        report.update(vote_importer.import_from_json(datadir))
+        report.update(bill_importer.import_directory(datadir))
+        report.update(event_importer.import_directory(datadir))
+        report.update(vote_importer.import_directory(datadir))
 
         return report
 
