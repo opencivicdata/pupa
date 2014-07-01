@@ -78,8 +78,9 @@ schema = {
             "items": {
                 "properties": {
                     "identifier": {"type": "string", "description": "name (e.g. HB 22)"},
-                    "note": {"type": ["string", "null"],
+                    "note": {"type": "string", "blank": True,
                              "description": "note describing why this name is attached"},
+                    "scheme": {"type": "string", "blank": True },
                 },
                 "type": "object"
             },

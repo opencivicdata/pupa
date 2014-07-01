@@ -80,8 +80,9 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
             "classification": classification,
             "entity_type": entity_type,
             "primary": primary,
-            entity_type + '_id': entity_id,
         }
+        if entity_type:
+            sp[entity_type + '_id'] = entity_id
         self.sponsorships.append(sp)
 
     def add_subject(self, subject):
@@ -93,8 +94,8 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     def add_title(self, title, note=''):
         self.other_titles.append({"note": note, "title": title})
 
-    def add_identifier(self, identifier, note=''):
-        self.other_identifiers.append({"note": note, "identifier": identifier})
+    def add_identifier(self, identifier, note='', scheme=''):
+        self.other_identifiers.append({"note": note, "identifier": identifier, 'scheme': scheme})
 
     def add_document_link(self, note, url, *, date='', media_type='', on_duplicate='error'):
         return self._add_associated_link(collection='documents', note=note, url=url, date=date,
