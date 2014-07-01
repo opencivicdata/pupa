@@ -8,7 +8,7 @@ class Legislator(Person):
     Legislator is a special case of Person that has a district, party, and perhaps a chamber
     """
     def __init__(self, name, district, *, party=None, chamber='', role='member',
-                 start_date=None, end_date=None, **kwargs):
+                 start_date='', end_date='', **kwargs):
 
         super(Legislator, self).__init__(name, **kwargs)
         self._district = district
