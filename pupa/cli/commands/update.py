@@ -173,6 +173,9 @@ class Command(BaseCommand):
                 elif arg in juris.scrapers:
                     cur_scraper = arg
                     scrapers[cur_scraper] = {}
+                else:
+                    raise CommandError('no such scraper: module={} scraper={}'.format(args.module,
+                                                                                      arg))
         else:
             scrapers = {key: {} for key in available_scrapers.keys()}
 
