@@ -9,7 +9,8 @@ from pupa import utils
 from pupa import settings
 
 from pupa.importers import (JurisdictionImporter, OrganizationImporter, PersonImporter,
-                            PostImporter, MembershipImporter)
+                            PostImporter, MembershipImporter, BillImporter,
+                            VoteImporter, EventImporter)
 from pupa.scrape import Jurisdiction, JurisdictionScraper
 
 
@@ -116,10 +117,10 @@ class Command(BaseCommand):
         post_importer = PostImporter(juris.jurisdiction_id, org_importer)
         membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
                                                  org_importer, post_importer)
-        #bill_importer = BillImporter(juris.jurisdiction_id, org_importer)
-        #vote_importer = VoteImporter(juris.jurisdiction_id, person_importer, org_importer,
-        #                             bill_importer)
-        #event_importer = EventImporter(juris.jurisdiction_id)
+        bill_importer = BillImporter(juris.jurisdiction_id, org_importer)
+        vote_importer = VoteImporter(juris.jurisdiction_id, person_importer, org_importer,
+                                     bill_importer)
+        event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
         # TODO: wrap in a transaction
@@ -128,9 +129,9 @@ class Command(BaseCommand):
         report.update(person_importer.import_directory(datadir))
         report.update(post_importer.import_directory(datadir))
         report.update(membership_importer.import_directory(datadir))
-        #report.update(bill_importer.import_from_json(datadir))
-        #report.update(event_importer.import_from_json(datadir))
-        #report.update(vote_importer.import_from_json(datadir))
+        report.update(bill_importer.import_from_json(datadir))
+        report.update(event_importer.import_from_json(datadir))
+        report.update(vote_importer.import_from_json(datadir))
 
         return report
 
