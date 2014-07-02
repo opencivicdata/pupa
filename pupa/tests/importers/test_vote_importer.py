@@ -36,7 +36,7 @@ def test_full_vote():
     assert VoteEvent.objects.count() == 1
     ve = VoteEvent.objects.get()
     assert ve.legislative_session_id == session.id
-    assert ve.classification == ['passage:bill']
+    assert ve.motion_classification == ['passage:bill']
     assert ve.bill_id == bill.id
     count = ve.counts.get()
     assert count.option == 'yes'
