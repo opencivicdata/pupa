@@ -1,5 +1,5 @@
 from .base import BaseImporter
-from opencivicdata.models import VoteEvent, JurisdictionSession
+from opencivicdata.models import VoteEvent, LegislativeSession
 
 
 class VoteImporter(BaseImporter):
@@ -25,7 +25,7 @@ class VoteImporter(BaseImporter):
         return self.model_class.objects.get(**spec)
 
     def prepare_for_db(self, data):
-        data['legislative_session'] = JurisdictionSession.objects.get(
+        data['legislative_session'] = LegislativeSession.objects.get(
             name=data.pop('legislative_session'), jurisdiction_id=self.jurisdiction_id)
         data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
         data['bill_id'] = self.bill_importer.resolve_json_id(data.pop('bill'))

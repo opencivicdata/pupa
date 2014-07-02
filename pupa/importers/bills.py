@@ -1,5 +1,5 @@
 from pupa.utils import fix_bill_id
-from opencivicdata.models import Bill, JurisdictionSession, RelatedBill
+from opencivicdata.models import Bill, LegislativeSession, RelatedBill
 from .base import BaseImporter
 
 
@@ -37,7 +37,7 @@ class BillImporter(BaseImporter):
 
     def prepare_for_db(self, data):
         data['identifier'] = fix_bill_id(data['identifier'])
-        data['legislative_session'] = JurisdictionSession.objects.get(
+        data['legislative_session'] = LegislativeSession.objects.get(
             jurisdiction_id=self.jurisdiction_id, name=data['legislative_session'])
 
         if data['from_organization']:
