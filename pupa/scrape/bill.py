@@ -1,4 +1,4 @@
-from ..utils import make_psuedo_id
+from ..utils import make_psuedo_id, psuedo_organization
 from .base import BaseModel, SourceMixin, AssociatedLinkMixin, cleanup_list
 from .schemas.bill import schema
 
@@ -23,15 +23,15 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     _type = 'bill'
     _schema = schema
 
-    def __init__(self, identifier, legislative_session, title, *, chamber=None, from_organization=None,
-                 classification=None):
+    def __init__(self, identifier, legislative_session, title, *, chamber=None,
+                 from_organization=None, classification=None):
         super(Bill, self).__init__()
 
         self.identifier = identifier
         self.legislative_session = legislative_session
         self.title = title
         self.classification = cleanup_list(classification, ['bill'])
-        self.from_organization = self._set_organization(from_organization, chamber)
+        self.from_organization = psuedo_organization(from_organization, chamber)
 
         self.actions = []
         self.other_identifiers = []
@@ -44,23 +44,10 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.versions = []
 
 
-    def _set_organization(self, organization, chamber):
-        """ helper for setting an appropriate ID for organizations """
-        if organization and chamber:
-            raise ValueError('cannot specify both chamber and organization')
-        elif chamber:
-            return make_psuedo_id(classification='legislature', chamber=chamber)
-        elif organization:
-            return organization
-        else:
-            # neither specified
-            return make_psuedo_id(classification='legislature')
-
-
     def add_action(self, description, date, *, organization=None, chamber=None,
                    classification=None, related_entities=None):
         action = Action(description=description, date=date,
-                        organization_id=self._set_organization(organization, chamber),
+                        organization_id=psuedo_organization(organization, chamber),
                         classification=cleanup_list(classification, []), related_entities=[])
         self.actions.append(action)
         return action

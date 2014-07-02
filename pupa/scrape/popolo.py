@@ -5,6 +5,7 @@ from .schemas.post import schema as post_schema
 from .schemas.person import schema as person_schema
 from .schemas.membership import schema as membership_schema
 from .schemas.organization import schema as org_schema
+from ..utils import psuedo_organization
 
 # a copy of the org schema without sources
 org_schema_no_sources = copy.deepcopy(org_schema)
@@ -19,11 +20,12 @@ class Post(BaseModel, LinkMixin, ContactDetailMixin):
     _type = 'post'
     _schema = post_schema
 
-    def __init__(self, *, label, role, organization_id, start_date='', end_date=''):
+    def __init__(self, *, label, role, organization_id=None, chamber=None,
+                 start_date='', end_date=''):
         super(Post, self).__init__()
         self.label = label
         self.role = role
-        self.organization_id = organization_id
+        self.organization_id = psuedo_organization(organization_id, chamber)
         self.start_date = start_date
         self.end_date = end_date
 

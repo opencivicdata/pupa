@@ -18,6 +18,19 @@ def get_psuedo_id(pid):
     return json.loads(pid[1:])
 
 
+def psuedo_organization(organization, chamber, classification='legislature'):
+    """ helper for setting an appropriate ID for organizations """
+    if organization and chamber:
+        raise ValueError('cannot specify both chamber and organization')
+    elif chamber:
+        return make_psuedo_id(classification=classification, chamber=chamber)
+    elif organization:
+        return organization
+    else:
+        # neither specified
+        return make_psuedo_id(classification=classification)
+
+
 def makedirs(dname):
     if not os.path.isdir(dname):
         os.makedirs(dname)
