@@ -23,6 +23,7 @@ ELASTICSEARCH_TIMEOUT = 2
 DEBUG = False
 TEMPLATE_DEBUG = False
 
+MIDDLEWARE_CLASSES = ()
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

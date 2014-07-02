@@ -15,8 +15,8 @@ class Vote(BaseModel, SourceMixin):
 
         self.legislative_session = legislative_session
         self.motion_text = motion_text
+        self.motion_classification = cleanup_list(classification, [])
         self.start_date = start_date
-        self.classification = cleanup_list(classification, [])
         self.result = result
         self.identifier = identifier
         self.organization = organization

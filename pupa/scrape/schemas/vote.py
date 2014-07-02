@@ -48,8 +48,8 @@ schema = {
         },
 
         # added fields
-        'classification': {"items": {"type": "string", "enum": common.VOTE_CLASSIFICATIONS},
-                           "type": "array", "description": "array of types"},
+        'motion_classification': {"items": {"type": "string", "enum": common.VOTE_CLASSIFICATIONS},
+                                  "type": "array", "description": "array of types"},
         'result': {"type": "string", "enum": common.VOTE_RESULTS,
                     "description": "outcome of vote (e.g. pass, fail)"},
         'organization': {"type": ["string", "null"],
