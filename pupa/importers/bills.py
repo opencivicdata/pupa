@@ -38,7 +38,8 @@ class BillImporter(BaseImporter):
     def prepare_for_db(self, data):
         data['identifier'] = fix_bill_id(data['identifier'])
         data['legislative_session'] = LegislativeSession.objects.get(
-            jurisdiction_id=self.jurisdiction_id, name=data['legislative_session'])
+            jurisdiction_id=self.jurisdiction_id,
+            identifier=data['legislative_session'])
 
         if data['from_organization']:
             data['from_organization_id'] = self.org_importer.resolve_json_id(
@@ -60,7 +61,7 @@ class BillImporter(BaseImporter):
                 bill__legislative_session__jurisdiction_id=self.jurisdiction_id,
                 related_bill=None):
             candidates = list(Bill.objects.filter(
-                legislative_session__name=rb.legislative_session,
+                legislative_session__identifier=rb.legislative_session,
                 legislative_session__jurisdiction_id=self.jurisdiction_id,
                 identifier=rb.identifier)
             )
