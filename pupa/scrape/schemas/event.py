@@ -2,55 +2,20 @@
     Schema for event objects.
 """
 
-from .common import sources, extras
+from .common import sources, extras, fuzzy_date_blank
 
 media_schema = {
-    "description": ("This \"special\" schema is used in two places in the Event"
-                    " schema, on the top level and inside the agenda item. This is an"
-                    " optional component that may be omited entirely from a document."),
     "items": {
         "properties": {
-            "name": {
-                "type": "string",
-                "description": ('name of the media link, such as "Recording of'
-                                ' the meeting" or "Discussion of construction'
-                                ' near the watershed"'),
-            },
-
-            "type": {
-                "type": "string",
-                "description": ('type of the set of recordings, such as'
-                                ' "recording" or "testimony".'),
-            },
-
-            "date": {
-                "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
-                "type": "string", "blank": True,
-                "description": "date of the recording.",
-            },
-
-            "offset": {
-                "type": ["number", "null"],
-                "description": ("Offset where the related part starts. This is"
-                                " optional and may be ommited entirely."),
-            },
-
+            "name": { "type": "string" },
+            "type": { "type": "string" },
+            "date": fuzzy_date_blank,
+            "offset": { "type": ["number", "null"] },
             "links": {
-                "description": ("List of links to the same media item, each"
-                                " with a different media_type."),
                 "items": {
                     "properties": {
-                        "media_type": {
-                            "description": ("media type of the media, such"
-                                            " as video/mp4 or audio/webm"),
-                            "type": ["string", "null"]
-                        },
-
-                        "url": {
-                            "type": "string",
-                            "description": "URL where this media may be accessed",
-                        },
-
+                        "media_type": { "type": "string", "blank": True },
+                        "url": { "type": "string" },
                     },
                     "type": "object"
                 },
@@ -63,71 +28,22 @@ media_schema = {
 }
 
 schema = {
-    "description": "event data",
-
-    "_order": (
-        ('Basics', ('name', 'description', 'when', 'end', 'status', 'location')),
-        ('Linked Entities', ('media', 'links', 'participants', 'agenda', 'documents',)),
-        ('Common Fields', ['updated_at', 'created_at', 'sources']),
-    ),
-
     "properties": {
-        "name": {
-            "type": "string",
-            "description": ('A simple name of the event, such as "Fiscal'
-                            ' subcommittee hearing on pudding cups"')
+        "name": { "type": "string" },
+        "start_time": { "type": "datetime", },
+        "all_day": { "type": "boolean" },
+        "end_time": { "type": ["datetime", "null"] },
+        "status": {
+            "type": "string", "blank": True,
+            "enum": ["cancelled", "tentative", "confirmed", "passed"],
         },
-
-        "all_day": {
-            "type": ["boolean"],
-            "description": ("Indicates if the event is an all-day event"),
-        },
-
-        "classification": {
-            "type": ["string"],
-            "description": ("type of event"),
-        },
-        # TODO: turn into enum
-
-        "updated_at": {
-            "type": ["string", "datetime"],
-            "required": False,
-            "description": "the time that this object was last updated.",
-        },
-
-        "created_at": {
-            "type": ["string", "datetime"],
-            "required": False,
-            "description": "the time that this object was first created.",
-        },
-
+        "classification": { "type": "string" }, # TODO: enum
         "description": {
             "type": "string", "blank": True,
             "description": ('A longer description describing the event. As an'
                             ' example, "Topics for discussion include this that'
                             ' and the other thing. In addition, lunch will be'
                             ' served".'),
-        },
-
-        "start_time": {
-            "type": ["datetime"],
-            "description": ("Starting date / time of the event. This should be"
-                            " fully timezone qualified."),
-        },
-
-        "end_time": {
-            "type": ["datetime", "null"],
-            "description": ("Ending date / time of the event. This should"
-                            " be fully timezone qualified."),
-        },
-
-
-        "status": {
-            "type": "string", "blank": True,
-            "enum": ["cancelled", "tentative", "confirmed", "passed"],
-            "description": ("String that denotes the status of the meeting."
-                            " This is useful for showing the meeting is cancelled"
-                            " in a machine-readable way."),
         },
 
         "location": {
