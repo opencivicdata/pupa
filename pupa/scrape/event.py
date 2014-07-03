@@ -11,7 +11,7 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
             "related_entities": [],
             "subjects": [],
             "media": [],
-            "notes": "",
+            "notes": [],
             "order": None,
         })
         self.event = event

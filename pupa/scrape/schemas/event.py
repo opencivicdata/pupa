@@ -309,7 +309,11 @@ schema = {
                     "notes": {
                         "description": ("Notes taken during this agenda"
                                         " item, may be used to construct meeting minutes."),
-                        "type": "string", "blank": True,
+                        "items": {
+                            "type": "string",
+                        },
+                        "type": "array",
+                        "minItems": 0,
                     },
 
                     "related_entities": {
