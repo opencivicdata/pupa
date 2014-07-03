@@ -1,48 +1,24 @@
-from .common import extras
+from .common import extras, fuzzy_date, fuzzy_date_blank
 from opencivicdata import common
 
 
 schema = {
-    "description": "Information about a jurisdiction, including session, chamber, etc.",
     "type": "object",
     "properties": {
-        "classification": {"type": "string",
-                 "description": "Jurisidction's type (e.g. government or school board)"},
-        "name": {"type": "string",
-                 "description": "Name of jurisdiction (e.g. North Carolina General Assembly)"},
-        "url": {"type": "string", "description": "URL pointing to jurisdiction's website.", },
+        "name": {"type": "string"},
+        "url": {"type": "string"},
+        "classification": {"type": "string"},   # TODO: enum
+        "division_id": {"type": "string"},
         "legislative_sessions": {
             "type": "array", "items": {"type": "object", "properties": {
-                "name": {"type": "string", "description": "Name of session."},
-                "type": {"type": "string", "required": False,
-                         "description": "Type of session: primary or special."},
-                "start_date": {"type": "string", "blank": True,
-                               "description": "Start date of session."},
-                "end_date": {"type": "string", "blank": True,
-                             "description": "End date of session."}
+                "name": {"type": "string"},
+                "name": {"type": "string"},
+                "type": {"classification": "string", "enum": ["primary", "special"]},
+                "start_date": fuzzy_date_blank,
+                "end_date": fuzzy_date_blank,
             }},
-            "description": ("List of sessions. Elements "
-                            "consist of several fields giving detail about the session.")
         },
-        "jurisdiction_id": {
-            "description": "ID of the jurisdiction",
-            "type": ["string"],
-        },
-        "jurisdiction_id": {
-            "description": "ID of the jurisdiction",
-            "type": "string",
-            "enum": common.JURISDICTION_CLASSIFICATIONS,
-        },
-        "division_id": {
-            "description": "Linked geospatial ID in OCD division ID format",
-            "type": ["string", "null"],
-        },
-        "feature_flags": {
-            "type": "array",
-            "items": {"type": "string"},
-            "description": ("A way to mark certain features as available on a per-jurisdiction "
-                            "basis."),
-        },
+        "feature_flags": { "type": "array", "items": {"type": "string"} },
         "extras": extras,
     }
 }
