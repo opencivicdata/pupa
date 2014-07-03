@@ -16,9 +16,9 @@ schema = {
                 "name": {"type": "string", "description": "Name of session."},
                 "type": {"type": "string", "required": False,
                          "description": "Type of session: primary or special."},
-                "start_date": {"type": ["datetime"], "required": False,
+                "start_date": {"type": "string", "blank": True,
                                "description": "Start date of session."},
-                "end_date": {"type": ["datetime"], "required": False,
+                "end_date": {"type": "string", "blank": True,
                              "description": "End date of session."}
             }},
             "description": ("List of sessions. Elements "
