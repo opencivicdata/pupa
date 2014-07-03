@@ -135,9 +135,13 @@ schema = {
                     "id": {"type": ["string", "null"],
                            "description": ("ID of entity if the sponsor has been resolved to "
                                            "another entity in the database."), },
-                    "_type": {"type": ["string", "null"], "enum": ["organization", "person"],
-                              "description": ("Type of entity if the sponsor has been resolved to "
-                                              "another entity in the database."), }
+                    "entity_type": {
+                        "enum": ["organization", "person", ""],
+                        "type": "string",
+                        "blank": True,
+                        "description": ("Type of entity if the sponsor has been "
+                                        "resolved to another entity in the "
+                                        "database."), },
                 },
                 "type": "object"
             },
@@ -175,8 +179,9 @@ schema = {
                                 "name": {"type": "string",
                                          "description": "Name of entity given by source data"},
                                 "entity_type": {
-                                    "enum": ["organization", "person"],
-                                    "type": ["string", "null"],
+                                    "enum": ["organization", "person", ""],
+                                    "type": "string",
+                                    "blank": True,
                                     "description": ("Type of entity if the sponsor has been "
                                                     "resolved to another entity in the "
                                                     "database."), },
