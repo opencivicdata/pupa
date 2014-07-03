@@ -30,8 +30,8 @@ other_names = {
     "items": {
         "properties": {
             "name": {"type": "string"},
-            "start_date": fuzzy_date,
-            "end_date": fuzzy_date,
+            "start_date": fuzzy_date_blank,
+            "end_date": fuzzy_date_blank,
             "note": {"type": "string", "blank": True },
         "type": "object",
         }

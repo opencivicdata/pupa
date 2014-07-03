@@ -1,4 +1,4 @@
-from .common import extras, fuzzy_date, fuzzy_date_blank
+from .common import extras, fuzzy_date_blank
 from opencivicdata import common
 
 
