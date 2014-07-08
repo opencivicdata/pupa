@@ -14,7 +14,7 @@ class DumbMockImporter(object):
 @pytest.mark.django_db
 def test_full_vote():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
-    session = j.legislative_sessions.create(name='1900')
+    session = j.legislative_sessions.create(name='1900', identifier='1900')
     person = Person.objects.create(id='person-id', name='Adam Smith')
     org = Organization.objects.create(id='org-id', name='House', chamber='lower',
                                       classification='legislature')
