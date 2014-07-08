@@ -1,4 +1,4 @@
-from .common import sources, extras, fuzzy_date, fuzzy_date_blank
+from .common import sources, extras, fuzzy_datetime_blank
 from opencivicdata import common
 
 
@@ -9,8 +9,8 @@ schema = {
         'motion_text': {"type": "string" },
         'motion_classification': {"items": {"type": "string", "enum": common.VOTE_CLASSIFICATIONS},
                                   "type": "array"},
-        'start_date': fuzzy_date,
-        'end_date': fuzzy_date_blank,
+        'start_date': fuzzy_datetime_blank,
+        'end_date': fuzzy_datetime_blank,
         'result': {"type": "string", "enum": common.VOTE_RESULTS},
         'organization': {"type": ["string", "null"]},
         'legislative_session': {"type": "string"},

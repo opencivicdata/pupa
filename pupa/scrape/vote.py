@@ -19,7 +19,6 @@ class Vote(BaseModel, SourceMixin):
         self.start_date = start_date
         self.result = result
         self.identifier = identifier
-        self.organization = organization
 
         self.set_bill(bill)
         self.votes = []

@@ -25,6 +25,9 @@ identifiers = {
 
 fuzzy_date = {"type": "string", "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}$"}
 fuzzy_date_blank = {"type": "string", "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}$", "blank": True}
+fuzzy_datetime_blank = {"type": "string",
+                        "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}( [0-9]{2}:[0-9]{2}:[0-9]{2})?$",
+                        "blank": True}
 
 other_names = {
     "items": {
