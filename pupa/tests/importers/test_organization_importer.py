@@ -102,3 +102,12 @@ def test_psuedo_ids():
     oi2 = OrganizationImporter('jid2')
     assert (oi2.resolve_json_id('~{"classification":"international", "name":"United Nations"}') ==
             un.id)
+
+@pytest.mark.django_db
+def test_parent_id_resolution():
+    parent = ScrapeOrganization('UN', classification='international')
+    child = ScrapeOrganization('UNESCO', classification='international', parent_id=parent._id)
+    OrganizationImporter('jurisdiction-id').import_data([parent.as_dict(), child.as_dict()])
+    assert Organization.objects.count() == 2
+    assert Organization.objects.get(name='UN').children.count() == 1
+    assert Organization.objects.get(name='UNESCO').parent.name == 'UN'
