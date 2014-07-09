@@ -194,13 +194,6 @@ class BaseImporter(object):
         import_order = self._order_imports(dicts)
 
         for json_id, data in import_order:
-            parent_id = data.get('parent_id', None)
-            if parent_id:
-                # If we've got a parent ID, let's resolve it's JSON id
-                # (scrape-time) to a Database ID (needs to have had the
-                # parent imported first - which we asserted is true via
-                # the topological sort)
-                data['parent_id'] = self.resolve_json_id(parent_id)
             obj, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj.id
             results[what] += 1
