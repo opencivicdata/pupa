@@ -131,14 +131,6 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
             schema = org_schema_no_sources
         return super(Organization, self).validate(schema=schema)
 
-    #@property
-    #def parent(self):
-    #    return self.parent_id
-
-    #@parent.setter
-    #def parent(self, val):
-    #    self.parent_id = val._id
-
     def add_post(self, label, role, **kwargs):
         post = Post(label=label, role=role, organization_id=self._id, **kwargs)
         self._related.append(post)
