@@ -16,15 +16,11 @@ class Jurisdiction(BaseModel):
     legislative_sessions = []
     feature_flags = []
     extras = {}
-    other_names = []
 
     # non-db properties
     scrapers = {}
     default_scrapers = {}
-    organizations = []
-    posts = []
     parties = []
-    parent_id = None
     ignored_scraped_sessions = []
 
     def __init__(self):
@@ -52,26 +48,20 @@ class Jurisdiction(BaseModel):
     def __str__(self):
         return self.name
 
+    def get_organizations(self):
+        raise NotImplementedError('get_organizations is not implemented')   # pragma: no cover
+
 
 class JurisdictionScraper(Scraper):
     def scrape(self):
         # yield a single Jurisdiction object
         yield self.jurisdiction
 
-        # if organizations weren't specified yield one top-level org
-        if not self.jurisdiction.organizations:
-            org = Organization(name=self.jurisdiction.name, classification='legislature')
-            org.add_source(self.jurisdiction.url)
+        # yield all organizations
+        for org in self.jurisdiction.get_organizations():
             yield org
-        else:
-            for org in self.jurisdiction.organizations:
-                org.add_source(self.jurisdiction.url)
-                yield org
 
         for party in self.jurisdiction.parties:
             org = Organization(classification='party', name=party['name'])
             org.add_source(self.jurisdiction.url)
             yield org
-
-        for post in self.jurisdiction.posts:
-            yield post

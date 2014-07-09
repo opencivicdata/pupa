@@ -7,11 +7,13 @@ class FakeJurisdiction(Jurisdiction):
     classification = 'government'
     name = 'Test'
     url = 'http://example.com'
-
-    organizations = [Organization('House', classification='lower'),
-                     Organization('Senate', classification='upper')]
-
     parties = [{'name': 'Republican'}, {'name': 'Democratic'}]
+
+    def get_organizations(self):
+        parent = Organization('Congress', classification='legislature')
+        yield parent
+        yield Organization('House', classification='lower', parent_id=parent)
+        yield Organization('Senate', classification='upper', parent_id=parent)
 
 
 def test_basics():
@@ -38,6 +40,9 @@ def test_jurisdiction_unicam_scrape():
         name = 'Unicameral'
         url = 'http://example.com'
 
+        def get_organizations(self):
+            yield Organization('Unicameral Legislature', classification='legislature')
+
     j = UnicameralJurisdiction()
     js = JurisdictionScraper(j, '/tmp/')
     objects = list(js.scrape())
@@ -46,10 +51,9 @@ def test_jurisdiction_unicam_scrape():
     assert len(objects) == 2
     assert objects[0] == j
 
-    # ensure we made a single legislature org as well
+    # ensure we made a single legislature org
     assert isinstance(objects[1], Organization)
     assert objects[1].classification == 'legislature'
-    assert objects[1].sources[0]['url'] == j.url
 
 
 def test_jurisdiction_bicameral_scrape():
@@ -64,6 +68,6 @@ def test_jurisdiction_bicameral_scrape():
         obj_types[type(o)] += 1
 
     # ensure Jurisdiction and 4 organizations were found
-    assert obj_names == {'Test', 'House', 'Senate', 'Democratic', 'Republican'}
+    assert obj_names == {'Test', 'Congress', 'House', 'Senate', 'Democratic', 'Republican'}
     assert obj_types[FakeJurisdiction] == 1
-    assert obj_types[Organization] == 4
+    assert obj_types[Organization] == 5
