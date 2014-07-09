@@ -106,7 +106,18 @@ def test_psuedo_ids():
 @pytest.mark.django_db
 def test_parent_id_resolution():
     parent = ScrapeOrganization('UN', classification='international')
-    child = ScrapeOrganization('UNESCO', classification='international', parent_id=parent._id)
+    child = ScrapeOrganization('UNESCO', classification='unknown', parent_id=parent._id)
+    OrganizationImporter('jurisdiction-id').import_data([parent.as_dict(), child.as_dict()])
+    assert Organization.objects.count() == 2
+    assert Organization.objects.get(name='UN').children.count() == 1
+    assert Organization.objects.get(name='UNESCO').parent.name == 'UN'
+
+
+@pytest.mark.django_db
+def test_psuedo_parent_id_resolution():
+    parent = ScrapeOrganization('UN', classification='international')
+    child = ScrapeOrganization('UNESCO', classification='unknown',
+                               parent_id='~{"classification": "international"}')
     OrganizationImporter('jurisdiction-id').import_data([parent.as_dict(), child.as_dict()])
     assert Organization.objects.count() == 2
     assert Organization.objects.get(name='UN').children.count() == 1
