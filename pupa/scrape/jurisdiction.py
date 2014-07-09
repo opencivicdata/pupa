@@ -17,7 +17,6 @@ class Jurisdiction(BaseModel):
     feature_flags = []
     extras = {}
     other_names = []
-    _meta = {}
 
     # non-db properties
     scrapers = {}
@@ -31,7 +30,6 @@ class Jurisdiction(BaseModel):
     def __init__(self):
         super(BaseModel, self).__init__()
         self._related = []
-        self._meta = {}
         self.extras = {}
 
     @property
@@ -50,9 +48,6 @@ class Jurisdiction(BaseModel):
 
     def get_session_list(self):
         raise NotImplementedError('get_session_list is not implemented')    # pragma: no cover
-
-    def extract_text(self):
-        raise NotImplementedError('extract_text is not implemented')        # pragma: no cover
 
     def __str__(self):
         return self.name

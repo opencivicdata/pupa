@@ -150,7 +150,6 @@ class BaseModel(object):
         super(BaseModel, self).__init__()
         self._id = str(uuid.uuid1())
         self._related = []
-        self._meta = {}
         self.extras = {}
 
     # validation
