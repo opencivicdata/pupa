@@ -32,7 +32,6 @@ class Post(BaseModel, LinkMixin, ContactDetailMixin):
 
     def __str__(self):
         return self.label
-    __unicode__ = __str__
 
 
 class Membership(BaseModel, ContactDetailMixin, LinkMixin):
@@ -64,7 +63,6 @@ class Membership(BaseModel, ContactDetailMixin, LinkMixin):
 
     def __str__(self):
         return self.person_id + ' membership in ' + self.organization_id
-    __unicode__ = __str__
 
 
 class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMixin,
@@ -100,7 +98,6 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
 
     def __str__(self):
         return self.name
-    __unicode__ = __str__
 
 
 class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMixin,
@@ -127,7 +124,6 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
 
     def __str__(self):
         return self.name
-    __unicode__ = __str__
 
     def validate(self):
         schema = None

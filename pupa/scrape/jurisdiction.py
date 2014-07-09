@@ -56,7 +56,6 @@ class Jurisdiction(BaseModel):
 
     def __str__(self):
         return self.name
-    __unicode__ = __str__
 
 
 class JurisdictionScraper(Scraper):

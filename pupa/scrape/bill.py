@@ -95,4 +95,3 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
 
     def __str__(self):
         return self.identifier + ' in ' + self.legislative_session
-    __unicode__ = __str__

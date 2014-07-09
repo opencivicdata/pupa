@@ -26,8 +26,8 @@ class Vote(BaseModel, SourceMixin):
         self.counts = []
 
     def __str__(self):
-        return u'{0} - {1} - {2}'.format(self.legislative_session, self.start_date,
-                                         self.motion_text)
+        return '{0} - {1} - {2}'.format(self.legislative_session, self.start_date,
+                                        self.motion_text)
 
     def set_bill(self, bill_or_identifier, *, chamber=None):
         if not bill_or_identifier:

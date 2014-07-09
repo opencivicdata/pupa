@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from django.db import connection
 from django.core.management import call_command
 

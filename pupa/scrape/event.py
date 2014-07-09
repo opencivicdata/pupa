@@ -60,8 +60,7 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         self.agenda = []
 
     def __str__(self):
-        return u'{0} {1}'.format(self.start_time, self.name.strip())
-    __unicode__ = __str__
+        return '{} {}'.format(self.start_time, self.name.strip())
 
     def add_participant(self, name, type, *, note='participant'):
         self.participants.append({"entity_type": type, "note": note, "name": name})
