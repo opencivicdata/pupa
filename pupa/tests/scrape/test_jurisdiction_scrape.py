@@ -67,7 +67,7 @@ def test_jurisdiction_bicameral_scrape():
         obj_names.add(o.name)
         obj_types[type(o)] += 1
 
-    # ensure Jurisdiction and 4 organizations were found
+    # ensure Jurisdiction and 5 organizations were found
     assert obj_names == {'Test', 'Congress', 'House', 'Senate', 'Democratic', 'Republican'}
     assert obj_types[FakeJurisdiction] == 1
     assert obj_types[Organization] == 5
