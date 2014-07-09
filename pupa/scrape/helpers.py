@@ -1,6 +1,6 @@
 """ these are helper classes for object creation during the scrape """
 from ..utils import make_psuedo_id
-from .popolo import Person, Organization, Membership
+from .popolo import Person, Organization, Membership, psuedo_organization
 
 
 class Legislator(Person):
@@ -20,18 +20,20 @@ class Legislator(Person):
 
     def pre_save(self, jurisdiction_id):
         # before saving create a membership to the current jurisdiction
-        post_kwargs = {"label": self._district}
-        if self._chamber:
-            post_kwargs['organization__chamber'] = self._chamber
-            post_kwargs['organization__classification'] = 'legislature'
 
-        membership = Membership(
-            person_id=self._id,
-            organization_id=make_psuedo_id(classification="legislature", chamber=self._chamber),
-            post_id=make_psuedo_id(**post_kwargs),
-            role=self._role,
-            start_date=self._start_date,
-            end_date=self._end_date)
+        kwargs = {}
+        if self._chamber:
+            org_classification = self._chamber
+        else:
+            org_classification = 'legislature'
+
+        org_id = make_psuedo_id(classification=org_classification)
+        post_id = make_psuedo_id(label=self._district,
+                                 organization__classification=org_classification)
+
+        membership = Membership(person_id=self._id, organization_id=org_id, post_id=post_id,
+                                role=self._role, start_date=self._start_date,
+                                end_date=self._end_date)
         self._related.append(membership)
 
         # create a party membership
@@ -48,8 +50,9 @@ class Committee(Organization):
     Committee is a special Organization that makes it easy to add members
     """
 
-    def __init__(self, name, *, chamber='', **kwargs):
-        super(Committee, self).__init__(name=name, classification='committee', chamber=chamber,
+    def __init__(self, name, *, parent_id=None, chamber=None, **kwargs):
+        parent_id = psuedo_organization(parent_id, chamber, 'legislature')
+        super(Committee, self).__init__(name=name, classification='committee', parent_id=parent_id,
                                         **kwargs)
 
     def add_member(self, name_or_person, role='member', **kwargs):

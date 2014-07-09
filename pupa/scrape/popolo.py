@@ -5,7 +5,7 @@ from .schemas.post import schema as post_schema
 from .schemas.person import schema as person_schema
 from .schemas.membership import schema as membership_schema
 from .schemas.organization import schema as org_schema
-from ..utils import psuedo_organization
+from ..utils import make_psuedo_id
 
 # a copy of the org schema without sources
 org_schema_no_sources = copy.deepcopy(org_schema)
@@ -25,7 +25,8 @@ class Post(BaseModel, LinkMixin, ContactDetailMixin):
         super(Post, self).__init__()
         self.label = label
         self.role = role
-        self.organization_id = psuedo_organization(organization_id, chamber)
+        # TODO: not sure that this should be defaulting to legislature
+        self.organization_id = psuedo_organization(organization_id, chamber, 'legislature')
         self.start_date = start_date
         self.end_date = end_date
 
@@ -111,7 +112,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
     _type = 'organization'
     _schema = org_schema
 
-    def __init__(self, name, *, classification='', parent_id=None, chamber='',
+    def __init__(self, name, *, classification='', parent_id=None,
                  founding_date='', dissolution_date='', image=''):
         """
         Constructor for the Organization object.
@@ -119,7 +120,6 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         super(Organization, self).__init__()
         self.name = name
         self.classification = classification
-        self.chamber = chamber
         self.founding_date = founding_date
         self.dissolution_date = dissolution_date
         self.parent_id = parent_id
@@ -147,3 +147,20 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         post = Post(label=label, role=role, organization_id=self._id, **kwargs)
         self._related.append(post)
         return post
+
+
+def psuedo_organization(organization, classification, default):
+    """ helper for setting an appropriate ID for organizations """
+    if organization and classification:
+        raise ValueError('cannot specify both classification and organization')
+    elif classification:
+        return make_psuedo_id(classification=classification)
+    elif organization:
+        if isinstance(organization, Organization):
+            return organization._id
+        elif isinstance(organization, str):
+            return organization
+        else:
+            return make_psuedo_id(**organization)
+    else:
+        return make_psuedo_id(classification=default)

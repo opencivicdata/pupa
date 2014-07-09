@@ -52,8 +52,8 @@ def test_from_organization():
              {'classification': 'legislature'}))
 
     # chamber set
-    assert (get_psuedo_id(Bill('HB 1', '2014', 'Some Bill', chamber='upper').from_organization) ==
-            {'chamber': 'upper', 'classification': 'legislature'})
+    assert (get_psuedo_id(Bill('SB 1', '2014', 'Some Bill', chamber='upper').from_organization) ==
+            {'classification': 'upper'})
     # org direct set
     assert Bill('HB 1', '2014', 'Some Bill', from_organization='test').from_organization == 'test'
 
@@ -68,8 +68,7 @@ def test_add_action():
     b.add_action("Some dude liked it.", "2013-04-29", chamber='lower')
     assert len(b.actions) == 1
     assert b.actions[0]['description'] == 'Some dude liked it.'
-    assert get_psuedo_id(b.actions[0]['organization_id']) == {'classification': 'legislature',
-                                                              'chamber': 'lower'}
+    assert get_psuedo_id(b.actions[0]['organization_id']) == {'classification': 'lower'}
     assert b.actions[0]['date'] == '2013-04-29'
     b.validate()
 

@@ -84,16 +84,16 @@ def test_deduplication_prevents_identical():
 @pytest.mark.django_db
 def test_psuedo_ids():
     wild = Organization.objects.create(id='1', name='Wild', classification='party')
-    senate = Organization.objects.create(id='2', name='Senate', classification='legislature',
-                                         chamber='upper', jurisdiction_id='jid1')
-    house = Organization.objects.create(id='3', name='House', classification='legislature',
-                                        chamber='lower', jurisdiction_id='jid1')
+    senate = Organization.objects.create(id='2', name='Senate', classification='upper',
+                                         jurisdiction_id='jid1')
+    house = Organization.objects.create(id='3', name='House', classification='lower',
+                                        jurisdiction_id='jid1')
     un = Organization.objects.create(id='4', name='United Nations', classification='international',
                                      jurisdiction_id='jid2')
 
     oi1 = OrganizationImporter('jid1')
-    assert oi1.resolve_json_id('~{"classification":"legislature", "chamber":"upper"}') == senate.id
-    assert oi1.resolve_json_id('~{"classification":"legislature", "chamber":"lower"}') == house.id
+    assert oi1.resolve_json_id('~{"classification":"upper"}') == senate.id
+    assert oi1.resolve_json_id('~{"classification":"lower"}') == house.id
     assert oi1.resolve_json_id('~{"classification":"party", "name":"Wild"}') == wild.id
 
     with pytest.raises(ValueError):

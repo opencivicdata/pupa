@@ -1,7 +1,7 @@
 from ..utils import make_psuedo_id
 from .base import BaseModel, cleanup_list, SourceMixin
 from .bill import Bill
-from .popolo import Organization
+from .popolo import psuedo_organization
 from .schemas.vote import schema
 
 
@@ -10,7 +10,7 @@ class Vote(BaseModel, SourceMixin):
     _schema = schema
 
     def __init__(self, *, legislative_session, motion_text, start_date, classification, result,
-                 identifier='', bill=None, organization=None, chamber=None, **kwargs):
+                 identifier='', bill=None, bill_chamber=None, organization=None, chamber=None):
         super(Vote, self).__init__()
 
         self.legislative_session = legislative_session
@@ -20,28 +20,14 @@ class Vote(BaseModel, SourceMixin):
         self.result = result
         self.identifier = identifier
 
-        self.set_bill(bill)
+        self.set_bill(bill, chamber=bill_chamber)
+        self.organization = psuedo_organization(organization, chamber, 'legislature')
         self.votes = []
         self.counts = []
-
-        if organization and chamber:
-            raise ValueError('cannot specify both chamber and organization')
-        elif chamber:
-            self.organization = make_psuedo_id(classification='legislature', chamber=chamber)
-        elif organization:
-            if isinstance(organization, Organization):
-                self.organization = organization._id
-            else:
-                self.organization = make_psuedo_id(**organization)
-        else:
-            # neither specified
-            self.organization = make_psuedo_id(classification='legislature')
 
     def __str__(self):
         return u'{0} - {1} - {2}'.format(self.legislative_session, self.start_date,
                                          self.motion_text)
-
-    __unicode__ = __str__
 
     def set_bill(self, bill_or_identifier, *, chamber=None):
         if not bill_or_identifier:
@@ -51,10 +37,10 @@ class Vote(BaseModel, SourceMixin):
                 raise ValueError("set_bill takes no arguments when using a `Bill` object")
             self.bill = bill_or_identifier._id
         else:
+            if chamber is None:
+                chamber = 'legislature'
             kwargs = {'identifier': bill_or_identifier,
-                      'from_organization__classification': 'legislature'}
-            if chamber:
-                kwargs['from_organization__chamber'] = chamber
+                      'from_organization__classification': chamber}
             self.bill = make_psuedo_id(**kwargs)
 
     def vote(self, option, voter):

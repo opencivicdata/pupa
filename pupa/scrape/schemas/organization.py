@@ -20,7 +20,6 @@ schema = {
         "sources": sources,
 
         # added to popolo
-        'chamber': { "enum": ["upper", "lower", ""], "type": "string", "blank": True },
         "jurisdiction_id": { "type": "string" },
         "division_id": { "type": ["string", "null"], },
         "extras": extras,

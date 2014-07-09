@@ -45,7 +45,7 @@ def test_vote_org_chamber():
     v = Vote(legislative_session="2009", motion_text="passage of the bill",
              start_date="2009-01-07", result='pass', classification='passage:bill',
              chamber='upper')
-    assert get_psuedo_id(v.organization) == {'classification': 'legislature', 'chamber': 'upper'}
+    assert get_psuedo_id(v.organization) == {'classification': 'upper'}
 
 
 def test_org_and_chamber_conflict():
@@ -81,8 +81,7 @@ def test_set_bill_psuedo_id():
     v = toy_vote()
     v.set_bill('HB 1', chamber='lower')
     assert get_psuedo_id(v.bill) == {'identifier': 'HB 1',
-                                     'from_organization__classification': 'legislature',
-                                     'from_organization__chamber': 'lower'}
+                                     'from_organization__classification': 'lower'}
 
 
 def test_str():

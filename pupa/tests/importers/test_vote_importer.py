@@ -16,14 +16,14 @@ def test_full_vote():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     session = j.legislative_sessions.create(name='1900', identifier='1900')
     person = Person.objects.create(id='person-id', name='Adam Smith')
-    org = Organization.objects.create(id='org-id', name='House', chamber='lower',
-                                      classification='legislature')
+    org = Organization.objects.create(id='org-id', name='House', classification='lower')
     bill = Bill.objects.create(id='bill-id', identifier='HB 1', legislative_session=session,
                                from_organization=org)
     com = Organization.objects.create(id='com-id', name='Arbitrary Committee', parent=org)
 
     vote = ScrapeVote(legislative_session='1900', motion_text='passage', start_date='1900-04-01',
-                      classification='passage:bill', result='pass', bill=bill.identifier)
+                      classification='passage:bill', result='pass', bill_chamber='lower',
+                      bill=bill.identifier)
     vote.set_count('yes', 20)
     vote.yes('John Smith')
     vote.no('Adam Smith')

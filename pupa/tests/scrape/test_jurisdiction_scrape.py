@@ -8,8 +8,8 @@ class FakeJurisdiction(Jurisdiction):
     name = 'Test'
     url = 'http://example.com'
 
-    organizations = [Organization('House', chamber='lower'),
-                     Organization('Senate', chamber='upper')]
+    organizations = [Organization('House', classification='lower'),
+                     Organization('Senate', classification='upper')]
 
     parties = [{'name': 'Republican'}, {'name': 'Democratic'}]
 
@@ -30,20 +30,6 @@ def test_as_dict():
     assert d['url'] == j.url
     assert d['legislative_sessions'] == []
     assert d['feature_flags'] == []
-
-
-#def test_get_organization_by_chamber():
-#    j = TestJurisdiction()
-
-#    assert j.get_organization(chamber='lower').name == 'House'
-
-#    with pytest.raises(ValueError):
-#        j.get_organization(chamber='joint')
-
-#    assert j.get_organization(party='Republican').name == 'Republican'
-
-#    with pytest.raises(ValueError):
-#        j.get_organization(party='Green')
 
 
 def test_jurisdiction_unicam_scrape():
