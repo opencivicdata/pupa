@@ -165,12 +165,13 @@ class BaseImporter(object):
             else:
                 self.duplicates[json_id] = seen_hashes[objhash]
 
-    def import_data(self, dicts):
+    def import_data(self, data_items):
         """ import a bunch of dicts together """
         # keep counts of all actions
         results = {'insert': 0, 'update': 0, 'noop': 0}
 
-        for json_id, data in self._prepare_imports(dicts):
+        for json_id, data in self._prepare_imports(data_items):
+            print(data)
             obj, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj.id
             results[what] += 1
