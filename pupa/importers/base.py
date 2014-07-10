@@ -171,7 +171,6 @@ class BaseImporter(object):
         results = {'insert': 0, 'update': 0, 'noop': 0}
 
         for json_id, data in self._prepare_imports(data_items):
-            print(data)
             obj, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj.id
             results[what] += 1
@@ -206,6 +205,7 @@ class BaseImporter(object):
             # check base object for changes
             for key, value in data.items():
                 if getattr(obj, key) != value:
+                    print('!!!!', obj, key, value)
                     setattr(obj, key, value)
                     what = 'update'
             if what == 'update':
