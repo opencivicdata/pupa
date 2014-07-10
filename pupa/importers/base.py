@@ -150,16 +150,46 @@ class BaseImporter(object):
         data_by_id = {}
         # hash(json): id
         seen_hashes = {}
+        # all psuedo parent ids we've seen
+        psuedo_ids = set()
+        # psuedo matches
+        psuedo_matches = {}
+        # all data items with a psuedo_id parent
+        psuedo_children = []
 
         # load all json, mapped by json_id
         for data in dicts:
             json_id = data.pop('_id')
+
+            # collect parent psuedo_ids
+            parent_id = data.get('parent_id', None) or ''
+            if parent_id.startswith('~'):
+                psuedo_ids.add(parent_id)
+
+            # map duplicates (using omnihash to tell if json dicts are identical-ish)
             objhash = omnihash(data)
             if objhash not in seen_hashes:
                 seen_hashes[objhash] = json_id
                 data_by_id[json_id] = data
             else:
                 self.duplicates[json_id] = seen_hashes[objhash]
+
+        # turn psuedo_ids into a tuple of dictionaries
+        psuedo_ids = [(ppid, get_psuedo_id(ppid)) for ppid in psuedo_ids]
+
+        # loop over all data again, finding the psuedo ids true json id
+        for json_id, data in data_by_id.items():
+            # check if this matches one of our ppids
+            for ppid, spec in psuedo_ids:
+                match = True
+                for k, v in spec.items():
+                    if data[k] != v:
+                        match = False
+                        break
+                if match:
+                    if ppid in psuedo_matches:
+                        raise Exception("multiple matches for psuedo-id " + ppid)
+                    psuedo_matches[ppid] = json_id
 
         # toposort the nodes so parents are imported first
         network = Network()
@@ -168,6 +198,11 @@ class BaseImporter(object):
 
         for json_id, data in data_by_id.items():
             parent_id = data.get('parent_id', None)
+
+            # resolve psuedo_ids to their json id before building the network
+            if parent_id in psuedo_matches:
+                parent_id = psuedo_matches[parent_id]
+
             network.add_node(json_id)
             if parent_id:
                 # Right. There's an import dep. We need to add the edge from
