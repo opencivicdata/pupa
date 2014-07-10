@@ -145,90 +145,32 @@ class BaseImporter(object):
 
         return self.import_data(dicts)
 
-    def _order_imports(self, dicts):
-        # id: json
-        data_by_id = {}
+    def _prepare_imports(self, dicts):
+        """ filters the import stream to remove duplicates
+
+        also serves as a good place to override if anything special has to be done to the
+        order of the import stream (see OrganizationImporter)
+        """
         # hash(json): id
         seen_hashes = {}
-        # all psuedo parent ids we've seen
-        psuedo_ids = set()
-        # psuedo matches
-        psuedo_matches = {}
-        # all data items with a psuedo_id parent
-        psuedo_children = []
 
-        # load all json, mapped by json_id
         for data in dicts:
             json_id = data.pop('_id')
-
-            # collect parent psuedo_ids
-            parent_id = data.get('parent_id', None) or ''
-            if parent_id.startswith('~'):
-                psuedo_ids.add(parent_id)
 
             # map duplicates (using omnihash to tell if json dicts are identical-ish)
             objhash = omnihash(data)
             if objhash not in seen_hashes:
                 seen_hashes[objhash] = json_id
-                data_by_id[json_id] = data
+                yield json_id, data
             else:
                 self.duplicates[json_id] = seen_hashes[objhash]
-
-        # turn psuedo_ids into a tuple of dictionaries
-        psuedo_ids = [(ppid, get_psuedo_id(ppid)) for ppid in psuedo_ids]
-
-        # loop over all data again, finding the psuedo ids true json id
-        for json_id, data in data_by_id.items():
-            # check if this matches one of our ppids
-            for ppid, spec in psuedo_ids:
-                match = True
-                for k, v in spec.items():
-                    if data[k] != v:
-                        match = False
-                        break
-                if match:
-                    if ppid in psuedo_matches:
-                        raise Exception("multiple matches for psuedo-id " + ppid)
-                    psuedo_matches[ppid] = json_id
-
-        # toposort the nodes so parents are imported first
-        network = Network()
-        in_network = set()
-        import_order = []
-
-        for json_id, data in data_by_id.items():
-            parent_id = data.get('parent_id', None)
-
-            # resolve psuedo_ids to their json id before building the network
-            if parent_id in psuedo_matches:
-                parent_id = psuedo_matches[parent_id]
-
-            network.add_node(json_id)
-            if parent_id:
-                # Right. There's an import dep. We need to add the edge from
-                # the parent to the current node, so that we import the parent
-                # before the current node.
-                network.add_edge(parent_id, json_id)
-
-        # resolve the sorted import order
-        for jid in network.sort():
-            import_order.append((jid, data_by_id[jid]))
-            in_network.add(jid)
-
-        # ensure all data made it into network (paranoid check, should never fail)
-        if in_network != set(data_by_id.keys()):    # pragma: no cover
-            raise Exception("import is missing nodes in network set")
-
-        return import_order
 
     def import_data(self, dicts):
         """ import a bunch of dicts together """
         # keep counts of all actions
         results = {'insert': 0, 'update': 0, 'noop': 0}
 
-        import_order = self._order_imports(dicts)
-
-        for json_id, data in import_order:
+        for json_id, data in self._prepare_imports(dicts):
             obj, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj.id
             results[what] += 1
