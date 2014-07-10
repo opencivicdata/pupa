@@ -205,7 +205,6 @@ class BaseImporter(object):
             # check base object for changes
             for key, value in data.items():
                 if getattr(obj, key) != value:
-                    print('!!!!', key, value, getattr(obj, key), type(value), type(getattr(obj, key)))
                     setattr(obj, key, value)
                     what = 'update'
             if what == 'update':
