@@ -4,7 +4,12 @@ from pupa.scrape import Event
 
 
 def event_obj():
-    e = Event(name="get-together", start_time=datetime.datetime.utcnow(), location="Joe's Place")
+    e = Event(
+        name="get-together",
+        start_time=datetime.datetime.utcnow(),
+        location="Joe's Place",
+        timezone="America/New_York",
+    )
     e.add_source(url='foobar')
     return e
 

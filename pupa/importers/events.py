@@ -42,7 +42,14 @@ class EventImporter(BaseImporter):
             x, pytz.timezone(timezone)) if x is not None else None
 
         # Now, set them back to the object, to prepare them for DB.
-        data['start_time'] = gdt(data['start_time'])
-        data['end_time'] = gdt(data.get('end_time', None))
+        try:
+            data['start_time'] = gdt(data['start_time'])
+        except TypeError:
+            pass
+
+        try:
+            data['end_time'] = gdt(data.get('end_time', None))
+        except TypeError:
+            pass
 
         return data
