@@ -128,7 +128,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
     def validate(self):
         schema = None
         # these are implicitly declared & do not require sources
-        if self.classification in ('party', 'legislature', 'upper', 'lower'):
+        if self.classification in ('party', 'legislature', 'upper', 'lower', 'executive'):
             schema = org_schema_no_sources
         return super(Organization, self).validate(schema=schema)
 
