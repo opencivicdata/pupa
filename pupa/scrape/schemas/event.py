@@ -76,7 +76,7 @@ schema = {
         "documents": {
             "items": {
                 "properties": {
-                    "name": { "type": "string", },
+                    "note": { "type": "string", },
                     "url": { "type": "string", },
                     "media_type": { "type": "string", },
                 },
