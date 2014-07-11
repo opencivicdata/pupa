@@ -7,9 +7,10 @@ from opencivicdata.models import Event, EventLocation
 class EventImporter(BaseImporter):
     _type = 'event'
     model_class = Event
-    related_models = {'sources': {}, 'documents': {}, 'links': {}, 'participants': {},
+    related_models = {'sources': {},  'documents': {'links': {}}, 'links': {}, 'participants': {},
                       'media': {'links': {}},
                       'agenda': {'related_entities': {}, 'media': {}, 'links': {}}}
+    preserve_order = {'agenda'}
 
     def get_object(self, event):
         spec = {
