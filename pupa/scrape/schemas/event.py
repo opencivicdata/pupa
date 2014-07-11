@@ -31,6 +31,7 @@ schema = {
     "properties": {
         "name": { "type": "string" },
         "start_time": { "type": "datetime", },
+        "timezone": { "type": "string" },
         "all_day": { "type": "boolean" },
         "end_time": { "type": ["datetime", "null"] },
         "status": {
@@ -75,7 +76,7 @@ schema = {
         "documents": {
             "items": {
                 "properties": {
-                    "name": { "type": "string", },
+                    "note": { "type": "string", },
                     "url": { "type": "string", },
                     "media_type": { "type": "string", },
                 },

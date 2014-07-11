@@ -12,6 +12,7 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
             "subjects": [],
             "media": [],
             "notes": [],
+            "links": [],
             "order": None,
         })
         self.event = event
@@ -43,10 +44,12 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     _type = 'event'
     _schema = schema
 
-    def __init__(self, name, start_time, location, *, all_day=False, description="", end_time=None,
+    def __init__(self, name, start_time, timezone, location, *,
+                 all_day=False, description="", end_time=None,
                  status="confirmed", classification="event"):
         super(Event, self).__init__()
         self.start_time = start_time
+        self.timezone = timezone
         self.all_day = all_day
         self.end_time = end_time
         self.name = name
