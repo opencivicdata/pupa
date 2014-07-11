@@ -3,10 +3,11 @@ import glob
 import importlib
 from collections import OrderedDict
 
+from django.db import transaction
+
 from .base import BaseCommand, CommandError
 from pupa import utils
 from pupa import settings
-
 from pupa.importers import (JurisdictionImporter, OrganizationImporter, PersonImporter,
                             PostImporter, MembershipImporter, BillImporter,
                             VoteImporter, EventImporter)
@@ -122,15 +123,16 @@ class Command(BaseCommand):
         event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
-        # TODO: wrap in a transaction
-        report.update(juris_importer.import_directory(datadir))
-        report.update(org_importer.import_directory(datadir))
-        report.update(person_importer.import_directory(datadir))
-        report.update(post_importer.import_directory(datadir))
-        report.update(membership_importer.import_directory(datadir))
-        report.update(bill_importer.import_directory(datadir))
-        report.update(event_importer.import_directory(datadir))
-        report.update(vote_importer.import_directory(datadir))
+
+        with transaction.atomic():
+            report.update(juris_importer.import_directory(datadir))
+            report.update(org_importer.import_directory(datadir))
+            report.update(person_importer.import_directory(datadir))
+            report.update(post_importer.import_directory(datadir))
+            report.update(membership_importer.import_directory(datadir))
+            report.update(bill_importer.import_directory(datadir))
+            report.update(event_importer.import_directory(datadir))
+            report.update(vote_importer.import_directory(datadir))
 
         return report
 
