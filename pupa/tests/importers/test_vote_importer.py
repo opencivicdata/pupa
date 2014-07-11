@@ -77,3 +77,53 @@ def test_vote_identifier_dedupe():
     _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
     assert what == 'update'
     assert VoteEvent.objects.count() == 1
+
+    # new bill, insert
+    vote.identifier = 'Roll Call 2'
+    _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
+    assert what == 'insert'
+    assert VoteEvent.objects.count() == 2
+
+
+@pytest.mark.django_db
+def test_vote_bill_id_dedupe():
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    session = j.legislative_sessions.create(name='1900', identifier='1900')
+    org = Organization.objects.create(id='org-id', name='House', classification='lower')
+    bill = Bill.objects.create(id='bill-1', identifier='HB 1', legislative_session=session,
+                               from_organization=org)
+    bill2 = Bill.objects.create(id='bill-2', identifier='HB 2', legislative_session=session,
+                                from_organization=org)
+
+    vote = ScrapeVote(legislative_session='1900', start_date='2013',
+                      classification='anything', result='passed',
+                      motion_text='a vote on something',
+                      bill=bill.identifier, bill_chamber='lower'
+                     )
+    dmi = DumbMockImporter()
+    bi = BillImporter('jid', dmi)
+
+    _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
+    assert what == 'insert'
+    assert VoteEvent.objects.count() == 1
+
+    # same exact vote, no changes
+    _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
+    assert what == 'noop'
+    assert VoteEvent.objects.count() == 1
+
+    # new info, update
+    vote.result = 'failed'
+    _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
+    assert what == 'update'
+    assert VoteEvent.objects.count() == 1
+
+    # new bill, insert
+    vote = ScrapeVote(legislative_session='1900', start_date='2013',
+                      classification='anything', result='passed',
+                      motion_text='a vote on something',
+                      bill=bill2.identifier, bill_chamber='lower'
+                     )
+    _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
+    assert what == 'update'
+    assert VoteEvent.objects.count() == 2
