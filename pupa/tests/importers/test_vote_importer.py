@@ -118,12 +118,12 @@ def test_vote_bill_id_dedupe():
     assert what == 'update'
     assert VoteEvent.objects.count() == 1
 
-    # new bill, insert
+    # new vote, insert
     vote = ScrapeVote(legislative_session='1900', start_date='2013',
                       classification='anything', result='passed',
                       motion_text='a vote on something',
                       bill=bill2.identifier, bill_chamber='lower'
                      )
     _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
-    assert what == 'update'
+    assert what == 'insert'
     assert VoteEvent.objects.count() == 2

@@ -16,11 +16,20 @@ class VoteImporter(BaseImporter):
         self.org_importer = org_importer
 
     def get_object(self, vote):
-        spec = {
-            'identifier': vote['identifier'],
-            'legislative_session': vote['legislative_session'],
-        }
-        # TODO: use bill, session, etc.
+        if vote['identifier']:
+            spec = {
+                'legislative_session': vote['legislative_session'],
+                'identifier': vote['identifier'],
+            }
+        elif vote['bill_id']:
+            spec = {
+                'legislative_session': vote['legislative_session'],
+                'bill_id': vote['bill_id'],
+                'motion_text': vote['motion_text'],
+                'start_date': vote['start_date'],
+            }
+        else:
+            raise ValueError('attempt to save a Vote without an "identifier" or "bill_id"')
         return self.model_class.objects.get(**spec)
 
     def prepare_for_db(self, data):
