@@ -48,3 +48,32 @@ def test_full_vote():
             assert v.option == 'yes'
         else:
             assert v.option == 'no'
+
+
+@pytest.mark.django_db
+def test_vote_identifier_dedupe():
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    session = j.legislative_sessions.create(name='1900', identifier='1900')
+
+    vote = ScrapeVote(legislative_session='1900', start_date='2013',
+                      classification='anything', result='passed',
+                      motion_text='a vote on something',
+                      identifier='Roll Call No. 1',
+                     )
+    dmi = DumbMockImporter()
+    bi = BillImporter('jid', dmi)
+
+    _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
+    assert what == 'insert'
+    assert VoteEvent.objects.count() == 1
+
+    # same exact vote, no changes
+    _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
+    assert what == 'noop'
+    assert VoteEvent.objects.count() == 1
+
+    # new info, update
+    vote.result = 'failed'
+    _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
+    assert what == 'update'
+    assert VoteEvent.objects.count() == 1

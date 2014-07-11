@@ -18,8 +18,7 @@ class VoteImporter(BaseImporter):
     def get_object(self, vote):
         spec = {
             'identifier': vote['identifier'],
-            'legislative_session__identifier': vote['legislative_session'],
-            'legislative_session__jurisdiction_id': self.jurisdiction_id,
+            'legislative_session': vote['legislative_session'],
         }
         # TODO: use bill, session, etc.
         return self.model_class.objects.get(**spec)
