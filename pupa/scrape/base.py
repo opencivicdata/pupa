@@ -6,7 +6,7 @@ import datetime
 from collections import defaultdict, OrderedDict
 
 import scrapelib
-import validictory
+from validictory import ValidationError
 
 from pupa import utils, settings
 
@@ -174,8 +174,8 @@ class BaseModel(object):
 
         try:
             validator.validate(self.as_dict(), schema)
-        except validictory.validator.FieldValidationError as ve:
-            raise ValueError('validation of {} failed: {}'.format(self.as_dict(), ve))
+        except ValidationError as ve:
+            raise ValidationError('validation of {} failed: {}'.format(self.as_dict(), ve))
 
     def pre_save(self, jurisdiction_id):
         pass
