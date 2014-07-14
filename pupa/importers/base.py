@@ -203,9 +203,8 @@ class BaseImporter(object):
         # obj existed, check if we need to do an update
         if obj:
             if obj.id in self.json_to_db_id.values():
-                msg = '''attempt to import data that would conflict with data already in the
-import: {} (already imported as {}'''.format(data, obj.id)
-                raise Exception(msg)
+                raise Exception('attempt to import data that would conflict with data already in '
+                                'the import: {} (already imported as {}'''.format(data, obj.id))
             # check base object for changes
             for key, value in data.items():
                 if getattr(obj, key) != value:
