@@ -5,8 +5,9 @@ import tempfile
 import mock
 import pytest
 from pupa.scrape import Person as ScrapePerson
+from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers.base import omnihash, BaseImporter
-from pupa.importers import PersonImporter
+from pupa.importers import PersonImporter, OrganizationImporter
 from opencivicdata.models import Person
 
 
@@ -64,6 +65,18 @@ def test_deduplication_identical_object():
     PersonImporter('jid').import_data([p1, p2])
 
     assert Person.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_exception_on_identical_objects_in_import_stream():
+    # these two objects aren't identical, but refer to the same thing
+    # at the moment we consider this an error (but there may be a better way to handle this?)
+    o1 = ScrapeOrganization('X-Men').as_dict()
+    o2 = ScrapeOrganization('X-Men', founding_date='1970').as_dict()
+
+    pi = OrganizationImporter('jid')
+    with pytest.raises(Exception):
+        OrganizationImporter('jid').import_data([o1, o2])
 
 
 @pytest.mark.django_db
