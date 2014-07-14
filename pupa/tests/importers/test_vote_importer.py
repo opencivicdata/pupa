@@ -109,13 +109,13 @@ def test_vote_bill_id_dedupe():
 
     # same exact vote, no changes
     _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
-    #assert what == 'noop'
+    assert what == 'noop'
     assert VoteEvent.objects.count() == 1
 
     # new info, update
     vote.result = 'failed'
     _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
-    #assert what == 'update'
+    assert what == 'update'
     assert VoteEvent.objects.count() == 1
 
     # new vote, insert
