@@ -36,6 +36,7 @@ class VoteImporter(BaseImporter):
                 'bill_id': vote['bill_id'],
                 'motion_text': vote['motion_text'],
                 'start_date': vote['start_date'],
+                'organization_id': vote['organization_id']
             }
         else:
             raise ValueError('attempt to save a Vote without an "identifier" or "bill_id"')
