@@ -17,7 +17,7 @@ def test_full_event():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     event = ScrapeEvent(
         name="America's Birthday",
-        start_time=dt.datetime.utcnow(),
+        start_time="2014-07-04T05:00Z",
         location="America",
         timezone="America/New_York",
         all_day=True)
@@ -25,3 +25,22 @@ def test_full_event():
     event.add_media_link("fireworks", "http://example.com/fireworks.mov")
 
     EventImporter('jid').import_data([event.as_dict()])
+
+
+@pytest.mark.django_db
+def test_bad_event_time():
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    event = ScrapeEvent(
+        name="America's Birthday",
+        start_time="2014-07-04T05:00",
+        location="America",
+        timezone="America/New_York",
+        all_day=True)
+    event.add_person("George Washington")
+    event.add_media_link("fireworks", "http://example.com/fireworks.mov")
+
+    pytest.raises(
+        ValueError,
+        EventImporter('jid').import_data,
+        [event.as_dict()]
+    )
