@@ -48,7 +48,10 @@ class JSONEncoderPlus(json.JSONEncoder):
     """
     def default(self, obj, **kwargs):
         if isinstance(obj, (datetime.date, datetime.datetime)):
-            return time.mktime(obj.isoformat())
+            if obj.tzinfo is None:
+                raise TypeError(
+                    "date '%s' is not fully timezone qualified." % (obj))
+            return "{}Z".format(obj.utcnow().isoformat())
         return super(JSONEncoderPlus, self).default(obj, **kwargs)
 
 
