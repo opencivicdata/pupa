@@ -158,7 +158,7 @@ schema = {
                     "related_entities": {
                         "items": {
                             "properties": {
-                                "type": {
+                                "entity_type": {
                                     "type": "string",
                                 },
 
