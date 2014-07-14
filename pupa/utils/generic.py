@@ -47,11 +47,8 @@ class JSONEncoderPlus(json.JSONEncoder):
     JSONEncoder that encodes datetime objects as Unix timestamps.
     """
     def default(self, obj, **kwargs):
-        if isinstance(obj, datetime.datetime):
-            return time.mktime(obj.utctimetuple())
-        elif isinstance(obj, datetime.date):
-            return time.mktime(obj.timetuple())
-
+        if isinstance(obj, (datetime.date, datetime.datetime)):
+            return time.mktime(obj.isoformat())
         return super(JSONEncoderPlus, self).default(obj, **kwargs)
 
 
