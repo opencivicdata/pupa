@@ -14,6 +14,7 @@ class VoteImporter(BaseImporter):
         self.person_importer = person_importer
         self.bill_importer = bill_importer
         self.org_importer = org_importer
+        self.seen_bill_ids = set()
 
     def get_object(self, vote):
         if vote['identifier']:
@@ -22,6 +23,9 @@ class VoteImporter(BaseImporter):
                 'identifier': vote['identifier'],
             }
         elif vote['bill_id']:
+            if vote['bill_id'] not in self.seen_bill_ids:
+                self.seen_bill_ids.add(vote['bill_id'])
+                self.model_class.objects.filter(bill_id=vote['bill_id']).delete()
             spec = {
                 'legislative_session': vote['legislative_session'],
                 'bill_id': vote['bill_id'],
