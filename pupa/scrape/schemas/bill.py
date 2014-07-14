@@ -40,7 +40,7 @@ schema = {
             "items": {
                 "properties": {
                     "abstract": {"type": "string"},
-                    "note": {"type": ["string", "null"]},
+                    "note": {"type": "string", "blank": True},
                 },
                 "type": "object"},
             "type": "array",
@@ -49,7 +49,7 @@ schema = {
             "items": {
                 "properties": {
                     "title": {"type": "string"},
-                    "note": {"type": ["string", "null"]},
+                    "note": {"type": "string", "blank": True},
                 },
                 "type": "object"
             },
