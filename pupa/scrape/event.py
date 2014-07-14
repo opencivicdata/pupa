@@ -21,20 +21,25 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
         self['subjects'].append(what)
 
     def add_committee(self, committee, *, id=None, note='participant'):
-        self.add_entity(name=committee, type='committee', id=id, note=note)
+        self.add_entity(name=committee, entity_type='committee', id=id, note=note)
 
     def add_bill(self, bill, *, id=None, note='consideration'):
-        self.add_entity(name=bill, type='bill', id=id, note=note)
+        self.add_entity(name=bill, entity_type='bill', id=id, note=note)
 
     def add_person(self, person, *, id=None, note='participant'):
-        self.add_entity(name=person, type='person', id=id, note=note)
+        self.add_entity(name=person, entity_type='person', id=id, note=note)
 
     def add_media_link(self, note, url, *, type='media', media_type=None, on_duplicate='error'):
         return self._add_associated_link(collection='media', note=note, url=url,
                                          media_type=media_type, on_duplicate=on_duplicate)
 
-    def add_entity(self, name, type, *, id, note):
-        self['related_entities'].append({"name": name, "type": type, "id": id, "note": note})
+    def add_entity(self, name, entity_type, *, id, note):
+        self['related_entities'].append({
+            "name": name,
+            "entity_type": entity_type,
+            "id": id,
+            "note": note
+        })
 
 
 class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
