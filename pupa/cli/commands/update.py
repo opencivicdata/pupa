@@ -6,11 +6,7 @@ from collections import OrderedDict
 from django.db import transaction
 
 from .base import BaseCommand, CommandError
-from pupa import utils
-from pupa import settings
-from pupa.importers import (JurisdictionImporter, OrganizationImporter, PersonImporter,
-                            PostImporter, MembershipImporter, BillImporter,
-                            VoteImporter, EventImporter)
+from pupa import settings, utils
 from pupa.scrape import Jurisdiction, JurisdictionScraper
 
 
@@ -109,6 +105,10 @@ class Command(BaseCommand):
         return report
 
     def do_import(self, juris, args):
+        # import inside here because to avoid loading Django code unnecessarily
+        from pupa.importers import (JurisdictionImporter, OrganizationImporter, PersonImporter,
+                                    PostImporter, MembershipImporter, BillImporter,
+                                    VoteImporter, EventImporter)
         datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
 
         juris_importer = JurisdictionImporter(juris.jurisdiction_id)
