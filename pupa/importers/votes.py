@@ -15,6 +15,7 @@ class VoteImporter(BaseImporter):
         self.bill_importer = bill_importer
         self.org_importer = org_importer
         self.seen_bill_ids = set()
+        self.votes_to_delete = set()
 
     def get_object(self, vote):
         if vote['identifier']:
@@ -25,7 +26,11 @@ class VoteImporter(BaseImporter):
         elif vote['bill_id']:
             if vote['bill_id'] not in self.seen_bill_ids:
                 self.seen_bill_ids.add(vote['bill_id'])
-                self.model_class.objects.filter(bill_id=vote['bill_id']).delete()
+                # keep a list of all the vote ids that should be deleted
+                self.votes_to_delete.update(
+                    self.model_class.objects.filter(bill_id=vote['bill_id']).values_list(
+                        'id', flat=True)
+                )
             spec = {
                 'legislative_session': vote['legislative_session'],
                 'bill_id': vote['bill_id'],
@@ -42,3 +47,9 @@ class VoteImporter(BaseImporter):
         data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
         data['bill_id'] = self.bill_importer.resolve_json_id(data.pop('bill'))
         return data
+
+    def postimport(self):
+        # be sure not to delete votes that were imported (meaning updated) this time through
+        self.votes_to_delete.difference_update(self.json_to_db_id.values())
+        # everything remaining, goodbye
+        self.model_class.objects.filter(id__in=self.votes_to_delete).delete()
