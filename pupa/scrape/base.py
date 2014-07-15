@@ -175,7 +175,7 @@ class BaseModel(object):
         try:
             validator.validate(self.as_dict(), schema)
         except ValidationError as ve:
-            raise ValidationError('validation of {} failed: {}'.format(self.as_dict(), ve))
+            raise ValidationError('validation of {} failed: {}'.format(self._id, ve))
 
     def pre_save(self, jurisdiction_id):
         pass
