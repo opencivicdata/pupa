@@ -283,7 +283,8 @@ class BaseImporter(object):
 
                 try:
                     subobj = getattr(obj, field).create(**item)
-                except TypeError as e:
+                except Exception as e:
+                    # TODO: revisit exception type
                     raise TypeError(str(e) + ' while importing ' + str(item))
 
                 self._create_related(subobj, subrelated, subfield_dict[field])
