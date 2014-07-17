@@ -3,6 +3,10 @@ import pytz
 
 
 EVENT_TIME_FORMATS = [
+    "%Y-%m-%dT%H:%M:%S.%f+00:00",
+    "%Y-%m-%dT%H:%M:%S+00:00",
+    "%Y-%m-%dT%H:%M+00:00",
+
     "%Y-%m-%dT%H:%M:%S.%fZ",
     "%Y-%m-%dT%H:%M:%SZ",
     "%Y-%m-%dT%H:%MZ",

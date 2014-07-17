@@ -18,6 +18,7 @@ class EventImporter(BaseImporter):
         spec = {
             'name': event['name'],
             'start_time': event['start_time'],
+            'timezone': event['timezone'],
             'jurisdiction_id': self.jurisdiction_id
         }
         return self.model_class.objects.get(**spec)

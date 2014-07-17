@@ -2,6 +2,7 @@ import re
 import os
 import time
 import json
+import pytz
 import datetime
 import subprocess
 from validictory.validator import SchemaValidator
@@ -51,7 +52,8 @@ class JSONEncoderPlus(json.JSONEncoder):
             if obj.tzinfo is None:
                 raise TypeError(
                     "date '%s' is not fully timezone qualified." % (obj))
-            return "{}Z".format(obj.utcnow().isoformat())
+            obj = obj.astimezone(pytz.UTC)
+            return "{}".format(obj.isoformat())
         return super(JSONEncoderPlus, self).default(obj, **kwargs)
 
 
