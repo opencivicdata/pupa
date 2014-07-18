@@ -136,14 +136,14 @@ class BaseImporter(object):
 
     def import_directory(self, datadir):
         """ import a JSON directory into the database """
-        dicts = []
 
-        # load all json, mapped by json_id
-        for fname in glob.glob(os.path.join(datadir, self._type + '_*.json')):
-            with open(fname) as f:
-                dicts.append(json.load(f))
+        def json_stream():
+            # load all json, mapped by json_id
+            for fname in glob.glob(os.path.join(datadir, self._type + '_*.json')):
+                with open(fname) as f:
+                    yield json.load(f)
 
-        return self.import_data(dicts)
+        return self.import_data(json_stream())
 
     def _prepare_imports(self, dicts):
         """ filters the import stream to remove duplicates

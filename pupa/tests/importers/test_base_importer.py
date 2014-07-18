@@ -43,12 +43,12 @@ def test_import_directory():
     # import_data should be called once
     assert mockobj.call_count == 1
     # kind of hacky, get the total list of args passed in
-    arg_objs = mockobj.call_args[0][0]
+    arg_objs = list(mockobj.call_args[0][0])
 
     # 2 args only, make sure a and b are in there
     assert len(arg_objs) == 2
-    assert dicta in mockobj.call_args[0][0]
-    assert dictb in mockobj.call_args[0][0]
+    assert dicta in arg_objs
+    assert dictb in arg_objs
 
     # clean up datadir
     shutil.rmtree(datadir)
