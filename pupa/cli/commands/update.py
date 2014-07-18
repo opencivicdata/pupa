@@ -125,13 +125,21 @@ class Command(BaseCommand):
         report = {}
 
         with transaction.atomic():
+            print('import jurisdictions...')
             report.update(juris_importer.import_directory(datadir))
+            print('import organizations...')
             report.update(org_importer.import_directory(datadir))
+            print('import people...')
             report.update(person_importer.import_directory(datadir))
+            print('import posts...')
             report.update(post_importer.import_directory(datadir))
+            print('import memberships...')
             report.update(membership_importer.import_directory(datadir))
+            print('import bills...')
             report.update(bill_importer.import_directory(datadir))
+            print('import events...')
             report.update(event_importer.import_directory(datadir))
+            print('import votes...')
             report.update(vote_importer.import_directory(datadir))
 
         return report
