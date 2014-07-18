@@ -29,7 +29,7 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
     def add_person(self, person, *, id=None, note='participant'):
         self.add_entity(name=person, entity_type='person', id=id, note=note)
 
-    def add_media_link(self, note, url, *, type='media', media_type=None, on_duplicate='error'):
+    def add_media_link(self, note, url, media_type, *, type='media', on_duplicate='error'):
         return self._add_associated_link(collection='media', note=note, url=url,
                                          media_type=media_type, on_duplicate=on_duplicate)
 

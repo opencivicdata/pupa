@@ -10,6 +10,7 @@ EVENT_TIME_FORMATS = [
     "%Y-%m-%dT%H:%M:%S.%fZ",
     "%Y-%m-%dT%H:%M:%SZ",
     "%Y-%m-%dT%H:%MZ",
+
     "%Y-%m-%d",
 ]
 
