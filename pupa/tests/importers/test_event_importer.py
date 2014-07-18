@@ -18,7 +18,58 @@ def ge():
 
 
 @pytest.mark.django_db
-def test_complex_event():
+def test_related_people_event():
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    event1 = ge()
+    event2 = ge()
+
+    for event in [event1, event2]:
+        item = event.add_agenda_item("Cookies will be served")
+        item.add_person(person="John Q. Public")
+
+    ret = EventImporter('jid').import_data([event1.as_dict()])
+    assert ret['event']['insert'] == 1
+
+    ret = EventImporter('jid').import_data([event2.as_dict()])
+    assert ret['event']['update'] == 1
+
+
+@pytest.mark.django_db
+def test_related_bill_event():
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    event1 = ge()
+    event2 = ge()
+
+    for event in [event1, event2]:
+        item = event.add_agenda_item("Cookies will be served")
+        item.add_bill(bill="HB 101")
+
+    ret = EventImporter('jid').import_data([event1.as_dict()])
+    assert ret['event']['insert'] == 1
+
+    ret = EventImporter('jid').import_data([event2.as_dict()])
+    assert ret['event']['update'] == 1
+
+
+@pytest.mark.django_db
+def test_related_committee_event():
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    event1 = ge()
+    event2 = ge()
+
+    for event in [event1, event2]:
+        item = event.add_agenda_item("Cookies will be served")
+        item.add_committee(committee="Fiscal Committee")
+
+    ret = EventImporter('jid').import_data([event1.as_dict()])
+    assert ret['event']['insert'] == 1
+
+    ret = EventImporter('jid').import_data([event2.as_dict()])
+    assert ret['event']['update'] == 1
+
+
+@pytest.mark.django_db
+def test_media_event():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     event1 = ge()
     event2 = ge()
@@ -30,14 +81,29 @@ def test_complex_event():
             media_type='application/octet-stream',
             url="http://hello.world/foo"
         )
-        item.add_person(person="John Q. Public")
 
-    ret = EventImporter('jid').import_data([
-        event1.as_dict(),
-        event2.as_dict()
-    ])
-
+    ret = EventImporter('jid').import_data([event1.as_dict()])
     assert ret['event']['insert'] == 1
+
+    ret = EventImporter('jid').import_data([event2.as_dict()])
+    assert ret['event']['update'] == 1
+
+
+@pytest.mark.django_db
+def test_media_event():
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    event1 = ge()
+    event2 = ge()
+
+    for event in [event1, event2]:
+        event.add_document(note="Presentation",
+                           url="http://example.com/presentation.pdf")
+
+    ret = EventImporter('jid').import_data([event1.as_dict()])
+    assert ret['event']['insert'] == 1
+
+    ret = EventImporter('jid').import_data([event2.as_dict()])
+    assert ret['event']['noop'] == 1
 
 
 @pytest.mark.django_db
