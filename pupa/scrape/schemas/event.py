@@ -112,10 +112,6 @@ schema = {
                         "type": "string",
                     },
 
-                    "id": {
-                        "type": ["string", "null"],
-                    },
-
                     "type": {
                         "enum": ["organization", "person"],
                         "type": "string",
@@ -160,10 +156,6 @@ schema = {
                             "properties": {
                                 "entity_type": {
                                     "type": "string",
-                                },
-
-                                "id": {
-                                    "type": ["string", "null"],
                                 },
 
                                 "name": {

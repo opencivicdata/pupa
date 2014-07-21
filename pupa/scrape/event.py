@@ -12,8 +12,7 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
             "subjects": [],
             "media": [],
             "notes": [],
-            "links": [],
-            "order": None,
+            "order": str(len(event.agenda)),
         })
         self.event = event
 
@@ -34,12 +33,14 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
                                          media_type=media_type, on_duplicate=on_duplicate)
 
     def add_entity(self, name, entity_type, *, id, note):
-        self['related_entities'].append({
+        ret = {
             "name": name,
             "entity_type": entity_type,
-            "id": id,
             "note": note
-        })
+        }
+        if id:
+            ret['id'] = id
+        self['related_entities'].append(ret)
 
 
 class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
