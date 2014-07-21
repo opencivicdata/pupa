@@ -82,7 +82,7 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         self.agenda.append(obj)
         return obj
 
-    def add_media_link(self, note, url, *, media_type='', on_duplicate='error'):
+    def add_media_link(self, note, url, media_type, *, type='media', on_duplicate='error'):
         return self._add_associated_link(collection='media', note=note, url=url,
                                          media_type=media_type, on_duplicate=on_duplicate)
 
