@@ -136,7 +136,7 @@ def test_bad_event_time():
 
 
 @pytest.mark.django_db
-def test_full_event():
+def test_top_level_media_event():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     event = ge()
     event.add_media_link(
