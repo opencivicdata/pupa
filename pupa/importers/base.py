@@ -59,7 +59,6 @@ def items_differ(jsonitems, dbitems, subfield_dict):
             jsonitems.pop(match)
         else:
             # exists in db but not json
-            # import pdb; pdb.set_trace()
             return True
 
     # if we get here, jsonitems has to be empty because we asserted that the length was
