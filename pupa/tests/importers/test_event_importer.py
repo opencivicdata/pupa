@@ -138,11 +138,15 @@ def test_bad_event_time():
 @pytest.mark.django_db
 def test_top_level_media_event():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
-    event = ge()
-    event.add_media_link(
-        "fireworks",
-        "http://example.com/fireworks.mov",
-        media_type='application/octet-stream'
-    )
-    obj, what = EventImporter('jid').import_item(event.as_dict())
+    event1, event2 = ge(), ge()
+
+    event1.add_media_link("fireworks", "http://example.com/fireworks.mov",
+                          media_type='application/octet-stream')
+    event2.add_media_link("fireworks", "http://example.com/fireworks.mov",
+                          media_type='application/octet-stream')
+
+    obj, what = EventImporter('jid').import_item(event1.as_dict())
     assert what == 'insert'
+
+    obj, what = EventImporter('jid').import_item(event2.as_dict())
+    assert what == 'noop'
