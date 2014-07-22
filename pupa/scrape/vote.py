@@ -43,14 +43,14 @@ class Vote(BaseModel, SourceMixin):
                       'from_organization__classification': chamber}
             self.bill = make_psuedo_id(**kwargs)
 
-    def vote(self, option, voter):
-        self.votes.append({"option": option, "voter_name": voter})
+    def vote(self, option, voter, *, note=''):
+        self.votes.append({"option": option, "voter_name": voter, 'note': note})
 
-    def yes(self, name, *, id=None):
-        return self.vote('yes', name)
+    def yes(self, name, *, id=None, note=''):
+        return self.vote('yes', name, note=note)
 
-    def no(self, name, *, id=None):
-        return self.vote('no', name)
+    def no(self, name, *, id=None, note=''):
+        return self.vote('no', name, note=note)
 
     def set_count(self, option, value):
         for co in self.counts:

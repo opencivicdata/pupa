@@ -21,6 +21,7 @@ schema = {
                 "properties": {
                     "option": {"type": "string", "enum": common.VOTE_OPTIONS },
                     "voter": {"type": "string"},
+                    "note": {"type": "string", "blank": True},
                 },
             },
         },
