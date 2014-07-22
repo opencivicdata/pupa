@@ -25,8 +25,7 @@ class Post(BaseModel, LinkMixin, ContactDetailMixin):
         super(Post, self).__init__()
         self.label = label
         self.role = role
-        # TODO: not sure that this should be defaulting to legislature
-        self.organization_id = psuedo_organization(organization_id, chamber, 'legislature')
+        self.organization_id = psuedo_organization(organization_id, chamber)
         self.start_date = start_date
         self.end_date = end_date
 
@@ -138,7 +137,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         return post
 
 
-def psuedo_organization(organization, classification, default):
+def psuedo_organization(organization, classification, default=None):
     """ helper for setting an appropriate ID for organizations """
     if organization and classification:
         raise ValueError('cannot specify both classification and organization')
@@ -151,5 +150,7 @@ def psuedo_organization(organization, classification, default):
             return organization
         else:
             return make_psuedo_id(**organization)
-    else:
+    elif default is not None:
         return make_psuedo_id(classification=default)
+    else:
+        raise ValueError('must specify classification or organization')
