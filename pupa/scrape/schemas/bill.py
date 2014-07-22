@@ -84,8 +84,8 @@ schema = {
                                     "enum": ["organization", "person", ""],
                                     "type": "string", "blank": True,
                                 },
-                                "id": {"type": ["string", "null"]}
-                                # TODO^^should this be person_id or organization_id
+                                "person_id": {"type": ["string", "null"]},
+                                "organization_id": {"type": ["string", "null"]},
                             },
                             "type": "object"
                         },
@@ -107,8 +107,8 @@ schema = {
                         "enum": ["organization", "person", ""],
                         "type": "string", "blank": True,
                     },
-                    "id": {"type": ["string", "null"] },
-                    # ^^^TODO: check this one too
+                    "person_id": {"type": ["string", "null"] },
+                    "organization_id": {"type": ["string", "null"] },
                 },
                 "type": "object"
             },
