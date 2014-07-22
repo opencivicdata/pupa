@@ -246,8 +246,8 @@ class BaseImporter(object):
         # for each related field - check if there are differences
         for field, items in related.items():
             # get items from database
-            dbitems = getattr(obj, field).all()
-            dbitems_count = dbitems.count()
+            dbitems = list(getattr(obj, field).all())
+            dbitems_count = len(dbitems)
 
             # default to doing nothing
             do_delete = do_update = False
