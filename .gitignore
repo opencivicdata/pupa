@@ -1,9 +1,9 @@
 *.pyc
-scraped_data
-scrape_cache
 *swp
 *egg-info*
 .tox
 dist
 .coverage
 htmlcov/
+_data/
+_cache/
