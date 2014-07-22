@@ -87,6 +87,7 @@ class BaseImporter(object):
         self.jurisdiction_id = jurisdiction_id
         self.json_to_db_id = {}
         self.duplicates = {}
+        self.psuedo_id_cache = {}
         self.logger = logging.getLogger("pupa")
         self.info = self.logger.info
         self.debug = self.logger.debug
@@ -118,13 +119,18 @@ class BaseImporter(object):
             return None
 
         if json_id.startswith('~'):
-            spec = get_psuedo_id(json_id)
-            spec = self.limit_spec(spec)
-            try:
-                return self.model_class.objects.get(**spec).id
-            except self.model_class.DoesNotExist:
-                raise ValueError('cannot resolve psuedo-id to {}: {}'.format(
-                    self.model_class.__name__, json_id))
+            # keep caches of all the psuedo-ids to avoid doing 1000s of lookups during import
+            if json_id not in self.psuedo_id_cache:
+                spec = get_psuedo_id(json_id)
+                spec = self.limit_spec(spec)
+                try:
+                    self.psuedo_id_cache[json_id] = self.model_class.objects.get(**spec).id
+                except self.model_class.DoesNotExist:
+                    raise ValueError('cannot resolve psuedo-id to {}: {}'.format(
+                        self.model_class.__name__, json_id))
+
+            # return the cached object
+            return self.psuedo_id_cache[json_id]
 
         # get the id that the duplicate points to, or use self
         json_id = self.duplicates.get(json_id, json_id)
