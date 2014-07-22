@@ -68,7 +68,11 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
             "classification": classification,
             "entity_type": entity_type,
             "primary": primary,
+            # set these so that all JSON objects have the same keys, prevents import errors
+            "person_id": None,
+            "organization_id": None,
         }
+        # overwrite the id that exists
         if entity_type:
             sp[entity_type + '_id'] = entity_id
         self.sponsorships.append(sp)
