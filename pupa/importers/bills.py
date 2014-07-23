@@ -29,7 +29,10 @@ class BillImporter(BaseImporter):
         if 'from_organization_id' in bill:
             spec['from_organization_id'] = bill['from_organization_id']
 
-        return self.model_class.objects.get(**spec)
+        return self.model_class.objects.prefetch_related('actions__related_entities',
+                                                         'versions__links',
+                                                         'documents__links',
+                                                        ).get(**spec)
 
     def limit_spec(self, spec):
         spec['legislative_session__jurisdiction_id'] = self.jurisdiction_id
