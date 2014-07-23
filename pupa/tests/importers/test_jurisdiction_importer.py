@@ -39,4 +39,4 @@ def test_jurisdiction_update():
     obj, what = ji.import_item(tj.as_dict())
     assert what == 'update'
     assert Jurisdiction.objects.count() == 1
-    assert obj.name == 'different name'
+    assert Jurisdiction.objects.get().name == 'different name'

@@ -184,8 +184,8 @@ class BaseImporter(object):
         results = {'insert': 0, 'update': 0, 'noop': 0}
 
         for json_id, data in self._prepare_imports(data_items):
-            obj, what = self.import_item(data)
-            self.json_to_db_id[json_id] = obj.id
+            obj_id, what = self.import_item(data)
+            self.json_to_db_id[json_id] = obj_id
             results[what] += 1
 
         # all objects are loaded, a perfect time to do inter-object resolution and other tasks
@@ -236,7 +236,7 @@ class BaseImporter(object):
             obj = self.model_class.objects.create(**data)
             self._create_related(obj, related, self.related_models)
 
-        return obj, what
+        return obj.id, what
 
 
 
