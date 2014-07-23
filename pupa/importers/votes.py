@@ -18,7 +18,7 @@ class VoteImporter(BaseImporter):
         self.votes_to_delete = set()
 
     def get_object(self, vote):
-        spec = {'legislative_session': vote['legislative_session']}
+        spec = {'legislative_session_id': vote['legislative_session_id']}
 
         if not vote['identifier'] and not vote['bill_id']:
             raise ValueError('attempt to save a Vote without an "identifier" or "bill_id"')
@@ -47,7 +47,7 @@ class VoteImporter(BaseImporter):
         return self.model_class.objects.get(**spec)
 
     def prepare_for_db(self, data):
-        data['legislative_session'] = self.get_session(data.pop('legislative_session'))
+        data['legislative_session_id'] = self.get_session_id(data.pop('legislative_session'))
         data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
         data['bill_id'] = self.bill_importer.resolve_json_id(data.pop('bill'))
         return data

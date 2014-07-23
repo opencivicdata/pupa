@@ -23,7 +23,7 @@ class BillImporter(BaseImporter):
 
     def get_object(self, bill):
         spec = {
-            'legislative_session': bill['legislative_session'],
+            'legislative_session_id': bill['legislative_session_id'],
             'identifier': bill['identifier'],
         }
         if 'from_organization_id' in bill:
@@ -37,7 +37,7 @@ class BillImporter(BaseImporter):
 
     def prepare_for_db(self, data):
         data['identifier'] = fix_bill_id(data['identifier'])
-        data['legislative_session'] = self.get_session(data['legislative_session'])
+        data['legislative_session_id'] = self.get_session_id(data.pop('legislative_session'))
 
         if data['from_organization']:
             data['from_organization_id'] = self.org_importer.resolve_json_id(

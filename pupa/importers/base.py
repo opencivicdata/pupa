@@ -96,10 +96,10 @@ class BaseImporter(object):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
-    def get_session(self, identifier):
+    def get_session_id(self, identifier):
         if identifier not in self.session_cache:
             self.session_cache[identifier] = LegislativeSession.objects.get(
-                identifier=identifier, jurisdiction_id=self.jurisdiction_id)
+                identifier=identifier, jurisdiction_id=self.jurisdiction_id).id
         return self.session_cache[identifier]
 
     # no-ops to be overriden
