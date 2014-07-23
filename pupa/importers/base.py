@@ -6,7 +6,7 @@ import uuid
 import logging
 from pupa.utils import get_psuedo_id
 from pupa.utils.topsort import Network
-
+from opencivicdata.models import LegislativeSession
 
 def omnihash(obj):
     """ recursively hash unhashable objects """
@@ -88,12 +88,19 @@ class BaseImporter(object):
         self.json_to_db_id = {}
         self.duplicates = {}
         self.psuedo_id_cache = {}
+        self.session_cache = {}
         self.logger = logging.getLogger("pupa")
         self.info = self.logger.info
         self.debug = self.logger.debug
         self.warning = self.logger.warning
         self.error = self.logger.error
         self.critical = self.logger.critical
+
+    def get_session(self, identifier):
+        if identifier not in self.session_cache:
+            self.session_cache[identifier] = LegislativeSession.objects.get(
+                identifier=identifier, jurisdiction_id=self.jurisdiction_id)
+        return self.session_cache[identifier]
 
     # no-ops to be overriden
     def prepare_for_db(self, data):
