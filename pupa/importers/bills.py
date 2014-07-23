@@ -1,20 +1,27 @@
 from pupa.utils import fix_bill_id
-from opencivicdata.models import Bill, RelatedBill
+from opencivicdata.models import (Bill, RelatedBill, BillAbstract, BillTitle, BillIdentifier,
+                                  BillAction, BillActionRelatedEntity, RelatedBill,
+                                  BillSponsorship, BillSource, BillDocument, BillVersion,
+                                  BillDocumentLink, BillVersionLink)
 from .base import BaseImporter
 
 
 class BillImporter(BaseImporter):
     _type = 'bill'
     model_class = Bill
-    related_models = {'abstracts': {},
-                      'other_titles': {},
-                      'other_identifiers': {},
-                      'actions': {'related_entities': {}},
-                      'related_bills': {},
-                      'sponsorships': {},
-                      'sources': {},
-                      'documents': {'links': {}},
-                      'versions': {'links': {}}}
+    related_models = {'abstracts': (BillAbstract, 'bill_id', {}),
+                      'other_titles': (BillTitle, 'bill_id', {}),
+                      'other_identifiers': (BillIdentifier, 'bill_id', {}),
+                      'actions': (BillAction, 'bill_id', {
+                          'related_entities': (BillActionRelatedEntity, 'action_id', {})}),
+                      'related_bills': (RelatedBill, 'bill_id', {}),
+                      'sponsorships': (BillSponsorship, 'bill_id', {}),
+                      'sources': (BillSource, 'bill_id', {}),
+                      'documents': (BillDocument, 'bill_id', {
+                          'links': (BillDocumentLink, 'document_id', {})}),
+                      'versions': (BillVersion, 'bill_id', {
+                          'links': (BillVersionLink, 'version_id', {})}),
+                     }
     preserve_order = {'actions'}
 
     def __init__(self, jurisdiction_id, org_importer):

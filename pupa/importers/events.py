@@ -3,30 +3,33 @@ import datetime
 
 from .base import BaseImporter
 from ..utils.event import read_event_iso_8601
-from opencivicdata.models import Event, EventLocation
+from opencivicdata.models import (Event, EventLocation, EventSource, EventDocument,
+                                  EventDocumentLink, EventLink, EventParticipant, EventMedia,
+                                  EventMediaLink, EventAgendaItem, EventRelatedEntity,
+                                  EventAgendaMedia, EventAgendaMediaLink)
 
 
 class EventImporter(BaseImporter):
     _type = 'event'
     model_class = Event
     related_models = {
-        'sources': {},
-        'documents': {
-            'links': {},
-        },
-        'links': {},
-        'participants': {},
-        'media': {
-            'links': {},
-        },
-        'agenda': {
-            'related_entities': {},
-            'media': {
-                'links': {},
-            },
-        }
+        'sources': (EventSource, 'event_id', {}),
+        'documents': (EventDocument, 'event_id', {
+            'links': (EventDocumentLink, 'document_id', {})
+        }),
+        'links': (EventLink, 'event_id', {}),
+        'participants': (EventParticipant, 'event_id', {}),
+        'media': (EventMedia, 'event_id', {
+            'links': (EventMediaLink, 'media_id', {}),
+        }),
+        'agenda': (EventAgendaItem, 'event_id', {
+            'related_entities': (EventRelatedEntity, 'agenda_item_id', {}),
+            'media': (EventAgendaMedia, 'agenda_item_id', {
+                'links': (EventAgendaMediaLink, 'media_id', {}),
+            }),
+        })
     }
-    preserve_order = {'agenda'}
+    preserve_order = ('agenda',)
 
     def get_object(self, event):
         spec = {

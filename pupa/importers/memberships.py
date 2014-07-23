@@ -1,11 +1,13 @@
-from opencivicdata.models import Membership
+from opencivicdata.models import Membership, MembershipContactDetail, MembershipLink
 from .base import BaseImporter
 
 
 class MembershipImporter(BaseImporter):
     _type = 'membership'
     model_class = Membership
-    related_models = {'contact_details': {}, 'links': {}}
+    related_models = {'contact_details': (MembershipContactDetail, 'membership_id', {}),
+                      'links': (MembershipLink, 'membership_id', {})
+                     }
 
     def __init__(self, jurisdiction_id, person_importer, org_importer, post_importer):
         super(MembershipImporter, self).__init__(jurisdiction_id)

@@ -1,16 +1,18 @@
 from django.db.models import Q
-from opencivicdata.models import Person
+from opencivicdata.models import (Person, PersonIdentifier, PersonName, PersonContactDetail,
+                                  PersonLink, PersonSource)
 from .base import BaseImporter
 
 
 class PersonImporter(BaseImporter):
     _type = 'person'
     model_class = Person
-    related_models = {'identifiers': {},
-                      'other_names': {},
-                      'contact_details': {},
-                      'links': {},
-                      'sources': {}}
+    related_models = {'identifiers': (PersonIdentifier, 'person_id', {}),
+                      'other_names': (PersonName, 'person_id', {}),
+                      'contact_details': (PersonContactDetail, 'person_id', {}),
+                      'links': (PersonLink, 'person_id', {}),
+                      'sources': (PersonSource, 'person_id', {}),
+                     }
 
     def get_object(self, person):
         all_names = [person['name']] + [o['name'] for o in person['other_names']]

@@ -47,7 +47,7 @@ def items_differ(jsonitems, dbitems, subfield_dict):
                 for k in subfield_dict:
                     jsonsubitems = jsonitem[k]
                     dbsubitems = list(getattr(dbitem, k).all())
-                    if items_differ(jsonsubitems, dbsubitems, subfield_dict[k]):
+                    if items_differ(jsonsubitems, dbsubitems, subfield_dict[k][2]):
                         break
                 else:
                     # these items are equal, so let's mark it for removal
@@ -260,7 +260,7 @@ class BaseImporter(object):
             do_delete = do_update = False
 
             if items and dbitems_count:         # we have items, so does db, check for conflict
-                do_delete = do_update = items_differ(items, dbitems, subfield_dict[field])
+                do_delete = do_update = items_differ(items, dbitems, subfield_dict[field][2])
             elif items and not dbitems_count:   # we have items, db doesn't, just update
                 do_update = True
             elif not items and dbitems_count:   # db has items, we don't, just delete
@@ -285,19 +285,31 @@ class BaseImporter(object):
             subfield_list:  where to get the next layer of subfields
         """
         for field, items in related.items():
+            subobjects = []
+            all_subrelated = []
+            Subtype, reverse_id_field, subsubdict = subfield_dict[field]
             for order, item in enumerate(items):
                 # pull off 'subrelated' (things that are related to this obj)
                 subrelated = {}
-                for subfield in subfield_dict[field]:
+                for subfield in subsubdict:
                     subrelated[subfield] = item.pop(subfield)
 
                 if field in self.preserve_order:
                     item['order'] = order
 
+                item[reverse_id_field] = obj.id
+
                 try:
-                    subobj = getattr(obj, field).create(**item)
+                    subobjects.append(Subtype(**item))
+                    all_subrelated.append(subrelated)
+                    #subobj = getattr(obj, field).create(**item)
                 except Exception as e:
                     # TODO: revisit exception type
-                    raise TypeError(str(e) + ' while importing ' + str(item))
+                    raise TypeError('{} while importing {} as {}'.format(e, item, Subtype))
 
-                self._create_related(subobj, subrelated, subfield_dict[field])
+            # add all subobjects at once (really great for actions & votes)
+            getattr(obj, field).bulk_create(subobjects)
+
+            # after import the subobjects, import their subsubobjects
+            for subobj, subrel in zip(subobjects, all_subrelated):
+                self._create_related(subobj, subrel, subsubdict)
