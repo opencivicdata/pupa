@@ -74,7 +74,9 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
     _schema = person_schema
 
     def __init__(self, name, *, birth_date='', death_date='', biography='', summary='', image='',
-                 gender='', national_identity=''):
+                 gender='', national_identity='',
+                 # specialty fields
+                 district=None, party=None, primary_org='', start_date='', end_date=''):
         super(Person, self).__init__()
         self.name = name
         self.birth_date = birth_date
@@ -84,6 +86,11 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         self.image = image
         self.gender = gender
         self.national_identity = national_identity
+        if district:
+            self.add_term('member', primary_org, district=district,
+                          start_date=start_date, end_date=end_date)
+        if party:
+            self.add_party(party)
 
     def add_membership(self, organization, role='member', **kwargs):
         """
@@ -94,6 +101,24 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
                                 role=role, **kwargs)
         self._related.append(membership)
         return membership
+
+    def add_party(self, party, **kwargs):
+        membership = Membership(
+            person_id=self._id,
+            organization_id=make_psuedo_id(classification="party", name=party),
+            role='member', **kwargs)
+        self._related.append(membership)
+
+    def add_term(self, role, org_classification, *, district=None, start_date='', end_date=''):
+        org_id = make_psuedo_id(classification=org_classification)
+        if district:
+            post_id = make_psuedo_id(label=district,
+                                     organization__classification=org_classification)
+        else:
+            post_id = None
+        membership = Membership(person_id=self._id, organization_id=org_id, post_id=post_id,
+                                role=role, start_date=start_date, end_date=end_date)
+        self._related.append(membership)
 
     def __str__(self):
         return self.name
@@ -109,7 +134,8 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
     _schema = org_schema
 
     def __init__(self, name, *, classification='', parent_id=None,
-                 founding_date='', dissolution_date='', image=''):
+                 founding_date='', dissolution_date='', image='',
+                 chamber=None):
         """
         Constructor for the Organization object.
         """
@@ -118,7 +144,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         self.classification = classification
         self.founding_date = founding_date
         self.dissolution_date = dissolution_date
-        self.parent_id = parent_id
+        self.parent_id = psuedo_organization(parent_id, chamber)
         self.image = image
 
     def __str__(self):
@@ -135,6 +161,16 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         post = Post(label=label, role=role, organization_id=self._id, **kwargs)
         self._related.append(post)
         return post
+
+    def add_member(self, name_or_person, role='member', **kwargs):
+        if isinstance(name_or_person, Person):
+            membership = Membership(person_id=name_or_person._id, organization_id=self._id,
+                                    role=role, **kwargs)
+        else:
+            membership = Membership(person_id=make_psuedo_id(name=name_or_person),
+                                    organization_id=self._id, role=role, **kwargs)
+        self._related.append(membership)
+        return membership
 
 
 def psuedo_organization(organization, classification, default=None):
@@ -153,4 +189,4 @@ def psuedo_organization(organization, classification, default=None):
     elif default is not None:
         return make_psuedo_id(classification=default)
     else:
-        raise ValueError('must specify classification or organization')
+        return None

@@ -1,9 +1,9 @@
-from pupa.scrape import Legislator, Committee, Person
+from pupa.scrape import Person, Organization
 from pupa.utils import get_psuedo_id
 
 
 def test_legislator_related_district():
-    l = Legislator('John Adams', district='1')
+    l = Person('John Adams', district='1', primary_org='legislature')
     l.pre_save('jurisdiction-id')
 
     assert len(l._related) == 1
@@ -15,7 +15,7 @@ def test_legislator_related_district():
 
 
 def test_legislator_related_chamber_district():
-    l = Legislator('John Adams', district='1', chamber='upper')
+    l = Person('John Adams', district='1', primary_org='upper')
     l.pre_save('jurisdiction-id')
 
     assert len(l._related) == 1
@@ -27,7 +27,7 @@ def test_legislator_related_chamber_district():
 
 
 def test_legislator_related_party():
-    l = Legislator('John Adams', district='1', party='Democratic-Republican')
+    l = Person('John Adams', district='1', party='Democratic-Republican')
     l.pre_save('jurisdiction-id')
 
     # a party membership
@@ -39,7 +39,7 @@ def test_legislator_related_party():
 
 
 def test_committee_add_member_person():
-    c = Committee('Defense')
+    c = Organization('Defense', classification='committee')
     p = Person('John Adams')
     c.add_member(p, role='chairman')
     assert c._related[0].person_id == p._id
@@ -48,7 +48,7 @@ def test_committee_add_member_person():
 
 
 def test_committee_add_member_name():
-    c = Committee('Defense')
+    c = Organization('Defense', classification='committee')
     c.add_member('John Adams')
     assert get_psuedo_id(c._related[0].person_id) == {'name': 'John Adams'}
     assert c._related[0].organization_id == c._id

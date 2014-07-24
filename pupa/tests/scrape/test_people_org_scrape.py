@@ -47,7 +47,7 @@ def test_basic_person():
 def test_person_add_membership():
     p = Person('Bob B. Bear')
     p.add_source('http://example.com')
-    o = Organization('test org')
+    o = Organization('test org', classification='unknown')
     p.add_membership(o, role='member', start_date='2007')
     assert len(p._related) == 1
     p._related[0].validate()

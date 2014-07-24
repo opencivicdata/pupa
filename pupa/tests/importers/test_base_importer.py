@@ -71,8 +71,8 @@ def test_deduplication_identical_object():
 def test_exception_on_identical_objects_in_import_stream():
     # these two objects aren't identical, but refer to the same thing
     # at the moment we consider this an error (but there may be a better way to handle this?)
-    o1 = ScrapeOrganization('X-Men').as_dict()
-    o2 = ScrapeOrganization('X-Men', founding_date='1970').as_dict()
+    o1 = ScrapeOrganization('X-Men', classification='unknown').as_dict()
+    o2 = ScrapeOrganization('X-Men', founding_date='1970', classification='unknown').as_dict()
 
     pi = OrganizationImporter('jid')
     with pytest.raises(Exception):

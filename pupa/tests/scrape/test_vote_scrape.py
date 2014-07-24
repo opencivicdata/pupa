@@ -27,7 +27,7 @@ def test_simple_vote():
 
 
 def test_vote_org_obj():
-    o = Organization('something')
+    o = Organization('something', classification='committee')
     v = Vote(legislative_session="2009", motion_text="passage of the bill",
              start_date="2009-01-07", result='pass', classification='passage:bill', organization=o)
     assert v.organization == o._id
