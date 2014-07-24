@@ -1,11 +1,13 @@
 import pytest
 from pupa.scrape import Membership as ScrapeMembership
-from pupa.importers import MembershipImporter
+from pupa.scrape import Person as ScrapePerson
+from pupa.importers import MembershipImporter, PersonImporter
+from pupa.exceptions import NoMembershipsError
 from opencivicdata.models import Organization, Post, Person
-
 
 class DumbMockImporter(object):
     """ this is a mock importer that implements a resolve_json_id that is just a pass-through """
+    json_to_db_id = {}
 
     def resolve_json_id(self, json_id):
         return json_id
@@ -45,3 +47,22 @@ def test_full_membership():
     assert cd.value == '555-555-1234'
     assert cd.note == 'this is fake'
     assert m.links.all()[0].url == 'http://example.com/link'
+
+
+
+@pytest.mark.django_db
+def test_no_membership_for_person():
+    org = Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
+                                      jurisdiction_id="fnd-jid")
+
+    # import a person with no memberships
+    p = ScrapePerson('a man without a country')
+    person_imp = PersonImporter('fnd-jid')
+    person_imp.import_data([p.as_dict()])
+
+    # try to import a membership
+    dumb_imp = DumbMockImporter()
+    memimp = MembershipImporter('fnd-jid', person_imp, dumb_imp, dumb_imp)
+
+    with pytest.raises(NoMembershipsError):
+        memimp.import_data([])

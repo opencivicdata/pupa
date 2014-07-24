@@ -1,5 +1,6 @@
 from opencivicdata.models import Membership, MembershipContactDetail, MembershipLink
 from .base import BaseImporter
+from ..exceptions import NoMembershipsError
 
 
 class MembershipImporter(BaseImporter):
@@ -14,6 +15,7 @@ class MembershipImporter(BaseImporter):
         self.person_importer = person_importer
         self.org_importer = org_importer
         self.post_importer = post_importer
+        self.seen_person_ids = set()
 
     def get_object(self, membership):
         spec = {'organization_id': membership['organization_id'],
@@ -32,4 +34,11 @@ class MembershipImporter(BaseImporter):
         data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
         data['person_id'] = self.person_importer.resolve_json_id(data['person_id'])
         data['post_id'] = self.post_importer.resolve_json_id(data['post_id'])
+        # track that we had a membership for this person
+        self.seen_person_ids.add(data['person_id'])
         return data
+
+    def postimport(self):
+        person_ids = set(self.person_importer.json_to_db_id.values()) - self.seen_person_ids
+        if person_ids:
+            raise NoMembershipsError(person_ids)
