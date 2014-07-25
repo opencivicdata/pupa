@@ -117,6 +117,7 @@ def test_multiple_memberships():
 
 @pytest.mark.django_db
 def test_same_name_people():
+    # ensure two people with the same name don't import without birthdays
     o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
     p1 = ScrapePerson('Dwayne Johnson', image='http://example.com/1')
     p2 = ScrapePerson('Dwayne Johnson', image='http://example.com/2')
@@ -136,15 +137,16 @@ def test_same_name_people():
     for p in Person.objects.all():
         Membership.objects.create(person=p, organization=o)
 
-    # and now test that an update works
+    # and now test that an update works and we can insert a new one with the same name
     p1.image = 'http://example.com/1.jpg'
-    p2.image = 'http://example.com/2.jpg'
+    p2.birth_date = '1931'  # change birth_date, means a new insert
     resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
-    assert Person.objects.count() == 2
-    assert resp['person'] == {'insert': 0, 'noop': 0, 'update': 2}
+    assert Person.objects.count() == 3
+    assert resp['person'] == {'insert': 1, 'noop': 0, 'update': 1}
 
 @pytest.mark.django_db
 def test_same_name_people_other_name():
+    # ensure we're taking other_names into account for the name collision code
     o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
     p1 = ScrapePerson('Dwayne Johnson', image='http://example.com/1')
     p2 = ScrapePerson('Rock', image='http://example.com/2')
@@ -153,3 +155,25 @@ def test_same_name_people_other_name():
     # the people have the same name but are apparently different
     with pytest.raises(SameNameError):
         PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+
+
+@pytest.mark.django_db
+def test_same_name_second_import():
+    # ensure two people with the same name don't import without birthdays
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    p1 = ScrapePerson('Dwayne Johnson', image='http://example.com/1')
+    p2 = ScrapePerson('Dwayne Johnson', image='http://example.com/2')
+    p1.birth_date = '1970'
+    p2.birth_date = '1930'
+
+    # when we give them birth dates all is well though
+    resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+
+    # fake some memberships so future lookups work on these people
+    for p in Person.objects.all():
+        Membership.objects.create(person=p, organization=o)
+
+    p3 = ScrapePerson('Dwayne Johnson', image='http://example.com/3')
+
+    with pytest.raises(SameNameError):
+        resp = PersonImporter('jurisdiction-id').import_data([p3.as_dict()])

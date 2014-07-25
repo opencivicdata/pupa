@@ -57,5 +57,4 @@ class PersonImporter(BaseImporter):
                 raise self.model_class.DoesNotExist('No Person: {} in {} with birth_date {}'
                                                     .format(all_names, self.jurisdiction_id,
                                                             person['birth_date']))
-            raise self.model_class.MultipleObjectsReturned('Multiple People: {} in {}'.format(
-                all_names, self.jurisdiction_id))
+            raise SameNameError(person['name'])
