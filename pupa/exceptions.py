@@ -4,8 +4,16 @@ class PupaError(Exception):
     """ Base class for exceptions from within Pupa """
 
 
+class PupaInternalError(PupaError):
+    """ Indication something went wrong inside of Pupa that never should happen """
+
+
 class DataImportError(PupaError):
     """ A generic error related to the import process. """
+
+
+class InvalidVoteError(DataImportError):
+    """ Attempt to create a vote without an identifier or bill_id """
 
 
 class NoMembershipsError(DataImportError):
@@ -23,3 +31,7 @@ class SameNameError(DataImportError):
         super(SameNameError, self).__init__('multiple people with same name "{}" in Jurisdiction '
                                             '- must provide birth_date to disambiguate'
                                             .format(name))
+
+
+class UnresolvedIdError(DataImportError):
+    """ Attempt was made to resolve an id that has no result. """

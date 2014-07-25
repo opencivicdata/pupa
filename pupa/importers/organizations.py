@@ -3,6 +3,7 @@ from opencivicdata.models import (Organization, OrganizationIdentifier, Organiza
 from .base import BaseImporter
 from ..utils import get_psuedo_id
 from ..utils.topsort import Network
+from ..exceptions import UnresolvedIdError, PupaInternalError
 
 
 class OrganizationImporter(BaseImporter):
@@ -71,7 +72,7 @@ class OrganizationImporter(BaseImporter):
                         break
                 if match:
                     if ppid in psuedo_matches:
-                        raise Exception("multiple matches for psuedo-id " + ppid)
+                        raise UnresolvedIdError('multiple matches for psuedo id: ' + ppid)
                     psuedo_matches[ppid] = json_id
 
         # toposort the nodes so parents are imported first
@@ -100,6 +101,6 @@ class OrganizationImporter(BaseImporter):
 
         # ensure all data made it into network (paranoid check, should never fail)
         if in_network != set(prepared.keys()):    # pragma: no cover
-            raise Exception("import is missing nodes in network set")
+            raise PupaInternalError("import is missing nodes in network set")
 
         return import_order

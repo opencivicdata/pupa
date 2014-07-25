@@ -4,6 +4,7 @@ from opencivicdata.models import (Bill, RelatedBill, BillAbstract, BillTitle, Bi
                                   BillSponsorship, BillSource, BillDocument, BillVersion,
                                   BillDocumentLink, BillVersionLink)
 from .base import BaseImporter
+from ..exceptions import PupaInternalError
 
 
 class BillImporter(BaseImporter):
@@ -78,4 +79,4 @@ class BillImporter(BaseImporter):
                 rb.save()
             elif len(candidates) > 1:    # pragma: no cover
                 # if we ever see this, we need to add additional fields on the relation
-                raise RuntimeError('multiple related_bill candidates found for {}'.format(rb))
+                raise PupaInternalError('multiple related_bill candidates found for {}'.format(rb))

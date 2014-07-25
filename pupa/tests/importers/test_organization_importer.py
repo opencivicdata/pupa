@@ -1,7 +1,8 @@
 import pytest
+from opencivicdata.models import Organization
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import OrganizationImporter
-from opencivicdata.models import Organization
+from pupa.exceptions import UnresolvedIdError
 
 
 @pytest.mark.django_db
@@ -96,7 +97,7 @@ def test_psuedo_ids():
     assert oi1.resolve_json_id('~{"classification":"lower"}') == house.id
     assert oi1.resolve_json_id('~{"classification":"party", "name":"Wild"}') == wild.id
 
-    with pytest.raises(ValueError):
+    with pytest.raises(UnresolvedIdError):
         oi1.resolve_json_id('~{"classification":"international", "name":"United Nations"}')
 
     oi2 = OrganizationImporter('jid2')

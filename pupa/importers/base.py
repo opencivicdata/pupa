@@ -7,6 +7,7 @@ import logging
 from pupa.utils import get_psuedo_id
 from pupa.utils.topsort import Network
 from opencivicdata.models import LegislativeSession
+from pupa.exceptions import UnresolvedIdError, DataImportError
 
 def omnihash(obj):
     """ recursively hash unhashable objects """
@@ -133,7 +134,7 @@ class BaseImporter(object):
                 try:
                     self.psuedo_id_cache[json_id] = self.model_class.objects.get(**spec).id
                 except self.model_class.DoesNotExist:
-                    raise ValueError('cannot resolve psuedo-id to {}: {}'.format(
+                    raise UnresolvedIdError('cannot resolve psuedo id to {}: {}'.format(
                         self.model_class.__name__, json_id))
 
             # return the cached object
@@ -145,7 +146,7 @@ class BaseImporter(object):
         try:
             return self.json_to_db_id[json_id]
         except KeyError:
-            raise ValueError('cannot resolve id: {}'.format(json_id))
+            raise UnresolvedIdError('cannot resolve id: {}'.format(json_id))
 
     def import_directory(self, datadir):
         """ import a JSON directory into the database """
@@ -216,8 +217,9 @@ class BaseImporter(object):
         # obj existed, check if we need to do an update
         if obj:
             if obj.id in self.json_to_db_id.values():
-                raise Exception('attempt to import data that would conflict with data already in '
-                                'the import: {} (already imported as {})'''.format(data, obj))
+                raise DuplicateItemError('attempt to import data that would conflict with data '
+                                         'already in the import: {} '
+                                         '(already imported as {})'.format(data, obj))
             # check base object for changes
             for key, value in data.items():
                 if getattr(obj, key) != value:
@@ -233,7 +235,11 @@ class BaseImporter(object):
         # need to create the data
         else:
             what = 'insert'
-            obj = self.model_class.objects.create(**data)
+            try:
+                obj = self.model_class.objects.create(**data)
+            except TypeError as e:
+                raise DataImportError('{} while importing {} as {}'.format(e, data,
+                                                                           self.model_class))
             self._create_related(obj, related, self.related_models)
 
         return obj.id, what
@@ -302,10 +308,8 @@ class BaseImporter(object):
                 try:
                     subobjects.append(Subtype(**item))
                     all_subrelated.append(subrelated)
-                    #subobj = getattr(obj, field).create(**item)
                 except Exception as e:
-                    # TODO: revisit exception type
-                    raise TypeError('{} while importing {} as {}'.format(e, item, Subtype))
+                    raise DataImportError('{} while importing {} as {}'.format(e, item, Subtype))
 
             # add all subobjects at once (really great for actions & votes)
             getattr(obj, field).bulk_create(subobjects)

@@ -1,6 +1,6 @@
-from .base import BaseImporter
 from opencivicdata.models import VoteEvent, VoteCount, PersonVote, VoteSource
-
+from .base import BaseImporter
+from ..exceptions import InvalidVoteError
 
 class VoteImporter(BaseImporter):
     _type = 'vote'
@@ -24,7 +24,7 @@ class VoteImporter(BaseImporter):
         spec = {'legislative_session_id': vote['legislative_session_id']}
 
         if not vote['identifier'] and not vote['bill_id']:
-            raise ValueError('attempt to save a Vote without an "identifier" or "bill_id"')
+            raise InvalidVoteError('attempt to save a Vote without an "identifier" or "bill_id"')
 
         if vote['bill_id']:
             if vote['bill_id'] not in self.seen_bill_ids:

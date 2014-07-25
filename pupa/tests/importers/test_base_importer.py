@@ -4,11 +4,12 @@ import shutil
 import tempfile
 import mock
 import pytest
+from opencivicdata.models import Person
 from pupa.scrape import Person as ScrapePerson
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers.base import omnihash, BaseImporter
 from pupa.importers import PersonImporter, OrganizationImporter
-from opencivicdata.models import Person
+from pupa.exceptions import UnresolvedIdError, DataImportError
 
 
 class FakeImporter(BaseImporter):
@@ -98,7 +99,7 @@ def test_resolve_json_id():
     # a null id should map to None
     assert pi.resolve_json_id(None) is None
     # no such id
-    with pytest.raises(ValueError):
+    with pytest.raises(UnresolvedIdError):
         pi.resolve_json_id('this-is-invalid')
 
 
@@ -107,7 +108,7 @@ def test_invalid_fields():
     p1 = ScrapePerson('Dwayne').as_dict()
     p1['newfield'] = "shouldn't happen"
 
-    with pytest.raises(TypeError):
+    with pytest.raises(DataImportError):
         PersonImporter('jid').import_data([p1])
 
 
@@ -118,5 +119,5 @@ def test_invalid_fields_related_item():
     p1 = p1.as_dict()
     p1['links'][0]['test'] = 3
 
-    with pytest.raises(TypeError):
+    with pytest.raises(DataImportError):
         PersonImporter('jid').import_data([p1])
