@@ -23,6 +23,8 @@ class PersonImporter(BaseImporter):
         for _, person in dicts:
             # take into account other_names?
             by_name[person['name']].append(person)
+            for other in person['other_names']:
+                by_name[other['name']].append(person)
 
         # check for duplicates
         for name, people in by_name.items():

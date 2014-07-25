@@ -142,3 +142,14 @@ def test_same_name_people():
     resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
     assert Person.objects.count() == 2
     assert resp['person'] == {'insert': 0, 'noop': 0, 'update': 2}
+
+@pytest.mark.django_db
+def test_same_name_people_other_name():
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    p1 = ScrapePerson('Dwayne Johnson', image='http://example.com/1')
+    p2 = ScrapePerson('Rock', image='http://example.com/2')
+    p2.add_name('Dwayne Johnson')
+
+    # the people have the same name but are apparently different
+    with pytest.raises(SameNameError):
+        PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
