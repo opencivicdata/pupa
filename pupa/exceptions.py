@@ -15,3 +15,11 @@ class NoMembershipsError(DataImportError):
         super(NoMembershipsError, self).__init__('no memberhips for {} people: \n{}'.format(
             len(ids), ', '.join(ids))
         )
+
+class SameNameError(DataImportError):
+    """ Attempt was made to import two people with the same name. """
+
+    def __init__(self, name):
+        super(SameNameError, self).__init__('multiple people with same name "{}" in Jurisdiction '
+                                            '- must provide birth_date to disambiguate'
+                                            .format(name))

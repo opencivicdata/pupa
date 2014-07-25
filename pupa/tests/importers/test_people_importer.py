@@ -2,7 +2,7 @@ import pytest
 from pupa.scrape import Person as ScrapePerson
 from pupa.importers import PersonImporter
 from opencivicdata.models import Person, Organization, Membership
-
+from pupa.exceptions import SameNameError
 
 @pytest.mark.django_db
 def test_full_person():
@@ -113,3 +113,32 @@ def test_multiple_memberships():
 
     # deduplication should still work
     assert Person.objects.all().count() == 1
+
+
+@pytest.mark.django_db
+def test_same_name_people():
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    p1 = ScrapePerson('Dwayne Johnson', image='http://example.com/1')
+    p2 = ScrapePerson('Dwayne Johnson', image='http://example.com/2')
+
+    # the people have the same name but are apparently different
+    with pytest.raises(SameNameError):
+        PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+
+    # when we give them birth dates all is well though
+    p1.birth_date = '1970'
+    p2.birth_date = '1930'
+    resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+    assert resp['person'] == {'insert': 2, 'noop': 0, 'update': 0}
+    assert Person.objects.count() == 2
+
+    # fake some memberships so future lookups work on these people
+    for p in Person.objects.all():
+        Membership.objects.create(person=p, organization=o)
+
+    # and now test that an update works
+    p1.image = 'http://example.com/1.jpg'
+    p2.image = 'http://example.com/2.jpg'
+    resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+    assert Person.objects.count() == 2
+    assert resp['person'] == {'insert': 0, 'noop': 0, 'update': 2}

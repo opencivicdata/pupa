@@ -1,7 +1,9 @@
+from collections import defaultdict
 from django.db.models import Q
 from opencivicdata.models import (Person, PersonIdentifier, PersonName, PersonContactDetail,
                                   PersonLink, PersonSource)
 from .base import BaseImporter
+from ..exceptions import SameNameError
 
 
 class PersonImporter(BaseImporter):
@@ -13,6 +15,23 @@ class PersonImporter(BaseImporter):
                       'links': (PersonLink, 'person_id', {}),
                       'sources': (PersonSource, 'person_id', {}),
                      }
+
+    def _prepare_imports(self, dicts):
+        dicts = list(super(PersonImporter, self)._prepare_imports(dicts))
+
+        by_name = defaultdict(list)
+        for _, person in dicts:
+            # take into account other_names?
+            by_name[person['name']].append(person)
+
+        # check for duplicates
+        for name, people in by_name.items():
+            if len(people) > 1:
+                for person in people:
+                    if person['birth_date'] == '':
+                        raise SameNameError(name)
+
+        return dicts
 
     def get_object(self, person):
         all_names = [person['name']] + [o['name'] for o in person['other_names']]
@@ -26,5 +45,15 @@ class PersonImporter(BaseImporter):
             raise self.model_class.DoesNotExist('No Person: {} in {}'.format(all_names,
                                                                              self.jurisdiction_id))
         else:
+            # try and match based on birth_date
+            if person['birth_date']:
+                for m in matches:
+                    if person['birth_date'] and m.birth_date == person['birth_date']:
+                        return m
+
+                # if we got here, no match based on birth_date, a new person?
+                raise self.model_class.DoesNotExist('No Person: {} in {} with birth_date {}'
+                                                    .format(all_names, self.jurisdiction_id,
+                                                            person['birth_date']))
             raise self.model_class.MultipleObjectsReturned('Multiple People: {} in {}'.format(
                 all_names, self.jurisdiction_id))
