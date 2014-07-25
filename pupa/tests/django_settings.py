@@ -10,3 +10,4 @@ DATABASES = {
         'HOST': 'localhost',
     }
 }
+MIDDLEWARE_CLASSES=()
