@@ -34,7 +34,9 @@ class EventImporter(BaseImporter):
     def get_object(self, event):
         spec = {
             'name': event['name'],
+            'description': event['description']
             'start_time': event['start_time'],
+            'end_time': event['end_time'],
             'timezone': event['timezone'],
             'jurisdiction_id': self.jurisdiction_id
         }
