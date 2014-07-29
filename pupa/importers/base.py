@@ -312,7 +312,10 @@ class BaseImporter(object):
                     raise DataImportError('{} while importing {} as {}'.format(e, item, Subtype))
 
             # add all subobjects at once (really great for actions & votes)
-            getattr(obj, field).bulk_create(subobjects)
+            try:
+                getattr(obj, field).bulk_create(subobjects)
+            except Exception as e:
+                raise DataImportError('{} while importing {} as {}'.format(e, subobjects, Subtype))
 
             # after import the subobjects, import their subsubobjects
             for subobj, subrel in zip(subobjects, all_subrelated):
