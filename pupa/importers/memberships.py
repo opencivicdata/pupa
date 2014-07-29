@@ -41,4 +41,6 @@ class MembershipImporter(BaseImporter):
     def postimport(self):
         person_ids = set(self.person_importer.json_to_db_id.values()) - self.seen_person_ids
         if person_ids:
+            reverse_id_dict = {v: k for k, v in self.person_importer.json_to_db_id.items()}
+            person_ids = [reverse_id_dict[pid] for pid in person_ids]
             raise NoMembershipsError(person_ids)
