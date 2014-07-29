@@ -137,6 +137,9 @@ class BaseImporter(object):
                 except self.model_class.DoesNotExist:
                     raise UnresolvedIdError('cannot resolve psuedo id to {}: {}'.format(
                         self.model_class.__name__, json_id))
+                except self.model_class.MultipleObjectsReturned:
+                    raise UnresolvedIdError('multiple objects returned for psuedo id to {}: {}'.format(
+                        self.model_class.__name__, json_id))
 
             # return the cached object
             return self.psuedo_id_cache[json_id]
