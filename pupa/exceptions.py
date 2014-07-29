@@ -33,5 +33,15 @@ class SameNameError(DataImportError):
                                             .format(name))
 
 
+class DuplicateItemError(DataImportError):
+    """ Attempt was made to import items that resolve to the same database item. """
+
+    def __init__(self, data, obj):
+        super(DuplicateItemError, self).__init__('attempt to import data that would conflict with data '
+                                                 'already in the import: {} '
+                                                 '(already imported as {})'.format(
+                                                     data, obj))
+
+
 class UnresolvedIdError(DataImportError):
     """ Attempt was made to resolve an id that has no result. """

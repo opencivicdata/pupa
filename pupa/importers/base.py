@@ -4,6 +4,7 @@ import glob
 import json
 import uuid
 import logging
+from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_psuedo_id
 from pupa.utils.topsort import Network
 from opencivicdata.models import LegislativeSession
@@ -217,9 +218,7 @@ class BaseImporter(object):
         # obj existed, check if we need to do an update
         if obj:
             if obj.id in self.json_to_db_id.values():
-                raise DuplicateItemError('attempt to import data that would conflict with data '
-                                         'already in the import: {} '
-                                         '(already imported as {})'.format(data, obj))
+                raise DuplicateItemError(data, obj)
             # check base object for changes
             for key, value in data.items():
                 if getattr(obj, key) != value:
