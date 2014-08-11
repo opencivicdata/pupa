@@ -1,9 +1,9 @@
-https://www.djangoproject.com/download/1.7c1/tarball/#egg=django
+https://www.djangoproject.com/download/1.7c2/tarball/#egg=django
 dj_database_url
 django-uuidfield
 djorm-pgarray
 jsonfield==0.9.20
-opencivicdata
+opencivicdata-django
 psycopg2
 scrapelib
 validictory
