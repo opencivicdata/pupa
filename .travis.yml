@@ -13,5 +13,4 @@ after_success:
 notifications:
     email:
         - jturk@sunlightfoundation.com
-        - tneale@sunlightfoundation.com
         - paultag@sunlightfoundation.com
