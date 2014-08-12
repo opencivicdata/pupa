@@ -32,6 +32,26 @@ def print_report(report):
                 print('  {}: {} new {} updated {} noop'.format(type, changes['insert'],
                                                                changes['update'], changes['noop']))
 
+@transaction.atomic
+def save_report(report, jurisdiction):
+    from pupa.models import RunPlan
+
+    plan = RunPlan.objects.create(jurisdiction_id=jurisdiction, success=report['success'])
+
+    for scraper, details in report.get('scrape', {}).items():
+        args = ' '.join('{k}={v}' for k, v in report['plan']['scrapers'].get(scraper, {}))
+        sr = plan.scrapers.create(scraper=scraper, args=args,
+                                  start_time=details['start'], end_time=details['end'])
+        for object_type, num in details['objects'].items():
+            sr.scraped_objects.create(object_type=object_type, count=num)
+
+    for object_type, changes in report.get('import', {}).items():
+        if(changes['insert'] or changes['update'] or changes['noop']):
+            plan.imported_objects.create(object_type=object_type,
+                                         insert_count=changes['insert'],
+                                         update_count=changes['update'],
+                                         noop_count=changes['noop'],
+                                         duration_seconds=0)
 
 class Command(BaseCommand):
     name = 'update'
@@ -204,6 +224,8 @@ class Command(BaseCommand):
 
         report['success'] = True
 
-        # XXX: save report
+        if 'import' in args.actions:
+            save_report(report, juris.jurisdiction_id)
+
         print_report(report)
         return report
