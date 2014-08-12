@@ -46,12 +46,15 @@ def save_report(report, jurisdiction):
             sr.scraped_objects.create(object_type=object_type, count=num)
 
     for object_type, changes in report.get('import', {}).items():
-        if(changes['insert'] or changes['update'] or changes['noop']):
+        if changes['insert'] or changes['update'] or changes['noop']:
             plan.imported_objects.create(object_type=object_type,
                                          insert_count=changes['insert'],
                                          update_count=changes['update'],
                                          noop_count=changes['noop'],
-                                         duration_seconds=0)
+                                         start_time=changes['start'],
+                                         end_time=changes['end'],
+                                        )
+
 
 class Command(BaseCommand):
     name = 'update'

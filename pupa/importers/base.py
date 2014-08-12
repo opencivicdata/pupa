@@ -4,11 +4,13 @@ import glob
 import json
 import uuid
 import logging
+import datetime
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_psuedo_id
 from pupa.utils.topsort import Network
 from opencivicdata.models import LegislativeSession
 from pupa.exceptions import UnresolvedIdError, DataImportError
+
 
 def omnihash(obj):
     """ recursively hash unhashable objects """
@@ -186,17 +188,22 @@ class BaseImporter(object):
     def import_data(self, data_items):
         """ import a bunch of dicts together """
         # keep counts of all actions
-        results = {'insert': 0, 'update': 0, 'noop': 0}
+        record = {
+            'insert': 0, 'update': 0, 'noop': 0,
+            'start': datetime.datetime.utcnow(),
+        }
 
         for json_id, data in self._prepare_imports(data_items):
             obj_id, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj_id
-            results[what] += 1
+            record[what] += 1
 
         # all objects are loaded, a perfect time to do inter-object resolution and other tasks
         self.postimport()
 
-        return {self._type: results}
+        record['end'] = datetime.datetime.utcnow()
+
+        return {self._type: record}
 
     def import_item(self, data):
         """ function used by import_data """

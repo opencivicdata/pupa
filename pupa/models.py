@@ -16,7 +16,7 @@ OBJECT_TYPES = (
 
 class RunPlan(models.Model):
     jurisdiction = models.ForeignKey(Jurisdiction, related_name='runs')
-    success = models.BooleanField()
+    success = models.BooleanField(default=True)
 
 
 class ScrapeReport(models.Model):
@@ -39,4 +39,5 @@ class ImportObjects(models.Model):
     insert_count = models.PositiveIntegerField()
     update_count = models.PositiveIntegerField()
     noop_count = models.PositiveIntegerField()
-    duration_seconds = models.PositiveIntegerField()
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
