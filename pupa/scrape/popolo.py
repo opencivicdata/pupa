@@ -86,7 +86,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         self.image = image
         self.gender = gender
         self.national_identity = national_identity
-        if primary_org:
+        if primary_org or district:
             self.add_term('member', primary_org, district=district,
                           start_date=start_date, end_date=end_date)
         if party:

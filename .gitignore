@@ -7,3 +7,4 @@ dist
 htmlcov/
 _data/
 _cache/
+build/
