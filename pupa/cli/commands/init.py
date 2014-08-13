@@ -1,31 +1,36 @@
 import os
 
 from .base import BaseCommand, CommandError
+from opencivicdata.common import JURISDICTION_CLASSIFICATIONS
 
 
 def prompt(ps, default=''):
     return input(ps).strip() or default
 
 
-def write_jurisdiction_template(dirname, short_name, jurisdiction_id, long_name, url,
+def write_jurisdiction_template(dirname, short_name, long_name, division_id, classification, url,
                                 scraper_types):
     camel_case = short_name.title().replace(' ', '')
     class_dict = {'events': 'Event', 'people': 'Person', 'bills': 'Bill', 'votes': 'Vote'}
 
     # write __init__
-    lines = ['# encoding=utf-8','from pupa.scrape import Jurisdiction']
+    lines = ['# encoding=utf-8', 'from pupa.scrape import Jurisdiction, Organization']
     for stype in scraper_types:
         lines.append('from .{} import {}{}Scraper'.format(stype, camel_case, class_dict[stype]))
     lines.append('')
     lines.append('')
     lines.append('class {}(Jurisdiction):'.format(camel_case))
-    lines.append('    jurisdiction_id = "{}"'.format(jurisdiction_id))
+    lines.append('    division_id = "{}"'.format(division_id))
+    lines.append('    classification = "{}"'.format(classification))
     lines.append('    name = "{}"'.format(long_name))
     lines.append('    url = "{}"'.format(url))
     lines.append('    scrapers = {')
     for stype in scraper_types:
         lines.append('        "{}": {}{}Scraper,'.format(stype, camel_case, class_dict[stype]))
     lines.append('    }')
+    lines.append('')
+    lines.append('    def get_organizations(self):')
+    lines.append('        return []')
     lines.append('')
 
     with open(os.path.join(dirname, '__init__.py'), 'w') as of:
@@ -56,12 +61,13 @@ class Command(BaseCommand):
 
     def handle(self, args, other):
         if os.path.exists(args.module):
-            raise CommandError(args.module + ' already exists')
+            raise CommandError(args.module + ' directory already exists')
         os.makedirs(args.module)
 
-        long_name = prompt('jurisdiction name (e.g. Seattle City Council): ')
-        jurisdiction = prompt('jurisdiction id (e.g. '
-                              'ocd-jurisdiction/country:us/state:wa/place:seattle/council): ')
+        name = prompt('jurisdiction name (e.g. Seattle): ')
+        division = prompt('division id (e.g. ocd-division/country:us/state:wa/place:seattle): ')
+        classification = prompt('classification (can be: {}): '
+                                .format(', '.join(JURISDICTION_CLASSIFICATIONS)))
         url = prompt('official URL: ')
 
         # will default to True until they pick one, then defaults to False
@@ -75,5 +81,5 @@ class Command(BaseCommand):
             if result == 'Y':
                 selected_scraper_types.append(stype)
 
-        write_jurisdiction_template(args.module, args.module, jurisdiction, long_name, url,
+        write_jurisdiction_template(args.module, args.module, name, division, classification, url,
                                     selected_scraper_types)
