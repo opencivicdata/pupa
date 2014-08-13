@@ -130,7 +130,9 @@ def test_same_name_people():
     p1.birth_date = '1970'
     p2.birth_date = '1930'
     resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
-    assert resp['person'] == {'insert': 2, 'noop': 0, 'update': 0}
+    assert resp['person']['insert'] == 2
+    assert resp['person']['noop'] == 0
+    assert resp['person']['update'] == 0
     assert Person.objects.count() == 2
 
     # fake some memberships so future lookups work on these people
@@ -142,7 +144,9 @@ def test_same_name_people():
     p2.birth_date = '1931'  # change birth_date, means a new insert
     resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
     assert Person.objects.count() == 3
-    assert resp['person'] == {'insert': 1, 'noop': 0, 'update': 1}
+    assert resp['person']['insert'] == 1
+    assert resp['person']['noop'] == 0
+    assert resp['person']['update'] == 1
 
 @pytest.mark.django_db
 def test_same_name_people_other_name():
