@@ -58,8 +58,9 @@ class BillImporter(BaseImporter):
             action['organization_id'] = self.org_importer.resolve_json_id(
                 action['organization_id'])
             for entity in action['related_entities']:
-                entity['organization_id'] = self.org_importer.resolve_json_id(
-                    entity['organization_id'])
+                if 'organization_id' in entity:
+                    entity['organization_id'] = self.org_importer.resolve_json_id(
+                        entity['organization_id'])
 
         return data
 
