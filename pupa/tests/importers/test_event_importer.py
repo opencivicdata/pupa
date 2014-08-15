@@ -26,12 +26,11 @@ def test_related_people_event():
         item = event.add_agenda_item("Cookies will be served")
         item.add_person(person="John Q. Public")
 
-    obj, what = EventImporter('jid').import_item(event1.as_dict())
-    assert what == 'insert'
+    result = EventImporter('jid').import_data([event1.as_dict()])
+    assert result['event']['insert'] == 1
 
-    obj, what = EventImporter('jid').import_item(event2.as_dict())
-    assert what == 'noop'
-
+    result = EventImporter('jid').import_data([event2.as_dict()])
+    assert result['event']['noop'] == 1
 
 
 @pytest.mark.django_db
@@ -44,11 +43,11 @@ def test_related_bill_event():
         item = event.add_agenda_item("Cookies will be served")
         item.add_bill(bill="HB 101")
 
-    obj, what = EventImporter('jid').import_item(event1.as_dict())
-    assert what == 'insert'
+    result = EventImporter('jid').import_data([event1.as_dict()])
+    assert result['event']['insert'] == 1
 
-    obj, what = EventImporter('jid').import_item(event2.as_dict())
-    assert what == 'noop'
+    result = EventImporter('jid').import_data([event2.as_dict()])
+    assert result['event']['noop'] == 1
 
 
 @pytest.mark.django_db
@@ -61,11 +60,11 @@ def test_related_committee_event():
         item = event.add_agenda_item("Cookies will be served")
         item.add_committee(committee="Fiscal Committee")
 
-    obj, what = EventImporter('jid').import_item(event1.as_dict())
-    assert what == 'insert'
+    result = EventImporter('jid').import_data([event1.as_dict()])
+    assert result['event']['insert'] == 1
 
-    obj, what = EventImporter('jid').import_item(event2.as_dict())
-    assert what == 'noop'
+    result = EventImporter('jid').import_data([event2.as_dict()])
+    assert result['event']['noop'] == 1
 
 
 @pytest.mark.django_db
@@ -82,11 +81,11 @@ def test_media_event():
             url="http://hello.world/foo"
         )
 
-    obj, what = EventImporter('jid').import_item(event1.as_dict())
-    assert what == 'insert'
+    result = EventImporter('jid').import_data([event1.as_dict()])
+    assert result['event']['insert'] == 1
 
-    obj, what = EventImporter('jid').import_item(event2.as_dict())
-    assert what == 'noop'
+    result = EventImporter('jid').import_data([event2.as_dict()])
+    assert result['event']['noop'] == 1
 
 
 @pytest.mark.django_db
@@ -99,11 +98,11 @@ def test_media_event():
         event.add_document(note="Presentation",
                            url="http://example.com/presentation.pdf")
 
-    obj, what = EventImporter('jid').import_item(event1.as_dict())
-    assert what == 'insert'
+    result = EventImporter('jid').import_data([event1.as_dict()])
+    assert result['event']['insert'] == 1
 
-    obj, what = EventImporter('jid').import_item(event2.as_dict())
-    assert what == 'noop'
+    result = EventImporter('jid').import_data([event2.as_dict()])
+    assert result['event']['noop'] == 1
 
 
 @pytest.mark.django_db
@@ -111,16 +110,16 @@ def test_full_event():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     event = ge()
 
-    obj, what = EventImporter('jid').import_item(event.as_dict())
-    assert what == 'insert'
+    result = EventImporter('jid').import_data([event.as_dict()])
+    assert result['event']['insert'] == 1
 
-    obj, what = EventImporter('jid').import_item(event.as_dict())
-    assert what == 'noop'
+    result = EventImporter('jid').import_data([event.as_dict()])
+    assert result['event']['noop'] == 1
 
     event = ge()
     event.location['name'] = "United States of America"
-    obj, what = EventImporter('jid').import_item(event.as_dict())
-    assert what == 'update'
+    result = EventImporter('jid').import_data([event.as_dict()])
+    assert result['event']['update'] == 1
 
 
 @pytest.mark.django_db
@@ -145,8 +144,8 @@ def test_top_level_media_event():
     event2.add_media_link("fireworks", "http://example.com/fireworks.mov",
                           media_type='application/octet-stream')
 
-    obj, what = EventImporter('jid').import_item(event1.as_dict())
-    assert what == 'insert'
+    result = EventImporter('jid').import_data([event1.as_dict()])
+    assert result['event']['insert'] == 1
 
-    obj, what = EventImporter('jid').import_item(event2.as_dict())
-    assert what == 'noop'
+    result = EventImporter('jid').import_data([event2.as_dict()])
+    assert result['event']['noop'] == 1
