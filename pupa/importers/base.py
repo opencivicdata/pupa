@@ -5,6 +5,7 @@ import json
 import uuid
 import logging
 import datetime
+from collections import OrderedDict
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_psuedo_id
 from pupa.utils.topsort import Network
@@ -87,6 +88,16 @@ class BaseImporter(object):
     related_models = {}
     preserve_order = set()
 
+
+    def _build_creation_order(self, related):
+        """ build an ordered dict of ModelCls: [] in the desired import order """
+        for ModelCls, _, _ in related.values():
+            self.to_create[ModelCls] = []
+        for _, _, subrelated in related.values():
+            if subrelated:
+                self._build_creation_order(subrelated)
+
+
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
         self.json_to_db_id = {}
@@ -99,6 +110,10 @@ class BaseImporter(object):
         self.warning = self.logger.warning
         self.error = self.logger.error
         self.critical = self.logger.critical
+
+        self.to_create = OrderedDict()
+        self._build_creation_order(self.related_models)
+
 
     def get_session_id(self, identifier):
         if identifier not in self.session_cache:
@@ -197,6 +212,15 @@ class BaseImporter(object):
             obj_id, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj_id
             record[what] += 1
+
+        # add all subobjects at once (really great for actions & votes)
+        # this only works because we don't have autoincrementing primary keys, otherwise
+        # obj.id wouldn't work
+        for Subtype, subobjects in self.to_create.items():
+            try:
+                Subtype.objects.bulk_create(subobjects)
+            except Exception as e:
+                raise DataImportError('{} while importing {} as {}'.format(e, subobjects, Subtype))
 
         # all objects are loaded, a perfect time to do inter-object resolution and other tasks
         self.postimport()
@@ -311,6 +335,7 @@ class BaseImporter(object):
                 if field in self.preserve_order:
                     item['order'] = order
 
+                # this is where we use obj.id, which is only set b/c we aren't using auto ids
                 item[reverse_id_field] = obj.id
 
                 try:
@@ -319,11 +344,7 @@ class BaseImporter(object):
                 except Exception as e:
                     raise DataImportError('{} while importing {} as {}'.format(e, item, Subtype))
 
-            # add all subobjects at once (really great for actions & votes)
-            try:
-                Subtype.objects.bulk_create(subobjects)
-            except Exception as e:
-                raise DataImportError('{} while importing {} as {}'.format(e, subobjects, Subtype))
+            self.to_create[Subtype].extend(subobjects)
 
             # after import the subobjects, import their subsubobjects
             for subobj, subrel in zip(subobjects, all_subrelated):
