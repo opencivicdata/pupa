@@ -216,7 +216,8 @@ class BaseImporter(object):
         # add all subobjects at once (really great for actions & votes)
         # this only works because we don't have autoincrementing primary keys, otherwise
         # obj.id wouldn't work
-        for Subtype, subobjects in self.to_create.items():
+        for Subtype in list(self.to_create.keys()):
+            subobjects = (Subtype(**item) for item in self.to_create.pop(Subtype))
             try:
                 Subtype.objects.bulk_create(subobjects, batch_size=10000)
             except Exception as e:
@@ -337,10 +338,15 @@ class BaseImporter(object):
 
                 # this is where we use obj.id, which is only set b/c we aren't using auto ids
                 item['id'] = uuid.uuid4()
-                item[reverse_id_field] = obj.id
+
+                # we don't know if obj is a dict or a class instance
+                try:
+                    item[reverse_id_field] = obj.id
+                except AttributeError:
+                    item[reverse_id_field] = obj['id']
 
                 try:
-                    subobjects.append(Subtype(**item))
+                    subobjects.append(item)
                     all_subrelated.append(subrelated)
                 except Exception as e:
                     raise DataImportError('{} while importing {} as {}'.format(e, item, Subtype))
