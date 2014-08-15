@@ -336,8 +336,9 @@ class BaseImporter(object):
                 if field in self.preserve_order:
                     item['order'] = order
 
-                # this is where we use obj.id, which is only set b/c we aren't using auto ids
-                item['id'] = uuid.uuid4()
+                # obj.id needs to be set so we can attach subobjects
+                if subsubdict:
+                    item['id'] = uuid.uuid4()
 
                 # we don't know if obj is a dict or a class instance
                 try:
