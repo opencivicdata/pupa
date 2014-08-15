@@ -291,7 +291,6 @@ class BaseImporter(object):
 
         return updated
 
-
     def _create_related(self, obj, related, subfield_dict):
         """
         create DB objects related to a base object
@@ -322,7 +321,7 @@ class BaseImporter(object):
 
             # add all subobjects at once (really great for actions & votes)
             try:
-                getattr(obj, field).bulk_create(subobjects)
+                Subtype.objects.bulk_create(subobjects)
             except Exception as e:
                 raise DataImportError('{} while importing {} as {}'.format(e, subobjects, Subtype))
 
