@@ -336,6 +336,7 @@ class BaseImporter(object):
                     item['order'] = order
 
                 # this is where we use obj.id, which is only set b/c we aren't using auto ids
+                item['id'] = uuid.uuid4()
                 item[reverse_id_field] = obj.id
 
                 try:
