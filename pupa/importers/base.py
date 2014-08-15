@@ -218,7 +218,7 @@ class BaseImporter(object):
         # obj.id wouldn't work
         for Subtype, subobjects in self.to_create.items():
             try:
-                Subtype.objects.bulk_create(subobjects)
+                Subtype.objects.bulk_create(subobjects, batch_size=10000)
             except Exception as e:
                 raise DataImportError('{} while importing {} as {}'.format(e, subobjects, Subtype))
 
