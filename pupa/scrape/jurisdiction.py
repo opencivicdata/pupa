@@ -63,5 +63,4 @@ class JurisdictionScraper(Scraper):
 
         for party in self.jurisdiction.parties:
             org = Organization(classification='party', name=party['name'])
-            org.add_source(self.jurisdiction.url)
             yield org
