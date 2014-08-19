@@ -1,5 +1,6 @@
 from opencivicdata.models import Membership, MembershipContactDetail, MembershipLink
 from .base import BaseImporter
+from ..utils import get_psuedo_id
 from ..exceptions import NoMembershipsError
 
 
@@ -31,11 +32,21 @@ class MembershipImporter(BaseImporter):
         return self.model_class.objects.get(**spec)
 
     def prepare_for_db(self, data):
+        # check if the organization is not tied to a jurisdiction
+        if data['organization_id'].startswith('~'):
+            psuedo_id = get_psuedo_id(data['organization_id'])
+            jurisdiction_included = ('jurisdiction_id' in psuedo_id)
+        else:
+            # we have to assume it has a jurisdiction if we want to avoid doing a lookup here
+            jurisdiction_included = True
+
+        party_flag = ('party' in data['organization_id'])
         data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
         data['person_id'] = self.person_importer.resolve_json_id(data['person_id'])
         data['post_id'] = self.post_importer.resolve_json_id(data['post_id'])
-        # track that we had a membership for this person
-        self.seen_person_ids.add(data['person_id'])
+        if jurisdiction_included:
+            # track that we had a membership for this person
+            self.seen_person_ids.add(data['person_id'])
         return data
 
     def postimport(self):
