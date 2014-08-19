@@ -115,15 +115,15 @@ def test_legislator_related_chamber_district():
 
 
 def test_legislator_related_party():
-    l = Person('John Adams', district='1', party='Democratic-Republican')
+    l = Person('John Adams', party='Democratic-Republican')
     l.pre_save('jurisdiction-id')
 
     # a party membership
-    assert len(l._related) == 2
-    assert l._related[1].person_id == l._id
-    assert get_psuedo_id(l._related[1].organization_id) == {'classification': 'party',
+    assert len(l._related) == 1
+    assert l._related[0].person_id == l._id
+    assert get_psuedo_id(l._related[0].organization_id) == {'classification': 'party',
                                                             'name': 'Democratic-Republican'}
-    assert l._related[1].role == 'member'
+    assert l._related[0].role == 'member'
 
 
 def test_committee_add_member_person():
