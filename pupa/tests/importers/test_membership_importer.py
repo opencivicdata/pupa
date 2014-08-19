@@ -49,7 +49,6 @@ def test_full_membership():
     assert m.links.all()[0].url == 'http://example.com/link'
 
 
-
 @pytest.mark.django_db
 def test_no_membership_for_person():
     org = Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
@@ -66,3 +65,26 @@ def test_no_membership_for_person():
 
     with pytest.raises(NoMembershipsError):
         memimp.import_data([])
+
+
+@pytest.mark.django_db
+def test_no_membership_for_person_including_party():
+    """
+    even though party is specified we should still get a no memberships error because it doesn't
+    bind the person to a jurisdiction, thus causing duplication
+    """
+    org = Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
+                                      jurisdiction_id="fnd-jid")
+    org = Organization.objects.create(id="dem", name="Democratic", classification="party")
+
+    # import a person with no memberships
+    p = ScrapePerson('a man without a country', party='Democratic')
+    person_imp = PersonImporter('fnd-jid')
+    person_imp.import_data([p.as_dict()])
+
+    # try to import a membership
+    dumb_imp = DumbMockImporter()
+    memimp = MembershipImporter('fnd-jid', person_imp, dumb_imp, dumb_imp)
+
+    with pytest.raises(NoMembershipsError):
+        memimp.import_data([p._related[0].as_dict()])
