@@ -35,16 +35,16 @@ class MembershipImporter(BaseImporter):
         # check if the organization is not tied to a jurisdiction
         if data['organization_id'].startswith('~'):
             psuedo_id = get_psuedo_id(data['organization_id'])
-            jurisdiction_included = ('jurisdiction_id' in psuedo_id)
+            is_party = (psuedo_id.get('classification') == 'party')
         else:
-            # we have to assume it has a jurisdiction if we want to avoid doing a lookup here
-            jurisdiction_included = True
+            # we have to assume it is not a party if we want to avoid doing a lookup here
+            is_party = False
 
         party_flag = ('party' in data['organization_id'])
         data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
         data['person_id'] = self.person_importer.resolve_json_id(data['person_id'])
         data['post_id'] = self.post_importer.resolve_json_id(data['post_id'])
-        if jurisdiction_included:
+        if not is_party:
             # track that we had a membership for this person
             self.seen_person_ids.add(data['person_id'])
         return data
