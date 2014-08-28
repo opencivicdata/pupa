@@ -109,7 +109,8 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
             role='member', **kwargs)
         self._related.append(membership)
 
-    def add_term(self, role, org_classification, *, district=None, start_date='', end_date=''):
+    def add_term(self, role, org_classification, *, district=None, start_date='', end_date='',
+                 label=''):
         org_id = make_psuedo_id(classification=org_classification)
         if district:
             post_id = make_psuedo_id(label=district,
@@ -117,7 +118,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         else:
             post_id = None
         membership = Membership(person_id=self._id, organization_id=org_id, post_id=post_id,
-                                role=role, start_date=start_date, end_date=end_date)
+                                role=role, start_date=start_date, end_date=end_date, label=label)
         self._related.append(membership)
 
     def __str__(self):
