@@ -14,6 +14,7 @@ COMMAND_MODULES = (
     'pupa.cli.commands.init',
     'pupa.cli.commands.dbinit',
     'pupa.cli.commands.update',
+    'pupa.cli.commands.dump',
 )
 
 

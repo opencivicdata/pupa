@@ -19,6 +19,12 @@ ENABLE_ELASTICSEARCH = False
 ELASTICSEARCH_HOST = 'localhost'
 ELASTICSEARCH_TIMEOUT = 2
 
+# dump settings
+
+API_KEY = os.environ.get('PUPA_API_KEY', None)
+AWS_KEY = os.environ.get('AWS_KEY', None)
+AWS_SECRET = os.environ.get('AWS_SECRET', None)
+
 # Django settings
 DEBUG = False
 TEMPLATE_DEBUG = False
