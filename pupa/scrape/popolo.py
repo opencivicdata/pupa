@@ -21,11 +21,12 @@ class Post(BaseModel, LinkMixin, ContactDetailMixin):
     _schema = post_schema
 
     def __init__(self, *, label, role, organization_id=None, chamber=None,
-                 start_date='', end_date=''):
+                 division_id=None, start_date='', end_date=''):
         super(Post, self).__init__()
         self.label = label
         self.role = role
         self.organization_id = psuedo_organization(organization_id, chamber)
+        self.division_id = division_id
         self.start_date = start_date
         self.end_date = end_date
 
