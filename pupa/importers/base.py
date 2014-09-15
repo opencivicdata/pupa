@@ -44,7 +44,7 @@ def items_differ(jsonitems, dbitems, subfield_dict):
         for i, jsonitem in enumerate(jsonitems):
             # check if all keys (excluding subfields) match
             for k in keys:
-                if k not in subfield_dict and getattr(dbitem, k) != jsonitem[k]:
+                if k not in subfield_dict and getattr(dbitem, k) != jsonitem.get(k, None):
                     break
             else:
                 # all fields match so far, possibly equal, just check subfields now
