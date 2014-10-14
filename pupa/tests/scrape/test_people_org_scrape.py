@@ -91,7 +91,7 @@ def test_org_add_post():
 
 
 def test_legislator_related_district():
-    l = Person('John Adams', district='1', primary_org='legislature')
+    l = Person('John Adams', district='1', classification='legislature')
     l.pre_save('jurisdiction-id')
 
     assert len(l._related) == 1
@@ -103,7 +103,7 @@ def test_legislator_related_district():
 
 
 def test_legislator_related_chamber_district():
-    l = Person('John Adams', district='1', primary_org='upper')
+    l = Person('John Adams', district='1', classification='upper')
     l.pre_save('jurisdiction-id')
 
     assert len(l._related) == 1
