@@ -63,7 +63,9 @@ LOGGING = {
 
 
 loader = importlib.find_loader('pupa_settings')
-if loader is not None:
+if loader is None:
+    print('no pupa_settings on path, using defaults')
+else:
     from pupa_settings import *     # NOQA
 
 
