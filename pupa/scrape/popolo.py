@@ -121,6 +121,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         membership = Membership(person_id=self._id, organization_id=org_id, post_id=post_id,
                                 role=role, start_date=start_date, end_date=end_date, label=label)
         self._related.append(membership)
+        return membership
 
     def __str__(self):
         return self.name
