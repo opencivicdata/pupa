@@ -69,7 +69,6 @@ if loader is None:
     print('no pupa_settings on path, using defaults')
 else:
     from pupa_settings import *     # NOQA
-sys.path.pop(1)
 
 
 DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
