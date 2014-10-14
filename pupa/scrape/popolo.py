@@ -77,7 +77,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
     def __init__(self, name, *, birth_date='', death_date='', biography='', summary='', image='',
                  gender='', national_identity='',
                  # specialty fields
-                 district=None, party=None, primary_org='', start_date='', end_date=''):
+                 district=None, party=None, primary_org='', role='member', start_date='', end_date=''):
         super(Person, self).__init__()
         self.name = name
         self.birth_date = birth_date
@@ -88,7 +88,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         self.gender = gender
         self.national_identity = national_identity
         if primary_org:
-            self.add_term('member', primary_org, district=district,
+            self.add_term(role, primary_org, district=district,
                           start_date=start_date, end_date=end_date)
         if party:
             self.add_party(party)
