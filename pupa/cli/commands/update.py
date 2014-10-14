@@ -167,24 +167,6 @@ class Command(BaseCommand):
 
         return report
 
-    def check_session_list(self, juris):
-        scraped_sessions = juris.scrape_session_list()
-
-        if not scraped_sessions:
-            raise CommandError('no sessions from scrape_session_list()')
-
-        # copy the list to avoid modifying it
-        sessions = list(juris.ignored_scraped_sessions)
-        # add _scraped_names
-        for session in juris.legislative_sessions:
-            sn = session.get('_scraped_name')
-            if sn:
-                sessions.append(sn)
-
-        unaccounted_sessions = list(set(scraped_sessions) - set(sessions))
-        if unaccounted_sessions:
-            raise CommandError('session(s) unaccounted for: %s' % ', '.join(unaccounted_sessions))
-
     def handle(self, args, other):
         juris = self.get_jurisdiction(args.module)
 
