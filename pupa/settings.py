@@ -1,5 +1,6 @@
 import os
 import importlib
+import sys
 import dj_database_url
 
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgis://pupa:pupa@localhost/opencivicdata')
@@ -62,6 +63,7 @@ LOGGING = {
 }
 
 
+sys.path.insert(1, os.getcwd())
 loader = importlib.find_loader('pupa_settings')
 if loader is None:
     print('no pupa_settings on path, using defaults')
