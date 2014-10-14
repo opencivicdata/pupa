@@ -1,7 +1,7 @@
-from ..utils import make_psuedo_id
+from ..utils import make_pseudo_id
 from .base import BaseModel, cleanup_list, SourceMixin
 from .bill import Bill
-from .popolo import psuedo_organization
+from .popolo import pseudo_organization
 from .schemas.vote import schema
 
 
@@ -21,7 +21,7 @@ class Vote(BaseModel, SourceMixin):
         self.identifier = identifier
 
         self.set_bill(bill, chamber=bill_chamber)
-        self.organization = psuedo_organization(organization, chamber, 'legislature')
+        self.organization = pseudo_organization(organization, chamber, 'legislature')
         self.votes = []
         self.counts = []
 
@@ -41,7 +41,7 @@ class Vote(BaseModel, SourceMixin):
                 chamber = 'legislature'
             kwargs = {'identifier': bill_or_identifier,
                       'from_organization__classification': chamber}
-            self.bill = make_psuedo_id(**kwargs)
+            self.bill = make_pseudo_id(**kwargs)
 
     def vote(self, option, voter, *, note=''):
         self.votes.append({"option": option, "voter_name": voter, 'note': note})

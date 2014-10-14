@@ -83,7 +83,7 @@ def test_deduplication_prevents_identical():
 
 
 @pytest.mark.django_db
-def test_psuedo_ids():
+def test_pseudo_ids():
     wild = Organization.objects.create(id='1', name='Wild', classification='party')
     senate = Organization.objects.create(id='2', name='Senate', classification='upper',
                                          jurisdiction_id='jid1')
@@ -115,7 +115,7 @@ def test_parent_id_resolution():
 
 
 @pytest.mark.django_db
-def test_psuedo_parent_id_resolution():
+def test_pseudo_parent_id_resolution():
     parent = ScrapeOrganization('UN', classification='international')
     child = ScrapeOrganization('UNESCO', classification='unknown',
                                parent_id='~{"classification": "international"}')

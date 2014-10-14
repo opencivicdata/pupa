@@ -1,5 +1,5 @@
-from ..utils import make_psuedo_id
-from .popolo import psuedo_organization
+from ..utils import make_pseudo_id
+from .popolo import pseudo_organization
 from .base import BaseModel, SourceMixin, AssociatedLinkMixin, cleanup_list
 from .schemas.bill import schema
 
@@ -32,7 +32,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.legislative_session = legislative_session
         self.title = title
         self.classification = cleanup_list(classification, ['bill'])
-        self.from_organization = psuedo_organization(from_organization, chamber, 'legislature')
+        self.from_organization = pseudo_organization(from_organization, chamber, 'legislature')
 
         self.actions = []
         self.other_identifiers = []
@@ -48,7 +48,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     def add_action(self, description, date, *, organization=None, chamber=None,
                    classification=None, related_entities=None):
         action = Action(description=description, date=date,
-                        organization_id=psuedo_organization(organization, chamber, 'legislature'),
+                        organization_id=pseudo_organization(organization, chamber, 'legislature'),
                         classification=cleanup_list(classification, []), related_entities=[])
         self.actions.append(action)
         return action

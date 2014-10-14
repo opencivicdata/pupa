@@ -1,6 +1,6 @@
 from opencivicdata.models import Membership, MembershipContactDetail, MembershipLink
 from .base import BaseImporter
-from ..utils import get_psuedo_id
+from ..utils import get_pseudo_id
 from ..exceptions import NoMembershipsError
 
 
@@ -34,8 +34,8 @@ class MembershipImporter(BaseImporter):
     def prepare_for_db(self, data):
         # check if the organization is not tied to a jurisdiction
         if data['organization_id'].startswith('~'):
-            psuedo_id = get_psuedo_id(data['organization_id'])
-            is_party = (psuedo_id.get('classification') == 'party')
+            pseudo_id = get_pseudo_id(data['organization_id'])
+            is_party = (pseudo_id.get('classification') == 'party')
         else:
             # we have to assume it is not a party if we want to avoid doing a lookup here
             is_party = False

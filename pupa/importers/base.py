@@ -6,7 +6,7 @@ import uuid
 import logging
 import datetime
 from pupa.exceptions import DuplicateItemError
-from pupa.utils import get_psuedo_id
+from pupa.utils import get_pseudo_id
 from pupa.utils.topsort import Network
 from opencivicdata.models import LegislativeSession
 from pupa.exceptions import UnresolvedIdError, DataImportError
@@ -78,7 +78,7 @@ class BaseImporter(object):
 
     Override:
         get_object(data)
-        limit_spec(spec)                [optional, required if psuedo_ids are used]
+        limit_spec(spec)                [optional, required if pseudo_ids are used]
         prepare_for_db(data)            [optional]
         postimport()                    [optional]
     """
@@ -91,7 +91,7 @@ class BaseImporter(object):
         self.jurisdiction_id = jurisdiction_id
         self.json_to_db_id = {}
         self.duplicates = {}
-        self.psuedo_id_cache = {}
+        self.pseudo_id_cache = {}
         self.session_cache = {}
         self.logger = logging.getLogger("pupa")
         self.info = self.logger.info
@@ -130,21 +130,21 @@ class BaseImporter(object):
             return None
 
         if json_id.startswith('~'):
-            # keep caches of all the psuedo-ids to avoid doing 1000s of lookups during import
-            if json_id not in self.psuedo_id_cache:
-                spec = get_psuedo_id(json_id)
+            # keep caches of all the pseudo-ids to avoid doing 1000s of lookups during import
+            if json_id not in self.pseudo_id_cache:
+                spec = get_pseudo_id(json_id)
                 spec = self.limit_spec(spec)
                 try:
-                    self.psuedo_id_cache[json_id] = self.model_class.objects.get(**spec).id
+                    self.pseudo_id_cache[json_id] = self.model_class.objects.get(**spec).id
                 except self.model_class.DoesNotExist:
-                    raise UnresolvedIdError('cannot resolve psuedo id to {}: {}'.format(
+                    raise UnresolvedIdError('cannot resolve pseudo id to {}: {}'.format(
                         self.model_class.__name__, json_id))
                 except self.model_class.MultipleObjectsReturned:
-                    raise UnresolvedIdError('multiple objects returned for psuedo id to {}: {}'.format(
+                    raise UnresolvedIdError('multiple objects returned for pseudo id to {}: {}'.format(
                         self.model_class.__name__, json_id))
 
             # return the cached object
-            return self.psuedo_id_cache[json_id]
+            return self.pseudo_id_cache[json_id]
 
         # get the id that the duplicate points to, or use self
         json_id = self.duplicates.get(json_id, json_id)

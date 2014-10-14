@@ -1,6 +1,6 @@
 import pytest
 from pupa.scrape import Vote, Bill, Organization
-from pupa.utils import get_psuedo_id
+from pupa.utils import get_pseudo_id
 
 
 def toy_vote():
@@ -19,7 +19,7 @@ def test_simple_vote():
 
     assert len(v.votes) == 3
     assert len(v.counts) == 1
-    assert get_psuedo_id(v.organization) == {'classification': 'legislature'}
+    assert get_pseudo_id(v.organization) == {'classification': 'legislature'}
     assert v.bill is None
 
     v.validate()
@@ -38,14 +38,14 @@ def test_vote_org_dict():
     v = Vote(legislative_session="2009", motion_text="passage of the bill",
              start_date="2009-01-07", result='pass', classification='bill-passage',
              organization=odict)
-    assert get_psuedo_id(v.organization) == odict
+    assert get_pseudo_id(v.organization) == odict
 
 
 def test_vote_org_chamber():
     v = Vote(legislative_session="2009", motion_text="passage of the bill",
              start_date="2009-01-07", result='pass', classification='bill-passage',
              chamber='upper')
-    assert get_psuedo_id(v.organization) == {'classification': 'upper'}
+    assert get_pseudo_id(v.organization) == {'classification': 'upper'}
 
 
 def test_org_and_chamber_conflict():
@@ -77,10 +77,10 @@ def test_set_bill_obj_no_extra_args():
         v.set_bill(b, chamber='lower')
 
 
-def test_set_bill_psuedo_id():
+def test_set_bill_pseudo_id():
     v = toy_vote()
     v.set_bill('HB 1', chamber='lower')
-    assert get_psuedo_id(v.bill) == {'identifier': 'HB 1',
+    assert get_pseudo_id(v.bill) == {'identifier': 'HB 1',
                                      'from_organization__classification': 'lower'}
 
 

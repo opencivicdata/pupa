@@ -1,7 +1,7 @@
 from opencivicdata.models import (Organization, OrganizationIdentifier, OrganizationName,
                                   OrganizationContactDetail, OrganizationLink, OrganizationSource)
 from .base import BaseImporter
-from ..utils import get_psuedo_id
+from ..utils import get_pseudo_id
 from ..utils.topsort import Network
 from ..exceptions import UnresolvedIdError, PupaInternalError
 
@@ -42,38 +42,38 @@ class OrganizationImporter(BaseImporter):
 
     def _prepare_imports(self, dicts):
         """ an override for prepare imports that sorts the imports by parent_id dependencies """
-        # all psuedo parent ids we've seen
-        psuedo_ids = set()
-        # psuedo matches
-        psuedo_matches = {}
-        # all data items with a psuedo_id parent
-        psuedo_children = []
+        # all pseudo parent ids we've seen
+        pseudo_ids = set()
+        # pseudo matches
+        pseudo_matches = {}
+        # all data items with a pseudo_id parent
+        pseudo_children = []
 
         # get prepared imports from parent
         prepared = dict(super(OrganizationImporter, self)._prepare_imports(dicts))
 
-        # collect parent psuedo_ids
+        # collect parent pseudo_ids
         for _, data in prepared.items():
             parent_id = data.get('parent_id', None) or ''
             if parent_id.startswith('~'):
-                psuedo_ids.add(parent_id)
+                pseudo_ids.add(parent_id)
 
-        # turn psuedo_ids into a tuple of dictionaries
-        psuedo_ids = [(ppid, get_psuedo_id(ppid)) for ppid in psuedo_ids]
+        # turn pseudo_ids into a tuple of dictionaries
+        pseudo_ids = [(ppid, get_pseudo_id(ppid)) for ppid in pseudo_ids]
 
-        # loop over all data again, finding the psuedo ids true json id
+        # loop over all data again, finding the pseudo ids true json id
         for json_id, data in prepared.items():
             # check if this matches one of our ppids
-            for ppid, spec in psuedo_ids:
+            for ppid, spec in pseudo_ids:
                 match = True
                 for k, v in spec.items():
                     if data[k] != v:
                         match = False
                         break
                 if match:
-                    if ppid in psuedo_matches:
-                        raise UnresolvedIdError('multiple matches for psuedo id: ' + ppid)
-                    psuedo_matches[ppid] = json_id
+                    if ppid in pseudo_matches:
+                        raise UnresolvedIdError('multiple matches for pseudo id: ' + ppid)
+                    pseudo_matches[ppid] = json_id
 
         # toposort the nodes so parents are imported first
         network = Network()
@@ -83,9 +83,9 @@ class OrganizationImporter(BaseImporter):
         for json_id, data in prepared.items():
             parent_id = data.get('parent_id', None)
 
-            # resolve psuedo_ids to their json id before building the network
-            if parent_id in psuedo_matches:
-                parent_id = psuedo_matches[parent_id]
+            # resolve pseudo_ids to their json id before building the network
+            if parent_id in pseudo_matches:
+                parent_id = pseudo_matches[parent_id]
 
             network.add_node(json_id)
             if parent_id:

@@ -1,7 +1,7 @@
 import pytest
 from validictory import ValidationError
 from pupa.scrape import Bill
-from pupa.utils.generic import get_psuedo_id
+from pupa.utils.generic import get_pseudo_id
 
 
 def toy_bill():
@@ -48,11 +48,11 @@ def test_basic_invalid_bill():
 
 def test_from_organization():
     # none set
-    assert ((get_psuedo_id(Bill('HB 1', '2014', 'Some Bill').from_organization) ==
+    assert ((get_pseudo_id(Bill('HB 1', '2014', 'Some Bill').from_organization) ==
              {'classification': 'legislature'}))
 
     # chamber set
-    assert (get_psuedo_id(Bill('SB 1', '2014', 'Some Bill', chamber='upper').from_organization) ==
+    assert (get_pseudo_id(Bill('SB 1', '2014', 'Some Bill', chamber='upper').from_organization) ==
             {'classification': 'upper'})
     # org direct set
     assert Bill('HB 1', '2014', 'Some Bill', from_organization='test').from_organization == 'test'
@@ -68,7 +68,7 @@ def test_add_action():
     b.add_action("Some dude liked it.", "2013-04-29", chamber='lower')
     assert len(b.actions) == 1
     assert b.actions[0]['description'] == 'Some dude liked it.'
-    assert get_psuedo_id(b.actions[0]['organization_id']) == {'classification': 'lower'}
+    assert get_pseudo_id(b.actions[0]['organization_id']) == {'classification': 'lower'}
     assert b.actions[0]['date'] == '2013-04-29'
     b.validate()
 

@@ -5,7 +5,7 @@ from .schemas.post import schema as post_schema
 from .schemas.person import schema as person_schema
 from .schemas.membership import schema as membership_schema
 from .schemas.organization import schema as org_schema
-from ..utils import make_psuedo_id
+from ..utils import make_pseudo_id
 
 # a copy of the org schema without sources
 org_schema_no_sources = copy.deepcopy(org_schema)
@@ -25,7 +25,7 @@ class Post(BaseModel, LinkMixin, ContactDetailMixin):
         super(Post, self).__init__()
         self.label = label
         self.role = role
-        self.organization_id = psuedo_organization(organization_id, chamber)
+        self.organization_id = pseudo_organization(organization_id, chamber)
         self.division_id = division_id
         self.start_date = start_date
         self.end_date = end_date
@@ -106,15 +106,15 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
     def add_party(self, party, **kwargs):
         membership = Membership(
             person_id=self._id,
-            organization_id=make_psuedo_id(classification="party", name=party),
+            organization_id=make_pseudo_id(classification="party", name=party),
             role='member', **kwargs)
         self._related.append(membership)
 
     def add_term(self, role, org_classification, *, district=None, start_date='', end_date='',
                  label=''):
-        org_id = make_psuedo_id(classification=org_classification)
+        org_id = make_pseudo_id(classification=org_classification)
         if district:
-            post_id = make_psuedo_id(label=district,
+            post_id = make_pseudo_id(label=district,
                                      organization__classification=org_classification)
         else:
             post_id = None
@@ -146,7 +146,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         self.classification = classification
         self.founding_date = founding_date
         self.dissolution_date = dissolution_date
-        self.parent_id = psuedo_organization(parent_id, chamber)
+        self.parent_id = pseudo_organization(parent_id, chamber)
         self.image = image
 
     def __str__(self):
@@ -169,26 +169,26 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
             membership = Membership(person_id=name_or_person._id, organization_id=self._id,
                                     role=role, **kwargs)
         else:
-            membership = Membership(person_id=make_psuedo_id(name=name_or_person),
+            membership = Membership(person_id=make_pseudo_id(name=name_or_person),
                                     organization_id=self._id, role=role, **kwargs)
         self._related.append(membership)
         return membership
 
 
-def psuedo_organization(organization, classification, default=None):
+def pseudo_organization(organization, classification, default=None):
     """ helper for setting an appropriate ID for organizations """
     if organization and classification:
         raise ValueError('cannot specify both classification and organization')
     elif classification:
-        return make_psuedo_id(classification=classification)
+        return make_pseudo_id(classification=classification)
     elif organization:
         if isinstance(organization, Organization):
             return organization._id
         elif isinstance(organization, str):
             return organization
         else:
-            return make_psuedo_id(**organization)
+            return make_pseudo_id(**organization)
     elif default is not None:
-        return make_psuedo_id(classification=default)
+        return make_pseudo_id(classification=default)
     else:
         return None
