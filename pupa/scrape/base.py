@@ -125,8 +125,8 @@ class BaseBillScraper(Scraper):
         """ indicate that scraping should continue without saving an object """
         pass
 
-    def scrape(self, session, **kwargs):
-        self.session = session
+    def scrape(self, legislative_session, **kwargs):
+        self.legislative_session = legislative_session
         for bill_id, extras in self.get_bill_ids(**kwargs):
             try:
                 yield self.get_bill(bill_id, **extras)
