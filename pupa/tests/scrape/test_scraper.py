@@ -112,13 +112,13 @@ def test_bill_scraper():
             else:
                 assert bill_id == '2'
                 assert kwargs == {}
-                b = Bill('1', self.session, 'title')
+                b = Bill('1', self.legislative_session, 'title')
                 b.add_source('http;//example.com')
                 return b
 
     bs = BillScraper(juris, '/tmp/')
     with mock.patch('json.dump') as json_dump:
-        record = bs.do_scrape(session='2020')
+        record = bs.do_scrape(legislative_session='2020')
 
     assert len(json_dump.mock_calls) == 1
     assert record['objects']['bill'] == 1
