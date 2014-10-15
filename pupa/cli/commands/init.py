@@ -30,7 +30,7 @@ def write_jurisdiction_template(dirname, short_name, long_name, division_id, cla
     lines.append('    }')
     lines.append('')
     lines.append('    def get_organizations(self):')
-    lines.append('        return []')
+    lines.append('        yield Organization(name=None, classification=None)')
     lines.append('')
 
     with open(os.path.join(dirname, '__init__.py'), 'w') as of:
