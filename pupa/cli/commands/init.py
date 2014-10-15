@@ -30,7 +30,7 @@ def write_jurisdiction_template(dirname, short_name, long_name, division_id, cla
     lines.append('    }')
     lines.append('')
     lines.append('    def get_organizations(self):')
-    lines.append('        return []')
+    lines.append('        yield Organization(name=None, classification=None)')
     lines.append('')
 
     with open(os.path.join(dirname, '__init__.py'), 'w') as of:
@@ -64,7 +64,7 @@ class Command(BaseCommand):
             raise CommandError(args.module + ' directory already exists')
         os.makedirs(args.module)
 
-        name = prompt('jurisdiction name (e.g. Seattle): ')
+        name = prompt('jurisdiction name (e.g. City of Seattle): ')
         division = prompt('division id (e.g. ocd-division/country:us/state:wa/place:seattle): ')
         classification = prompt('classification (can be: {}): '
                                 .format(', '.join(JURISDICTION_CLASSIFICATIONS)))

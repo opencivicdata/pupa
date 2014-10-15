@@ -12,7 +12,6 @@ schema = {
         "legislative_sessions": {
             "type": "array", "items": {"type": "object", "properties": {
                 "name": {"type": "string"},
-                "name": {"type": "string"},
                 "type": {"classification": "string", "enum": ["primary", "special"]},
                 "start_date": fuzzy_date_blank,
                 "end_date": fuzzy_date_blank,
