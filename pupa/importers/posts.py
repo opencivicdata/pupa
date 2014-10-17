@@ -17,9 +17,16 @@ class PostImporter(BaseImporter):
         data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
         return data
 
-    def get_object(self, data):
-        return self.model_class.objects.get(organization_id=data['organization_id'],
-                                            label=data['label'])
+    def get_object(self, post):
+        spec = {
+            'organization_id': post['organization_id'],
+            'label': post['label'],
+        }
+
+        if post['role']:
+            spec['role'] = post['role']
+
+        return self.model_class.objects.get(**spec)
 
     def limit_spec(self, spec):
         spec['organization__jurisdiction_id'] = self.jurisdiction_id
