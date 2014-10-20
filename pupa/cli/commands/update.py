@@ -156,7 +156,11 @@ class Command(BaseCommand):
         return report
 
     def check_session_list(self, juris):
-        scraped_sessions = juris.scrape_session_list()
+        if juris.check_sessions is False:
+            print("Not checking sessions...")
+            return
+
+        scraped_sessions = juris.get_session_list()
 
         if not scraped_sessions:
             raise CommandError('no sessions from scrape_session_list()')
@@ -207,6 +211,8 @@ class Command(BaseCommand):
         # print the plan
         report = {'plan': {'module': args.module, 'actions': args.actions, 'scrapers': scrapers}}
         print_report(report)
+
+        self.check_session_list(juris)
 
         if 'scrape' in args.actions:
             report['scrape'] = self.do_scrape(juris, args, scrapers)

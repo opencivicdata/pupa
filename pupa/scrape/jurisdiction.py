@@ -22,6 +22,7 @@ class Jurisdiction(BaseModel):
     default_scrapers = {}
     parties = []
     ignored_scraped_sessions = []
+    check_sessions = False
 
     def __init__(self):
         super(BaseModel, self).__init__()
