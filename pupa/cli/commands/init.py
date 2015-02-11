@@ -10,7 +10,8 @@ def prompt(ps, default=''):
 CLASS_DICT = {'events': 'Event',
               'people': 'Person',
               'bills': 'Bill',
-              'votes': 'Vote'}
+              'votes': 'Vote',
+              'disclosures': 'Disclosure'}
 
 
 def write_jurisdiction_template(dirname, short_name, long_name, division_id, classification, url,
