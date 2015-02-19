@@ -1,75 +1,89 @@
-from .base import BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin
+import datetime
+
+from .base import BaseModel, SourceMixin, AssociatedLinkMixin, IdentifierMixin
 from .schemas.disclosure import disclosure_schema, reporting_period_schema
 
 
 class DisclosureReportingPeriod(BaseModel):
 
-    _type = 'disclosure-reporting-period'
+    _type = 'reporting-period'
     _schema = reporting_period_schema
 
-    def __init__(self, name, start_time, end_time, period_type):
+    def __init__(self, name, start_time, end_time, period_type, description):
         self.name = name
-        self.start_time = start_time
-        self.end_time = end_time
+        self.start_date = start_time
+        self.end_date = end_time
         self.period_type = period_type
-    
-    def add_authority(self, name, id):
-        self.authority = name
-        self.authority_id = id
+        self.authorities = []
+
+    def add_authority(self, name, type, *, jurisdiction=None, id=None):
+        self.authorities.append({
+            "name": name,
+            "id": id,
+            "jurisdiction": jurisdiction,
+            "type": type,
+        })
 
 
-class Disclosure(BaseModel, SourceMixin, AssociatedLinkMixin):
+class Disclosure(BaseModel, SourceMixin, AssociatedLinkMixin, IdentifierMixin):
     """
     Details for a Disclosure in .format
     """
     _type = 'disclosure'
-    _schema = schema
+    _schema = disclosure_schema
 
-    def __init__(self, disclosure_id, effective_date):
+    def __init__(self, effective_date, submitted_date=None, classification=None):
         super(Disclosure, self).__init__()
-        self._id = disclosure_id
+        classification = classification
         self.effective_date = effective_date
+        self.submitted_date = submitted_date
         self.registrant = ""
         self.registrant_id = ""
         self.authority = ""
         self.authority_id = ""
-        self.reporting_period = None
         self.related_entities = []
-        self.identifiers = []
-        self.created_at = datetime.now.isoformat()
-        self.updated_at = None
-        self.documents = []
         self.disclosed_events = []
+        self.identifiers = []
+        self.documents = []
         self.extras = {}
 
-    def add_registrant(self, registrant):
-        self._related.append(registrant)
-        self.add_entity(name=registrant['name'],
-                        entity_type=registrant._type,
-                        id=registrant['id'],
+    def add_registrant(self, name, type, *, id=None, note='registrant'):
+        self.add_entity(name=name,
+                        entity_type=type,
+                        id=id,
                         note='registrant')
-        self.registrant = registrant.name
-        self.registrant_id = registrant._id
-        pass
+        self.registrant = name
+        self.registrant_id = id
 
-    def add_authority(self, authority):
-        self.add_entity(name=registrant['name'],
-                        entity_type=registrant._type,
-                        id=registrant['id'],
-                        note='authority')
-        self.authority = authority.name
-        self.authority_id = authority._id
+    def add_authority(self, name, type, *, id=None, note='authority'):
+        self.add_entity(name=name,
+                        entity_type=type,
+                        id=id,
+                        note=note)
+        self.authority = name
+        self.authority_id = id
 
-    def add_document(self, note, url, *, media_type='', on_duplicate='error'):
+    def add_reporting_period(self, name, type, *, id=None, note="reporting_period"):
+        self.add_entity(name=name,
+                        entity_type=type,
+                        id=id,
+                        note=note)
+
+    def add_document(self, note, url, *, media_type='', on_duplicate='error', date=''):
         return self._add_associated_link(collection='documents',
                                          note=note,
                                          url=url,
-                                         *,
                                          media_type=media_type,
-                                         on_duplicate=on_duplicate)
+                                         on_duplicate=on_duplicate,
+                                         date=date)
 
     def add_disclosed_event(self, disclosed_event):
-        self.disclosed_events.append(disclosed_event)
+        self.disclosed_events.append({
+            "name": disclosed_event.name,
+            "type": disclosed_event._type,
+            "id": disclosed_event._id,
+            "note": disclosed_event.description
+        })
         self._related.append(disclosed_event)
 
     def add_entity(self, name, entity_type, *, id, note):
@@ -80,4 +94,4 @@ class Disclosure(BaseModel, SourceMixin, AssociatedLinkMixin):
         }
         if id:
             ret['id'] = id
-        self['related_entities'].append(ret)
+        self.related_entities.append(ret)
