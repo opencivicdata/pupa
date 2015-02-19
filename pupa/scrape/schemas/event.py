@@ -2,7 +2,7 @@
     Schema for event objects.
 """
 
-from .common import sources, extras, fuzzy_date_blank
+from .common import sources, extras, fuzzy_date_blank, documents
 
 media_schema = {
     "items": {
@@ -73,17 +73,7 @@ schema = {
 
         "media": media_schema,
 
-        "documents": {
-            "items": {
-                "properties": {
-                    "note": { "type": "string", },
-                    "url": { "type": "string", },
-                    "media_type": { "type": "string", },
-                },
-                "type": "object"
-            },
-            "type": "array"
-        },
+        "documents": documents,
 
         "links": {
             "items": {

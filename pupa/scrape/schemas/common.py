@@ -70,3 +70,15 @@ sources = {
 extras = {
     "type": "object",
 }
+
+documents = {
+    "items": {
+        "properties": {
+            "note": { "type": "string", },
+            "url": { "type": "string", },
+            "media_type": { "type": "string", },
+        },
+        "type": "object"
+    },
+    "type": "array"
+} 

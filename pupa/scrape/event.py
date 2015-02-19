@@ -71,8 +71,11 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     def __str__(self):
         return '{} {}'.format(self.start_time, self.name.strip())
 
-    def add_participant(self, name, type, *, note='participant'):
-        self.participants.append({"entity_type": type, "note": note, "name": name})
+    def add_participant(self, name, type, *, note='participant', id=None):
+        participant = {"entity_type": type, "note": note, "name": name}
+        if id is not None:
+            participant["id"] = id
+        self.participants.append(participant)
 
     def add_person(self, name, *, note='participant'):
         return self.add_participant(name=name, type='person', note=note)
