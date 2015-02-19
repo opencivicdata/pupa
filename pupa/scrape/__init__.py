@@ -5,4 +5,4 @@ from .vote import Vote
 from .bill import Bill
 from .event import Event
 from .disclosure import Disclosure
-from .base import Scraper, BaseBillScraper
+from .base import Scraper, BaseBillScraper, BaseDisclosureScraper
