@@ -3,6 +3,8 @@ import json
 import uuid
 import logging
 import datetime
+import shutil
+import glob
 from collections import defaultdict, OrderedDict
 
 import scrapelib
@@ -134,6 +136,16 @@ class BaseBillScraper(Scraper):
                 self.warning('skipping %s: %r', bill_id, exc)
                 self.skipped += 1
                 continue
+
+
+class BaseDisclosureScraper(Scraper):
+
+    def do_scrape(self, **kwargs):
+        record = super(BaseDisclosureScraper, self).do_scrape(**kwargs)
+        utils.makedirs(settings.PERSIST_DATA_DIR)
+        for f in glob.glob(settings.SCRAPED_DATA_DIR + '/*/*.json'):
+            shutil.copy(f, settings.PERSIST_DATA_DIR)
+        return record
 
 
 class BaseModel(object):
