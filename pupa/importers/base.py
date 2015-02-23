@@ -87,7 +87,7 @@ class BaseImporter(object):
     related_models = {}
     preserve_order = set()
 
-    def __init__(self, jurisdiction_id):
+    def __init__(self, jurisdiction_id, dedupe_exact=False):
         self.jurisdiction_id = jurisdiction_id
         self.json_to_db_id = {}
         self.duplicates = {}
@@ -99,6 +99,12 @@ class BaseImporter(object):
         self.warning = self.logger.warning
         self.error = self.logger.error
         self.critical = self.logger.critical
+
+        if dedupe_exact and self._type in ('government',):
+            self.warning('ignoring debug_exact for type {}'.format(
+                self._type))
+        else:
+            self.dedupe_exact = dedupe_exact
 
     def get_session_id(self, identifier):
         if identifier not in self.session_cache:
@@ -216,9 +222,12 @@ class BaseImporter(object):
         # add fields/etc.
         data = self.prepare_for_db(data)
 
-        try:
-            obj = self.get_object(data)
-        except self.model_class.DoesNotExist:
+        if not self.dedupe_exact:
+            try:
+                obj = self.get_object(data)
+            except self.model_class.DoesNotExist:
+                obj = None
+        else:
             obj = None
 
         # pull related fields off

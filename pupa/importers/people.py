@@ -18,22 +18,23 @@ class PersonImporter(BaseImporter):
 
     def _prepare_imports(self, dicts):
         dicts = list(super(PersonImporter, self)._prepare_imports(dicts))
+        if self.dedupe_exact:
+            return dicts
+        else:
+            by_name = defaultdict(list)
+            for _, person in dicts:
+                # take into account other_names?
+                by_name[person['name']].append(person)
+                for other in person['other_names']:
+                    by_name[other['name']].append(person)
 
-        by_name = defaultdict(list)
-        for _, person in dicts:
-            # take into account other_names?
-            by_name[person['name']].append(person)
-            for other in person['other_names']:
-                by_name[other['name']].append(person)
-
-        # check for duplicates
-        for name, people in by_name.items():
-            if len(people) > 1:
-                for person in people:
-                    if person['birth_date'] == '':
-                        raise SameNameError(name)
-
-        return dicts
+            # check for duplicates
+            for name, people in by_name.items():
+                if len(people) > 1:
+                    for person in people:
+                        if person['birth_date'] == '':
+                            raise SameNameError(name)
+            return dicts
 
     def get_object(self, person):
         all_names = [person['name']] + [o['name'] for o in person['other_names']]
