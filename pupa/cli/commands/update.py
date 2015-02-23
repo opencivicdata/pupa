@@ -32,6 +32,7 @@ def print_report(report):
                 print('  {}: {} new {} updated {} noop'.format(type, changes['insert'],
                                                                changes['update'], changes['noop']))
 
+
 @transaction.atomic
 def save_report(report, jurisdiction):
     from pupa.models import RunPlan
@@ -47,13 +48,14 @@ def save_report(report, jurisdiction):
 
     for object_type, changes in report.get('import', {}).items():
         if changes['insert'] or changes['update'] or changes['noop']:
-            plan.imported_objects.create(object_type=object_type,
-                                         insert_count=changes['insert'],
-                                         update_count=changes['update'],
-                                         noop_count=changes['noop'],
-                                         start_time=changes['start'],
-                                         end_time=changes['end'],
-                                        )
+            plan.imported_objects.create(
+                object_type=object_type,
+                insert_count=changes['insert'],
+                update_count=changes['update'],
+                noop_count=changes['noop'],
+                start_time=changes['start'],
+                end_time=changes['end'],
+            )
 
 
 class Command(BaseCommand):
@@ -87,9 +89,15 @@ class Command(BaseCommand):
         module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
             # ensure we're dealing with a subclass of Jurisdiction
-            if isinstance(obj, type) and issubclass(obj, Jurisdiction) and getattr(obj, 'division_id', None) and obj.classification:
+            if (isinstance(obj, type)
+               and issubclass(obj, Jurisdiction)
+               and getattr(obj, 'division_id', None)
+               and obj.classification):
                 return obj()
-        raise CommandError('Unable to import Jurisdiction subclass from ' + module_name + '. Jurisdiction subclass may be missing a division_id and classification.')
+        raise CommandError('Unable to import Jurisdiction subclass from '
+                           + module_name
+                           + '. Jurisdiction subclass may be missing a '
+                           + 'division_id and classification.')
 
     def do_scrape(self, juris, args, scrapers):
         # make output and cache dirs
