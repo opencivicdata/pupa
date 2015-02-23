@@ -31,7 +31,7 @@ class OrganizationImporter(BaseImporter):
     def prepare_for_db(self, data):
         data['parent_id'] = self.resolve_json_id(data['parent_id'])
 
-        if data['classification'] != 'party':
+        if data['classification'] not in ('party', 'company'):
             data['jurisdiction_id'] = self.jurisdiction_id
         return data
 
