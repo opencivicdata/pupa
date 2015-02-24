@@ -166,6 +166,7 @@ class BaseImporter(object):
         return self.import_data(json_stream())
 
     def _prepare_imports(self, dicts):
+
         """ filters the import stream to remove duplicates
 
         also serves as a good place to override if anything special has to be done to the

@@ -2,16 +2,16 @@ from opencivicdata.models import VoteEvent, VoteCount, PersonVote, VoteSource
 from .base import BaseImporter
 from ..exceptions import InvalidVoteError
 
+
 class VoteImporter(BaseImporter):
     _type = 'vote'
     model_class = VoteEvent
     related_models = {'counts': (VoteCount, 'vote_id', {}),
                       'votes': (PersonVote, 'vote_id', {}),
-                      'sources': (VoteSource, 'vote_event_id', {})
-                     }
+                      'sources': (VoteSource, 'vote_event_id', {})}
 
-    def __init__(self, jurisdiction_id,
-                 person_importer, org_importer, bill_importer):
+    def __init__(self, jurisdiction_id, person_importer, org_importer,
+                 bill_importer):
 
         super(VoteImporter, self).__init__(jurisdiction_id)
         self.person_importer = person_importer
