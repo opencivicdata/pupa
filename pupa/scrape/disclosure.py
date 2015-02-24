@@ -32,10 +32,11 @@ class Disclosure(BaseModel, SourceMixin, AssociatedLinkMixin, IdentifierMixin):
     _type = 'disclosure'
     _schema = disclosure_schema
 
-    def __init__(self, effective_date, submitted_date=None, classification=None):
+    def __init__(self, effective_date, timezone, submitted_date=None, classification=None):
         super(Disclosure, self).__init__()
-        classification = classification
+        self.classification = classification
         self.effective_date = effective_date
+        self.timezone = timezone
         self.submitted_date = submitted_date
         self.registrant = ""
         self.registrant_id = ""
@@ -50,24 +51,25 @@ class Disclosure(BaseModel, SourceMixin, AssociatedLinkMixin, IdentifierMixin):
     def add_registrant(self, name, type, *, id=None, note='registrant'):
         self.add_entity(name=name,
                         entity_type=type,
-                        id=id,
-                        note='registrant')
+                        note='registrant',
+                        id=id)
         self.registrant = name
         self.registrant_id = id
 
     def add_authority(self, name, type, *, id=None, note='authority'):
         self.add_entity(name=name,
                         entity_type=type,
-                        id=id,
-                        note=note)
+                        note=note,
+                        id=id)
         self.authority = name
         self.authority_id = id
 
-    def add_reporting_period(self, name, type, *, id=None, note="reporting_period"):
-        self.add_entity(name=name,
-                        entity_type=type,
-                        id=id,
-                        note=note)
+    # TODO: may want to avoid making an id, here
+    # def add_reporting_period(self, name, type, *, id=None, note="reporting_period"):
+    #     self.add_entity(name=name,
+    #                     entity_type=type,
+    #                     id=id,
+    #                     note=note)
 
     def add_document(self, note, url, *, media_type='', on_duplicate='error', date=''):
         return self._add_associated_link(collection='documents',
@@ -80,13 +82,12 @@ class Disclosure(BaseModel, SourceMixin, AssociatedLinkMixin, IdentifierMixin):
     def add_disclosed_event(self, disclosed_event):
         self.disclosed_events.append({
             "name": disclosed_event.name,
-            "type": disclosed_event._type,
+            "entity_type": disclosed_event._type,
             "id": disclosed_event._id,
-            "note": disclosed_event.description
         })
         self._related.append(disclosed_event)
 
-    def add_entity(self, name, entity_type, *, id, note):
+    def add_entity(self, name, entity_type, *, id=None, note):
         ret = {
             "name": name,
             "entity_type": entity_type,

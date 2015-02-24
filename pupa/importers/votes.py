@@ -11,9 +11,10 @@ class VoteImporter(BaseImporter):
                       'sources': (VoteSource, 'vote_event_id', {})}
 
     def __init__(self, jurisdiction_id, person_importer, org_importer,
-                 bill_importer):
+                 bill_importer, dedupe_exact=False):
 
-        super(VoteImporter, self).__init__(jurisdiction_id)
+        super(VoteImporter, self).__init__(jurisdiction_id,
+                                           dedupe_exact=dedupe_exact)
         self.person_importer = person_importer
         self.bill_importer = bill_importer
         self.org_importer = org_importer

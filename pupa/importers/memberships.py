@@ -11,8 +11,9 @@ class MembershipImporter(BaseImporter):
                       'links': (MembershipLink, 'membership_id', {})
                      }
 
-    def __init__(self, jurisdiction_id, person_importer, org_importer, post_importer):
-        super(MembershipImporter, self).__init__(jurisdiction_id)
+    def __init__(self, jurisdiction_id, person_importer, org_importer,
+                 post_importer, dedupe_exact=False):
+        super(MembershipImporter, self).__init__(jurisdiction_id, dedupe_exact=dedupe_exact)
         self.person_importer = person_importer
         self.org_importer = org_importer
         self.post_importer = post_importer
