@@ -6,6 +6,8 @@ import copy
 from .common import sources, extras, identifiers, contact_details,\
     fuzzy_datetime_blank, documents
 
+from opencivicdata import common
+
 fuzzy_datetime = copy.deepcopy(fuzzy_datetime_blank)
 fuzzy_datetime["blank"] = False
 
@@ -13,6 +15,9 @@ reporting_period_schema = {
     "properties": {
         'start_date': fuzzy_datetime_blank,
         'end_date': fuzzy_datetime_blank,
+        "timezone": {
+            "type": "string"
+        },
         'period_type': {
             'type': 'string'
         },
@@ -65,6 +70,10 @@ disclosed_event_schema = {
 
 disclosure_schema = {
     "properties": {
+        "classification": {
+            "type": ["string", "null"],
+            "enum": common.DISCLOSURE_CLASSIFICATIONS,
+        },
         "identifiers": identifiers,
         "contact_details": contact_details,
         "registrant": {
@@ -83,9 +92,6 @@ disclosure_schema = {
             "items": {
                 "properties": {
                     "entity_type": {
-                        "type": "string"
-                    },
-                    "id": {
                         "type": "string"
                     },
                     "name": {
@@ -109,7 +115,10 @@ disclosure_schema = {
         "effective_date": {
             "type": fuzzy_datetime
         },
-        "documents": documents, 
+        "timezone": {
+            "type": "string"
+        },
+        "documents": documents,
         "sources": sources,
         "extras": extras
     },

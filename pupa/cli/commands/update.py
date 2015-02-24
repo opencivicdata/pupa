@@ -130,23 +130,46 @@ class Command(BaseCommand):
         # import inside here because to avoid loading Django code unnecessarily
         from pupa.importers import (JurisdictionImporter, OrganizationImporter, PersonImporter,
                                     PostImporter, MembershipImporter, BillImporter,
-                                    VoteImporter, EventImporter)
+                                    VoteImporter, EventImporter,
+                                    DisclosureImporter)
         datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
 
         juris_importer = JurisdictionImporter(juris.jurisdiction_id)
+
         org_importer = OrganizationImporter(juris.jurisdiction_id,
-                                            args.dedupe_exact)
+                                            dedupe_exact=args.dedupe_exact)
+
         person_importer = PersonImporter(juris.jurisdiction_id,
-                                         args.dedupe_exact)
-        post_importer = PostImporter(juris.jurisdiction_id, org_importer)
+                                         dedupe_exact=args.dedupe_exact)
+
+        post_importer = PostImporter(juris.jurisdiction_id,
+                                     org_importer,
+                                     dedupe_exact=args.dedupe_exact)
+
         membership_importer = MembershipImporter(juris.jurisdiction_id,
                                                  person_importer,
                                                  org_importer,
-                                                 post_importer)
-        bill_importer = BillImporter(juris.jurisdiction_id, org_importer)
-        vote_importer = VoteImporter(juris.jurisdiction_id, person_importer, org_importer,
-                                     bill_importer)
-        event_importer = EventImporter(juris.jurisdiction_id)
+                                                 post_importer,
+                                                 dedupe_exact=args.dedupe_exact)
+
+        bill_importer = BillImporter(juris.jurisdiction_id,
+                                     org_importer,
+                                     dedupe_exact=args.dedupe_exact)
+
+        vote_importer = VoteImporter(juris.jurisdiction_id,
+                                     person_importer,
+                                     org_importer,
+                                     bill_importer,
+                                     dedupe_exact=args.dedupe_exact)
+
+        event_importer = EventImporter(juris.jurisdiction_id,
+                                       dedupe_exact=args.dedupe_exact)
+
+        disclosure_importer = DisclosureImporter(juris.jurisdiction_id,
+                                                 org_importer,
+                                                 person_importer,
+                                                 event_importer,
+                                                 dedupe_exact=args.dedupe_exact)
 
         report = {}
 
@@ -165,6 +188,8 @@ class Command(BaseCommand):
             report.update(bill_importer.import_directory(datadir))
             print('import events...')
             report.update(event_importer.import_directory(datadir))
+            print('import disclosures...')
+            report.update(disclosure_importer.import_directory(datadir))
             print('import votes...')
             report.update(vote_importer.import_directory(datadir))
 
