@@ -1,5 +1,3 @@
-import datetime
-
 from .base import BaseModel, SourceMixin, AssociatedLinkMixin, IdentifierMixin
 from .schemas.disclosure import disclosure_schema, reporting_period_schema
 
