@@ -40,7 +40,8 @@ def save_report(report, jurisdiction):
     plan = RunPlan.objects.create(jurisdiction_id=jurisdiction, success=report['success'])
 
     for scraper, details in report.get('scrape', {}).items():
-        args = ' '.join('{k}={v}' for k, v in report['plan']['scrapers'].get(scraper, {}).items())
+        args = ' '.join('{k}={v}'.format(k=k, v=v)
+                        for k, v in report['plan']['scrapers'].get(scraper, {}).items())
         sr = plan.scrapers.create(scraper=scraper, args=args,
                                   start_time=details['start'], end_time=details['end'])
         for object_type, num in details['objects'].items():
