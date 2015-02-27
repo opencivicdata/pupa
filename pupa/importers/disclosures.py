@@ -1,8 +1,6 @@
 from .base import BaseImporter
 from opencivicdata.models import (Disclosure,
                                   DisclosureSource,
-                                  DisclosureRegistrant,
-                                  DisclosureAuthority,
                                   DisclosureDocument, DisclosureDocumentLink,
                                   DisclosureRelatedEntity,
                                   DisclosureDisclosedEvent,
@@ -20,8 +18,6 @@ class DisclosureImporter(BaseImporter):
         }),
         'related_entities': (DisclosureRelatedEntity, 'disclosure_id', {}),
         'disclosed_events': (DisclosureDisclosedEvent, 'disclosure_id', {}),
-        #'registrant': (DisclosureRegistrant, 'disclosure_id', {}),
-        #'authority': (DisclosureAuthority, 'disclosure_id', {}),
         'identifiers': (DisclosureIdentifier, 'disclosure_id', {})
     }
 
@@ -36,40 +32,40 @@ class DisclosureImporter(BaseImporter):
     def prepare_for_db(self, data):
         del data['registrant_id']
         del data['authority_id']
-        
+
         registrants = [re for re in data['related_entities']
-                      if re['note'] == 'registrant']
+                       if re['note'] == 'registrant']
 
         assert len(registrants) == 1
         registrant = registrants[0]
-        
+
         authorities = [re for re in data['related_entities']
                        if re['note'] == 'authority']
 
         assert len(authorities) == 1
         authority = authorities[0]
-        
-        # if registrant['entity_type'] == 'person':
-        #     registrant['id'] = self.person_importer.resolve_json_id(
-        #         registrant['id'])
-        # elif registrant['entity_type'] == 'organization':
-        #     registrant['id'] = self.org_importer.resolve_json_id(
-        #         registrant['id'])
+
+        registrant_id = registrant.pop('id')
+        if registrant['entity_type'] == 'person':
+            registrant['person_id'] = self.person_importer.resolve_json_id(
+                registrant_id)
+        elif registrant['entity_type'] == 'organization':
+            registrant['organization_id'] = self.org_importer.resolve_json_id(
+                registrant_id)
+
+        authority_id = authority.pop('id')
+        authority['organization_id'] = self.org_importer.resolve_json_id(
+            authority_id)
 
         del data['registrant']
         del data['authority']
 
-        data['related_entities'] = [registrant,]
-
-        #data['registrant'] = registrant
-        #data['authority'] = authority
-
+        data['related_entities'] = [registrant, authority]
 
         for event in data['disclosed_events']:
             event_id = event.pop('id')
             event['event_id'] = self.event_importer.resolve_json_id(
                 event_id)
-
 
         data['jurisdiction_id'] = self.jurisdiction_id
 
