@@ -38,7 +38,6 @@ class Disclosure(BaseModel, SourceMixin, AssociatedLinkMixin, IdentifierMixin):
         self.timezone = timezone
         self.submitted_date = submitted_date
         self.related_entities = []
-        self.disclosed_events = []
         self.identifiers = []
         self.documents = []
         self.extras = {}
@@ -74,13 +73,15 @@ class Disclosure(BaseModel, SourceMixin, AssociatedLinkMixin, IdentifierMixin):
                                          on_duplicate=on_duplicate,
                                          date=date)
 
-    def add_disclosed_event(self, disclosed_event):
-        self.disclosed_events.append({
-            "name": disclosed_event.name,
-            "entity_type": disclosed_event._type,
-            "id": disclosed_event._id,
-        })
-        self._related.append(disclosed_event)
+    def add_disclosed_event(self, name, type, *, classification=None, id=None,
+                            note='disclosed_event'):
+        self.add_entity(
+            name=name,
+            entity_type=type,
+            classification=classification,
+            id=id,
+            note=note
+        )
 
     def add_entity(self, name, entity_type, *, classification=None, id=None, note):
         ret = {
