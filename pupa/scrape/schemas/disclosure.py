@@ -48,25 +48,6 @@ reporting_period_schema = {
     "type": "object"
 }
 
-disclosed_event_schema = {
-    "properties": {
-        "entity_type": {
-            "type": "string"
-        },
-        "id": {
-            "type": "string"
-        },
-        "name": {
-            "type": "string"
-        },
-        "note": {
-            "type": ["string", "null"],
-            "blank": True
-        }
-    },
-    "type": "object"
-}
-
 
 disclosure_schema = {
     "properties": {
@@ -91,10 +72,6 @@ disclosure_schema = {
                 },
                 "type": "object"
             },
-            "type": "array"
-        },
-        "disclosed_events": {
-            "items": disclosed_event_schema,
             "type": "array"
         },
         "submitted_date": {

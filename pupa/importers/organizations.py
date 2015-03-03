@@ -13,8 +13,8 @@ class OrganizationImporter(BaseImporter):
                       'other_names': (OrganizationName, 'organization_id', {}),
                       'contact_details': (OrganizationContactDetail, 'organization_id', {}),
                       'links': (OrganizationLink, 'organization_id', {}),
-                      'sources': (OrganizationSource, 'organization_id', {}),
-                     }
+                      'sources': (OrganizationSource, 'organization_id', {})
+                      }
 
     def get_object(self, org):
         spec = {'classification': org['classification'],

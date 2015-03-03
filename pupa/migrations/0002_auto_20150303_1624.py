@@ -14,37 +14,37 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='importobjects',
             name='object_type',
-            field=models.CharField(max_length=20, choices=[('jurisdiction', 'Jurisdiction'), ('person', 'Person'), ('organization', 'Organization'), ('post', 'Post'), ('membership', 'Membership'), ('bill', 'Bill'), ('vote', 'Vote'), ('event', 'Event'), ('disclosure', 'Disclosure')]),
+            field=models.CharField(choices=[('jurisdiction', 'Jurisdiction'), ('person', 'Person'), ('organization', 'Organization'), ('post', 'Post'), ('membership', 'Membership'), ('bill', 'Bill'), ('vote', 'Vote'), ('event', 'Event'), ('disclosure', 'Disclosure')], max_length=20),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='importobjects',
             name='report',
-            field=models.ForeignKey(to='pupa.RunPlan', related_name='imported_objects'),
+            field=models.ForeignKey(related_name='imported_objects', to='pupa.RunPlan'),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='runplan',
             name='jurisdiction',
-            field=models.ForeignKey(to='opencivicdata.Jurisdiction', related_name='runs'),
+            field=models.ForeignKey(related_name='runs', to='opencivicdata.Jurisdiction'),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='scrapeobjects',
             name='object_type',
-            field=models.CharField(max_length=20, choices=[('jurisdiction', 'Jurisdiction'), ('person', 'Person'), ('organization', 'Organization'), ('post', 'Post'), ('membership', 'Membership'), ('bill', 'Bill'), ('vote', 'Vote'), ('event', 'Event'), ('disclosure', 'Disclosure')]),
+            field=models.CharField(choices=[('jurisdiction', 'Jurisdiction'), ('person', 'Person'), ('organization', 'Organization'), ('post', 'Post'), ('membership', 'Membership'), ('bill', 'Bill'), ('vote', 'Vote'), ('event', 'Event'), ('disclosure', 'Disclosure')], max_length=20),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='scrapeobjects',
             name='report',
-            field=models.ForeignKey(to='pupa.ScrapeReport', related_name='scraped_objects'),
+            field=models.ForeignKey(related_name='scraped_objects', to='pupa.ScrapeReport'),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='scrapereport',
             name='plan',
-            field=models.ForeignKey(to='pupa.RunPlan', related_name='scrapers'),
+            field=models.ForeignKey(related_name='scrapers', to='pupa.RunPlan'),
             preserve_default=True,
         ),
     ]
