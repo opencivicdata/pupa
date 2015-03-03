@@ -30,9 +30,6 @@ class DisclosureImporter(BaseImporter):
         self.event_importer = event_importer
 
     def prepare_for_db(self, data):
-        del data['registrant_id']
-        del data['authority_id']
-
         registrants = [re for re in data['related_entities']
                        if re['note'] == 'registrant']
 
@@ -56,9 +53,6 @@ class DisclosureImporter(BaseImporter):
         authority_id = authority.pop('id')
         authority['organization_id'] = self.org_importer.resolve_json_id(
             authority_id)
-
-        del data['registrant']
-        del data['authority']
 
         data['related_entities'] = [registrant, authority]
 

@@ -76,18 +76,6 @@ disclosure_schema = {
         },
         "identifiers": identifiers,
         "contact_details": contact_details,
-        "registrant": {
-            "type": "string"
-        },
-        "registrant_id": {
-            "type": "string"
-        },
-        "authority": {
-            "type": "string"
-        },
-        "authority_id": {
-            "type": "string"
-        },
         "related_entities": {
             "items": {
                 "properties": {
