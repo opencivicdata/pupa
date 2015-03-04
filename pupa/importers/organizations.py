@@ -21,6 +21,13 @@ class OrganizationImporter(BaseImporter):
                 'name': org['name'],
                 'parent_id': org['parent_id']}
 
+        if org['source_identified']:
+            try:
+                spec['sources__url__in'] = [s['url'] for s in org['sources']]
+            except KeyError:
+                raise KeyError('source-identified org {} has no sources!'.format(
+                    org['name']))
+
         # add jurisdiction_id unless this is a party
         jid = org.get('jurisdiction_id')
         if jid:
@@ -36,7 +43,7 @@ class OrganizationImporter(BaseImporter):
         return data
 
     def limit_spec(self, spec):
-        if spec.get('classification') != 'party':
+        if spec.get('classification') not in ('party', 'company'):
             spec['jurisdiction_id'] = self.jurisdiction_id
         return spec
 

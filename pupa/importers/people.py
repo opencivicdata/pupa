@@ -14,7 +14,7 @@ class PersonImporter(BaseImporter):
                       'contact_details': (PersonContactDetail, 'person_id', {}),
                       'links': (PersonLink, 'person_id', {}),
                       'sources': (PersonSource, 'person_id', {}),
-                     }
+                      }
 
     def _prepare_imports(self, dicts):
         dicts = list(super(PersonImporter, self)._prepare_imports(dicts))
@@ -49,7 +49,22 @@ class PersonImporter(BaseImporter):
                                                                              self.jurisdiction_id))
         else:
             # try and match based on birth_date
-            if person['birth_date']:
+            if person['source_identified']:
+                for m in matches:
+                    m_sources = set([s.url for s in m.sources.all()])
+                    try:
+                        p_sources = set([i['url'] for i in person['sources']])
+                    except KeyError:
+                        raise KeyError('source-identified person {} has no sources!'.format(
+                            all_names))
+
+                    if len(p_sources & m_sources) > 0:
+                        return m
+                    else:
+                        raise self.model_class.DoesNotExist(
+                            'No Person: {} in {} with any of source urls {}'.format(
+                                all_names, self.jurisdiction_id, p_sources))
+            elif person['birth_date']:
                 for m in matches:
                     if person['birth_date'] and m.birth_date == person['birth_date']:
                         return m

@@ -90,6 +90,7 @@ class BaseImporter(object):
     def __init__(self, jurisdiction_id, *, dedupe_exact=False):
         self.jurisdiction_id = jurisdiction_id
         self.json_to_db_id = {}
+        self.json_to_source_urls = {}
         self.duplicates = {}
         self.pseudo_id_cache = {}
         self.session_cache = {}
@@ -198,6 +199,8 @@ class BaseImporter(object):
         for json_id, data in self._prepare_imports(data_items):
             obj_id, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj_id
+            if data.get('source_identified', False):
+                self.json_to_source_urls[json_id] = set([s['url'] for s in data['sources']])
             record[what] += 1
 
         # all objects are loaded, a perfect time to do inter-object resolution and other tasks
@@ -217,20 +220,20 @@ class BaseImporter(object):
         # add fields/etc.
         data = self.prepare_for_db(data)
 
-        if self.dedupe_exact and not (data.get('classification', '') in
-                                      ('government',
-                                       'office',
-                                       'party',
-                                       'legislature',
-                                       'upper',
-                                       'lower'
-                                       'international')):
+        #if self.dedupe_exact and not (data.get('classification', '') in
+        #                              ('government',
+        #                               'office',
+        #                               'party',
+        #                               'legislature',
+        #                               'upper',
+        #                               'lower'
+        #                               'international')):
+        #    obj = None
+        #else:
+        try:
+            obj = self.get_object(data)
+        except self.model_class.DoesNotExist:
             obj = None
-        else:
-            try:
-                obj = self.get_object(data)
-            except self.model_class.DoesNotExist:
-                obj = None
 
         # pull related fields off
         related = {}
@@ -240,7 +243,17 @@ class BaseImporter(object):
         # obj existed, check if we need to do an update
         if obj:
             if obj.id in self.json_to_db_id.values():
-                raise DuplicateItemError(data, obj)
+                if data.get('source_identified', False):
+                    obj_sources = set([s.url for s in obj.sources.all()])
+                    possible_dupes = [k for k, v in self.json_to_db_id.items()
+                                      if v == obj.id]
+                    for pd in possible_dupes:
+                        pd_sources = self.json_to_source_urls[pd]
+                        if len(pd_sources & obj_sources) > 0:
+                            raise DuplicateItemError(data, obj)
+                else:
+                    raise DuplicateItemError(data, obj)
+
             # check base object for changes
             for key, value in data.items():
                 if getattr(obj, key) != value:
@@ -264,8 +277,6 @@ class BaseImporter(object):
             self._create_related(obj, related, self.related_models)
 
         return obj.id, what
-
-
 
     def _update_related(self, obj, related, subfield_dict):
         """

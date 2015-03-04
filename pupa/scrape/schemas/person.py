@@ -16,6 +16,7 @@ schema = {
         "national_identity": { "type": "string", "blank": True },
         "contact_details": contact_details,
         "links": links,
+        "source_identified": { "type": ["null", "boolean"] },
         "sources": sources,
         "extras": extras,
     },
