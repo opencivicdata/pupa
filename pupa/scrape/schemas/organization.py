@@ -17,6 +17,7 @@ schema = {
         "image": { "type": "string", "blank": True, "format": "uri" },
         "contact_details": contact_details,
         "links": links,
+        "source_identified": { "type": ["null", "boolean"] },
         "sources": sources,
 
         # added to popolo

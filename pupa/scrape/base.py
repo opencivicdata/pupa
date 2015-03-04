@@ -217,7 +217,7 @@ class SourceMixin(object):
 
     def add_source(self, url, *, note=''):
         """ Add a source URL from which data was collected """
-        new = {'url': url, 'note': note}
+        new = {'url': utils.canonize_url(url), 'note': note}
         self.sources.append(new)
 
 
@@ -236,7 +236,7 @@ class LinkMixin(object):
         self.links = []
 
     def add_link(self, url, *, note=''):
-        self.links.append({"note": note, "url": url})
+        self.links.append({"note": note, "url": utils.canonize_url(url)})
 
 
 class IdentifierMixin(object):
@@ -307,7 +307,7 @@ class AssociatedLinkMixin(object):
                 return None
 
         # OK. This is either new or old. Let's just go for it.
-        ret = {'url': url, 'media_type': media_type}
+        ret = {'url': utils.canonize_url(url), 'media_type': media_type}
 
         ver['links'].append(ret)
 
