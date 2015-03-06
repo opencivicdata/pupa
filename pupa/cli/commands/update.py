@@ -163,6 +163,8 @@ class Command(BaseCommand):
                                      dedupe_exact=args.dedupe_exact)
 
         event_importer = EventImporter(juris.jurisdiction_id,
+                                       org_importer,
+                                       person_importer,
                                        dedupe_exact=args.dedupe_exact)
 
         disclosure_importer = DisclosureImporter(juris.jurisdiction_id,

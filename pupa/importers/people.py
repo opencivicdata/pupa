@@ -43,6 +43,9 @@ class PersonImporter(BaseImporter):
 
         return dicts
 
+    def limit_spec(self, spec):
+        return spec
+
     def get_object(self, person):
         if person['source_identified']:
             # special lookup for when we're assuming that, for every combination

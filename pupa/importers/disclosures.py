@@ -6,7 +6,8 @@ from opencivicdata.models import (Disclosure,
                                   DisclosureIdentifier,
                                   )
 from pupa.exceptions import UnresolvedIdError
-from pupa.utils import make_pseudo_id
+from ..utils import make_pseudo_id
+from ..utils.event import read_event_iso_8601
 
 
 class DisclosureImporter(BaseImporter):
@@ -40,15 +41,16 @@ class DisclosureImporter(BaseImporter):
         return self.model_class.objects.get(**spec)
 
     def prepare_for_db(self, data):
+        gdt = lambda x: read_event_iso_8601(x) if x is not None else None
+
+        data['submitted_date'] = gdt(data.get('submitted_date', None))
+        data['effective_date'] = gdt(data.get('effective_date', None))
+        
         new_related_entities = []
 
         for entity in data['related_entities']:
             entity_id = entity.pop('id')
             print('looking_up {}'.format(entity_id))
-            #if entity['note'] == 'authority':
-            #    etype = entity['entity_type']
-            #    entity['organization_id'] = self.org_importer.resolve_json_id(entity_id)
-            #    print('found {}'.format(entity['organization_id']))
             if entity['entity_type'] == 'person':
                 try:
                     entity_pseudo_id = make_pseudo_id(
@@ -78,7 +80,7 @@ class DisclosureImporter(BaseImporter):
                         sources__url=data['sources'][0]['url'],
                         name=entity['name'],
                     )
-                    entity['event_id'] = self.org_importer.resolve_json_id(
+                    entity['event_id'] = self.event_importer.resolve_json_id(
                         entity_pseudo_id)
                 except UnresolvedIdError:
                     entity['event_id'] = self.event_importer.resolve_json_id(entity_id)

@@ -75,10 +75,10 @@ disclosure_schema = {
             "type": "array"
         },
         "submitted_date": {
-            "type": fuzzy_datetime
+            "type": "datetime"
         },
         "effective_date": {
-            "type": fuzzy_datetime
+            "type": "datetime"
         },
         "timezone": {
             "type": "string"

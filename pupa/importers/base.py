@@ -198,7 +198,7 @@ class BaseImporter(object):
 
         for json_id, data in self._prepare_imports(data_items):
             if data.get('source_identified', False):
-                data_sources = set([(s['url'], s.get('note','')) for s in data['sources']])
+                data_sources = set([(s['url'], s.get('note', '')) for s in data['sources']])
             obj_id, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj_id
             if data.get('source_identified', False):
@@ -215,7 +215,6 @@ class BaseImporter(object):
     def import_item(self, data):
         """ function used by import_data """
         what = 'noop'
-        _new_data = deepcopy(data)
 
         # remove the JSON _id (may still be there if called directly)
         data.pop('_id', None)
@@ -233,15 +232,13 @@ class BaseImporter(object):
         for field in self.related_models:
             related[field] = data.pop(field)
 
-
         # obj existed, check if we need to do an update
         if obj:
-            _matched_obj_data = obj.__dict__()
-            if obj.hasattr('sources'):
-                _matched_obj_data['sources'] = obj.sources.all()
+            _matched_obj_data = copy.deepcopy(obj.__dict__)
             if obj.id in self.json_to_db_id.values():
                 if data.get('source_identified', False):
                     obj_sources = set([(s.url, s.note) for s in obj.sources.all()])
+                    _matched_obj_data['sources'] = copy.deepcopy(obj_sources)
                     possible_dupes = [k for k, v in self.json_to_db_id.items()
                                       if v == obj.id]
                     for pd in possible_dupes:
@@ -257,8 +254,8 @@ class BaseImporter(object):
                     setattr(obj, key, value)
                     what = 'update'
             if what == 'update':
-                self.debug('original:\n{}'.format(_matched_obj_data))
-                self.debug('new:\n{}'.format(_new_data))
+                self.debug('matched... {}'.format(pp.pformat(_matched_obj_data)))
+                self.debug('new... {}'.format(pp.pformat(data)))
                 obj.save()
 
             updated = self._update_related(obj, related, self.related_models)

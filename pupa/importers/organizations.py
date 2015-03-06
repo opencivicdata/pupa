@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from opencivicdata.models import (Organization, OrganizationIdentifier, OrganizationName,
                                   OrganizationContactDetail, OrganizationLink, OrganizationSource)
 from .base import BaseImporter
@@ -20,20 +22,30 @@ class OrganizationImporter(BaseImporter):
         spec = {'classification': org['classification'],
                 'name': org['name'],
                 'parent_id': org['parent_id']}
-
-        if org['source_identified']:
-            try:
-                spec['sources__url__in'] = [s['url'] for s in org['sources']]
-            except KeyError:
-                raise KeyError('source-identified org {} has no sources!'.format(
-                    org['name']))
-
+        
         # add jurisdiction_id unless this is a party
         jid = org.get('jurisdiction_id')
         if jid:
             spec['jurisdiction_id'] = jid
 
-        return self.model_class.objects.get(**spec)
+        main_query=Q(**spec)
+
+        if org['source_identified']:
+            source_qs = []
+            if len(org['sources']) == 0:
+                raise KeyError('source-identified org {} has no sources!'.format(
+                    org['name']))
+            for s in org['sources']:
+                sq = {}
+                sq['sources__url'] = s['url']
+                sq['sources__note'] = s.get('note', '')
+                source_qs.append(Q(**sq))
+            source_query = source_qs.pop()
+            for q in source_qs:
+                source_query |= q
+            main_query &= source_query
+
+        return self.model_class.objects.get(main_query)
 
     def prepare_for_db(self, data):
         data['parent_id'] = self.resolve_json_id(data['parent_id'])
