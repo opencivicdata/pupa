@@ -77,10 +77,13 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
             sp[entity_type + '_id'] = entity_id
         self.sponsorships.append(sp)
 
-    def add_sponsorship_by_identifier(self, name, classification, entity_type, primary, *,
-                                      scheme, identifier, chamber=None):
-        self.add_sponsorship(name, classification, entity_type, primary, chamber=chamber,
-                             entity_id=make_pseudo_id(identifiers__scheme=scheme, identifiers__identifier=identifier) 
+    def add_sponsorship_by_identifier(self, name, classification, entity_type,
+                                      primary, *, scheme, identifier,
+                                      chamber=None):
+        return self.add_sponsorship(name, classification, entity_type, primary,
+                             chamber=chamber, entity_id=make_pseudo_id(
+                                 identifiers__scheme=scheme,
+                                 identifiers__identifier=identifier)
 
     def add_subject(self, subject):
         self.subject.append(subject)
