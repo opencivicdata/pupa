@@ -20,6 +20,8 @@ def create_org():
 def test_full_bill():
     create_jurisdiction()
     person = Person.objects.create(id='person-id', name='Adam Smith')
+    person2 = Person.objects.create(id='person-id-2', name='Kdawg Smith')
+    PersonIdentifier.objects.create(person=person2, scheme='thomas_id', identifier='01791')
     org = ScrapeOrganization(name='House', classification='lower')
     com = ScrapeOrganization(name='Arbitrary Committee', classification='committee',
                              parent_id=org._id)
@@ -40,6 +42,8 @@ def test_full_bill():
                          primary=False, entity_id=person.id)
     bill.add_sponsorship('Jane Smith', classification='lead sponsor', entity_type='person',
                          primary=True)
+    bill.add_sponsorship_by_identifier('Kdawg Smith', classification='writer', entity_type='person',
+                                       primary=False, scheme='thomas_id', identifier='01791')
     bill.add_abstract('This is an act about axes and taxes and tacks.', note="official")
     bill.add_document_link('Fiscal Note', 'http://example.com/fn.pdf',
                            media_type='application/pdf')
@@ -84,13 +88,15 @@ def test_full_bill():
 
     # sponsors added, linked & unlinked
     sponsorships = b.sponsorships.all()
-    assert len(sponsorships) == 2
+    assert len(sponsorships) == 3
     for ss in sponsorships:
         if ss.primary:
             assert ss.person is None
             assert ss.organization is None
-        else:
+        elif ss.classification == 'extra sponsor':
             assert ss.person == person
+        else:
+            assert ss.person == person2
 
     # versions & documents with their links
     versions = b.versions.all()
