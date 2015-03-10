@@ -1,7 +1,7 @@
 import pytest
 from pupa.scrape import Bill as ScrapeBill
 from pupa.scrape import Organization as ScrapeOrganization
-from pupa.importers import BillImporter, OrganizationImporter
+from pupa.importers import BillImporter, OrganizationImporter, PersonImporter
 from opencivicdata.models import Bill, Jurisdiction, Person, Organization
 
 
@@ -50,7 +50,8 @@ def test_full_bill():
     # import bill
     oi = OrganizationImporter('jid')
     oi.import_data([org.as_dict(), com.as_dict()])
-    BillImporter('jid', oi).import_data([oldbill.as_dict(), bill.as_dict()])
+    pi = PersonImporter('jid')
+    BillImporter('jid', oi, pi).import_data([oldbill.as_dict(), bill.as_dict()])
 
     # get bill from db and assert it imported correctly
     b = Bill.objects.get(identifier='HB 1')
@@ -113,7 +114,8 @@ def test_bill_chamber_param():
                       classification='tax bill', chamber='lower')
 
     oi = OrganizationImporter('jid')
-    BillImporter('jid', oi).import_data([bill.as_dict()])
+    pi = PersonImporter('jid')
+    BillImporter('jid', oi, pi).import_data([bill.as_dict()])
 
     assert Bill.objects.get().from_organization_id == org.id
 
@@ -126,9 +128,10 @@ def test_bill_update():
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
 
     oi = OrganizationImporter('jid')
-    _, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    pi = PersonImporter('jid')
+    _, what = BillImporter('jid', oi, pi).import_item(bill.as_dict())
     assert what == 'insert'
-    _, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    _, what = BillImporter('jid', oi, pi).import_item(bill.as_dict())
     assert what == 'noop'
 
     # ensure no new object was created
@@ -136,7 +139,7 @@ def test_bill_update():
 
     # test basic update
     bill = ScrapeBill('HB 1', '1900', '1st Bill', chamber='lower')
-    _, what = BillImporter('jid', oi).import_item(bill.as_dict())
+    _, what = BillImporter('jid', oi, pi).import_item(bill.as_dict())
     assert what == 'update'
     assert Bill.objects.get().title == '1st Bill'
 
@@ -146,11 +149,12 @@ def test_bill_update_because_of_subitem():
     create_jurisdiction()
     create_org()
     oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
 
     # initial bill
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_action('this is an action', chamber='lower', date='1900-01-01')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['insert'] == 1
     obj = Bill.objects.get()
     assert obj.actions.count() == 1
@@ -159,7 +163,7 @@ def test_bill_update_because_of_subitem():
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_action('this is an action', chamber='lower', date='1900-01-01')
     bill.add_action('this is a second action', chamber='lower', date='1900-01-02')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['update'] == 1
     obj = Bill.objects.get()
     assert obj.actions.count() == 2
@@ -168,7 +172,7 @@ def test_bill_update_because_of_subitem():
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_action('this is an action', chamber='lower', date='1900-01-01')
     bill.add_action('this is a second action', chamber='lower', date='1900-01-02')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['noop'] == 1
     obj = Bill.objects.get()
     assert obj.actions.count() == 2
@@ -177,7 +181,7 @@ def test_bill_update_because_of_subitem():
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_action('this is an action', chamber='lower', date='1900-01-01')
     bill.add_action('this is a different second action', chamber='lower', date='1900-01-02')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['update'] == 1
     obj = Bill.objects.get()
     assert obj.actions.count() == 2
@@ -185,14 +189,14 @@ def test_bill_update_because_of_subitem():
     # delete an action, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_action('this is a second action', chamber='lower', date='1900-01-02')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['update'] == 1
     obj = Bill.objects.get()
     assert obj.actions.count() == 1
 
     # delete all actions, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['update'] == 1
     obj = Bill.objects.get()
     assert obj.actions.count() == 0
@@ -200,7 +204,7 @@ def test_bill_update_because_of_subitem():
     # and back to initial status, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_action('this is an action', chamber='lower', date='1900-01-01')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['update'] == 1
     obj = Bill.objects.get()
     assert obj.actions.count() == 1
@@ -211,11 +215,12 @@ def test_bill_update_subsubitem():
     create_jurisdiction()
     create_org()
     oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
 
     # initial sub-subitem
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_version_link('printing', 'http://example.com/test.pdf', media_type='application/pdf')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['insert'] == 1
     obj = Bill.objects.get()
     assert obj.versions.count() == 1
@@ -225,7 +230,7 @@ def test_bill_update_subsubitem():
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_version_link('printing', 'http://example.com/test.pdf', media_type='application/pdf')
     bill.add_version_link('printing', 'http://example.com/test.text', media_type='text/plain')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['update'] == 1
     obj = Bill.objects.get()
     assert obj.versions.count() == 1
@@ -235,7 +240,7 @@ def test_bill_update_subsubitem():
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_version_link('printing', 'http://example.com/test.pdf', media_type='application/pdf')
     bill.add_version_link('printing', 'http://example.com/test.text', media_type='text/plain')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['noop'] == 1
     obj = Bill.objects.get()
     assert obj.versions.count() == 1
@@ -245,7 +250,7 @@ def test_bill_update_subsubitem():
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_version_link('printing', 'http://example.com/test.pdf', media_type='application/pdf')
     bill.add_version_link('printing', 'http://example.com/diff-link.txt', media_type='text/plain')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['update'] == 1
     obj = Bill.objects.get()
     assert obj.versions.count() == 1
@@ -254,7 +259,7 @@ def test_bill_update_subsubitem():
     # delete one, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_version_link('printing', 'http://example.com/test.pdf', media_type='application/pdf')
-    result = BillImporter('jid', oi).import_data([bill.as_dict()])
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
     assert result['bill']['update'] == 1
     obj = Bill.objects.get()
     assert obj.versions.count() == 1

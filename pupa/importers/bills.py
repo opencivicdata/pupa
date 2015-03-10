@@ -25,9 +25,10 @@ class BillImporter(BaseImporter):
                      }
     preserve_order = {'actions'}
 
-    def __init__(self, jurisdiction_id, org_importer):
+    def __init__(self, jurisdiction_id, org_importer, person_importer):
         super(BillImporter, self).__init__(jurisdiction_id)
         self.org_importer = org_importer
+        self.person_importer = person_importer
 
     def get_object(self, bill):
         spec = {
