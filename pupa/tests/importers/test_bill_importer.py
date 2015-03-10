@@ -1,8 +1,9 @@
 import pytest
 from pupa.scrape import Bill as ScrapeBill
+from pupa.scrape import Person as ScrapePerson
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import BillImporter, OrganizationImporter, PersonImporter
-from opencivicdata.models import Bill, Jurisdiction, Person, Organization
+from opencivicdata.models import Bill, Jurisdiction, Person, Organization, Membership
 
 
 def create_jurisdiction():
@@ -50,7 +51,14 @@ def test_full_bill():
     # import bill
     oi = OrganizationImporter('jid')
     oi.import_data([org.as_dict(), com.as_dict()])
+
     pi = PersonImporter('jid')
+    pi.json_to_db_id['person-id'] = 'person-id'
+    # Since we have to create this person behind the back of the import
+    # transaction, we'll fake the json-id to db-id, since they match in this
+    # case. This is *really* getting at some implementation detail, but it's
+    # the cleanest way to ensure we short-circut the json id lookup.
+
     BillImporter('jid', oi, pi).import_data([oldbill.as_dict(), bill.as_dict()])
 
     # get bill from db and assert it imported correctly
@@ -264,3 +272,77 @@ def test_bill_update_subsubitem():
     obj = Bill.objects.get()
     assert obj.versions.count() == 1
     assert obj.versions.get().links.count() == 1
+
+
+@pytest.mark.django_db
+def test_bill_sponsor_by_identifier():
+    create_jurisdiction()
+    org = create_org()
+
+    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act',
+                      classification='tax bill', chamber='lower')
+    bill.add_sponsorship_by_identifier(name="SNODGRASS",
+                                       classification='sponsor',
+                                       entity_type='person',
+                                       primary=True,
+                                       identifier="TOTALLY_REAL_ID",
+                                       scheme="TOTALLY_REAL_SCHEME")
+
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
+    zs = ScrapePerson(name='Zadock Snodgrass')
+    zs.add_identifier(identifier='TOTALLY_REAL_ID',
+                      scheme='TOTALLY_REAL_SCHEME')
+    pi.import_data([zs.as_dict()])
+    za_db = Person.objects.get()
+    Membership.objects.create(person_id=za_db.id,
+                              organization_id=org.id)
+
+    BillImporter('jid', oi, pi).import_data([bill.as_dict()])
+
+    obj = Bill.objects.get()
+    (entry,) = obj.sponsorships.all()
+    assert entry.person.name == "Zadock Snodgrass"
+
+
+@pytest.mark.django_db
+def test_bill_sponsor_limit_lookup():
+    create_jurisdiction()
+    org = create_org()
+
+    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act',
+                      classification='tax bill', chamber='lower')
+    bill.add_sponsorship_by_identifier(name="SNODGRASS",
+                                       classification='sponsor',
+                                       entity_type='person',
+                                       primary=True,
+                                       identifier="TOTALLY_REAL_ID",
+                                       scheme="TOTALLY_REAL_SCHEME")
+
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
+    zs = ScrapePerson(name='Zadock Snodgrass', birth_date="1800-01-01")
+    zs.add_identifier(identifier='TOTALLY_REAL_ID',
+                      scheme='TOTALLY_REAL_SCHEME')
+    pi.import_data([zs.as_dict()])
+
+    za_db = Person.objects.get()
+    Membership.objects.create(person_id=za_db.id,
+                              organization_id=org.id)
+
+    zs2 = ScrapePerson(name='Zadock Snodgrass', birth_date="1900-01-01")
+    zs2.add_identifier(identifier='TOTALLY_REAL_ID',
+                       scheme='TOTALLY_REAL_SCHEME')
+
+    # This is contrived and perhaps broken, but we're going to check this.
+    # We *really* don't want to *ever* cross jurisdiction bounds.
+    PersonImporter('another-jurisdiction').import_data([zs.as_dict()])
+
+    BillImporter('jid', oi, pi).import_data([bill.as_dict()])
+
+    obj = Bill.objects.get()
+    (entry,) = obj.sponsorships.all()
+    assert entry.person.name == "Zadock Snodgrass"
+    assert entry.person.birth_date == "1800-01-01"
