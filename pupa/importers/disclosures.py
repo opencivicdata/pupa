@@ -1,4 +1,6 @@
 from .base import BaseImporter
+from django.db.models import Q
+
 from opencivicdata.models import (Disclosure,
                                   DisclosureSource,
                                   DisclosureDocument, DisclosureDocumentLink,
@@ -34,9 +36,27 @@ class DisclosureImporter(BaseImporter):
         return spec
 
     def get_object(self, data):
-        spec = {'sources__url': data['sources'][0]['url'],
-                'effective_date': data['effective_date'],
+        spec = {'effective_date': data['effective_date'],
                 'submitted_date': data['submitted_date']}
+        
+        main_query = Q(**spec)
+
+        if data['source_identified']:
+            source_qs = []
+            if len(data['sources']) == 0:
+                raise KeyError('source-identified disclosure {} has no sources!'.format(
+                    data['name']))
+            for s in data['sources']:
+                sq = {}
+                sq['sources__url'] = s['url']
+                sq['sources__note'] = s.get('note', '')
+                source_qs.append(Q(**sq))
+            source_query = source_qs.pop()
+            for q in source_qs:
+                source_query |= q
+            main_query &= source_query
+
+        return self.model_class.objects.get(main_query)
 
         return self.model_class.objects.get(**spec)
 
@@ -45,24 +65,22 @@ class DisclosureImporter(BaseImporter):
 
         data['submitted_date'] = gdt(data.get('submitted_date', None))
         data['effective_date'] = gdt(data.get('effective_date', None))
-        
+
         new_related_entities = []
 
         for entity in data['related_entities']:
             entity_id = entity.pop('id')
-            print('looking_up {}'.format(entity_id))
             if entity['entity_type'] == 'person':
                 try:
                     entity_pseudo_id = make_pseudo_id(
                         sources__url=data['sources'][0]['url'],
                         name=entity['name'],
                     )
-                    
+
                     entity['person_id'] = self.person_importer.resolve_json_id(
                         entity_pseudo_id)
                 except UnresolvedIdError:
                     entity['person_id'] = self.person_importer.resolve_json_id(entity_id)
-                print('found {}'.format(entity['person_id']))
             elif entity['entity_type'] == 'organization':
                 try:
                     entity_pseudo_id = make_pseudo_id(
@@ -73,7 +91,6 @@ class DisclosureImporter(BaseImporter):
                         entity_pseudo_id)
                 except UnresolvedIdError:
                     entity['organization_id'] = self.org_importer.resolve_json_id(entity_id)
-                print('found {}'.format(entity['organization_id']))
             elif entity['entity_type'] == 'event':
                 try:
                     entity_pseudo_id = make_pseudo_id(
@@ -84,7 +101,6 @@ class DisclosureImporter(BaseImporter):
                         entity_pseudo_id)
                 except UnresolvedIdError:
                     entity['event_id'] = self.event_importer.resolve_json_id(entity_id)
-                print('found {}'.format(entity['event_id']))
             new_related_entities.append(entity)
 
         data['related_entities'] = new_related_entities

@@ -19,16 +19,17 @@ class OrganizationImporter(BaseImporter):
                       }
 
     def get_object(self, org):
+        all_names = [org['name']] + [o['name'] for o in org['other_names']]
         spec = {'classification': org['classification'],
-                'name': org['name'],
                 'parent_id': org['parent_id']}
-        
+
         # add jurisdiction_id unless this is a party
         jid = org.get('jurisdiction_id')
         if jid:
             spec['jurisdiction_id'] = jid
 
-        main_query=Q(**spec)
+        main_query = Q(**spec)
+        main_query &= (Q(name__in=all_names) | Q(other_names__name__in=all_names))
 
         if org['source_identified']:
             source_qs = []
