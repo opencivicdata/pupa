@@ -139,18 +139,10 @@ class Command(BaseCommand):
         person_importer = PersonImporter(juris.jurisdiction_id)
 
         post_importer = PostImporter(juris.jurisdiction_id, org_importer)
-
-        membership_importer = MembershipImporter(juris.jurisdiction_id,
-                                                 person_importer,
-                                                 org_importer,
-                                                 post_importer)
-
-        bill_importer = BillImporter(juris.jurisdiction_id,
-                                     org_importer)
-
-        vote_importer = VoteImporter(juris.jurisdiction_id,
-                                     person_importer,
-                                     org_importer,
+        membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
+                                                 org_importer, post_importer)
+        bill_importer = BillImporter(juris.jurisdiction_id, org_importer, person_importer)
+        vote_importer = VoteImporter(juris.jurisdiction_id, person_importer, org_importer,
                                      bill_importer)
 
         event_importer = EventImporter(juris.jurisdiction_id,

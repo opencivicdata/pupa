@@ -46,6 +46,12 @@ class PersonImporter(BaseImporter):
         return dicts
 
     def limit_spec(self, spec):
+        """
+        Whenever we do a Pseudo ID lookup from the database, we need to limit
+        based on the memberships -> organization -> jurisdiction, so we scope
+        the resolution.
+        """
+        spec['memberships__organization__jurisdiction_id'] = self.jurisdiction_id
         return spec
 
     def get_object(self, person):
