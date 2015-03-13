@@ -83,6 +83,9 @@ disclosure_schema = {
         "timezone": {
             "type": "string"
         },
+        "source_identified": {
+            "type": "boolean",
+        },
         "documents": documents,
         "sources": sources,
         "extras": extras

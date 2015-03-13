@@ -41,6 +41,8 @@ class Disclosure(BaseModel, SourceMixin, AssociatedLinkMixin, IdentifierMixin):
         self.identifiers = []
         self.documents = []
         self.extras = {}
+        # All disclosures must have a source
+        self.source_identified = True
 
     def add_registrant(self, name, type, *, classification=None, id=None, note='registrant'):
         self.add_entity(name=name,
