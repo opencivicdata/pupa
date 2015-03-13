@@ -25,9 +25,8 @@ class DisclosureImporter(BaseImporter):
     }
 
     def __init__(self, jurisdiction_id, org_importer, person_importer,
-                 event_importer, dedupe_exact=False):
-        super(DisclosureImporter, self).__init__(jurisdiction_id,
-                                                 dedupe_exact=dedupe_exact)
+                 event_importer):
+        super(DisclosureImporter, self).__init__(jurisdiction_id)
         self.org_importer = org_importer
         self.person_importer = person_importer
         self.event_importer = event_importer

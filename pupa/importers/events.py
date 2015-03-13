@@ -33,10 +33,8 @@ class EventImporter(BaseImporter):
     }
     preserve_order = ('agenda',)
     
-    def __init__(self, jurisdiction_id, org_importer, person_importer,
-                 dedupe_exact=False):
-        super(EventImporter, self).__init__(jurisdiction_id,
-                                                 dedupe_exact=dedupe_exact)
+    def __init__(self, jurisdiction_id, org_importer, person_importer):
+        super(EventImporter, self).__init__(jurisdiction_id)
         self.org_importer = org_importer
         self.person_importer = person_importer
     

@@ -9,9 +9,8 @@ class PostImporter(BaseImporter):
                       'links': (PostLink, 'post_id', {})
                      }
 
-    def __init__(self, jurisdiction_id, org_importer, dedupe_exact=False):
-        super(PostImporter, self).__init__(jurisdiction_id,
-                                           dedupe_exact=dedupe_exact)
+    def __init__(self, jurisdiction_id, org_importer):
+        super(PostImporter, self).__init__(jurisdiction_id)
         self.org_importer = org_importer
 
     def prepare_for_db(self, data):

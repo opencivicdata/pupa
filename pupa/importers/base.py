@@ -87,7 +87,7 @@ class BaseImporter(object):
     related_models = {}
     preserve_order = set()
 
-    def __init__(self, jurisdiction_id, *, dedupe_exact=False):
+    def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
         self.json_to_db_id = {}
         self.json_to_sources = {}
@@ -100,7 +100,6 @@ class BaseImporter(object):
         self.warning = self.logger.warning
         self.error = self.logger.error
         self.critical = self.logger.critical
-        self.dedupe_exact = dedupe_exact
 
     def get_session_id(self, identifier):
         if identifier not in self.session_cache:

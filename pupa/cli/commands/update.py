@@ -75,8 +75,6 @@ class Command(BaseCommand):
                           default=True, help='skip validation on save')
         self.add_argument('--fastmode', action='store_true', default=False,
                           help='use cache and turn off throttling')
-        self.add_argument('--dedupe_exact', action='store_true', default=False,
-                          help='while importing, de-duplicate iff objs match on all attributes')
 
         # settings overrides
         self.add_argument('--datadir', help='data directory', dest='SCRAPED_DATA_DIR')
@@ -136,42 +134,33 @@ class Command(BaseCommand):
 
         juris_importer = JurisdictionImporter(juris.jurisdiction_id)
 
-        org_importer = OrganizationImporter(juris.jurisdiction_id,
-                                            dedupe_exact=args.dedupe_exact)
+        org_importer = OrganizationImporter(juris.jurisdiction_id)
 
-        person_importer = PersonImporter(juris.jurisdiction_id,
-                                         dedupe_exact=args.dedupe_exact)
+        person_importer = PersonImporter(juris.jurisdiction_id)
 
-        post_importer = PostImporter(juris.jurisdiction_id,
-                                     org_importer,
-                                     dedupe_exact=args.dedupe_exact)
+        post_importer = PostImporter(juris.jurisdiction_id, org_importer)
 
         membership_importer = MembershipImporter(juris.jurisdiction_id,
                                                  person_importer,
                                                  org_importer,
-                                                 post_importer,
-                                                 dedupe_exact=args.dedupe_exact)
+                                                 post_importer)
 
         bill_importer = BillImporter(juris.jurisdiction_id,
-                                     org_importer,
-                                     dedupe_exact=args.dedupe_exact)
+                                     org_importer)
 
         vote_importer = VoteImporter(juris.jurisdiction_id,
                                      person_importer,
                                      org_importer,
-                                     bill_importer,
-                                     dedupe_exact=args.dedupe_exact)
+                                     bill_importer)
 
         event_importer = EventImporter(juris.jurisdiction_id,
                                        org_importer,
-                                       person_importer,
-                                       dedupe_exact=args.dedupe_exact)
+                                       person_importer)
 
         disclosure_importer = DisclosureImporter(juris.jurisdiction_id,
                                                  org_importer,
                                                  person_importer,
-                                                 event_importer,
-                                                 dedupe_exact=args.dedupe_exact)
+                                                 event_importer)
 
         report = {}
 

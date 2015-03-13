@@ -25,8 +25,8 @@ class BillImporter(BaseImporter):
                      }
     preserve_order = {'actions'}
 
-    def __init__(self, jurisdiction_id, org_importer, dedupe_exact=False):
-        super(BillImporter, self).__init__(jurisdiction_id, dedupe_exact=dedupe_exact)
+    def __init__(self, jurisdiction_id, org_importer):
+        super(BillImporter, self).__init__(jurisdiction_id)
         self.org_importer = org_importer
 
     def get_object(self, bill):
