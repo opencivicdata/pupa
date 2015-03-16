@@ -40,13 +40,12 @@ class OrganizationImporter(BaseImporter):
         else:
             spec = {'classification': org['classification'],
                     'parent_id': org['parent_id']}
+            # add jurisdiction_id unless this is a party or company
+            jid = org.get('jurisdiction_id')
+            if jid:
+                spec['jurisdiction_id'] = jid
 
             main_query &= Q(**spec)
-
-        # add jurisdiction_id unless this is a party or company
-        jid = org.get('jurisdiction_id')
-        if jid:
-            spec['jurisdiction_id'] = jid
 
         return self.model_class.objects.get(main_query)
 
