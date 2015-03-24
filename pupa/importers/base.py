@@ -5,11 +5,14 @@ import json
 import uuid
 import logging
 import datetime
+from pprint import PrettyPrinter
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id
 from pupa.utils.topsort import Network
 from opencivicdata.models import LegislativeSession
 from pupa.exceptions import UnresolvedIdError, DataImportError
+
+pp = PrettyPrinter(indent=4)
 
 
 def omnihash(obj):
