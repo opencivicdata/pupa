@@ -253,11 +253,14 @@ class BaseImporter(object):
             # check base object for changes
             for key, value in data.items():
                 if getattr(obj, key) != value:
+                    self.debug('differing property: {k} ({v})'.format(k=key,
+                                                                      v=getattr(obj, key)))
+                    self.debug('new value: {v}'.format(v=value))
                     setattr(obj, key, value)
                     what = 'update'
             if what == 'update':
-                self.debug('matched... {}'.format(pp.pformat(_matched_obj_data)))
-                self.debug('new... {}'.format(pp.pformat(data)))
+                #self.debug('matched... {}'.format(pp.pformat(_matched_obj_data)))
+                #self.debug('new... {}'.format(pp.pformat(data)))
                 obj.save()
 
             updated = self._update_related(obj, related, self.related_models)
