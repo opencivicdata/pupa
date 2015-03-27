@@ -252,7 +252,12 @@ class BaseImporter(object):
 
             # check base object for changes
             for key, value in data.items():
-                if getattr(obj, key) != value:
+                obj_value = getattr(obj, key)
+                if key == "extras":
+                    # this is needed because value is a json-formatted string,
+                    # due to changes in jsonfield 1.0.3
+                    obj_value = json.loads(obj_value)
+                if obj_value != value:
                     self.debug('differing property: {k} ({v})'.format(k=key,
                                                                       v=getattr(obj, key)))
                     self.debug('new value: {v}'.format(v=value))
