@@ -16,8 +16,8 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
     duplicate_user = User.objects.get(email='good_email+duplicate@example.com')
     merge_model_objects(primary_user, duplicate_user)
     """
-    if not isinstance(alias_objects, list):
-        alias_objects = [alias_objects]
+    #if not isinstance(alias_objects, list):
+    #    alias_objects = [alias_objects]
 
     # check that all aliases are the same class as primary one and that
     # they are subclass of model
@@ -35,7 +35,7 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
     # method to the ForeignKey field for accessing the generic related fields.
     generic_fields = []
     for model in get_models():
-        for field_name, field in filter(lambda x: isinstance(x[1], GenericForeignKey), model.__dict__.iteritems()):
+        for field_name, field in filter(lambda x: isinstance(x[1], GenericForeignKey), model.__dict__.items()):
             generic_fields.append(field)
 
     blank_local_fields = set([field.attname for field in primary_object._meta.local_fields if getattr(primary_object, field.attname) in [None, '']])
