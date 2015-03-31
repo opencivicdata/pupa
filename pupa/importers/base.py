@@ -254,9 +254,9 @@ class BaseImporter(object):
             for key, value in data.items():
                 obj_value = getattr(obj, key)
                 if key == "extras":
-                    # this is needed because value is a json-formatted string,
-                    # due to changes in jsonfield 1.0.3
-                    obj_value = json.loads(obj_value)
+                    # extras shouldn't be basis of comparison. this means extras
+                    # will only be saved on first insert, not update
+                    continue
                 if obj_value != value:
                     self.debug('differing property: {k} ({v})'.format(k=key,
                                                                       v=getattr(obj, key)))

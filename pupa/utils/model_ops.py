@@ -2,6 +2,9 @@ from django.db import transaction
 from django.db.models import get_models, Model
 from django.contrib.contenttypes.generic import GenericForeignKey
 
+import logging
+
+logger = logging.getLogger("")
 
 @transaction.commit_on_success
 def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
@@ -51,7 +54,19 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
             related_objects = getattr(alias_object, alias_varname)
             for obj in related_objects.all():
                 setattr(obj, obj_varname, primary_object)
-                obj.save()
+                field_names = [fn for fn in obj._meta.get_all_field_names()
+                               if fn not in ['created_at', 'updated_at', 'extras', 'id']]
+                spec = {fn: getattr(obj, fn) for fn in field_names
+                        if not hasattr(getattr(obj, fn), 'prefetch_related')}
+                check_for_dupes = getattr(primary_object, alias_varname).filter(**spec).all()
+                if len(check_for_dupes) == 0:
+                    obj.save()
+                else:
+                    for dupe in check_for_dupes:
+                        logging.debug('not creating new {} object, dupe found:'.format(alias_varname))
+                        logging.debug('...new: {od}\n...found: {dd}'.format(od=obj.__dict__,
+                                                                            dd=dupe.__dict__))
+
 
         # Migrate all many to many references from alias object to primary object.
         for related_many_object in alias_object._meta.get_all_related_many_to_many_objects():
