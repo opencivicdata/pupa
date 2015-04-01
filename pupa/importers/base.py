@@ -7,7 +7,7 @@ import logging
 import datetime
 from pprint import PrettyPrinter
 from pupa.exceptions import DuplicateItemError
-from pupa.utils import get_pseudo_id
+from pupa.utils import get_pseudo_id, combine_dicts
 from pupa.utils.topsort import Network
 from opencivicdata.models import LegislativeSession
 from pupa.exceptions import UnresolvedIdError, DataImportError
@@ -254,15 +254,24 @@ class BaseImporter(object):
             for key, value in data.items():
                 obj_value = getattr(obj, key)
                 if key == "extras":
-                    # extras shouldn't be basis of comparison. this means extras
-                    # will only be saved on first insert, not update
-                    continue
-                if obj_value != value:
-                    self.debug('differing property: {k} ({v})'.format(k=key,
-                                                                      v=getattr(obj, key)))
-                    self.debug('new value: {v}'.format(v=value))
-                    setattr(obj, key, value)
-                    what = 'update'
+                    obj_value = json.loads(obj_value)
+                    if obj_value != value:
+                        new_extras = combine_dicts(value, obj_value)
+                        if new_extras != obj_value:
+                            setattr(obj, key, new_extras)
+                            what = 'update'
+                elif key == "name" and ('other_names' in related):
+                    existing_names = [oname.name for oname in obj.other_names.all()]
+                    existing_names.append(obj_value)
+                    if value in existing_names:
+                        continue
+                else:
+                    if obj_value != value:
+                        self.debug('differing property: {k} ({v})'.format(k=key,
+                                                                          v=getattr(obj, key)))
+                        self.debug('new value: {v}'.format(v=value))
+                        setattr(obj, key, value)
+                        what = 'update'
             if what == 'update':
                 #self.debug('matched... {}'.format(pp.pformat(_matched_obj_data)))
                 #self.debug('new... {}'.format(pp.pformat(data)))

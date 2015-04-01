@@ -2,6 +2,7 @@ from django.db import transaction
 from django.db.models import get_models, Model
 from django.contrib.contenttypes.generic import GenericForeignKey
 
+import json
 import logging
 
 logger = logging.getLogger("")
@@ -60,7 +61,12 @@ def merge_model_objects(primary_object, alias_objects=[], keep_old=False):
                         if not hasattr(getattr(obj, fn), 'prefetch_related')}
                 check_for_dupes = getattr(primary_object, alias_varname).filter(**spec).all()
                 if len(check_for_dupes) == 0:
+                    # TODO: get rid of this when moving to jsonb
+                    if hasattr(obj, 'extras'):
+                        if isinstance(obj.extras, str):
+                            obj.extras = json.loads(obj.extras)
                     obj.save()
+                    logging.debug('merge created new object: {}'.format(obj.__dict__))
                 else:
                     for dupe in check_for_dupes:
                         logging.debug('not creating new {} object, dupe found:'.format(alias_varname))
