@@ -123,3 +123,14 @@ def test_pseudo_parent_id_resolution():
     assert Organization.objects.count() == 2
     assert Organization.objects.get(name='UN').children.count() == 1
     assert Organization.objects.get(name='UNESCO').parent.name == 'UN'
+
+
+@pytest.mark.django_db
+def test_extras_organization():
+    org = ScrapeOrganization('United Nations', classification='international')
+    org.extras = {"hello": "world",
+                  "foo": {"bar": "baz"}}
+    od = org.as_dict()
+    OrganizationImporter('jurisdiction-id').import_data([od])
+    o = Organization.objects.get()
+    assert o.extras['foo']['bar'] == 'baz'
