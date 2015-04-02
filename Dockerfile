@@ -12,7 +12,7 @@ RUN pip3 install -e /opt/sunlightfoundation.com/pupa/
 RUN pip3 install -e git://github.com/opencivicdata/python-opencivicdata-django.git#egg=opencivicdata-django
 RUN pip3 install jsonfield django-uuidfield
 
-RUN mkdir -p /tmp/pupa
-WORKDIR /tmp/pupa
+RUN mkdir -p /pupa
+WORKDIR /pupa
 
 ENTRYPOINT ["pupa"]
