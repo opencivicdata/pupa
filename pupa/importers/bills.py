@@ -25,9 +25,10 @@ class BillImporter(BaseImporter):
                      }
     preserve_order = {'actions'}
 
-    def __init__(self, jurisdiction_id, org_importer):
+    def __init__(self, jurisdiction_id, org_importer, person_importer):
         super(BillImporter, self).__init__(jurisdiction_id)
         self.org_importer = org_importer
+        self.person_importer = person_importer
 
     def get_object(self, bill):
         spec = {
@@ -61,6 +62,15 @@ class BillImporter(BaseImporter):
                 if 'organization_id' in entity:
                     entity['organization_id'] = self.org_importer.resolve_json_id(
                         entity['organization_id'])
+
+        for sponsor in data['sponsorships']:
+            if 'person_id' in sponsor:
+                sponsor['person_id'] = self.person_importer.resolve_json_id(
+                    sponsor['person_id'])
+
+            if 'organization_id' in sponsor:
+                sponsor['organization_id'] = self.person_importer.resolve_json_id(
+                    sponsor['organization_id'])
 
         return data
 

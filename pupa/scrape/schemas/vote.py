@@ -7,7 +7,7 @@ schema = {
     "properties": {
         'identifier': {"type": "string", "blank": True,},
         'motion_text': {"type": "string" },
-        'motion_classification': {"items": {"type": "string", "enum": common.VOTE_CLASSIFICATIONS},
+        'motion_classification': {"items": {"type": "string"},
                                   "type": "array"},
         'start_date': fuzzy_datetime_blank,
         'end_date': fuzzy_datetime_blank,

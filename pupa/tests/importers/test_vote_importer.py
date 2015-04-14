@@ -29,7 +29,7 @@ def test_full_vote():
     vote.no('Adam Smith')
 
     dmi = DumbMockImporter()
-    bi = BillImporter('jid', dmi)
+    bi = BillImporter('jid', dmi, dmi)
 
     VoteImporter('jid', dmi, dmi, bi).import_data([vote.as_dict()])
 
@@ -61,7 +61,7 @@ def test_vote_identifier_dedupe():
                       identifier='Roll Call No. 1',
                      )
     dmi = DumbMockImporter()
-    bi = BillImporter('jid', dmi)
+    bi = BillImporter('jid', dmi, dmi)
 
     _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
     assert what == 'insert'
@@ -101,7 +101,7 @@ def test_vote_bill_id_dedupe():
                       bill=bill.identifier, bill_chamber='lower'
                      )
     dmi = DumbMockImporter()
-    bi = BillImporter('jid', dmi)
+    bi = BillImporter('jid', dmi, dmi)
 
     _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
     assert what == 'insert'
@@ -141,7 +141,7 @@ def test_vote_bill_clearing():
     bill2 = Bill.objects.create(id='bill-2', identifier='HB 2', legislative_session=session,
                                 from_organization=org)
     dmi = DumbMockImporter()
-    bi = BillImporter('jid', dmi)
+    bi = BillImporter('jid', dmi, dmi)
 
     vote1 = ScrapeVote(legislative_session='1900', start_date='2013',
                        classification='anything', result='passed',
