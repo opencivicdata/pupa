@@ -51,6 +51,6 @@ class Command(BaseCommand):
         bucket = 'allthe.opencivicdata.org'
         fname = 'ocd-allpeople.tar.gz'
         dump_people()
-        os.system('tar cf {} ocd-person/'.format(fname))
+        os.system('tar -zcf {} ocd-person/'.format(fname))
         upload(fname, bucket, fname)
         upload(fname, bucket, datetime.date.today().strftime('%Y%m%d-') + fname)
