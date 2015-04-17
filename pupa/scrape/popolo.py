@@ -165,7 +165,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         post = None
 
         num_seats = kwargs.pop('num_seats', 1)
-        for _ in num_seats:
+        for _ in range(num_seats):
             post = Post(label=label, role=role, organization_id=self._id, **kwargs)
             self._related.append(post)
 
