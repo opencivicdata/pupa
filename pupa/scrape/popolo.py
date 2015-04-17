@@ -162,8 +162,14 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         return super(Organization, self).validate(schema=schema)
 
     def add_post(self, label, role, **kwargs):
-        post = Post(label=label, role=role, organization_id=self._id, **kwargs)
-        self._related.append(post)
+        post = None
+
+        num_seats = kwargs.pop('num_seats', 1)
+        for _ in num_seats:
+            post = Post(label=label, role=role, organization_id=self._id, **kwargs)
+            self._related.append(post)
+
+        # Only returns the last processed `post` if there's more than one seat
         return post
 
     def add_member(self, name_or_person, role='member', **kwargs):
