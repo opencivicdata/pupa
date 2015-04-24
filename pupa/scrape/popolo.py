@@ -117,6 +117,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         org_id = make_pseudo_id(classification=org_classification)
         if district:
             post_id = make_pseudo_id(label=district,
+                                     role=role,
                                      organization__classification=org_classification)
         else:
             post_id = None

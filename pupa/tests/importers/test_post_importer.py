@@ -54,15 +54,6 @@ def test_deduplication():
     PostImporter('nc', nc_oi).import_data([gov.as_dict()])
     assert Post.objects.count() == 3
 
-    # ensure changing the role is allowed
-    pres = ScrapePost(label='executive', role='King',
-                      organization_id='~{"classification": "executive"}')
-    PostImporter('us', us_oi).import_data([pres.as_dict()])
-
-    # no new object, just an update for role
-    assert Post.objects.count() == 3
-    assert Post.objects.get(organization_id='us', label='executive').role == 'King'
-
 
 @pytest.mark.django_db
 def test_resolve_special_json_id():
