@@ -113,7 +113,7 @@ class BaseImporter(object):
     def postimport(self):
         pass
 
-    def resolve_json_id(self, json_id,data=None):
+    def resolve_json_id(self, json_id, data=None):
         """
             Given an id found in scraped JSON, return a DB id for the object.
 
@@ -140,7 +140,7 @@ class BaseImporter(object):
                     raise UnresolvedIdError('cannot resolve pseudo id to {}: {}.\nFull data: {}'.format(
                         self.model_class.__name__, json_id, data))
                 except self.model_class.MultipleObjectsReturned:
-                    raise UnresolvedIdError('multiple objects returned for pseudo id to {}: {}.\nFull data:'.format(
+                    raise UnresolvedIdError('multiple objects returned for pseudo id to {}: {}.\nFull data: {}'.format(
                         self.model_class.__name__, json_id, data))
 
             # return the cached object
