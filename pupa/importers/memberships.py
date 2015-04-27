@@ -41,9 +41,9 @@ class MembershipImporter(BaseImporter):
             is_party = False
 
         party_flag = ('party' in data['organization_id'])
-        data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
-        data['person_id'] = self.person_importer.resolve_json_id(data['person_id'])
-        data['post_id'] = self.post_importer.resolve_json_id(data['post_id'])
+        data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'],data)
+        data['person_id'] = self.person_importer.resolve_json_id(data['person_id'],data)
+        data['post_id'] = self.post_importer.resolve_json_id(data['post_id'],data)
         if not is_party:
             # track that we had a membership for this person
             self.seen_person_ids.add(data['person_id'])

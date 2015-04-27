@@ -53,24 +53,24 @@ class BillImporter(BaseImporter):
 
         if data['from_organization']:
             data['from_organization_id'] = self.org_importer.resolve_json_id(
-                data.pop('from_organization'))
+                data.pop('from_organization'),data)
 
         for action in data['actions']:
             action['organization_id'] = self.org_importer.resolve_json_id(
-                action['organization_id'])
+                action['organization_id'],data)
             for entity in action['related_entities']:
                 if 'organization_id' in entity:
                     entity['organization_id'] = self.org_importer.resolve_json_id(
-                        entity['organization_id'])
+                        entity['organization_id'],data)
 
         for sponsor in data['sponsorships']:
             if 'person_id' in sponsor:
                 sponsor['person_id'] = self.person_importer.resolve_json_id(
-                    sponsor['person_id'])
+                    sponsor['person_id'],data)
 
             if 'organization_id' in sponsor:
                 sponsor['organization_id'] = self.person_importer.resolve_json_id(
-                    sponsor['organization_id'])
+                    sponsor['organization_id'],data)
 
         return data
 

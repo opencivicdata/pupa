@@ -29,7 +29,7 @@ class OrganizationImporter(BaseImporter):
         return self.model_class.objects.get(**spec)
 
     def prepare_for_db(self, data):
-        data['parent_id'] = self.resolve_json_id(data['parent_id'])
+        data['parent_id'] = self.resolve_json_id(data['parent_id'],data)
 
         if data['classification'] != 'party':
             data['jurisdiction_id'] = self.jurisdiction_id
