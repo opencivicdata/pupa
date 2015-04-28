@@ -71,7 +71,7 @@ class EventImporter(BaseImporter):
         resolved_participants = []
 
         for entity in data['participants']:
-            entity_id = entity.pop('id')
+            entity_id = entity.pop('id', None)
             if entity['entity_type'] == 'person':
                 try:
                     entity_pseudo_id = make_pseudo_id(
