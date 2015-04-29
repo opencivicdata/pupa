@@ -44,6 +44,18 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.abstracts = []
         self.versions = []
 
+    def add_amendment(self, identifier, title, *, chamber=None, from_organization=None):
+        bill = Bill(classification='amendment',
+                    identifier=identifier,
+                    legislative_session=self.legislative_session,
+                    title=title,
+                    chamber=chamber,
+                    from_organization=from_organization)
+        self._related.append(bill)
+        self.add_related_bill(identifier=identifier,
+                              legislative_session=self.legislative_session,
+                              relation_type='amendment')
+        return bill
 
     def add_action(self, description, date, *, organization=None, chamber=None,
                    classification=None, related_entities=None):
