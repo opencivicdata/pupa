@@ -1,8 +1,9 @@
 import os
+import sys
 
 from .base import BaseCommand, CommandError
 from opencivicdata.common import JURISDICTION_CLASSIFICATIONS
-
+from opencivicdata.divisions import Division
 
 def prompt(ps, default=''):
     return input(ps).strip() or default
@@ -78,15 +79,25 @@ class Command(BaseCommand):
         self.add_argument('module', type=str, help='name of the new scraper module')
 
     def handle(self, args, other):
-        if os.path.exists(args.module):
-            raise CommandError(args.module + ' directory already exists')
-        os.makedirs(args.module)
 
         name = prompt('jurisdiction name (e.g. City of Seattle): ')
         division = prompt('division id (look this up in the opencivicdata/ocd-division-ids repository): ')
         classification = prompt('classification (can be: {}): '
                                 .format(', '.join(JURISDICTION_CLASSIFICATIONS)))
         url = prompt('official URL: ')
+
+        try:
+            Division.get(division)
+        except ValueError:
+            print("\nERROR: Division ID is invalid.",\
+                    "Please find the correct division_id here",\
+                    "https://github.com/opencivicdata/ocd-division-ids/tree/master/identifiers",\
+                    "or contact open-civic-data@googlegroups.org to add a new country\n")
+            sys.exit(1)
+
+        if os.path.exists(args.module):
+            raise CommandError(args.module + ' directory already exists')
+        os.makedirs(args.module)
 
         # will default to True until they pick one, then defaults to False
         scraper_types = CLASS_DICT.keys()
