@@ -1,5 +1,6 @@
 import os
 import glob
+import json
 import importlib
 from collections import OrderedDict
 
@@ -31,6 +32,21 @@ def print_report(report):
             if(changes['insert'] or changes['update'] or changes['noop']):
                 print('  {}: {} new {} updated {} noop'.format(type, changes['insert'],
                                                                changes['update'], changes['noop']))
+
+
+def forward_report(report, jurisdiction):
+    from kafka.client import KafkaClient
+    from kafka.producer import SimpleProducer
+
+    client = KafkaClient("localhost:9092")
+    producer = SimpleProducer(client)
+    producer.send_messages(
+        'post-scrape-reports',
+        json.dumps({"jurisdiction": jurisdiction,
+                    "report": {k: v['records']
+                                for (k, v) in report['import'].items()},
+                    "type": "report"},
+                   cls=utils.JSONEncoderPlus).encode())
 
 
 @transaction.atomic
@@ -229,6 +245,7 @@ class Command(BaseCommand):
 
         if 'import' in args.actions:
             save_report(report, juris.jurisdiction_id)
+            forward_report(report, juris.jurisdiction_id)
 
         print_report(report)
         return report
