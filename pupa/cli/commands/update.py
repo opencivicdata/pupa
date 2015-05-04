@@ -35,16 +35,18 @@ def print_report(report):
 
 
 def forward_report(report, jurisdiction):
+    if not settings.ENABLE_KAFKA:
+        return
+
     from kafka.client import KafkaClient
     from kafka.producer import SimpleProducer
 
-    client = KafkaClient("localhost:9092")
+    client = KafkaClient(settings.KAFKA_SERVER)  # "localhost:9092")
     producer = SimpleProducer(client)
     producer.send_messages(
-        'post-scrape-reports',
+        settings.KAFKA_REPORT_TOPIC,
         json.dumps({"jurisdiction": jurisdiction,
-                    "report": {k: v['records']
-                                for (k, v) in report['import'].items()},
+                    "report": report,
                     "type": "report"},
                    cls=utils.JSONEncoderPlus).encode())
 
