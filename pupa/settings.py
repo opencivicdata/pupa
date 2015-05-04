@@ -9,7 +9,7 @@ INSTALLED_APPS = ('opencivicdata.apps.BaseConfig', 'pupa',)
 
 # scrape settings
 
-ENABLE_KAFKA = False
+ENABLE_KAFKA = os.environ.get('ENABLE_KAFKA', "False").lower() == "true"
 KAFKA_REPORT_TOPIC = 'post-scrape-reports'
 KAFKA_SERVER = "localhost:9092"
 
