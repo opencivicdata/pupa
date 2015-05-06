@@ -10,8 +10,8 @@ INSTALLED_APPS = ('opencivicdata.apps.BaseConfig', 'pupa',)
 # scrape settings
 
 ENABLE_KAFKA = os.environ.get('ENABLE_KAFKA', "False").lower() == "true"
-KAFKA_REPORT_TOPIC = 'post-scrape-reports'
-KAFKA_SERVER = "localhost:9092"
+KAFKA_REPORT_TOPIC = os.environ.get('KAFKA_REPORT_TOPIC', 'post-scrape-reports')
+KAFKA_SERVER = os.environ.get('KAFKA_SERVER', "localhost:9092")
 
 SCRAPELIB_RPM = 60
 SCRAPELIB_TIMEOUT = 60
