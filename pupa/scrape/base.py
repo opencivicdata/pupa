@@ -98,14 +98,14 @@ class Scraper(scrapelib.Scraper):
     def do_scrape(self, **kwargs):
         record = {'objects': defaultdict(int)}
         self.output_names = defaultdict(set)
-        record['start'] = datetime.datetime.utcnow()
+        record['start'] = utils.utcnow()
         for obj in self.scrape(**kwargs) or []:
             if hasattr(obj, '__iter__'):
                 for iterobj in obj:
                     self.save_object(iterobj)
             else:
                 self.save_object(obj)
-        record['end'] = datetime.datetime.utcnow()
+        record['end'] = utils.utcnow()
         record['skipped'] = getattr(self, 'skipped', 0)
         if not self.output_names:
             raise ScrapeError('no objects returned from scrape')
