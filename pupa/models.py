@@ -41,3 +41,10 @@ class ImportObjects(models.Model):
     noop_count = models.PositiveIntegerField()
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+
+
+class Measures(models.Model):
+    plan = models.ForeignKey(RunPlan, related_name='measures')
+    object_type = models.CharField(max_length=20, choices=OBJECT_TYPES)
+    measure = models.CharField(max_length=300)
+    value = models.FloatField()

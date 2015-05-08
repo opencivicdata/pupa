@@ -59,6 +59,41 @@ def save_report(report, jurisdiction):
             )
 
 
+    # from pupa.reports.organizations import organization_report
+    from pupa.reports.people import person_report
+    from pupa.reports.posts import post_report
+    from pupa.reports.bills import bill_report
+    from pupa.reports.votes import vote_report
+
+    scrapers = report['plan']['scrapers']
+
+    measures = {}
+
+    # organization_report(jurisdiction)
+
+    if 'people' in scrapers:
+        measures['person'] = person_report(jurisdiction)
+        measures['post'] = post_report(jurisdiction)
+        # measures['membership'] = membership_report(jurisdiction)
+
+    if 'bills' in scrapers:
+        measures['bill'] = bill_report(jurisdiction)
+        measures['vote'] = vote_report(jurisdiction)
+
+    # if 'events' in scrapers:
+        # measures['event'] = event_report(jurisdiction)
+
+    from pupa.models import Measures
+    for key in measures.keys():
+        for measure, value in measures[key].items():
+            Measures.objects.create(
+                plan=plan,
+                object_type=key,
+                measure=measure,
+                value=value
+            )
+
+
 class Command(BaseCommand):
     name = 'update'
     help = 'update pupa data'
@@ -222,8 +257,8 @@ class Command(BaseCommand):
 
         if 'scrape' in args.actions:
             report['scrape'] = self.do_scrape(juris, args, scrapers)
-        if 'import' in args.actions:
-            report['import'] = self.do_import(juris, args)
+        # if 'import' in args.actions:
+        #     report['import'] = self.do_import(juris, args)
 
         report['success'] = True
 
