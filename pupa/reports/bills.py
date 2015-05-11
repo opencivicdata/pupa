@@ -24,8 +24,8 @@ def bill_report(jurisdiction):
     report['no_sponsors'] = percentage(
         bills.filter(sponsorships__isnull=True).count(), total)
     report['no_sponsor_objs'] = percentage(
-        bills.filter(sponsorships__person__isnull=True).
-        filter(sponsorships__organization__isnull=True).count(), total)
+        bills.annotate(num_sponsors=Count('sponsorships')).
+        filter(num_sponsors=0).count(), total)
 
     report['dup_versions'] = percentage(
         versions.values('links__url').annotate(url_count=Count('links__url')).
