@@ -19,6 +19,9 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
     def add_subject(self, what):
         self['subjects'].append(what)
 
+    def add_vote(self, vote, *, id=None, note='consideration'):
+        self.add_entity(name=vote, entity_type='vote', id=id, note=note)
+
     def add_committee(self, committee, *, id=None, note='participant'):
         self.add_entity(name=committee, entity_type='committee', id=id, note=note)
 
