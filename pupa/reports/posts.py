@@ -9,7 +9,9 @@ def post_report(jurisdiction):
 
     posts = Post.objects.filter(organization__jurisdiction=jurisdiction)
 
-    # report['over'] =
+    # Waiting to add `over` until the discussion on `num_seats` is finished
+    # https://github.com/opencivicdata/pupa/pull/167
+    # report['over']
 
     today = datetime.date.today().strftime('%Y-%m-%d')
     report['vacant'] = posts.filter(
