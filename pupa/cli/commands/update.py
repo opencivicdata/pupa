@@ -34,7 +34,7 @@ def print_report(report):
 
 
 @transaction.atomic
-def save_report(report, jurisdiction):
+def save_import_result(report, jurisdiction):
     from pupa.models import RunPlan
 
     plan = RunPlan.objects.create(jurisdiction_id=jurisdiction, success=report['success'])
@@ -58,6 +58,11 @@ def save_report(report, jurisdiction):
                 end_time=changes['end'],
             )
 
+
+@transaction.atomic
+def save_report(report, jurisdiction):
+    from pupa.models import RunPlan
+    plan = RunPlan.objects.filter(jurisdiction=jurisdiction).latest('id')
 
     # from pupa.reports.organizations import organization_report
     from pupa.reports.people import person_report
@@ -257,13 +262,14 @@ class Command(BaseCommand):
 
         if 'scrape' in args.actions:
             report['scrape'] = self.do_scrape(juris, args, scrapers)
-        # if 'import' in args.actions:
-        #     report['import'] = self.do_import(juris, args)
-
-        report['success'] = True
 
         if 'import' in args.actions:
+            report['import'] = self.do_import(juris, args)
+            report['success'] = True
+            save_import_result(report, juris.jurisdiction_id)
+            print_report(report)
+
+        if 'report' in args.actions:
             save_report(report, juris.jurisdiction_id)
 
-        print_report(report)
         return report
