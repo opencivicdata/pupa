@@ -2,7 +2,7 @@ from pupa.utils import fix_bill_id
 from opencivicdata.models import (Bill, RelatedBill, BillAbstract, BillTitle, BillIdentifier,
                                   BillAction, BillActionRelatedEntity, RelatedBill,
                                   BillSponsorship, BillSource, BillDocument, BillVersion,
-                                  BillDocumentLink, BillVersionLink)
+                                  BillDocumentLink, BillVersionLink, BillSummary)
 from .base import BaseImporter
 from ..exceptions import PupaInternalError
 
@@ -11,6 +11,7 @@ class BillImporter(BaseImporter):
     _type = 'bill'
     model_class = Bill
     related_models = {'abstracts': (BillAbstract, 'bill_id', {}),
+                      'summaries': (BillSummary, 'bill_id', {}),
                       'other_titles': (BillTitle, 'bill_id', {}),
                       'other_identifiers': (BillIdentifier, 'bill_id', {}),
                       'actions': (BillAction, 'bill_id', {
