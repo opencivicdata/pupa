@@ -62,7 +62,7 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         self.description = description
         self.status = status
         self.classification = classification
-        self.location = {"name": location, "note": "", "coordinates": None}
+        self.location = location
         self.documents = []
         self.participants = []
         self.media = []
@@ -71,6 +71,9 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     def __str__(self):
         return '{} {}'.format(self.start_time, self.name.strip())
 
+    def set_location(self, name, note="", url="", coordinates=None):
+        self.location = {'name': name, 'note': note, 'url': url, 'coordinates': coordinates}
+    
     def add_participant(self, name, type, *, note='participant'):
         self.participants.append({"entity_type": type, "note": note, "name": name})
 
