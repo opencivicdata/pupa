@@ -15,6 +15,7 @@ COMMAND_MODULES = (
     'pupa.cli.commands.dbinit',
     'pupa.cli.commands.update',
     'pupa.cli.commands.dump',
+    'pupa.cli.commands.elasticsearch_push',
 )
 
 
