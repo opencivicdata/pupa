@@ -1,8 +1,67 @@
-import urllib
+import os
+import subprocess
+
+import lxml.html
+import scrapelib
 
 
-def document_url_to_text(url):
-    with open(urllib2.urlopen(url), 'wb') as doc:
+s = scrapelib.Scraper()
+
+
+def html_to_text(response):
+    doc = lxml.html.fromstring(response.text)
+    text = doc.text_content()
+    return text
+
+
+def pdf_to_text(response):
+    # Download the file
+    if not os.path.exists(os.path.join(os.getcwd(), '_cache')):
+        os.makedirs(os.path.join(os.getcwd(), '_cache'))
+    local_filename = os.path.join(os.getcwd(), '_cache', format(response.url.split('/')[-1]))
+    with open(local_filename, 'wb') as pdf_file:
+        for block in response.iter_content(1024):
+            if block:
+                pdf_file.write(block)
+
+    try:
+        pipe = subprocess.Popen(['pdftotext', '-layout', local_filename, '-'],
+            stdout=subprocess.PIPE,
+            close_fds=True).stdout
+    except OSError as e:
+        print('Unable to parse the bill PDF\n{}'.format(e))
+    text = pipe.read().decode('utf-8')
+
+    pipe.close()
+    os.remove(local_filename)
+
+    return text
+
+
+def version_to_text(version):
+    text = ''
+
+    link = None
+    filetype = None
+    preferred_mimetypes = ['text/html', 'application/pdf', ]
+    for mimetype in preferred_mimetypes:
+        for link_obj in version.links.all():
+            if link_obj.media_type == mimetype:
+                try:
+                    r = s.get(link_obj.url)
+                except scrapelib.HTTPError:
+                    pass
+                else:
+                    filetype = mimetype.split('/')[-1]
+                    link = link_obj.url
+        if filetype or link:
+            break
+
+    if filetype == 'html':
+        text = html_to_text(r)
+    elif filetype == 'pdf':
+        text = pdf_to_text(r)
+    else:
         pass
 
     return text
@@ -46,10 +105,13 @@ def bill_to_elasticsearch(bill):
 
     # Gather the text of the most recent bill
     # If dates are present, use the one version most recently added to the database
-    es_bill['text'] = []
+    es_bill['text'] = ''
     latest_version = None
     for version in bill.versions.all().order_by('date'):
         latest_version = version
-    # es_bill['text'].append(document_url_to_text(latest_version.url))
+    if latest_version:
+        text = version_to_text(latest_version)
+        es_bill['text'] = text
 
+    # if es_bill['text']:
     return es_bill
