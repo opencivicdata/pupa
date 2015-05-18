@@ -48,7 +48,7 @@ class Network(object):
         helpful to find all nodes without dependencies.
         """
         # Now contains all nodes that contain dependencies.
-        deps = { item for sublist in self.edges.values() for item in sublist }
+        deps = {item for sublist in self.edges.values() for item in sublist}
         # contains all nodes *without* any dependencies (leaf nodes)
         return self.nodes - deps
 
