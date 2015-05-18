@@ -34,6 +34,23 @@ def test_related_people_event():
 
 
 @pytest.mark.django_db
+def test_related_vote_event():
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    event1 = ge()
+    event2 = ge()
+
+    for event in [event1, event2]:
+        item = event.add_agenda_item("Cookies will be served")
+        item.add_vote(vote="Roll no. 12")
+
+    result = EventImporter('jid').import_data([event1.as_dict()])
+    assert result['event']['insert'] == 1
+
+    result = EventImporter('jid').import_data([event2.as_dict()])
+    assert result['event']['noop'] == 1
+
+
+@pytest.mark.django_db
 def test_related_bill_event():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     event1 = ge()
