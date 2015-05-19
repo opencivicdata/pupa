@@ -5,6 +5,7 @@ from pupa.importers import MembershipImporter, PersonImporter
 from pupa.exceptions import NoMembershipsError
 from opencivicdata.models import Organization, Post, Person
 
+
 class DumbMockImporter(object):
     """ this is a mock importer that implements a resolve_json_id that is just a pass-through """
     json_to_db_id = {}
@@ -51,8 +52,8 @@ def test_full_membership():
 
 @pytest.mark.django_db
 def test_no_membership_for_person():
-    org = Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
-                                      jurisdiction_id="fnd-jid")
+    Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
+                                jurisdiction_id="fnd-jid")
 
     # import a person with no memberships
     p = ScrapePerson('a man without a country')
@@ -73,9 +74,9 @@ def test_no_membership_for_person_including_party():
     even though party is specified we should still get a no memberships error because it doesn't
     bind the person to a jurisdiction, thus causing duplication
     """
-    org = Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
-                                      jurisdiction_id="fnd-jid")
-    org = Organization.objects.create(id="dem", name="Democratic", classification="party")
+    Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
+                                jurisdiction_id="fnd-jid")
+    Organization.objects.create(id="dem", name="Democratic", classification="party")
 
     # import a person with no memberships
     p = ScrapePerson('a man without a country', party='Democratic')

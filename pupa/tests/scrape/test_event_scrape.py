@@ -54,7 +54,7 @@ def test_agenda_add_vote():
     e = event_obj()
     agenda = e.add_agenda_item("foo bar")
     assert agenda['related_entities'] == []
-    
+
     agenda.add_vote(vote='Roll no. 12')
     assert len(e.agenda[0]['related_entities']) == 1
     e.validate()
@@ -118,7 +118,8 @@ def test_participants():
 
 def test_set_location():
     e = event_obj()
-    e.set_location('North Pole', note='it is cold here', coordinates={'latitude': '90.0000', 'longitude': '0.0000'})
+    e.set_location('North Pole', note='it is cold here',
+                   coordinates={'latitude': '90.0000', 'longitude': '0.0000'})
 
     assert e.location.get('name') == 'North Pole'
     assert e.location.get('note') == 'it is cold here'
