@@ -87,8 +87,8 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     def add_subject(self, subject):
         self.subject.append(subject)
 
-    def add_abstract(self, abstract, note):
-        self.abstracts.append({"note": note, "abstract": abstract})
+    def add_abstract(self, abstract, note, date=''):
+        self.abstracts.append({"note": note, "abstract": abstract, "date": date})
 
     def add_title(self, title, note=''):
         self.other_titles.append({"note": note, "title": title})

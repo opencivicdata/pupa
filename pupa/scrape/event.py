@@ -19,6 +19,9 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
     def add_subject(self, what):
         self['subjects'].append(what)
 
+    def add_vote(self, vote, *, id=None, note='consideration'):
+        self.add_entity(name=vote, entity_type='vote', id=id, note=note)
+
     def add_committee(self, committee, *, id=None, note='participant'):
         self.add_entity(name=committee, entity_type='committee', id=id, note=note)
 
@@ -50,7 +53,7 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     _type = 'event'
     _schema = schema
 
-    def __init__(self, name, start_time, timezone, location, *,
+    def __init__(self, name, start_time, timezone, location_name, *,
                  all_day=False, description="", end_time=None,
                  status="confirmed", classification="event"):
         super(Event, self).__init__()
@@ -62,7 +65,7 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         self.description = description
         self.status = status
         self.classification = classification
-        self.location = {"name": location, "note": "", "coordinates": None}
+        self.location = {"name": location_name, "note": "", "coordinates": None}
         self.documents = []
         self.participants = []
         self.media = []
@@ -71,14 +74,24 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     def __str__(self):
         return '{} {}'.format(self.start_time, self.name.strip())
 
-    def add_participant(self, name, type, *, note='participant', id=None):
-        participant = {"entity_type": type, "note": note, "name": name}
-        if id is not None:
-            participant["id"] = id
-        self.participants.append(participant)
+    def set_location(self, name, *, note="", coordinates=None):
+        self.location = {"name": name, "note": note, "coordinates": coordinates}
 
-    def add_person(self, name, *, note='participant'):
-        return self.add_participant(name=name, type='person', note=note)
+    def add_participant(self, name, type, *, id=None, note='participant'):
+        p = {
+            "name": name,
+            "entity_type": type,
+            "note": note
+        }
+        if id:
+            p['id'] = id
+        self.participants.append(p)
+
+    def add_person(self, name, *, id=None, note='participant'):
+        return self.add_participant(name=name, type='person', id=id, note=note)
+
+    def add_committee(self, name, *, id=None, note='participant'):
+        return self.add_participant(name=name, type='organization', id=id, note=note)
 
     def add_agenda_item(self, description):
         obj = EventAgendaItem(description, self)

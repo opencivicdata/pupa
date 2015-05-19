@@ -9,7 +9,7 @@ def ge():
     event = ScrapeEvent(
         name="America's Birthday",
         start_time="2014-07-04T05:00Z",
-        location="America",
+        location_name="America",
         timezone="America/New_York",
         all_day=True)
     event.add_person("George Washington")
@@ -33,6 +33,23 @@ def test_related_people_event():
     assert result['event']['insert'] == 1
 
     result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event2.as_dict()])
+    assert result['event']['noop'] == 1
+    
+
+@pytest.mark.django_db
+def test_related_vote_event():
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    event1 = ge()
+    event2 = ge()
+
+    for event in [event1, event2]:
+        item = event.add_agenda_item("Cookies will be served")
+        item.add_vote(vote="Roll no. 12")
+
+    result = EventImporter('jid').import_data([event1.as_dict()])
+    assert result['event']['insert'] == 1
+
+    result = EventImporter('jid').import_data([event2.as_dict()])
     assert result['event']['noop'] == 1
 
 

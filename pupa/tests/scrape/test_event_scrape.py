@@ -7,7 +7,7 @@ def event_obj():
     e = Event(
         name="get-together",
         start_time=datetime.datetime.utcnow(),
-        location="Joe's Place",
+        location_name="Joe's Place",
         timezone="America/New_York",
     )
     e.add_source(url='foobar')
@@ -46,6 +46,16 @@ def test_agenda_add_person():
     assert agenda['related_entities'] == []
 
     agenda.add_person(person='John Q. Hacker', note='chair')
+    assert len(e.agenda[0]['related_entities']) == 1
+    e.validate()
+
+
+def test_agenda_add_vote():
+    e = event_obj()
+    agenda = e.add_agenda_item("foo bar")
+    assert agenda['related_entities'] == []
+    
+    agenda.add_vote(vote='Roll no. 12')
     assert len(e.agenda[0]['related_entities']) == 1
     e.validate()
 
@@ -104,6 +114,18 @@ def test_participants():
     assert e.participants[1]['name'] == 'Bill Stevenson'
     assert e.participants[1]['entity_type'] == 'person'
     assert e.participants[1]['note'] == 'participant'
+
+
+def test_set_location():
+    e = event_obj()
+    e.set_location('North Pole', note='it is cold here', coordinates={'latitude': '90.0000', 'longitude': '0.0000'})
+
+    assert e.location.get('name') == 'North Pole'
+    assert e.location.get('note') == 'it is cold here'
+    assert e.location.get('coordinates').get('latitude') == '90.0000'
+    assert e.location.get('coordinates').get('longitude') == '0.0000'
+
+    e.validate()
 
 
 def test_add_media():
