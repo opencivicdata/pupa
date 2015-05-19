@@ -1,7 +1,10 @@
 from opencivicdata.models.vote import VoteEvent, VoteCount, PersonVote
+from .utils import assert_data_quality_types_exist, get_or_create_type_and_modify
 
 
 def vote_report(jurisdiction):
+    get_or_create_type_and_modify('vote', 'invalid', (1, None))
+
     report = {}
 
     votes = VoteEvent.objects.filter(organization__jurisdiction=jurisdiction)
@@ -11,14 +14,12 @@ def vote_report(jurisdiction):
         person_votes = PersonVote.objects.filter(vote=vote)
         vote_counts = VoteCount.objects.filter(vote=vote)
 
-        is_invalid = False
         for vote_option in vote_counts.values_list('option', flat=True):
             roll_call_count = person_votes.filter(option=vote_option).count()
             official_count = vote_counts.get(option=vote_option).value
             if roll_call_count != official_count:
-                is_invalid = True
+                report['invalid'] += 1
+                break
 
-        if is_invalid:
-            report['invalid'] += 1
-
+    assert_data_quality_types_exist('vote', report)
     return report

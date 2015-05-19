@@ -4,10 +4,17 @@ from opencivicdata.models.bill import Bill
 from opencivicdata.models.bill import BillAction
 from opencivicdata.models.bill import BillVersion
 
-from .utils import percentage
+from .utils import percentage, assert_data_quality_types_exist, get_or_create_type_and_modify
 
 
 def bill_report(jurisdiction):
+    get_or_create_type_and_modify('bill', 'no_versions', (1, None))
+    get_or_create_type_and_modify('bill', 'no_actions', (1, None))
+    get_or_create_type_and_modify('bill', 'no_sponsors', (1, None))
+    get_or_create_type_and_modify('bill', 'no_sponsor_objs', (1, None))
+    get_or_create_type_and_modify('bill', 'dup_versions', (1, None))
+    get_or_create_type_and_modify('bill', 'unclassified_actions', (1, None))
+
     report = {}
 
     bills = Bill.objects.filter(from_organization__jurisdiction=jurisdiction)
@@ -34,4 +41,5 @@ def bill_report(jurisdiction):
     report['unclassified_actions'] = percentage(
         actions.filter(classification__isnull=True).count(), actions.count())
 
+    assert_data_quality_types_exist('bill', report)
     return report

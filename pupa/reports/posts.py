@@ -3,8 +3,12 @@ import datetime
 from django.db.models import Q
 from opencivicdata.models.people_orgs import Post
 
+from .utils import assert_data_quality_types_exist, get_or_create_type_and_modify
+
 
 def post_report(jurisdiction):
+    get_or_create_type_and_modify('post', 'vacant', (1, None))
+
     report = {}
 
     posts = Post.objects.filter(organization__jurisdiction=jurisdiction)
@@ -20,4 +24,5 @@ def post_report(jurisdiction):
         Q(memberships__end_date__gte=today) | Q(memberships__end_date__isnull=True),
         memberships__start_date__lte=today).count()
 
+    assert_data_quality_types_exist('post', report)
     return report

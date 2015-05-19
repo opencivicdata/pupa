@@ -1,4 +1,5 @@
 from django.db import models
+# from django.contrib.postgres.fields import ArrayField, FloatRangeField
 from opencivicdata.models import Jurisdiction
 
 
@@ -43,8 +44,15 @@ class ImportObjects(models.Model):
     end_time = models.DateTimeField()
 
 
-class Measures(models.Model):
-    plan = models.ForeignKey(RunPlan, related_name='measures')
+class DataQualityTypes(models.Model):
     object_type = models.CharField(max_length=20, choices=OBJECT_TYPES)
-    measure = models.CharField(max_length=300)
+    name = models.CharField(max_length=300)
+    # bad_range = FloatRangeField()
+    bad_range = models.FloatField()
+
+
+class DataQualityChecks(models.Model):
+    plan = models.ForeignKey(RunPlan, related_name='checks')
+    type = models.ForeignKey(DataQualityTypes, related_name='checks')
     value = models.FloatField()
+    # bad_objects = ArrayField(models.CharField(max_length=300))

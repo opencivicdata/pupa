@@ -34,11 +34,7 @@ def print_report(report):
 
 
 @transaction.atomic
-def save_import_result(report, jurisdiction):
-    from pupa.models import RunPlan
-
-    plan = RunPlan.objects.create(jurisdiction_id=jurisdiction, success=report['success'])
-
+def save_import_result(report, jurisdiction, plan):
     for scraper, details in report.get('scrape', {}).items():
         args = ' '.join('{k}={v}'.format(k=k, v=v)
                         for k, v in report['plan']['scrapers'].get(scraper, {}).items())
@@ -60,9 +56,10 @@ def save_import_result(report, jurisdiction):
 
 
 @transaction.atomic
-def save_report(report, jurisdiction):
-    from pupa.models import RunPlan
-    plan = RunPlan.objects.filter(jurisdiction=jurisdiction).latest('id')
+def save_report(jurisdiction, plan):
+    if not plan:
+        from pupa.models import RunPlan
+        plan = RunPlan.objects.filter(jurisdiction=jurisdiction).latest('id')
 
     # from pupa.reports.organizations import organization_report
     from pupa.reports.people import person_report
@@ -70,31 +67,26 @@ def save_report(report, jurisdiction):
     from pupa.reports.bills import bill_report
     from pupa.reports.votes import vote_report
 
-    scrapers = report['plan']['scrapers']
-
     measures = {}
 
     # organization_report(jurisdiction)
 
-    if 'people' in scrapers:
-        measures['person'] = person_report(jurisdiction)
-        measures['post'] = post_report(jurisdiction)
-        # measures['membership'] = membership_report(jurisdiction)
+    measures['person'] = person_report(jurisdiction)
+    measures['post'] = post_report(jurisdiction)
+    # measures['membership'] = membership_report(jurisdiction)
 
-    if 'bills' in scrapers:
-        measures['bill'] = bill_report(jurisdiction)
-        measures['vote'] = vote_report(jurisdiction)
+    measures['bill'] = bill_report(jurisdiction)
+    measures['vote'] = vote_report(jurisdiction)
 
-    # if 'events' in scrapers:
-        # measures['event'] = event_report(jurisdiction)
+    # measures['event'] = event_report(jurisdiction)
 
-    from pupa.models import Measures
+    from pupa.models import DataQualityChecks, DataQualityTypes
     for key in measures.keys():
         for measure, value in measures[key].items():
-            Measures.objects.create(
+            type_ = DataQualityTypes.objects.get(object_type=key, name=measure)
+            DataQualityChecks.objects.create(
                 plan=plan,
-                object_type=key,
-                measure=measure,
+                type=type_,
                 value=value
             )
 
@@ -258,6 +250,8 @@ class Command(BaseCommand):
         report = {'plan': {'module': args.module, 'actions': args.actions, 'scrapers': scrapers}}
         print_report(report)
 
+        plan = None
+
         self.check_session_list(juris)
 
         if 'scrape' in args.actions:
@@ -266,10 +260,15 @@ class Command(BaseCommand):
         if 'import' in args.actions:
             report['import'] = self.do_import(juris, args)
             report['success'] = True
-            save_import_result(report, juris.jurisdiction_id)
+
+            from pupa.models import RunPlan
+            plan = RunPlan.objects.create(
+                jurisdiction_id=juris.jurisdiction_id, success=report['success'])
+
+            save_import_result(report, juris.jurisdiction_id, plan)
             print_report(report)
 
         if 'report' in args.actions:
-            save_report(report, juris.jurisdiction_id)
+            save_report(juris.jurisdiction_id, plan)
 
         return report
