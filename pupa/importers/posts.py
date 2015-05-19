@@ -14,7 +14,7 @@ class PostImporter(BaseImporter):
         self.org_importer = org_importer
 
     def prepare_for_db(self, data):
-        data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
+        data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'],data)
         return data
 
     def get_object(self, post):

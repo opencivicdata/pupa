@@ -51,7 +51,7 @@ class VoteImporter(BaseImporter):
 
     def prepare_for_db(self, data):
         data['legislative_session_id'] = self.get_session_id(data.pop('legislative_session'))
-        data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
+        data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'),data)
         data['bill_id'] = self.bill_importer.resolve_json_id(data.pop('bill'))
         return data
 
