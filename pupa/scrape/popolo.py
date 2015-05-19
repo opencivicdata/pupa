@@ -77,7 +77,8 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
     def __init__(self, name, *, birth_date='', death_date='', biography='', summary='', image='',
                  gender='', national_identity='',
                  # specialty fields
-                 district=None, party=None, primary_org='', role='member', start_date='', end_date=''):
+                 district=None, party=None, primary_org='', role='member',
+                 start_date='', end_date=''):
         super(Person, self).__init__()
         self.name = name
         self.birth_date = birth_date

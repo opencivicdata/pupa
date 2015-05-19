@@ -1,5 +1,4 @@
 import datetime as dt
-import pytz
 
 
 EVENT_TIME_FORMATS = [

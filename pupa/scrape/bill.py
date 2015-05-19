@@ -44,7 +44,6 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.abstracts = []
         self.versions = []
 
-
     def add_action(self, description, date, *, organization=None, chamber=None,
                    classification=None, related_entities=None):
         action = Action(description=description, date=date,
@@ -81,8 +80,8 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
                                       primary, *, scheme, identifier, chamber=None):
         return self.add_sponsorship(name, classification, entity_type, primary,
                                     chamber=chamber, entity_id=make_pseudo_id(
-                                      identifiers__scheme=scheme,
-                                      identifiers__identifier=identifier))
+                                    identifiers__scheme=scheme,
+                                    identifiers__identifier=identifier))
 
     def add_subject(self, subject):
         self.subject.append(subject)
