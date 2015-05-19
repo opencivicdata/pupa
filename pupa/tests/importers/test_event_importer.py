@@ -9,7 +9,7 @@ def ge():
     event = ScrapeEvent(
         name="America's Birthday",
         start_time="2014-07-04T05:00Z",
-        location="America",
+        location_name="America",
         timezone="America/New_York",
         all_day=True)
     event.add_person("George Washington")

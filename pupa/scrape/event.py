@@ -53,7 +53,7 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     _type = 'event'
     _schema = schema
 
-    def __init__(self, name, start_time, timezone, location, *,
+    def __init__(self, name, start_time, timezone, location_name, *,
                  all_day=False, description="", end_time=None,
                  status="confirmed", classification="event"):
         super(Event, self).__init__()
@@ -65,7 +65,7 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         self.description = description
         self.status = status
         self.classification = classification
-        self.location = {"name": location, "note": "", "coordinates": None}
+        self.location = {"name": location_name, "note": "", "coordinates": None}
         self.documents = []
         self.participants = []
         self.media = []
@@ -73,6 +73,9 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
 
     def __str__(self):
         return '{} {}'.format(self.start_time, self.name.strip())
+
+    def set_location(self, name, *, note="", coordinates=None):
+        self.location = {"name": name, "note": note, "coordinates": coordinates}
 
     def add_participant(self, name, type, *, id=None, note='participant'):
         p = {
