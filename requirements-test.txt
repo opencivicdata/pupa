@@ -1,8 +1,5 @@
 Django==1.8.0
 dj_database_url
-django-uuidfield
-djorm-pgarray
-jsonfield==0.9.20
 opencivicdata-django
 psycopg2
 scrapelib
