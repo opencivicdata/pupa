@@ -41,7 +41,7 @@ def test_full_bill():
                          primary=False, entity_id=person.id)
     bill.add_sponsorship('Jane Smith', classification='lead sponsor', entity_type='person',
                          primary=True)
-    bill.add_abstract('This is an act about axes and taxes and tacks.', note="official")
+    bill.add_abstract('This is an act about axes and taxes and tacks.', note="official", date='1969-10-20')
     bill.add_document_link('Fiscal Note', 'http://example.com/fn.pdf',
                            media_type='application/pdf')
     bill.add_document_link('Fiscal Note', 'http://example.com/fn.html', media_type='text/html')
@@ -69,6 +69,7 @@ def test_full_bill():
     assert b.classification == bill.classification
     assert b.subject == ['taxes', 'axes']
     assert b.abstracts.get().note == 'official'
+    assert b.abstracts.get().date == '1969-10-20'
 
     # other_title, other_identifier added
     assert b.other_titles.get().title == 'Tack & Axe Tax Act'
