@@ -2,7 +2,6 @@ import os
 import json
 import uuid
 import logging
-import datetime
 from collections import defaultdict, OrderedDict
 
 import scrapelib
