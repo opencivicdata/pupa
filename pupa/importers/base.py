@@ -213,6 +213,11 @@ class BaseImporter(object):
         # remove the JSON _id (may still be there if called directly)
         data.pop('_id', None)
 
+        # XXX TEMPORARY XXX
+        # this was added temporarily while we avoid storing extras in the db
+        # waiting on a suitable JSONB implementation (Django 1.9 most likely)
+        data.pop('extras', None)
+
         # add fields/etc.
         data = self.prepare_for_db(data)
 

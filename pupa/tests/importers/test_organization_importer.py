@@ -125,6 +125,8 @@ def test_pseudo_parent_id_resolution():
     assert Organization.objects.get(name='UNESCO').parent.name == 'UN'
 
 
+# XXX TEMPORARY disabling of extras XXX
+@pytest.mark.skipif(True, reason="extras is temporarily disabled")
 @pytest.mark.django_db
 def test_extras_organization():
     org = ScrapeOrganization('United Nations', classification='international')
