@@ -47,6 +47,7 @@ class ImportObjects(models.Model):
 class DataQualityTypes(models.Model):
     object_type = models.CharField(max_length=20, choices=OBJECT_TYPES)
     name = models.CharField(max_length=300)
+    is_percentage = models.BooleanField()
     # bad_range = FloatRangeField()
     bad_range = models.FloatField()
 

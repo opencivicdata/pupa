@@ -61,7 +61,7 @@ def save_report(jurisdiction, plan):
         from pupa.models import RunPlan
         plan = RunPlan.objects.filter(jurisdiction=jurisdiction).latest('id')
 
-    # from pupa.reports.organizations import organization_report
+    from pupa.reports.organizations import organization_report
     from pupa.reports.people import person_report
     from pupa.reports.posts import post_report
     from pupa.reports.bills import bill_report
@@ -69,7 +69,7 @@ def save_report(jurisdiction, plan):
 
     measures = {}
 
-    # organization_report(jurisdiction)
+    measures['organization'] = organization_report(jurisdiction)
 
     measures['person'] = person_report(jurisdiction)
     measures['post'] = post_report(jurisdiction)

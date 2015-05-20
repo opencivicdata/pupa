@@ -3,7 +3,7 @@ from .utils import assert_data_quality_types_exist, get_or_create_type_and_modif
 
 
 def vote_report(jurisdiction):
-    get_or_create_type_and_modify('vote', 'invalid', (1, None))
+    get_or_create_type_and_modify('vote', 'invalid', (1, None), False)
 
     report = {}
 

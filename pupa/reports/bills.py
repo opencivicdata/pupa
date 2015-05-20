@@ -8,12 +8,12 @@ from .utils import percentage, assert_data_quality_types_exist, get_or_create_ty
 
 
 def bill_report(jurisdiction):
-    get_or_create_type_and_modify('bill', 'no_versions', (1, None))
-    get_or_create_type_and_modify('bill', 'no_actions', (1, None))
-    get_or_create_type_and_modify('bill', 'no_sponsors', (1, None))
-    get_or_create_type_and_modify('bill', 'no_sponsor_objs', (1, None))
-    get_or_create_type_and_modify('bill', 'dup_versions', (1, None))
-    get_or_create_type_and_modify('bill', 'unclassified_actions', (1, None))
+    get_or_create_type_and_modify('bill', 'no_versions', (1, None), True)
+    get_or_create_type_and_modify('bill', 'no_actions', (1, None), True)
+    get_or_create_type_and_modify('bill', 'no_sponsors', (1, None), True)
+    get_or_create_type_and_modify('bill', 'no_sponsor_objs', (1, None), True)
+    get_or_create_type_and_modify('bill', 'dup_versions', (1, None), True)
+    get_or_create_type_and_modify('bill', 'unclassified_actions', (1, None), True)
 
     report = {}
 

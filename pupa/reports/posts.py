@@ -7,7 +7,7 @@ from .utils import assert_data_quality_types_exist, get_or_create_type_and_modif
 
 
 def post_report(jurisdiction):
-    get_or_create_type_and_modify('post', 'vacant', (1, None))
+    get_or_create_type_and_modify('post', 'vacant', (1, None), False)
 
     report = {}
 
@@ -19,9 +19,9 @@ def post_report(jurisdiction):
 
     today = datetime.date.today().strftime('%Y-%m-%d')
     report['vacant'] = posts.filter(
-        Q(end_date__gte=today) | Q(end_date__isnull=True),
+        Q(end_date__gte=today) | Q(end_date=''),
         start_date__lte=today).exclude(
-        Q(memberships__end_date__gte=today) | Q(memberships__end_date__isnull=True),
+        Q(memberships__end_date__gte=today) | Q(memberships__end_date=''),
         memberships__start_date__lte=today).count()
 
     assert_data_quality_types_exist('post', report)
