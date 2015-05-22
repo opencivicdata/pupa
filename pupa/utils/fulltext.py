@@ -38,6 +38,12 @@ def pdf_to_text(response):
     return text
 
 
+def clean_text(text):
+    text = ' '.join(text.split())
+
+    return text
+
+
 def version_to_text(version):
     text = ''
 
@@ -64,6 +70,7 @@ def version_to_text(version):
     else:
         pass
 
+    text = clean_text(text)
     return text
 
 
