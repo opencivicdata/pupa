@@ -56,7 +56,7 @@ def version_to_text(version):
             if link_obj.media_type == mimetype:
                 try:
                     r = s.get(link_obj.url)
-                except scrapelib.HTTPError, requests.exceptions.ReadTimeout:
+                except (scrapelib.HTTPError, requests.exceptions.ReadTimeout):
                     pass
                 else:
                     filetype = mimetype.split('/')[-1]
@@ -110,6 +110,7 @@ def bill_to_elasticsearch(bill):
     es_bill['action_dates'] = []
     for action in bill.actions.all():
         es_bill['action_dates'].append(action.date)
+    es_bill['action_dates'] = sorted(list(set(es_bill['action_dates'])))
 
     # Gather the text of the most recent bill
     # If dates are present, use the one version most recently added to the database

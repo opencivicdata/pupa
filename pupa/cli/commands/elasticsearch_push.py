@@ -11,9 +11,13 @@ class Command(BaseCommand):
 
     def add_args(self):
         self.add_argument('jurisdictions', type=str, nargs='+',
-            help="Full OCD jurisdiction IDs to push; pass `_all` to push all jurisdictions'")
+            help="Full OCD jurisdiction IDs to push; pass `_all` to push all'")
 
     def handle(self, args, other):
+        if elasticsearch is None:
+            raise AssertionError(
+                "No elasticsearch instance found; make sure it's configured")
+
         if args.jurisdictions == ['_all', ]:
             for bill in Bill.objects.all():
                 elasticsearch.index(

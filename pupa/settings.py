@@ -75,6 +75,7 @@ else:
 DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
 
 
+elasticsearch = None
 if ENABLE_ELASTICSEARCH:
     elasticsearch = pyelasticsearch.ElasticSearch(
         urls='http://{}'.format(ELASTICSEARCH_HOST),
