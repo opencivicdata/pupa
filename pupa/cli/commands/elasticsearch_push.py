@@ -16,7 +16,6 @@ class Command(BaseCommand):
     def handle(self, args, other):
         if args.jurisdictions == ['_all', ]:
             for bill in Bill.objects.all():
-                # print(bill_to_elasticsearch(bill))
                 elasticsearch.index(
                     index='ocd', doc_type='bill', id=bill.id,
                     doc=bill_to_elasticsearch(bill))

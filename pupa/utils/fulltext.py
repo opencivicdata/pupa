@@ -2,6 +2,7 @@ import os
 import subprocess
 
 import lxml.html
+import requests
 import scrapelib
 
 
@@ -55,7 +56,7 @@ def version_to_text(version):
             if link_obj.media_type == mimetype:
                 try:
                     r = s.get(link_obj.url)
-                except scrapelib.HTTPError:
+                except scrapelib.HTTPError, requests.exceptions.ReadTimeout:
                     pass
                 else:
                     filetype = mimetype.split('/')[-1]
@@ -120,5 +121,4 @@ def bill_to_elasticsearch(bill):
         text = version_to_text(latest_version)
         es_bill['text'] = text
 
-    # if es_bill['text']:
     return es_bill
