@@ -76,18 +76,17 @@ def version_to_text(version):
 
 
 def bill_to_elasticsearch(bill):
-    es_bill = {}
-
-    # Include auxilary informaiton about the bill, besides its text
     DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
-    es_bill['jurisdiction'] = bill.get_jurisdiction_name()
-    es_bill['session'] = bill.get_session_name()
-    es_bill['identifier'] = bill.identifier
-    es_bill['subjects'] = bill.subject
-    es_bill['classifications'] = bill.classification
-    es_bill['updated_at'] = bill.updated_at.strftime(DATETIME_FORMAT)
-    es_bill['created_at'] = bill.created_at.strftime(DATETIME_FORMAT)
+    es_bill = {
+        'jurisdiction': bill.get_jurisdiction_name(),
+        'session': bill.get_session_name(),
+        'identifier': bill.identifier,
+        'subjects': bill.subject,
+        'classifications': bill.classification,
+        'updated_at': bill.updated_at.strftime(DATETIME_FORMAT),
+        'created_at': bill.created_at.strftime(DATETIME_FORMAT),
+    }
 
     es_bill['titles'] = [bill.title, ]
     for other_title in bill.other_titles.all():
