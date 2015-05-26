@@ -18,12 +18,9 @@ SCRAPELIB_RETRY_WAIT_SECONDS = 20
 CACHE_DIR = os.path.join(os.getcwd(), '_cache')
 SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 
-ENABLE_ELASTICSEARCH = True
-ELASTICSEARCH_HOST = 'localhost'
+ENABLE_ELASTICSEARCH = os.environ.get('ENABLE_ELASTICSEARCH', False)
+ELASTICSEARCH_HOST = os.environ.get('ELASTICSEARCH_HOST', 'localhost')
 ELASTICSEARCH_TIMEOUT = 2
-elasticsearch = pyelasticsearch.ElasticSearch(
-    urls='http://{}:9200'.format(ELASTICSEARCH_HOST),
-    timeout=ELASTICSEARCH_TIMEOUT)
 
 # dump settings
 
@@ -76,3 +73,8 @@ else:
 
 
 DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
+
+
+elasticsearch = pyelasticsearch.ElasticSearch(
+    urls='http://{}:9200'.format(ELASTICSEARCH_HOST),
+    timeout=ELASTICSEARCH_TIMEOUT)
