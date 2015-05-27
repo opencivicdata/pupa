@@ -1,6 +1,3 @@
-import pytz
-import datetime
-
 from .base import BaseImporter
 from ..utils.event import read_event_iso_8601
 from opencivicdata.models import (Event, EventLocation, EventSource, EventDocument,
@@ -41,7 +38,6 @@ class EventImporter(BaseImporter):
             'jurisdiction_id': self.jurisdiction_id
         }
         return self.model_class.objects.get(**spec)
-
 
     def get_location(self, location_data):
         obj, created = EventLocation.objects.get_or_create(name=location_data['name'],

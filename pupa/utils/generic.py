@@ -1,6 +1,5 @@
 import re
 import os
-import time
 import json
 import pytz
 import datetime
@@ -10,6 +9,7 @@ from validictory.validator import SchemaValidator
 
 def utcnow():
     return datetime.datetime.now(datetime.timezone.utc)
+
 
 def make_pseudo_id(**kwargs):
     """ pseudo ids are just JSON """

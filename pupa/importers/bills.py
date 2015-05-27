@@ -1,6 +1,6 @@
 from pupa.utils import fix_bill_id
 from opencivicdata.models import (Bill, RelatedBill, BillAbstract, BillTitle, BillIdentifier,
-                                  BillAction, BillActionRelatedEntity, RelatedBill,
+                                  BillAction, BillActionRelatedEntity,
                                   BillSponsorship, BillSource, BillDocument, BillVersion,
                                   BillDocumentLink, BillVersionLink)
 from .base import BaseImporter

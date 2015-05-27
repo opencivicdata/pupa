@@ -104,6 +104,7 @@ def test_pseudo_ids():
     assert (oi2.resolve_json_id('~{"classification":"international", "name":"United Nations"}') ==
             un.id)
 
+
 @pytest.mark.django_db
 def test_parent_id_resolution():
     parent = ScrapeOrganization('UN', classification='international')
