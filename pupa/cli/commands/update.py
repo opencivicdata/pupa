@@ -6,7 +6,8 @@ from collections import OrderedDict
 from django.db import transaction
 
 from .base import BaseCommand, CommandError
-from pupa import settings, utils
+from pupa import utils
+from pupa.core import settings
 from pupa.scrape import Jurisdiction, JurisdictionScraper
 
 
