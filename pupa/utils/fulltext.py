@@ -92,15 +92,10 @@ def bill_to_elasticsearch(bill):
     for other_title in bill.other_titles.all():
         es_bill['titles'].append(other_title.title)
 
-    # Recursively retrieve all organizations that the bill is related to
-    es_bill['organizations'] = []
     organization = bill.from_organization
-    while True:
-        try:
-            es_bill['organizations'].append(organization.name)
-        except AttributeError:
-            break
-        organization = organization.parent
+    es_bill['organizations'] = [organization.name, ]
+    for ancestor in organization.get_parents():
+        es_bill['organizations'].append(ancestor.name)
 
     es_bill['sponsors'] = []
     for sponsor in bill.sponsorships.all().filter(bill=bill):
