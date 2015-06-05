@@ -29,6 +29,7 @@ pupa = pupa.cli.__main__:main''',
           'psycopg2',
           'pytz',
           'boto',
+          #'kafka-python',  # Optional Kafka dep
       ],
       classifiers=["Development Status :: 4 - Beta",
                    "Intended Audience :: Developers",

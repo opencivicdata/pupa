@@ -75,7 +75,6 @@ def test_exception_on_identical_objects_in_import_stream():
     o1 = ScrapeOrganization('X-Men', classification='unknown').as_dict()
     o2 = ScrapeOrganization('X-Men', founding_date='1970', classification='unknown').as_dict()
 
-    pi = OrganizationImporter('jid')
     with pytest.raises(Exception):
         OrganizationImporter('jid').import_data([o1, o2])
 

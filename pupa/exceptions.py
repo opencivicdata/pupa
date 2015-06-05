@@ -20,9 +20,10 @@ class NoMembershipsError(DataImportError):
     """ An attempt was made to import a person without any memberships. """
 
     def __init__(self, ids):
-        super(NoMembershipsError, self).__init__('no memberhips for {} people: \n{}'.format(
+        super(NoMembershipsError, self).__init__('no memberships for {} people: \n{}'.format(
             len(ids), ', '.join(ids))
         )
+
 
 class SameNameError(DataImportError):
     """ Attempt was made to import two people with the same name. """
@@ -37,8 +38,8 @@ class DuplicateItemError(DataImportError):
     """ Attempt was made to import items that resolve to the same database item. """
 
     def __init__(self, data, obj):
-        super(DuplicateItemError, self).__init__('attempt to import data that would conflict with data '
-                                                 'already in the import: {} '
+        super(DuplicateItemError, self).__init__('attempt to import data that would conflict with '
+                                                 'data already in the import: {} '
                                                  '(already imported as {})'.format(
                                                      data, obj))
 

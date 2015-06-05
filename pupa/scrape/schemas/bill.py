@@ -41,6 +41,7 @@ schema = {
                 "properties": {
                     "abstract": {"type": "string"},
                     "note": {"type": "string", "blank": True},
+                    "date": {"type": "string", "blank": True},
                 },
                 "type": "object"},
             "type": "array",

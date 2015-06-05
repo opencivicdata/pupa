@@ -15,11 +15,11 @@ class DumbMockImporter(object):
 def test_full_vote():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     session = j.legislative_sessions.create(name='1900', identifier='1900')
-    person = Person.objects.create(id='person-id', name='Adam Smith')
+    Person.objects.create(id='person-id', name='Adam Smith')
     org = Organization.objects.create(id='org-id', name='House', classification='lower')
     bill = Bill.objects.create(id='bill-id', identifier='HB 1', legislative_session=session,
                                from_organization=org)
-    com = Organization.objects.create(id='com-id', name='Arbitrary Committee', parent=org)
+    Organization.objects.create(id='com-id', name='Arbitrary Committee', parent=org)
 
     vote = ScrapeVote(legislative_session='1900', motion_text='passage', start_date='1900-04-01',
                       classification='passage:bill', result='pass', bill_chamber='lower',
@@ -53,13 +53,12 @@ def test_full_vote():
 @pytest.mark.django_db
 def test_vote_identifier_dedupe():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
-    session = j.legislative_sessions.create(name='1900', identifier='1900')
+    j.legislative_sessions.create(name='1900', identifier='1900')
 
     vote = ScrapeVote(legislative_session='1900', start_date='2013',
                       classification='anything', result='passed',
                       motion_text='a vote on something',
-                      identifier='Roll Call No. 1',
-                     )
+                      identifier='Roll Call No. 1')
     dmi = DumbMockImporter()
     bi = BillImporter('jid', dmi, dmi)
 
@@ -98,8 +97,7 @@ def test_vote_bill_id_dedupe():
     vote = ScrapeVote(legislative_session='1900', start_date='2013',
                       classification='anything', result='passed',
                       motion_text='a vote on something',
-                      bill=bill.identifier, bill_chamber='lower'
-                     )
+                      bill=bill.identifier, bill_chamber='lower')
     dmi = DumbMockImporter()
     bi = BillImporter('jid', dmi, dmi)
 
@@ -122,8 +120,7 @@ def test_vote_bill_id_dedupe():
     vote = ScrapeVote(legislative_session='1900', start_date='2013',
                       classification='anything', result='passed',
                       motion_text='a vote on something',
-                      bill=bill2.identifier, bill_chamber='lower'
-                     )
+                      bill=bill2.identifier, bill_chamber='lower')
     _, what = VoteImporter('jid', dmi, dmi, bi).import_item(vote.as_dict())
     assert what == 'insert'
     assert VoteEvent.objects.count() == 2
@@ -138,21 +135,19 @@ def test_vote_bill_clearing():
     org = Organization.objects.create(id='org-id', name='House', classification='lower')
     bill = Bill.objects.create(id='bill-1', identifier='HB 1', legislative_session=session,
                                from_organization=org)
-    bill2 = Bill.objects.create(id='bill-2', identifier='HB 2', legislative_session=session,
-                                from_organization=org)
+    Bill.objects.create(id='bill-2', identifier='HB 2', legislative_session=session,
+                        from_organization=org)
     dmi = DumbMockImporter()
     bi = BillImporter('jid', dmi, dmi)
 
     vote1 = ScrapeVote(legislative_session='1900', start_date='2013',
                        classification='anything', result='passed',
-                       motion_text='a vote on somthing', # typo intentional
-                       bill=bill.identifier, bill_chamber='lower'
-                     )
+                       motion_text='a vote on somthing',             # typo intentional
+                       bill=bill.identifier, bill_chamber='lower')
     vote2 = ScrapeVote(legislative_session='1900', start_date='2013',
                        classification='anything', result='passed',
                        motion_text='a vote on something else',
-                       bill=bill.identifier, bill_chamber='lower'
-                     )
+                       bill=bill.identifier, bill_chamber='lower')
 
     # have to use import_data so postimport is called
     VoteImporter('jid', dmi, dmi, bi).import_data([vote1.as_dict(), vote2.as_dict()])

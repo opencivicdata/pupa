@@ -4,7 +4,7 @@ import requests
 import boto
 
 from ... import settings
-from .base import BaseCommand, CommandError
+from .base import BaseCommand
 
 
 def parse_page(url):
@@ -13,8 +13,8 @@ def parse_page(url):
     data = requests.get(url + '&apikey=' + settings.API_KEY).json()
     for person in data['results']:
         id = person['id']
-        pjson = requests.get('https://api.opencivicdata.org/{}/?apikey={}'.format(id,
-                                                                                  settings.API_KEY))
+        pjson = requests.get('https://api.opencivicdata.org/{}/?apikey={}'.format(
+            id, settings.API_KEY))
         with open(id, 'w') as f:
             f.write(pjson.text)
     page = data['meta']['page'] + 1
@@ -45,7 +45,6 @@ class Command(BaseCommand):
 
     def add_args(self):
         pass
-        #self.add_argument('module', type=str, help='name of the new scraper module')
 
     def handle(self, args, other):
         bucket = 'allthe.opencivicdata.org'

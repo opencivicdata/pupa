@@ -1,11 +1,14 @@
 import re
 import os
-import time
 import json
 import pytz
 import datetime
 import subprocess
 from validictory.validator import SchemaValidator
+
+
+def utcnow():
+    return datetime.datetime.now(datetime.timezone.utc)
 
 
 def make_pseudo_id(**kwargs):
