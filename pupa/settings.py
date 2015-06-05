@@ -2,7 +2,6 @@ import os
 import importlib
 import sys
 import dj_database_url
-import pyelasticsearch
 
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgis://pupa:pupa@localhost/opencivicdata')
 SECRET_KEY = 'non-secret'
@@ -22,12 +21,9 @@ SCRAPELIB_RETRY_WAIT_SECONDS = 20
 CACHE_DIR = os.path.join(os.getcwd(), '_cache')
 SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 
-ENABLE_ELASTICSEARCH = True
+ENABLE_ELASTICSEARCH = False
 ELASTICSEARCH_HOST = 'localhost'
 ELASTICSEARCH_TIMEOUT = 2
-elasticsearch = pyelasticsearch.ElasticSearch(
-    urls='http://{}:9200'.format(ELASTICSEARCH_HOST),
-    timeout=ELASTICSEARCH_TIMEOUT)
 
 # dump settings
 
