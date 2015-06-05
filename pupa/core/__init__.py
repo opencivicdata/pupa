@@ -1,1 +1,1 @@
-from elasticsearch import elasticsearch
+from .elasticsearch import elasticsearch
