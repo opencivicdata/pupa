@@ -85,23 +85,23 @@ def save_report(jurisdiction, plan):
     from pupa.reports.bills import bill_report
     from pupa.reports.votes import vote_report
 
-    measures = {}
+    report = {}
 
-    measures['organization'] = organization_report(jurisdiction)
+    report['organization'] = organization_report(jurisdiction)
 
-    measures['person'] = person_report(jurisdiction)
-    measures['post'] = post_report(jurisdiction)
-    # measures['membership'] = membership_report(jurisdiction)
+    report['person'] = person_report(jurisdiction)
+    report['post'] = post_report(jurisdiction)
+    # report['membership'] = membership_report(jurisdiction)
 
-    measures['bill'] = bill_report(jurisdiction)
-    measures['vote'] = vote_report(jurisdiction)
+    report['bill'] = bill_report(jurisdiction)
+    report['vote'] = vote_report(jurisdiction)
 
-    # measures['event'] = event_report(jurisdiction)
+    # report['event'] = event_report(jurisdiction)
 
     from pupa.models import DataQualityChecks, DataQualityTypes
-    for key in measures.keys():
-        for measure, value in measures[key].items():
-            type_ = DataQualityTypes.objects.get(object_type=key, name=measure)
+    for key in report.keys():
+        for check, value in report[key].items():
+            type_ = DataQualityTypes.objects.get(object_type=key, name=check)
             DataQualityChecks.objects.create(
                 plan=plan,
                 type=type_,
