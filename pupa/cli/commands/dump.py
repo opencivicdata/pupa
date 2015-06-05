@@ -3,7 +3,7 @@ import datetime
 import requests
 import boto
 
-from pupa.core import settings
+from ... import settings
 from .base import BaseCommand, CommandError
 
 

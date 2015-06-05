@@ -30,7 +30,7 @@ def main():
 
     # configure Django before model imports
     if os.environ.get("DJANGO_SETTINGS_MODULE") is None:
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'pupa.core.settings'
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'pupa.settings'
 
     try:
         django.setup()

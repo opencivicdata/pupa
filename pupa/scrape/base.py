@@ -8,8 +8,7 @@ from collections import defaultdict, OrderedDict
 import scrapelib
 from validictory import ValidationError
 
-from pupa import utils
-from pupa.core import settings
+from pupa import utils, settings
 
 
 class ScrapeError(Exception):

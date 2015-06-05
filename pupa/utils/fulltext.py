@@ -79,8 +79,8 @@ def bill_to_elasticsearch(bill):
     DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
     es_bill = {
-        'jurisdiction': bill.legislative_session.jurisdiction.name,
-        'session': bill.legislative_session.name,
+        'jurisdiction': bill.get_jurisdiction_name(),
+        'session': bill.get_session_name(),
         'identifier': bill.identifier,
         'subjects': bill.subject,
         'classifications': bill.classification,

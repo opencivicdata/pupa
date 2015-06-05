@@ -2,7 +2,7 @@ from opencivicdata.models.bill import Bill
 
 from .base import BaseCommand
 from pupa.utils.fulltext import bill_to_elasticsearch
-from pupa.core import elasticsearch
+from pupa.settings import elasticsearch
 
 
 class Command(BaseCommand):
