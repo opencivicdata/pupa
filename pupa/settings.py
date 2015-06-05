@@ -2,7 +2,6 @@ import os
 import importlib
 import sys
 import dj_database_url
-import pyelasticsearch
 
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgis://pupa:pupa@localhost/opencivicdata')
 SECRET_KEY = 'non-secret'
@@ -73,10 +72,3 @@ else:
 
 
 DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
-
-
-elasticsearch = None
-if ENABLE_ELASTICSEARCH:
-    elasticsearch = pyelasticsearch.ElasticSearch(
-        urls='http://{}'.format(ELASTICSEARCH_HOST),
-        timeout=ELASTICSEARCH_TIMEOUT)
