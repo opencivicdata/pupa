@@ -46,3 +46,14 @@ class DuplicateItemError(DataImportError):
 
 class UnresolvedIdError(DataImportError):
     """ Attempt was made to resolve an id that has no result. """
+
+
+class SourceHasDuplicateNamesError(DataImportError):
+    """ Attempt was made to import two people with the same name who appear in the same source. """
+
+    def __init__(self, name, source_url):
+        super(SourceHasDuplicateNamesError, self).__init__(
+            'Person objects where source_identified == True must have names '
+            'that are unique to their source. attempted to import '
+            'the name {} more than once in the '
+            'source {}'.format(name, source_url))

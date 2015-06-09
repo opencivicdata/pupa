@@ -3,7 +3,7 @@ from django.db.models import Q
 from opencivicdata.models import (Person, PersonIdentifier, PersonName, PersonContactDetail,
                                   PersonLink, PersonSource)
 from .base import BaseImporter
-from ..exceptions import SameNameError
+from ..exceptions import SameNameError, SourceHasDuplicateNamesError
 
 
 class PersonImporter(BaseImporter):
@@ -41,7 +41,7 @@ class PersonImporter(BaseImporter):
             namecounts = Counter(namelist)
             for n, count in namecounts.items():
                 if count > 1:
-                    raise Exception('{} has duplicate names'.format(source))
+                    raise SourceHasDuplicateNamesError(n, sourcekey[0])
 
         return dicts
 
