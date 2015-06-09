@@ -73,9 +73,6 @@ class PersonImporter(BaseImporter):
             main_query = Q(**spec)
 
             source_qs = []
-            if len(person['sources']) == 0:
-                raise KeyError('source-identified person {} has no sources!'.format(
-                    person['name']))
             for s in person['sources']:
                 sq = {}
                 sq['sources__url'] = s['url']

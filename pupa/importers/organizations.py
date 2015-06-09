@@ -25,9 +25,6 @@ class OrganizationImporter(BaseImporter):
 
         if org['source_identified']:
             source_qs = []
-            if len(org['sources']) == 0:
-                raise KeyError('source-identified org {} has no sources!'.format(
-                    org['name']))
             for s in org['sources']:
                 sq = {}
                 sq['sources__url'] = s['url']
