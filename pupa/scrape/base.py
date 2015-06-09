@@ -137,16 +137,6 @@ class BaseBillScraper(Scraper):
                 continue
 
 
-class BaseDisclosureScraper(Scraper):
-
-    def do_scrape(self, **kwargs):
-        record = super(BaseDisclosureScraper, self).do_scrape(**kwargs)
-        utils.makedirs(settings.PERSIST_DATA_DIR)
-        for f in glob.glob(settings.SCRAPED_DATA_DIR + '/*/*.json'):
-            shutil.copy(f, settings.PERSIST_DATA_DIR)
-        return record
-
-
 class BaseModel(object):
     """
     This is the base class for all the Open Civic objects. This contains
