@@ -5,6 +5,7 @@ from .base import BaseCommand, CommandError
 from opencivicdata.common import JURISDICTION_CLASSIFICATIONS
 from opencivicdata.divisions import Division
 
+
 def prompt(ps, default=''):
     return input(ps).strip() or default
 
@@ -43,10 +44,11 @@ def write_jurisdiction_template(dirname, short_name, long_name, division_id, cla
     lines.append('        org = Organization(name="org_name", classification="legislature")')
     lines.append('')
 
-    lines.append('        #OPTIONAL: add posts to your organizaion using thi format,')
-    lines.append('        #where label is a human-readable description of the post (eg "Ward 8 conucilmember")')
-    lines.append('        #and role is the positoin type (eg conucilmember, alderman, mayor...)')
-    lines.append('        #skip entirely if you\'re not writing a people scraper.')
+    lines.append('        # OPTIONAL: add posts to your organizaion using thi format,')
+    lines.append('        # where label is a human-readable description of the post '
+                 '(eg "Ward 8 councilmember")')
+    lines.append('        # and role is the positoin type (eg conucilmember, alderman, mayor...)')
+    lines.append('        # skip entirely if you\'re not writing a people scraper.')
     lines.append('        org.add_post(label="position_description", role="position_type")')
     lines.append('')
     lines.append('        #REQUIIRED: yield the organization')
@@ -82,7 +84,8 @@ class Command(BaseCommand):
     def handle(self, args, other):
 
         name = prompt('jurisdiction name (e.g. City of Seattle): ')
-        division = prompt('division id (look this up in the opencivicdata/ocd-division-ids repository): ')
+        division = prompt('division id (look this up in the opencivicdata/ocd-division-ids '
+                          'repository): ')
         classification = prompt('classification (can be: {}): '
                                 .format(', '.join(JURISDICTION_CLASSIFICATIONS)))
         url = prompt('official URL: ')
@@ -90,10 +93,10 @@ class Command(BaseCommand):
         try:
             Division.get(division)
         except ValueError:
-            print("\nERROR: Division ID is invalid.",\
-                    "Please find the correct division_id here",\
-                    "https://github.com/opencivicdata/ocd-division-ids/tree/master/identifiers",\
-                    "or contact open-civic-data@googlegroups.org to add a new country\n")
+            print("\nERROR: Division ID is invalid.",
+                  "Please find the correct division_id here",
+                  "https://github.com/opencivicdata/ocd-division-ids/tree/master/identifiers",
+                  "or contact open-civic-data@googlegroups.org to add a new country\n")
             sys.exit(1)
 
         if os.path.exists(args.module):

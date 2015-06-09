@@ -2,17 +2,11 @@ import os
 import copy
 import glob
 import json
-import uuid
 import logging
-import datetime
-from pprint import PrettyPrinter
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id, combine_dicts, utcnow
-from pupa.utils.topsort import Network
 from opencivicdata.models import LegislativeSession
 from pupa.exceptions import UnresolvedIdError, DataImportError
-
-pp = PrettyPrinter(indent=4)
 
 
 def omnihash(obj):
@@ -144,8 +138,10 @@ class BaseImporter(object):
                     raise UnresolvedIdError('cannot resolve pseudo id to {}: {}'.format(
                         self.model_class.__name__, json_id))
                 except self.model_class.MultipleObjectsReturned:
-                    raise UnresolvedIdError('multiple objects returned for pseudo id to {}: {}'.format(
-                        self.model_class.__name__, json_id))
+                    raise UnresolvedIdError(
+                        'multiple objects returned for pseudo id to {}: {}'.format(
+                            self.model_class.__name__, json_id)
+                    )
 
             # return the cached object
             return self.pseudo_id_cache[json_id]
@@ -279,8 +275,6 @@ class BaseImporter(object):
                         setattr(obj, key, value)
                         what = 'update'
             if what == 'update':
-                #self.debug('matched... {}'.format(pp.pformat(_matched_obj_data)))
-                #self.debug('new... {}'.format(pp.pformat(data)))
                 obj.save()
 
             updated = self._update_related(obj, related, self.related_models)

@@ -24,7 +24,8 @@ def test_bill_type_setting():
     assert b.classification == ["bill"]
 
     # string -> list
-    b = Bill(identifier="some bill", legislative_session="session", title="the title", classification="string")
+    b = Bill(identifier="some bill", legislative_session="session", title="the title",
+             classification="string")
     assert b.classification == ["string"]
 
     # list unmodified

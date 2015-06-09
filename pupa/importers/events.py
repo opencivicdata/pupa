@@ -1,6 +1,3 @@
-import pytz
-import datetime
-
 from .base import BaseImporter
 from ..utils.event import read_event_iso_8601
 from opencivicdata.models import (Event, EventLocation, EventSource, EventDocument,

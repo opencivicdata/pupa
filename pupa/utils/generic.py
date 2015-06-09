@@ -12,6 +12,7 @@ from validictory.validator import SchemaValidator
 def utcnow():
     return datetime.datetime.now(datetime.timezone.utc)
 
+
 def make_pseudo_id(**kwargs):
     """ pseudo ids are just JSON """
     return '~' + json.dumps(kwargs)
