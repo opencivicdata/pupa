@@ -16,4 +16,7 @@ RUN pip3 install jsonfield kafka-python
 RUN mkdir -p /pupa
 WORKDIR /pupa
 
+ENV PYTHONIOENCODING 'utf-8'
+ENV LANG 'en_US.UTF-8'
+
 ENTRYPOINT ["pupa"]
