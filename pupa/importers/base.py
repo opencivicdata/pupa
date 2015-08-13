@@ -140,11 +140,11 @@ class BaseImporter(object):
                 elif not ids :
                     raise UnresolvedIdError(
                         'cannot resolve pseudo id to {}: {}'.format(
-                        self.model_class.__name__, json_id))
+                            self.model_class.__name__, json_id))
                 else :
                     raise UnresolvedIdError(
                         'multiple objects returned for pseudo id to {}: {}'.format(
-                        self.model_class.__name__, json_id))
+                            self.model_class.__name__, json_id))
 
             # return the cached object
             return self.pseudo_id_cache[json_id]
