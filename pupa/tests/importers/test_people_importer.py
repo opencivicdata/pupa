@@ -4,6 +4,7 @@ from pupa.importers import PersonImporter
 from opencivicdata.models import Person, Organization, Membership
 from pupa.exceptions import SameNameError
 
+
 @pytest.mark.django_db
 def test_full_person():
     person = ScrapePerson('Tom Sawyer')
@@ -148,10 +149,11 @@ def test_same_name_people():
     assert resp['person']['noop'] == 0
     assert resp['person']['update'] == 1
 
+
 @pytest.mark.django_db
 def test_same_name_people_other_name():
     # ensure we're taking other_names into account for the name collision code
-    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
     p1 = ScrapePerson('Dwayne Johnson', image='http://example.com/1')
     p2 = ScrapePerson('Rock', image='http://example.com/2')
     p2.add_name('Dwayne Johnson')
@@ -171,7 +173,7 @@ def test_same_name_second_import():
     p2.birth_date = '1930'
 
     # when we give them birth dates all is well though
-    resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+    PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
 
     # fake some memberships so future lookups work on these people
     for p in Person.objects.all():
@@ -180,4 +182,4 @@ def test_same_name_second_import():
     p3 = ScrapePerson('Dwayne Johnson', image='http://example.com/3')
 
     with pytest.raises(SameNameError):
-        resp = PersonImporter('jurisdiction-id').import_data([p3.as_dict()])
+        PersonImporter('jurisdiction-id').import_data([p3.as_dict()])

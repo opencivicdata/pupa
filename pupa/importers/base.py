@@ -2,12 +2,9 @@ import os
 import copy
 import glob
 import json
-import uuid
 import logging
-import datetime
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id, utcnow
-from pupa.utils.topsort import Network
 from opencivicdata.models import LegislativeSession
 from pupa.exceptions import UnresolvedIdError, DataImportError
 
@@ -141,10 +138,12 @@ class BaseImporter(object):
                 if len(ids) == 1 :
                     self.pseudo_id_cache[json_id] = ids.pop()
                 elif not ids :
-                    raise UnresolvedIdError('cannot resolve pseudo id to {}: {}'.format(
+                    raise UnresolvedIdError(
+                        'cannot resolve pseudo id to {}: {}'.format(
                         self.model_class.__name__, json_id))
                 else :
-                    raise UnresolvedIdError('multiple objects returned for pseudo id to {}: {}'.format(
+                    raise UnresolvedIdError(
+                        'multiple objects returned for pseudo id to {}: {}'.format(
                         self.model_class.__name__, json_id))
 
             # return the cached object
@@ -263,8 +262,6 @@ class BaseImporter(object):
             self._create_related(obj, related, self.related_models)
 
         return obj.id, what
-
-
 
     def _update_related(self, obj, related, subfield_dict):
         """

@@ -74,8 +74,8 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     def __str__(self):
         return '{} {}'.format(self.start_time, self.name.strip())
 
-    def set_location(self, name, *, note="", coordinates=None):
-        self.location = {"name": name, "note": note, "coordinates": coordinates}
+    def set_location(self, name, *, note="", url="", coordinates=None):
+        self.location = {"name": name, "note": note, "url": url, "coordinates": coordinates}
 
     def add_participant(self, name, type, *, id=None, note='participant'):
         p = {

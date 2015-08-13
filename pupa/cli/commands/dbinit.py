@@ -37,7 +37,7 @@ class Command(BaseCommand):
         self.add_argument('--reset', action='store_true', default=False,
                           help='reset entire database - USE WITH CAUTION')
         self.add_argument('--partial-reset', action='store_true', default=False,
-                          help='reset entire database, except for divisions - STILL, USE WITH CAUTION')
+                          help='reset entire database, except for divisions - USE WITH CAUTION')
         self.add_argument(type=str, dest='country', nargs='+',
                           help='country to load divisions for')
 

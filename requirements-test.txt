@@ -1,4 +1,4 @@
-Django>=1.7,<1.8
+Django>=1.8
 dj_database_url
 django-uuidfield
 djorm-pgarray
