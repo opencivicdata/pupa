@@ -3,7 +3,7 @@ dj_database_url
 django-uuidfield
 djorm-pgarray
 jsonfield==0.9.20
-opencivicdata-django
+-e git://github.com/opencivicdata/python-opencivicdata-django.git#egg=opencivicdata-django
 psycopg2
 scrapelib
 validictory
