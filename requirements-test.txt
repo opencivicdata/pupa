@@ -14,3 +14,5 @@ pytest
 pytest-cov
 pytest-django
 coveralls
+
+-e git://github.com/sunlightlabs/waterfall.git#egg=waterfall
