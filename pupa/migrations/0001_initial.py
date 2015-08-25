@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='ImportObjects',
             fields=[
                 ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
-                ('object_type', models.CharField(max_length=20, choices=[('jurisdiction', 'Jurisdiction'), ('person', 'Person'), ('organization', 'Organization'), ('post', 'Post'), ('membership', 'Membership'), ('bill', 'Bill'), ('vote', 'Vote'), ('event', 'Event')])),
+                ('object_type', models.CharField(max_length=20, choices=[('jurisdiction', 'Jurisdiction'), ('person', 'Person'), ('organization', 'Organization'), ('post', 'Post'), ('membership', 'Membership'), ('bill', 'Bill'), ('vote_event', 'VoteEvent'), ('event', 'Event')])),
                 ('insert_count', models.PositiveIntegerField()),
                 ('update_count', models.PositiveIntegerField()),
                 ('noop_count', models.PositiveIntegerField()),
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
             name='ScrapeObjects',
             fields=[
                 ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
-                ('object_type', models.CharField(max_length=20, choices=[('jurisdiction', 'Jurisdiction'), ('person', 'Person'), ('organization', 'Organization'), ('post', 'Post'), ('membership', 'Membership'), ('bill', 'Bill'), ('vote', 'Vote'), ('event', 'Event')])),
+                ('object_type', models.CharField(max_length=20, choices=[('jurisdiction', 'Jurisdiction'), ('person', 'Person'), ('organization', 'Organization'), ('post', 'Post'), ('membership', 'Membership'), ('bill', 'Bill'), ('vote_event', 'VoteEvent'), ('event', 'Event')])),
                 ('count', models.PositiveIntegerField()),
             ],
             options={

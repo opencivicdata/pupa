@@ -40,7 +40,7 @@ def test_related_vote_event():
 
     for event in [event1, event2]:
         item = event.add_agenda_item("Cookies will be served")
-        item.add_vote(vote="Roll no. 12")
+        item.add_vote_event(vote_event="Roll no. 12")
 
     result = EventImporter('jid').import_data([event1.as_dict()])
     assert result['event']['insert'] == 1

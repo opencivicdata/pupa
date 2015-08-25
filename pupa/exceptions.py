@@ -12,8 +12,8 @@ class DataImportError(PupaError):
     """ A generic error related to the import process. """
 
 
-class InvalidVoteError(DataImportError):
-    """ Attempt to create a vote without an identifier or bill_id """
+class InvalidVoteEventError(DataImportError):
+    """ Attempt to create a vote event without an identifier or bill_id """
 
 
 class NoMembershipsError(DataImportError):

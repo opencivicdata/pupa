@@ -146,7 +146,7 @@ class Command(BaseCommand):
         # import inside here because to avoid loading Django code unnecessarily
         from pupa.importers import (JurisdictionImporter, OrganizationImporter, PersonImporter,
                                     PostImporter, MembershipImporter, BillImporter,
-                                    VoteImporter, EventImporter)
+                                    VoteEventImporter, EventImporter)
         datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
 
         juris_importer = JurisdictionImporter(juris.jurisdiction_id)
@@ -156,8 +156,8 @@ class Command(BaseCommand):
         membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
                                                  org_importer, post_importer)
         bill_importer = BillImporter(juris.jurisdiction_id, org_importer, person_importer)
-        vote_importer = VoteImporter(juris.jurisdiction_id, person_importer, org_importer,
-                                     bill_importer)
+        vote_event_importer = VoteEventImporter(juris.jurisdiction_id, person_importer, org_importer,
+                                                bill_importer)
         event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
@@ -177,8 +177,8 @@ class Command(BaseCommand):
             report.update(bill_importer.import_directory(datadir))
             print('import events...')
             report.update(event_importer.import_directory(datadir))
-            print('import votes...')
-            report.update(vote_importer.import_directory(datadir))
+            print('import vote events...')
+            report.update(vote_event_importer.import_directory(datadir))
 
         return report
 
