@@ -132,16 +132,14 @@ class BaseImporter(object):
                 spec = get_pseudo_id(json_id)
                 spec = self.limit_spec(spec)
 
-                ids = {each.id 
-                       for each 
-                       in self.model_class.objects.filter(**spec)}
-                if len(ids) == 1 :
+                ids = {each.id for each in self.model_class.objects.filter(**spec)}
+                if len(ids) == 1:
                     self.pseudo_id_cache[json_id] = ids.pop()
-                elif not ids :
+                elif not ids:
                     raise UnresolvedIdError(
                         'cannot resolve pseudo id to {}: {}'.format(
                             self.model_class.__name__, json_id))
-                else :
+                else:
                     raise UnresolvedIdError(
                         'multiple objects returned for pseudo id to {}: {}'.format(
                             self.model_class.__name__, json_id))

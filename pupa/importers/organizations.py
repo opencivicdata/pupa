@@ -46,8 +46,6 @@ class OrganizationImporter(BaseImporter):
         pseudo_ids = set()
         # pseudo matches
         pseudo_matches = {}
-        # all data items with a pseudo_id parent
-        pseudo_children = []
 
         # get prepared imports from parent
         prepared = dict(super(OrganizationImporter, self)._prepare_imports(dicts))
