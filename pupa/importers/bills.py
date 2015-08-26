@@ -69,7 +69,7 @@ class BillImporter(BaseImporter):
                     sponsor['person_id'])
 
             if 'organization_id' in sponsor:
-                sponsor['organization_id'] = self.person_importer.resolve_json_id(
+                sponsor['organization_id'] = self.org_importer.resolve_json_id(
                     sponsor['organization_id'])
 
         return data
