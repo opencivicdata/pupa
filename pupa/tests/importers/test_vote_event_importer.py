@@ -1,7 +1,10 @@
 import pytest
-from pupa.scrape import VoteEvent as ScrapeVoteEvent
-from pupa.importers import VoteEventImporter, BillImporter
-from opencivicdata.models import VoteEvent, Jurisdiction, Person, Organization, Bill
+from pupa.scrape import (VoteEvent as ScrapeVoteEvent, Bill as ScrapeBill, Organization as
+                         ScrapeOrganization, Person as ScrapePerson)
+from pupa.importers import (VoteEventImporter, BillImporter, MembershipImporter,
+                            OrganizationImporter, PersonImporter)
+from opencivicdata.models import (VoteEvent, Jurisdiction, LegislativeSession, Person,
+                                  Organization, Bill)
 
 
 class DumbMockImporter(object):
@@ -14,30 +17,38 @@ class DumbMockImporter(object):
 @pytest.mark.django_db
 def test_full_vote_event():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
-    session = j.legislative_sessions.create(name='1900', identifier='1900')
-    Person.objects.create(id='person-id', name='Adam Smith')
-    org = Organization.objects.create(id='org-id', name='House', classification='lower')
-    bill = Bill.objects.create(id='bill-id', identifier='HB 1', legislative_session=session,
-                               from_organization=org)
-    Organization.objects.create(id='com-id', name='Arbitrary Committee', parent=org)
-
+    j.legislative_sessions.create(name='1900', identifier='1900')
+    sp1 = ScrapePerson('John Smith', primary_org='lower')
+    sp2 = ScrapePerson('Adam Smith', primary_org='lower')
+    org = ScrapeOrganization(name='House', classification='lower')
+    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act', from_organization=org._id)
     vote_event = ScrapeVoteEvent(legislative_session='1900', motion_text='passage',
                                  start_date='1900-04-01', classification='passage:bill',
-                                 result='pass', bill_chamber='lower', bill=bill.identifier)
+                                 result='pass', bill_chamber='lower', bill='HB 1',
+                                 organization=org._id)
     vote_event.set_count('yes', 20)
     vote_event.yes('John Smith')
     vote_event.no('Adam Smith')
 
-    dmi = DumbMockImporter()
-    bi = BillImporter('jid', dmi, dmi)
+    oi = OrganizationImporter('jid')
+    oi.import_data([org.as_dict()])
 
-    VoteEventImporter('jid', dmi, dmi, bi).import_data([vote_event.as_dict()])
+    pi = PersonImporter('jid')
+    pi.import_data([sp1.as_dict(), sp2.as_dict()])
+
+    mi = MembershipImporter('jid', pi, oi, DumbMockImporter())
+    mi.import_data([sp1._related[0].as_dict(), sp2._related[0].as_dict()])
+
+    bi = BillImporter('jid', oi, pi)
+    bi.import_data([bill.as_dict()])
+
+    VoteEventImporter('jid', pi, oi, bi).import_data([vote_event.as_dict()])
 
     assert VoteEvent.objects.count() == 1
     ve = VoteEvent.objects.get()
-    assert ve.legislative_session_id == session.id
+    assert ve.legislative_session == LegislativeSession.objects.get()
     assert ve.motion_classification == ['passage:bill']
-    assert ve.bill_id == bill.id
+    assert ve.bill == Bill.objects.get()
     count = ve.counts.get()
     assert count.option == 'yes'
     assert count.value == 20
@@ -46,8 +57,10 @@ def test_full_vote_event():
     for v in ve.votes.all():
         if v.voter_name == 'John Smith':
             assert v.option == 'yes'
+            assert v.voter == Person.objects.get(name='John Smith')
         else:
             assert v.option == 'no'
+            assert v.voter == Person.objects.get(name='Adam Smith')
 
 
 @pytest.mark.django_db

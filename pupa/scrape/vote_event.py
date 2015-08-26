@@ -44,7 +44,8 @@ class VoteEvent(BaseModel, SourceMixin):
             self.bill = make_pseudo_id(**kwargs)
 
     def vote(self, option, voter, *, note=''):
-        self.votes.append({"option": option, "voter_name": voter, 'note': note})
+        self.votes.append({"option": option, "voter_name": voter,
+                           "voter_id": make_pseudo_id(name=voter), 'note': note})
 
     def yes(self, name, *, id=None, note=''):
         return self.vote('yes', name, note=note)

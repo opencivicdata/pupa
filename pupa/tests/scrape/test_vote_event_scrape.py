@@ -20,6 +20,9 @@ def test_simple_vote_event():
     assert len(ve.votes) == 3
     assert len(ve.counts) == 1
     assert get_pseudo_id(ve.organization) == {'classification': 'legislature'}
+    assert get_pseudo_id(ve.votes[0]['voter_id']) == {'name': 'James'}
+    assert get_pseudo_id(ve.votes[1]['voter_id']) == {'name': 'Paul'}
+    assert get_pseudo_id(ve.votes[2]['voter_id']) == {'name': 'Thom'}
     assert ve.bill is None
 
     ve.validate()
