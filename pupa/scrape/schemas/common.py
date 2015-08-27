@@ -35,10 +35,10 @@ other_names = {
             "name": {"type": "string"},
             "start_date": fuzzy_date_blank,
             "end_date": fuzzy_date_blank,
-            "note": {"type": "string", "blank": True },
-        "type": "object",
+            "note": {"type": "string", "blank": True }
+            },
+        "type": "object"
         }
-    },
     "type": "array"
 }
 
