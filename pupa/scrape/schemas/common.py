@@ -38,7 +38,7 @@ other_names = {
             "note": {"type": "string", "blank": True }
             },
         "type": "object"
-        }
+        },
     "type": "array"
 }
 
