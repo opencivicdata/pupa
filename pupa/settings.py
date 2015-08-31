@@ -21,8 +21,8 @@ SCRAPELIB_RETRY_WAIT_SECONDS = 20
 CACHE_DIR = os.path.join(os.getcwd(), '_cache')
 SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 
-ENABLE_ELASTICSEARCH = False
-ELASTICSEARCH_HOST = 'localhost'
+ENABLE_ELASTICSEARCH = os.environ.get('ENABLE_ELASTICSEARCH', False)
+ELASTICSEARCH_HOST = os.environ.get('ELASTICSEARCH_HOST', 'localhost:9200')
 ELASTICSEARCH_TIMEOUT = 2
 
 # dump settings

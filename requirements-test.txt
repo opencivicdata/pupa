@@ -8,6 +8,7 @@ psycopg2
 scrapelib
 validictory
 pytz
+pyelasticsearch
 
 mock
 pytest
