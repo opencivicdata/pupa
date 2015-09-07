@@ -1,7 +1,7 @@
 import pytest
 from pupa.scrape import Event as ScrapeEvent
-from pupa.importers import EventImporter
-from opencivicdata.models import Jurisdiction
+from pupa.importers import EventImporter, OrganizationImporter, PersonImporter
+from opencivicdata.models import Event, Jurisdiction
 
 
 def ge():
@@ -21,14 +21,17 @@ def test_related_people_event():
     event1 = ge()
     event2 = ge()
 
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
     for event in [event1, event2]:
         item = event.add_agenda_item("Cookies will be served")
         item.add_person(person="John Q. Public")
 
-    result = EventImporter('jid').import_data([event1.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event1.as_dict()])
     assert result['event']['insert'] == 1
 
-    result = EventImporter('jid').import_data([event2.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event2.as_dict()])
     assert result['event']['noop'] == 1
 
 
@@ -55,14 +58,17 @@ def test_related_bill_event():
     event1 = ge()
     event2 = ge()
 
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
     for event in [event1, event2]:
         item = event.add_agenda_item("Cookies will be served")
         item.add_bill(bill="HB 101")
 
-    result = EventImporter('jid').import_data([event1.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event1.as_dict()])
     assert result['event']['insert'] == 1
 
-    result = EventImporter('jid').import_data([event2.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event2.as_dict()])
     assert result['event']['noop'] == 1
 
 
@@ -72,14 +78,17 @@ def test_related_committee_event():
     event1 = ge()
     event2 = ge()
 
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
     for event in [event1, event2]:
         item = event.add_agenda_item("Cookies will be served")
         item.add_committee(committee="Fiscal Committee")
 
-    result = EventImporter('jid').import_data([event1.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event1.as_dict()])
     assert result['event']['insert'] == 1
 
-    result = EventImporter('jid').import_data([event2.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event2.as_dict()])
     assert result['event']['noop'] == 1
 
 
@@ -89,6 +98,9 @@ def test_media_event():
     event1 = ge()
     event2 = ge()
 
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
     for event in [event1, event2]:
         item = event.add_agenda_item("Cookies will be served")
         item.add_media_link(
@@ -97,10 +109,10 @@ def test_media_event():
             url="http://hello.world/foo"
         )
 
-    result = EventImporter('jid').import_data([event1.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event1.as_dict()])
     assert result['event']['insert'] == 1
 
-    result = EventImporter('jid').import_data([event2.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event2.as_dict()])
     assert result['event']['noop'] == 1
 
 
@@ -110,14 +122,17 @@ def test_media_document():
     event1 = ge()
     event2 = ge()
 
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
     for event in [event1, event2]:
         event.add_document(note="Presentation",
                            url="http://example.com/presentation.pdf")
 
-    result = EventImporter('jid').import_data([event1.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event1.as_dict()])
     assert result['event']['insert'] == 1
 
-    result = EventImporter('jid').import_data([event2.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event2.as_dict()])
     assert result['event']['noop'] == 1
 
 
@@ -126,26 +141,32 @@ def test_full_event():
     Jurisdiction.objects.create(id='jid', division_id='did')
     event = ge()
 
-    result = EventImporter('jid').import_data([event.as_dict()])
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event.as_dict()])
     assert result['event']['insert'] == 1
 
-    result = EventImporter('jid').import_data([event.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event.as_dict()])
     assert result['event']['noop'] == 1
 
     event = ge()
     event.location['name'] = "United States of America"
-    result = EventImporter('jid').import_data([event.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event.as_dict()])
     assert result['event']['update'] == 1
 
 
 @pytest.mark.django_db
 def test_bad_event_time():
-    Jurisdiction.objects.create(id='jid', division_id='did')
+    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
     event = ge()
     event.start_time = "2014-07-04T05:00"
     pytest.raises(
         ValueError,
-        EventImporter('jid').import_item,
+        EventImporter('jid', org_importer=oi, person_importer=pi).import_item,
         event.as_dict()
     )
 
@@ -155,13 +176,16 @@ def test_top_level_media_event():
     Jurisdiction.objects.create(id='jid', division_id='did')
     event1, event2 = ge(), ge()
 
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
     event1.add_media_link("fireworks", "http://example.com/fireworks.mov",
                           media_type='application/octet-stream')
     event2.add_media_link("fireworks", "http://example.com/fireworks.mov",
                           media_type='application/octet-stream')
 
-    result = EventImporter('jid').import_data([event1.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event1.as_dict()])
     assert result['event']['insert'] == 1
 
-    result = EventImporter('jid').import_data([event2.as_dict()])
+    result = EventImporter('jid', org_importer=oi, person_importer=pi).import_data([event2.as_dict()])
     assert result['event']['noop'] == 1

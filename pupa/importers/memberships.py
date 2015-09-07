@@ -9,9 +9,10 @@ class MembershipImporter(BaseImporter):
     model_class = Membership
     related_models = {'contact_details': (MembershipContactDetail, 'membership_id', {}),
                       'links': (MembershipLink, 'membership_id', {})
-                     }
+                      }
 
-    def __init__(self, jurisdiction_id, person_importer, org_importer, post_importer):
+    def __init__(self, jurisdiction_id, person_importer, org_importer,
+                 post_importer):
         super(MembershipImporter, self).__init__(jurisdiction_id)
         self.person_importer = person_importer
         self.org_importer = org_importer
@@ -29,7 +30,10 @@ class MembershipImporter(BaseImporter):
         if membership['post_id']:
             spec['post_id'] = membership['post_id']
 
-        return self.model_class.objects.get(**spec)
+        found_object = self.model_class.objects.get(**spec)
+        if membership['start_date'] > found_object.start_date:
+            membership['start_date'] = found_object.start_date
+        return found_object
 
     def prepare_for_db(self, data):
         # check if the organization is not tied to a jurisdiction

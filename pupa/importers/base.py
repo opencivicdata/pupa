@@ -4,7 +4,7 @@ import glob
 import json
 import logging
 from pupa.exceptions import DuplicateItemError
-from pupa.utils import get_pseudo_id, utcnow
+from pupa.utils import get_pseudo_id, combine_dicts, utcnow
 from opencivicdata.models import LegislativeSession
 from pupa.exceptions import UnresolvedIdError, DataImportError
 
@@ -87,6 +87,7 @@ class BaseImporter(object):
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
         self.json_to_db_id = {}
+        self.json_to_sources = {}
         self.duplicates = {}
         self.pseudo_id_cache = {}
         self.session_cache = {}
@@ -203,8 +204,12 @@ class BaseImporter(object):
         }
 
         for json_id, data in self._prepare_imports(data_items):
+            if data.get('source_identified', False):
+                data_sources = set([(s['url'], s.get('note', '')) for s in data['sources']])
             obj_id, what = self.import_item(data)
             self.json_to_db_id[json_id] = obj_id
+            if data.get('source_identified', False):
+                self.json_to_sources[json_id] = data_sources
             record['records'][what].append(obj_id)
             record[what] += 1
 
@@ -237,13 +242,42 @@ class BaseImporter(object):
 
         # obj existed, check if we need to do an update
         if obj:
+            _matched_obj_data = copy.deepcopy(obj.__dict__)
             if obj.id in self.json_to_db_id.values():
-                raise DuplicateItemError(data, obj)
+                if data.get('source_identified', False):
+                    obj_sources = set([(s.url, s.note) for s in obj.sources.all()])
+                    _matched_obj_data['sources'] = copy.deepcopy(obj_sources)
+                    possible_dupes = [k for k, v in self.json_to_db_id.items()
+                                      if v == obj.id]
+                    for pd in possible_dupes:
+                        pd_sources = self.json_to_sources[pd]
+                        if len(pd_sources & obj_sources) > 0:
+                            raise DuplicateItemError(data, obj)
+                else:
+                    raise DuplicateItemError(data, obj)
+
             # check base object for changes
             for key, value in data.items():
-                if getattr(obj, key) != value:
-                    setattr(obj, key, value)
-                    what = 'update'
+                obj_value = getattr(obj, key)
+                if key == "extras":
+                    obj_value = json.loads(obj_value)
+                    if obj_value != value:
+                        new_extras = combine_dicts(value, obj_value)
+                        if new_extras != obj_value:
+                            setattr(obj, key, new_extras)
+                            what = 'update'
+                elif key == "name" and ('other_names' in related):
+                    existing_names = [oname.name for oname in obj.other_names.all()]
+                    existing_names.append(obj_value)
+                    if value in existing_names:
+                        continue
+                else:
+                    if obj_value != value:
+                        self.debug('differing property: {k} ({v})'.format(k=key,
+                                                                          v=getattr(obj, key)))
+                        self.debug('new value: {v}'.format(v=value))
+                        setattr(obj, key, value)
+                        what = 'update'
             if what == 'update':
                 obj.save()
 

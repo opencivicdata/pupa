@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from opencivicdata.models import (Organization, OrganizationIdentifier, OrganizationName,
                                   OrganizationContactDetail, OrganizationLink, OrganizationSource)
 from .base import BaseImporter
@@ -13,30 +15,46 @@ class OrganizationImporter(BaseImporter):
                       'other_names': (OrganizationName, 'organization_id', {}),
                       'contact_details': (OrganizationContactDetail, 'organization_id', {}),
                       'links': (OrganizationLink, 'organization_id', {}),
-                      'sources': (OrganizationSource, 'organization_id', {}),
-                     }
+                      'sources': (OrganizationSource, 'organization_id', {})
+                      }
 
     def get_object(self, org):
-        spec = {'classification': org['classification'],
-                'name': org['name'],
-                'parent_id': org['parent_id']}
+        all_names = [org['name']] + [o['name'] for o in org['other_names']]
 
-        # add jurisdiction_id unless this is a party
-        jid = org.get('jurisdiction_id')
-        if jid:
-            spec['jurisdiction_id'] = jid
+        main_query = (Q(name__in=all_names) | Q(other_names__name__in=all_names))
 
-        return self.model_class.objects.get(**spec)
+        if org['source_identified']:
+            source_qs = []
+            for s in org['sources']:
+                sq = {}
+                sq['sources__url'] = s['url']
+                sq['sources__note'] = s.get('note', '')
+                source_qs.append(Q(**sq))
+            source_query = source_qs.pop()
+            for q in source_qs:
+                source_query |= q
+            main_query &= source_query
+        else:
+            spec = {'classification': org['classification'],
+                    'parent_id': org['parent_id']}
+            # add jurisdiction_id unless this is a party or company
+            jid = org.get('jurisdiction_id')
+            if jid:
+                spec['jurisdiction_id'] = jid
+
+            main_query &= Q(**spec)
+
+        return self.model_class.objects.get(main_query)
 
     def prepare_for_db(self, data):
         data['parent_id'] = self.resolve_json_id(data['parent_id'])
 
-        if data['classification'] != 'party':
+        if data['classification'] not in ('party', 'company'):
             data['jurisdiction_id'] = self.jurisdiction_id
         return data
 
     def limit_spec(self, spec):
-        if spec.get('classification') != 'party':
+        if spec.get('classification') not in ('party', 'company'):
             spec['jurisdiction_id'] = self.jurisdiction_id
         return spec
 

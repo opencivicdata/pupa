@@ -78,7 +78,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
                  gender='', national_identity='',
                  # specialty fields
                  district=None, party=None, primary_org='', role='member',
-                 start_date='', end_date=''):
+                 start_date='', end_date='', source_identified=False):
         super(Person, self).__init__()
         self.name = name
         self.birth_date = birth_date
@@ -88,6 +88,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         self.image = image
         self.gender = gender
         self.national_identity = national_identity
+        self.source_identified = source_identified
         if primary_org:
             self.add_term(role, primary_org, district=district,
                           start_date=start_date, end_date=end_date)
@@ -140,7 +141,9 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
 
     def __init__(self, name, *, classification='', parent_id=None,
                  founding_date='', dissolution_date='', image='',
-                 chamber=None):
+                 chamber=None,
+                 # specialty fields
+                 source_identified=False):
         """
         Constructor for the Organization object.
         """
@@ -151,6 +154,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
         self.dissolution_date = dissolution_date
         self.parent_id = pseudo_organization(parent_id, chamber)
         self.image = image
+        self.source_identified = source_identified
 
     def __str__(self):
         return self.name
@@ -158,7 +162,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
     def validate(self):
         schema = None
         # these are implicitly declared & do not require sources
-        if self.classification in ('party', 'legislature', 'upper', 'lower', 'executive'):
+        if self.classification in ('party', 'legislature', 'upper', 'lower', 'executive', 'office'):
             schema = org_schema_no_sources
         return super(Organization, self).validate(schema=schema)
 

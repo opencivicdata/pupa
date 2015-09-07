@@ -4,6 +4,8 @@ import json
 import pytz
 import datetime
 import subprocess
+import operator
+from urllib.parse import urlsplit, parse_qsl, urlencode, urlunsplit, SplitResult
 from validictory.validator import SchemaValidator
 
 
@@ -72,3 +74,20 @@ def convert_pdf(filename, type='xml'):
     data = pipe.read()
     pipe.close()
     return data
+
+
+def canonize_url(url):
+    split_url = urlsplit(url)
+
+    canonical_query = urlencode(sorted(parse_qsl(split_url.query)))
+    return urlunsplit(SplitResult(scheme=split_url.scheme,
+                                  netloc=split_url.netloc,
+                                  path=split_url.path,
+                                  query=canonical_query,
+                                  fragment=split_url.fragment))
+
+
+def combine_dicts(a, b, op=operator.add):
+    return dict([i for i in a.items()] +
+                [i for i in b.items()] +
+                [(k, op(a[k], b[k])) for k in set(b) & set(a)])

@@ -11,6 +11,7 @@ OBJECT_TYPES = (
     ('bill', 'Bill'),
     ('vote', 'Vote'),
     ('event', 'Event'),
+    ('disclosure', 'Disclosure')
 )
 
 
