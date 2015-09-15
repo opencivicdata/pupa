@@ -9,7 +9,8 @@ class Vote(BaseModel, SourceMixin):
     _type = 'vote'
     _schema = schema
 
-    def __init__(self, *, legislative_session, motion_text, start_date, classification, result,
+    def __init__(self, *, motion_text, start_date, classification, result,
+                 legislative_session=None,
                  identifier='', bill=None, bill_chamber=None, organization=None, chamber=None):
         super(Vote, self).__init__()
 
@@ -21,6 +22,13 @@ class Vote(BaseModel, SourceMixin):
         self.identifier = identifier
 
         self.set_bill(bill, chamber=bill_chamber)
+
+        if isinstance(bill, Bill) and not self.legislative_session:
+            self.legislative_session = bill.legislative_session
+
+        if not self.legislative_session:
+            raise ValueError('must set legislative_session or bill')
+
         self.organization = pseudo_organization(organization, chamber, 'legislature')
         self.votes = []
         self.counts = []
