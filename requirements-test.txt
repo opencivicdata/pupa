@@ -1,9 +1,6 @@
-Django>=1.8
+-e git://github.com/django/django.git#egg=Django
 dj_database_url
-django-uuidfield
-djorm-pgarray
-jsonfield==0.9.20
--e git://github.com/opencivicdata/python-opencivicdata-django.git#egg=opencivicdata-django
+-e git://github.com/opencivicdata/python-opencivicdata-django.git@0.7.x#egg=opencivicdata-django
 psycopg2
 scrapelib
 validictory
