@@ -305,12 +305,14 @@ class BaseImporter(object):
                 #       add it to new_items
                 for item in items:
                     key = tuple(item.get(k) for k in keylist)
-                    print(key, keyed_dbitems.keys())
                     dbitem = keyed_dbitems.get(key)
                     if not dbitem:
                         new_items.append(item)
                     else:
-                        pass
+                        # update dbitem
+                        for fname, val in item.items():
+                            setattr(dbitem, fname, val)
+                        dbitem.save()
 
                 # import anything that made it to new_items in the usual fashion
                 self._create_related(obj, {field: new_items}, subfield_dict)
