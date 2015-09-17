@@ -67,3 +67,9 @@ def test_jurisdiction_merge_related():
     tj.legislative_sessions.append({'identifier': '2017', 'name': '2017 Session'})
     ji.import_item(tj.as_dict())
     assert LegislativeSession.objects.count() == 3
+
+    # and test that the non-identifier fields actually update
+    tj.legislative_sessions.append({'identifier': '2016', 'name': 'updated'})
+    ji.import_item(tj.as_dict())
+    assert LegislativeSession.objects.count() == 3
+    assert LegislativeSession.objects.get(identifier='2016').name == 'updated'
