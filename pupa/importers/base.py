@@ -83,7 +83,6 @@ class BaseImporter(object):
     model_class = None
     related_models = {}
     preserve_order = set()
-    merge_related = {}
 
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
@@ -133,8 +132,8 @@ class BaseImporter(object):
                 spec = get_pseudo_id(json_id)
                 spec = self.limit_spec(spec)
 
-                ids = {each.id
-                       for each
+                ids = {each.id 
+                       for each 
                        in self.model_class.objects.filter(**spec)}
                 if len(ids) == 1 :
                     self.pseudo_id_cache[json_id] = ids.pop()
@@ -291,37 +290,12 @@ class BaseImporter(object):
                 do_delete = True
             # otherwise: no items or dbitems, so nothing is done
 
-            # don't delete if field is in merge_related
-            if field in self.merge_related:
-                new_items = []
-                # build a list of keyfields to existing database objects
-                keylist = self.merge_related[field]
-                keyed_dbitems = {tuple(getattr(item, k) for k in keylist): item for item in dbitems}
-
-                # go through 'new' items
-                #   if item with the same keyfields exists:
-                #       update the database item w/ the new item's properties
-                #   else:
-                #       add it to new_items
-                for item in items:
-                    key = tuple(item.get(k) for k in keylist)
-                    print(key, keyed_dbitems.keys())
-                    dbitem = keyed_dbitems.get(key)
-                    if not dbitem:
-                        new_items.append(item)
-                    else:
-                        pass
-
-                # import anything that made it to new_items in the usual fashion
-                self._create_related(obj, {field: new_items}, subfield_dict)
-            else:
-                # default logic is to just wipe and recreate subobjects
-                if do_delete:
-                    updated = True
-                    getattr(obj, field).all().delete()
-                if do_update:
-                    updated = True
-                    self._create_related(obj, {field: items}, subfield_dict)
+            if do_delete:
+                updated = True
+                getattr(obj, field).all().delete()
+            if do_update:
+                updated = True
+                self._create_related(obj, {field: items}, subfield_dict)
 
         return updated
 
