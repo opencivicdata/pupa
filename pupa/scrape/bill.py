@@ -7,6 +7,8 @@ from .schemas.bill import schema
 class Action(dict):
 
     def add_related_entity(self, name, entity_type, entity_id=None):
+        if entity_id is None :
+            entity_id = make_pseudo_id(name=name)
         ent = {
             'name': name,
             'entity_type': entity_type,
@@ -72,8 +74,11 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
             "organization_id": None,
         }
         # overwrite the id that exists
-        if entity_type:
+        if entity_type and entity_id:
             sp[entity_type + '_id'] = entity_id
+        elif entity_type :
+            sp[entity_type + '_id'] = make_pseudo_id(name=name)
+            
         self.sponsorships.append(sp)
 
     def add_sponsorship_by_identifier(self, name, classification, entity_type,
