@@ -9,7 +9,7 @@ class Action(dict):
     def add_related_entity(self, name, entity_type, entity_id=None):
         if entity_id is None:
             entity_id = make_pseudo_id(name=name)
-        elif entity_id == False:
+        elif not entity_id:
             entity_id = None
         ent = {
             'name': name,
