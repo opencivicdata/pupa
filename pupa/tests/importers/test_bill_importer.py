@@ -56,7 +56,7 @@ def test_full_bill():
     oi.import_data([org.as_dict(), com.as_dict()])
 
     pi = PersonImporter('jid')
-    pi.import_date(adam.as_dict(), karl.as_dict()]
+    pi.import_data(adam.as_dict(), karl.as_dict()]
 
     BillImporter('jid', oi, pi).import_data([oldbill.as_dict(), bill.as_dict()])
 
