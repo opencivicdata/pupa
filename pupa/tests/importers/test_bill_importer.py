@@ -20,7 +20,8 @@ def create_org():
 @pytest.mark.django_db
 def test_full_bill():
     create_jurisdiction()
-    person = Person.objects.create(id='person-id', name='Adam Smith')
+    adam = Person.objects.create(id='person-id', name='Adam Smith')
+    karl = Person.objects.create(name='Karl Marx')
     org = ScrapeOrganization(name='House', classification='lower')
     com = ScrapeOrganization(name='Arbitrary Committee', classification='committee',
                              parent_id=org._id)
@@ -41,6 +42,8 @@ def test_full_bill():
                          primary=False, entity_id=person.id)
     bill.add_sponsorship('Jane Smith', classification='lead sponsor', entity_type='person',
                          primary=True, entity_id = False)
+    bill.add_sponsorship('Karl Marx', classification='super sponsor', entity_type='person',
+                         primary=True)
     bill.add_abstract('This is an act about axes and taxes and tacks.', note="official", date='1969-10-20')
     bill.add_document_link('Fiscal Note', 'http://example.com/fn.pdf',
                            media_type='application/pdf')
@@ -53,11 +56,7 @@ def test_full_bill():
     oi.import_data([org.as_dict(), com.as_dict()])
 
     pi = PersonImporter('jid')
-    pi.json_to_db_id['person-id'] = 'person-id'
-    # Since we have to create this person behind the back of the import
-    # transaction, we'll fake the json-id to db-id, since they match in this
-    # case. This is *really* getting at some implementation detail, but it's
-    # the cleanest way to ensure we short-circut the json id lookup.
+    pi.import_date(adam.as_dict(), karl.as_dict()]
 
     BillImporter('jid', oi, pi).import_data([oldbill.as_dict(), bill.as_dict()])
 
@@ -99,8 +98,10 @@ def test_full_bill():
         if ss.primary:
             assert ss.person is None
             assert ss.organization is None
-        else:
-            assert ss.person == person
+        elif ss.classification = 'super sponsor':
+            assert ss.person == karl
+        else :
+            assert ss.person == adam
 
     # versions & documents with their links
     versions = b.versions.all()
