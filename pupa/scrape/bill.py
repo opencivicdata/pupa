@@ -9,6 +9,8 @@ class Action(dict):
     def add_related_entity(self, name, entity_type, entity_id=None):
         if entity_id is None:
             entity_id = make_pseudo_id(name=name)
+        elif entity_id == False:
+            entity_id = None
         ent = {
             'name': name,
             'entity_type': entity_type,
@@ -76,7 +78,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         # overwrite the id that exists
         if entity_type and entity_id:
             sp[entity_type + '_id'] = entity_id
-        elif entity_type:
+        elif entity_type and entity_id is None:
             sp[entity_type + '_id'] = make_pseudo_id(name=name)
 
         self.sponsorships.append(sp)
