@@ -172,7 +172,7 @@ class BaseModel(object):
         validator = utils.DatetimeValidator(required_by_default=False)
 
         try:
-            validator.validate(self.as_dict(), schema)
+            validator.validate(self.as_dict(), schema, fail_fast=False)
         except ValidationError as ve:
             raise ValidationError('validation of {} {} failed: {}'.format(
                 self.__class__.__name__, self._id, ve)
