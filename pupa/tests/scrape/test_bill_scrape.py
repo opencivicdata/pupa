@@ -88,7 +88,7 @@ def test_add_related_bill():
 def test_add_sponsor():
     b = toy_bill()
     b.add_sponsorship(name="Joe Bleu", classification="Author", entity_type="person",
-                      primary=True, chamber="upper")
+                      primary=True, chamber="upper", entity_id=False)
     assert len(b.sponsorships) == 1
     assert b.sponsorships[0] == {'person_id': None, 'name': 'Joe Bleu',
                                  'classification': 'Author', 'entity_type': 'person',
