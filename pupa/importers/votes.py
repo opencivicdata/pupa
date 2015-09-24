@@ -6,8 +6,8 @@ from ..exceptions import InvalidVoteError
 class VoteImporter(BaseImporter):
     _type = 'vote'
     model_class = VoteEvent
-    related_models = {'counts': (VoteCount, 'vote_id', {}),
-                      'votes': (PersonVote, 'vote_id', {}),
+    related_models = {'counts': (VoteCount, 'vote_event_id', {}),
+                      'votes': (PersonVote, 'vote_event_id', {}),
                       'sources': (VoteSource, 'vote_event_id', {})}
 
     def __init__(self, jurisdiction_id, person_importer, org_importer,

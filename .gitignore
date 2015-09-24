@@ -8,3 +8,4 @@ htmlcov/
 _data/
 _cache/
 build/
+.cache/

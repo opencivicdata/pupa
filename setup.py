@@ -17,16 +17,15 @@ setup(name='pupa',
       entry_points='''[console_scripts]
 pupa = pupa.cli.__main__:main''',
       install_requires=[
-          #'Django==1.7.0',
+          'Django>=1.9a1',
+          'opencivicdata-django>=0.7.0a1',
           'dj_database_url==0.3.0',
-          'opencivicdata-django>=0.7.0',
           'opencivicdata-divisions',
           'scrapelib>=0.10',
           'validictory>=1.0.0a2',
           'psycopg2',
           'pytz',
           'boto',
-          #'kafka-python',  # Optional Kafka dep
       ],
       classifiers=["Development Status :: 4 - Beta",
                    "Intended Audience :: Developers",

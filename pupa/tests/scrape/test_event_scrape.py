@@ -96,7 +96,7 @@ def test_add_document():
     assert len(e.documents) == 1
     o = e.documents[0]
     assert o['note'] == 'hello'
-    assert o['links'] == [{'url': 'http://example.com', 'media_type': 'text/html'}]
+    assert o['links'] == [{'url': 'http://example.com', 'media_type': 'text/html', 'text': ''}]
     e.validate()
 
 

@@ -1,6 +1,7 @@
--e git://github.com/django/django.git#egg=Django
+Django>=1.9a
+opencivicdata-django>=0.7.0a1
+
 dj_database_url
--e git://github.com/opencivicdata/python-opencivicdata-django.git@0.7.x#egg=opencivicdata-django
 psycopg2
 scrapelib
 validictory
