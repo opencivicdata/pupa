@@ -169,10 +169,10 @@ class BaseModel(object):
         if schema is None:
             schema = self._schema
 
-        validator = utils.DatetimeValidator(required_by_default=False)
+        validator = utils.DatetimeValidator(required_by_default=False, fail_fast=False)
 
         try:
-            validator.validate(self.as_dict(), schema, fail_fast=False)
+            validator.validate(self.as_dict(), schema)
         except ValidationError as ve:
             raise ValidationError('validation of {} {} failed: {}'.format(
                 self.__class__.__name__, self._id, ve)

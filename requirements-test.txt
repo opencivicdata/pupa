@@ -4,7 +4,7 @@ opencivicdata-django>=0.7.0a1
 dj_database_url
 psycopg2
 scrapelib
-validictory
+validictory>=1.0.1
 pytz
 
 mock
