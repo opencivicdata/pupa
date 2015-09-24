@@ -108,8 +108,10 @@ def test_abstract():
     b = toy_bill()
     b.add_abstract('this bill is stupid', 'K-5', '1969-10-20')
     b.add_abstract('this legislative document is ignorant', '6-12', '2010-10-10')
-    assert b.abstracts == [{'note': 'K-5', 'abstract': 'this bill is stupid', 'date': '1969-10-20'},
-                           {'note': '6-12', 'abstract': 'this legislative document is ignorant', 'date': '2010-10-10'}]
+    assert b.abstracts == [{'note': 'K-5', 'abstract': 'this bill is stupid',
+                            'date': '1969-10-20'},
+                           {'note': '6-12', 'abstract': 'this legislative document is ignorant',
+                            'date': '2010-10-10'}]
 
 
 def test_add_documents():

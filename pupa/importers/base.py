@@ -136,13 +136,12 @@ class BaseImporter(object):
                 ids = {each.id
                        for each
                        in self.model_class.objects.filter(**spec)}
-                if len(ids) == 1 :
+                if len(ids) == 1:
                     self.pseudo_id_cache[json_id] = ids.pop()
-                elif not ids :
-                    raise UnresolvedIdError(
-                        'cannot resolve pseudo id to {}: {}'.format(
-                            self.model_class.__name__, json_id))
-                else :
+                elif not ids:
+                    raise UnresolvedIdError('cannot resolve pseudo id to {}: {}'.format(
+                        self.model_class.__name__, json_id))
+                else:
                     raise UnresolvedIdError(
                         'multiple objects returned for pseudo id to {}: {}'.format(
                             self.model_class.__name__, json_id))
@@ -296,7 +295,8 @@ class BaseImporter(object):
                 new_items = []
                 # build a list of keyfields to existing database objects
                 keylist = self.merge_related[field]
-                keyed_dbitems = {tuple(getattr(item, k) for k in keylist): item for item in dbitems}
+                keyed_dbitems = {tuple(getattr(item, k) for k in keylist):
+                                 item for item in dbitems}
 
                 # go through 'new' items
                 #   if item with the same keyfields exists:

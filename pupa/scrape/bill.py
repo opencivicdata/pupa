@@ -96,12 +96,14 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     def add_identifier(self, identifier, note='', scheme=''):
         self.other_identifiers.append({"note": note, "identifier": identifier, 'scheme': scheme})
 
-    def add_document_link(self, note, url, *, date='', media_type='', text='', on_duplicate='error'):
+    def add_document_link(self, note, url, *, date='', media_type='', text='',
+                          on_duplicate='error'):
         return self._add_associated_link(collection='documents', note=note, url=url, date=date,
                                          text=text, media_type=media_type,
                                          on_duplicate=on_duplicate)
 
-    def add_version_link(self, note, url, *, date='', media_type='', text='', on_duplicate='error'):
+    def add_version_link(self, note, url, *, date='', media_type='', text='',
+                         on_duplicate='error'):
         return self._add_associated_link(collection='versions', note=note, url=url, date=date,
                                          text=text, media_type=media_type,
                                          on_duplicate=on_duplicate)
