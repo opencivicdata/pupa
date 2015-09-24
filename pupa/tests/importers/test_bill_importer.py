@@ -20,8 +20,10 @@ def create_org():
 @pytest.mark.django_db
 def test_full_bill():
     create_jurisdiction()
-    adam = Person.objects.create(id='person-id', name='Adam Smith')
-    karl = Person.objects.create(name='Karl Marx')
+    adam = Person.objects.create(id='foo', name='Adam Smith')
+    adam.save()
+    karl = Person.objects.create(id='bar', name='Karl Marx')
+    karl.save()
     org = ScrapeOrganization(name='House', classification='lower')
     com = ScrapeOrganization(name='Arbitrary Committee', classification='committee',
                              parent_id=org._id)
@@ -39,11 +41,11 @@ def test_full_bill():
     act.add_related_entity('arbitrary committee', 'organization', com._id)
     bill.add_related_bill("HB 99", legislative_session="1899", relation_type="prior-session")
     bill.add_sponsorship('Adam Smith', classification='extra sponsor', entity_type='person',
-                         primary=False, entity_id=person.id)
+                         primary=False, entity_id=adam.id)
     bill.add_sponsorship('Jane Smith', classification='lead sponsor', entity_type='person',
                          primary=True, entity_id = False)
     bill.add_sponsorship('Karl Marx', classification='super sponsor', entity_type='person',
-                         primary=True)
+                         primary=False)
     bill.add_abstract('This is an act about axes and taxes and tacks.', note="official", date='1969-10-20')
     bill.add_document_link('Fiscal Note', 'http://example.com/fn.pdf',
                            media_type='application/pdf')
@@ -56,7 +58,7 @@ def test_full_bill():
     oi.import_data([org.as_dict(), com.as_dict()])
 
     pi = PersonImporter('jid')
-    pi.import_data(adam.as_dict(), karl.as_dict()]
+    pi.json_to_db_id = {'foo' : 'foo', 'bar' : 'bar'}
 
     BillImporter('jid', oi, pi).import_data([oldbill.as_dict(), bill.as_dict()])
 
@@ -98,7 +100,7 @@ def test_full_bill():
         if ss.primary:
             assert ss.person is None
             assert ss.organization is None
-        elif ss.classification = 'super sponsor':
+        elif ss.classification == 'super sponsor':
             assert ss.person == karl
         else :
             assert ss.person == adam
@@ -114,6 +116,8 @@ def test_full_bill():
     # sources
     assert b.sources.count() == 1
 
+    adam.delete()
+    karl.delete()
 
 @pytest.mark.django_db
 def test_bill_chamber_param():
