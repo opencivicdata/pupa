@@ -48,12 +48,14 @@ class VoteEventImporter(BaseImporter):
                 'organization_id': vote_event['organization_id']
             })
 
-        return self.model_class.objects.get(**spec)
+        return self.model_class.objects.prefetch_related('votes__voter').get(**spec)
 
     def prepare_for_db(self, data):
         data['legislative_session_id'] = self.get_session_id(data.pop('legislative_session'))
         data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
         data['bill_id'] = self.bill_importer.resolve_json_id(data.pop('bill'))
+        for vote in data['votes']:
+            vote['voter_id'] = self.person_importer.resolve_json_id(vote['voter_id'])
         return data
 
     def postimport(self):

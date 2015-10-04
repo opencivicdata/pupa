@@ -156,8 +156,8 @@ class Command(BaseCommand):
         membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
                                                  org_importer, post_importer)
         bill_importer = BillImporter(juris.jurisdiction_id, org_importer, person_importer)
-        vote_event_importer = VoteEventImporter(juris.jurisdiction_id, person_importer, org_importer,
-                                                bill_importer)
+        vote_event_importer = VoteEventImporter(juris.jurisdiction_id, person_importer,
+                                                org_importer, bill_importer)
         event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
