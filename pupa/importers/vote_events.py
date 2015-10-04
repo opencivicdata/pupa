@@ -55,7 +55,8 @@ class VoteEventImporter(BaseImporter):
         data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
         data['bill_id'] = self.bill_importer.resolve_json_id(data.pop('bill'))
         for vote in data['votes']:
-            vote['voter_id'] = self.person_importer.resolve_json_id(vote['voter_id'])
+            vote['voter_id'] = self.person_importer.resolve_json_id(vote['voter_id'],
+                                                                    allow_no_match=True)
         return data
 
     def postimport(self):

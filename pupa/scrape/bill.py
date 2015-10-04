@@ -73,6 +73,8 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         }
         # overwrite the id that exists
         if entity_type:
+            if not entity_id:
+                entity_id = make_pseudo_id(name=name)
             sp[entity_type + '_id'] = entity_id
         self.sponsorships.append(sp)
 
