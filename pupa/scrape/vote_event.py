@@ -2,17 +2,17 @@ from ..utils import make_pseudo_id
 from .base import BaseModel, cleanup_list, SourceMixin
 from .bill import Bill
 from .popolo import pseudo_organization
-from .schemas.vote import schema
+from .schemas.vote_event import schema
 
 
-class Vote(BaseModel, SourceMixin):
-    _type = 'vote'
+class VoteEvent(BaseModel, SourceMixin):
+    _type = 'vote_event'
     _schema = schema
 
     def __init__(self, *, motion_text, start_date, classification, result,
                  legislative_session=None,
                  identifier='', bill=None, bill_chamber=None, organization=None, chamber=None):
-        super(Vote, self).__init__()
+        super(VoteEvent, self).__init__()
 
         self.legislative_session = legislative_session
         self.motion_text = motion_text
@@ -52,7 +52,8 @@ class Vote(BaseModel, SourceMixin):
             self.bill = make_pseudo_id(**kwargs)
 
     def vote(self, option, voter, *, note=''):
-        self.votes.append({"option": option, "voter_name": voter, 'note': note})
+        self.votes.append({"option": option, "voter_name": voter,
+                           "voter_id": make_pseudo_id(name=voter), 'note': note})
 
     def yes(self, name, *, id=None, note=''):
         return self.vote('yes', name, note=note)

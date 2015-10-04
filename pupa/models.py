@@ -9,7 +9,7 @@ OBJECT_TYPES = (
     ('post', 'Post'),
     ('membership', 'Membership'),
     ('bill', 'Bill'),
-    ('vote', 'Vote'),
+    ('vote_event', 'VoteEvent'),
     ('event', 'Event'),
 )
 
