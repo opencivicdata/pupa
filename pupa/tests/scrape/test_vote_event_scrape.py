@@ -1,17 +1,17 @@
 import pytest
-from pupa.scrape import Vote, Bill, Organization
+from pupa.scrape import VoteEvent, Bill, Organization
 from pupa.utils import get_pseudo_id
 
 
-def toy_vote():
-    v = Vote(legislative_session="2009", motion_text="passage of the bill",
-             start_date="2009-01-07", result='pass', classification='bill-passage')
+def toy_vote_event():
+    v = VoteEvent(legislative_session="2009", motion_text="passage of the bill",
+                  start_date="2009-01-07", result='pass', classification='bill-passage')
     v.add_source("http://uri.example.com/", note="foo")
     return v
 
 
-def test_simple_vote():
-    v = toy_vote()
+def test_simple_vote_event():
+    v = toy_vote_event()
     v.set_count('yes', 2)
     v.yes('James')
     v.no('Paul')
@@ -26,37 +26,38 @@ def test_simple_vote():
     assert 'we get here'
 
 
-def test_vote_org_obj():
+def test_vote_event_org_obj():
     o = Organization('something', classification='committee')
-    v = Vote(legislative_session="2009", motion_text="passage of the bill",
-             start_date="2009-01-07", result='pass', classification='bill-passage', organization=o)
+    v = VoteEvent(legislative_session="2009", motion_text="passage of the bill",
+                  start_date="2009-01-07", result='pass', classification='bill-passage',
+                  organization=o)
     assert v.organization == o._id
 
 
-def test_vote_org_dict():
+def test_vote_event_org_dict():
     odict = {'name': 'Random Committee', 'classification': 'committee'}
-    v = Vote(legislative_session="2009", motion_text="passage of the bill",
-             start_date="2009-01-07", result='pass', classification='bill-passage',
-             organization=odict)
+    v = VoteEvent(legislative_session="2009", motion_text="passage of the bill",
+                  start_date="2009-01-07", result='pass', classification='bill-passage',
+                  organization=odict)
     assert get_pseudo_id(v.organization) == odict
 
 
-def test_vote_org_chamber():
-    v = Vote(legislative_session="2009", motion_text="passage of the bill",
-             start_date="2009-01-07", result='pass', classification='bill-passage',
-             chamber='upper')
+def test_vote_event_org_chamber():
+    v = VoteEvent(legislative_session="2009", motion_text="passage of the bill",
+                  start_date="2009-01-07", result='pass', classification='bill-passage',
+                  chamber='upper')
     assert get_pseudo_id(v.organization) == {'classification': 'upper'}
 
 
 def test_org_and_chamber_conflict():
     with pytest.raises(ValueError):
-        Vote(legislative_session="2009", motion_text="passage of the bill",
-             start_date="2009-01-07", result='pass', classification='passage', organization='test',
-             chamber='lower')
+        VoteEvent(legislative_session="2009", motion_text="passage of the bill",
+                  start_date="2009-01-07", result='pass', classification='passage',
+                  organization='test', chamber='lower')
 
 
 def test_set_count():
-    v = toy_vote()
+    v = toy_vote_event()
     v.set_count('yes', 2)
     v.set_count('no', 100)
     v.set_count('yes', 0)
@@ -64,28 +65,28 @@ def test_set_count():
 
 
 def test_set_bill_obj():
-    v = toy_vote()
+    v = toy_vote_event()
     b = Bill('HB 1', legislative_session='2009', title='fake bill')
     v.set_bill(b)
     assert v.bill == b._id
 
 
 def test_set_bill_obj_no_extra_args():
-    v = toy_vote()
+    v = toy_vote_event()
     b = Bill('HB 1', legislative_session='2009', title='fake bill')
     with pytest.raises(ValueError):
         v.set_bill(b, chamber='lower')
 
 
 def test_set_bill_pseudo_id():
-    v = toy_vote()
+    v = toy_vote_event()
     v.set_bill('HB 1', chamber='lower')
     assert get_pseudo_id(v.bill) == {'identifier': 'HB 1',
                                      'from_organization__classification': 'lower'}
 
 
 def test_str():
-    v = toy_vote()
+    v = toy_vote_event()
     s = str(v)
     assert v.legislative_session in s
     assert v.motion_text in s
