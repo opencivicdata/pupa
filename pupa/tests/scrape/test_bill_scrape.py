@@ -90,7 +90,7 @@ def test_add_sponsor():
     b.add_sponsorship(name="Joe Bleu", classification="Author", entity_type="person",
                       primary=True, chamber="upper")
     assert len(b.sponsorships) == 1
-    assert b.sponsorships[0] == {'person_id': None, 'name': 'Joe Bleu',
+    assert b.sponsorships[0] == {'person_id': '~{"name": "Joe Bleu"}', 'name': 'Joe Bleu',
                                  'classification': 'Author', 'entity_type': 'person',
                                  'primary': True, 'organization_id': None}
     b.validate()
