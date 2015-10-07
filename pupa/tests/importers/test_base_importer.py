@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import mock
 import pytest
-from opencivicdata.models import Person
+from opencivicdata.models import Person, Organization
 from pupa.scrape import Person as ScrapePerson
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers.base import omnihash, BaseImporter
@@ -120,3 +120,26 @@ def test_invalid_fields_related_item():
 
     with pytest.raises(DataImportError):
         PersonImporter('jid').import_data([p1])
+
+
+@pytest.mark.django_db
+def test_locked_field():
+    # import w/ a locked field
+    org = ScrapeOrganization('SHIELD').as_dict()
+    oi = OrganizationImporter('jid')
+    oi.import_data([org])
+
+    # set date and lock field
+    o = Organization.objects.get()
+    o.dissolution_date = '2015'
+    o.locked_fields = ['dissolution_date']
+    o.save()
+
+    # reimport
+    org = ScrapeOrganization('SHIELD').as_dict()
+    oi = OrganizationImporter('jid')
+    oi.import_data([org])
+
+    o = Organization.objects.get()
+    assert o.dissolution_date == '2015'
+    assert o.locked_fields == ['dissolution_date']
