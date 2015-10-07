@@ -1,4 +1,4 @@
-from ..utils import make_pseudo_id
+from ..utils import _make_pseudo_id
 from .base import BaseModel, cleanup_list, SourceMixin
 from .bill import Bill
 from .popolo import pseudo_organization
@@ -49,11 +49,11 @@ class VoteEvent(BaseModel, SourceMixin):
                 chamber = 'legislature'
             kwargs = {'identifier': bill_or_identifier,
                       'from_organization__classification': chamber}
-            self.bill = make_pseudo_id(**kwargs)
+            self.bill = _make_pseudo_id(**kwargs)
 
     def vote(self, option, voter, *, note=''):
         self.votes.append({"option": option, "voter_name": voter,
-                           "voter_id": make_pseudo_id(name=voter), 'note': note})
+                           "voter_id": _make_pseudo_id(name=voter), 'note': note})
 
     def yes(self, name, *, id=None, note=''):
         return self.vote('yes', name, note=note)

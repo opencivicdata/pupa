@@ -1,4 +1,4 @@
-from ..utils import make_pseudo_id
+from ..utils import _make_pseudo_id
 from .popolo import pseudo_organization
 from .base import BaseModel, SourceMixin, AssociatedLinkMixin, cleanup_list
 from .schemas.bill import schema
@@ -74,14 +74,14 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         # overwrite the id that exists
         if entity_type:
             if not entity_id:
-                entity_id = make_pseudo_id(name=name)
+                entity_id = _make_pseudo_id(name=name)
             sp[entity_type + '_id'] = entity_id
         self.sponsorships.append(sp)
 
     def add_sponsorship_by_identifier(self, name, classification, entity_type,
                                       primary, *, scheme, identifier, chamber=None):
         return self.add_sponsorship(name, classification, entity_type, primary,
-                                    chamber=chamber, entity_id=make_pseudo_id(
+                                    chamber=chamber, entity_id=_make_pseudo_id(
                                         identifiers__scheme=scheme,
                                         identifiers__identifier=identifier)
                                     )
