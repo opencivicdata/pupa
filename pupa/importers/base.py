@@ -281,6 +281,10 @@ class BaseImporter(object):
 
         # for each related field - check if there are differences
         for field, items in related.items():
+            # skip subitem check if it's locked anyway
+            if field in obj.locked_fields:
+                continue
+
             # get items from database
             dbitems = list(getattr(obj, field).all())
             dbitems_count = len(dbitems)

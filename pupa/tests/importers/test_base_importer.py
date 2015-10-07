@@ -124,7 +124,6 @@ def test_invalid_fields_related_item():
 
 @pytest.mark.django_db
 def test_locked_field():
-    # import w/ a locked field
     org = ScrapeOrganization('SHIELD').as_dict()
     oi = OrganizationImporter('jid')
     oi.import_data([org])
@@ -152,3 +151,24 @@ def test_locked_field():
     o = Organization.objects.get()
     assert o.dissolution_date == '2015'
     assert o.locked_fields == ['dissolution_date']
+
+
+@pytest.mark.django_db
+def test_locked_field_subitem():
+    org = ScrapeOrganization('SHIELD')
+    org.add_name('S.H.I.E.L.D.')
+    oi = OrganizationImporter('jid')
+    oi.import_data([org.as_dict()])
+
+    # lock the field
+    o = Organization.objects.get()
+    o.locked_fields = ['other_names']
+    o.save()
+
+    # reimport
+    org = ScrapeOrganization('SHIELD').as_dict()
+    oi = OrganizationImporter('jid')
+    oi.import_data([org])
+
+    o = Organization.objects.get()
+    assert o.other_names.get().name == 'S.H.I.E.L.D.'
