@@ -247,7 +247,7 @@ class BaseImporter(object):
                 raise DuplicateItemError(data, obj)
             # check base object for changes
             for key, value in data.items():
-                if getattr(obj, key) != value:
+                if getattr(obj, key) != value and key not in obj.locked_fields:
                     setattr(obj, key, value)
                     what = 'update'
             if what == 'update':

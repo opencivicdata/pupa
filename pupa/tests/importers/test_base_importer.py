@@ -143,3 +143,12 @@ def test_locked_field():
     o = Organization.objects.get()
     assert o.dissolution_date == '2015'
     assert o.locked_fields == ['dissolution_date']
+
+    # do it a third time to check for the locked_fields reversion issue
+    org = ScrapeOrganization('SHIELD').as_dict()
+    oi = OrganizationImporter('jid')
+    oi.import_data([org])
+
+    o = Organization.objects.get()
+    assert o.dissolution_date == '2015'
+    assert o.locked_fields == ['dissolution_date']
