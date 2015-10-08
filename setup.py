@@ -18,7 +18,7 @@ setup(name='pupa',
 pupa = pupa.cli.__main__:main''',
       install_requires=[
           'Django>=1.9a1',
-          'opencivicdata-django>=0.7.0a1',
+          'opencivicdata-django>=0.7.0',
           'dj_database_url==0.3.0',
           'opencivicdata-divisions',
           'scrapelib>=0.10',
