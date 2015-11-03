@@ -90,7 +90,7 @@ def test_add_sponsor():
     b.add_sponsorship(name="Joe Bleu", classification="Author", entity_type="person",
                       primary=True, chamber="upper")
     assert len(b.sponsorships) == 1
-    assert b.sponsorships[0] == {'person_id': None, 'name': 'Joe Bleu',
+    assert b.sponsorships[0] == {'person_id': '~{"name": "Joe Bleu"}', 'name': 'Joe Bleu',
                                  'classification': 'Author', 'entity_type': 'person',
                                  'primary': True, 'organization_id': None}
     b.validate()
@@ -108,8 +108,10 @@ def test_abstract():
     b = toy_bill()
     b.add_abstract('this bill is stupid', 'K-5', '1969-10-20')
     b.add_abstract('this legislative document is ignorant', '6-12', '2010-10-10')
-    assert b.abstracts == [{'note': 'K-5', 'abstract': 'this bill is stupid', 'date': '1969-10-20'},
-                           {'note': '6-12', 'abstract': 'this legislative document is ignorant', 'date': '2010-10-10'}]
+    assert b.abstracts == [{'note': 'K-5', 'abstract': 'this bill is stupid',
+                            'date': '1969-10-20'},
+                           {'note': '6-12', 'abstract': 'this legislative document is ignorant',
+                            'date': '2010-10-10'}]
 
 
 def test_add_documents():

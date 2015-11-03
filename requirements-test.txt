@@ -1,12 +1,10 @@
-Django>=1.8
+Django>=1.9a
+opencivicdata-django>=0.7.0a1
+
 dj_database_url
-django-uuidfield
-djorm-pgarray
-jsonfield==0.9.20
--e git://github.com/opencivicdata/python-opencivicdata-django.git#egg=opencivicdata-django
 psycopg2
 scrapelib
-validictory
+validictory>=1.0.1
 pytz
 
 mock

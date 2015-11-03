@@ -40,7 +40,6 @@ class MembershipImporter(BaseImporter):
             # we have to assume it is not a party if we want to avoid doing a lookup here
             is_party = False
 
-        party_flag = ('party' in data['organization_id'])
         data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
         data['person_id'] = self.person_importer.resolve_json_id(data['person_id'])
         data['post_id'] = self.post_importer.resolve_json_id(data['post_id'])

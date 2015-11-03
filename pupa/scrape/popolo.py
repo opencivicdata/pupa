@@ -5,7 +5,7 @@ from .schemas.post import schema as post_schema
 from .schemas.person import schema as person_schema
 from .schemas.membership import schema as membership_schema
 from .schemas.organization import schema as org_schema
-from ..utils import make_pseudo_id
+from ..utils import _make_pseudo_id
 
 # a copy of the org schema without sources
 org_schema_no_sources = copy.deepcopy(org_schema)
@@ -107,17 +107,17 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
     def add_party(self, party, **kwargs):
         membership = Membership(
             person_id=self._id,
-            organization_id=make_pseudo_id(classification="party", name=party),
+            organization_id=_make_pseudo_id(classification="party", name=party),
             role='member', **kwargs)
         self._related.append(membership)
 
     def add_term(self, role, org_classification, *, district=None, start_date='', end_date='',
                  label=''):
-        org_id = make_pseudo_id(classification=org_classification)
+        org_id = _make_pseudo_id(classification=org_classification)
         if district:
-            post_id = make_pseudo_id(label=district,
-                                     role=role,
-                                     organization__classification=org_classification)
+            post_id = _make_pseudo_id(label=district,
+                                      role=role,
+                                      organization__classification=org_classification)
         else:
             post_id = None
         membership = Membership(person_id=self._id, organization_id=org_id, post_id=post_id,
@@ -172,7 +172,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
             membership = Membership(person_id=name_or_person._id, organization_id=self._id,
                                     role=role, **kwargs)
         else:
-            membership = Membership(person_id=make_pseudo_id(name=name_or_person),
+            membership = Membership(person_id=_make_pseudo_id(name=name_or_person),
                                     organization_id=self._id, role=role, **kwargs)
         self._related.append(membership)
         return membership
@@ -183,15 +183,15 @@ def pseudo_organization(organization, classification, default=None):
     if organization and classification:
         raise ValueError('cannot specify both classification and organization')
     elif classification:
-        return make_pseudo_id(classification=classification)
+        return _make_pseudo_id(classification=classification)
     elif organization:
         if isinstance(organization, Organization):
             return organization._id
         elif isinstance(organization, str):
             return organization
         else:
-            return make_pseudo_id(**organization)
+            return _make_pseudo_id(**organization)
     elif default is not None:
-        return make_pseudo_id(classification=default)
+        return _make_pseudo_id(classification=default)
     else:
         return None

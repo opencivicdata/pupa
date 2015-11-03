@@ -1,4 +1,4 @@
-from ..utils import make_pseudo_id
+from ..utils import _make_pseudo_id
 from .popolo import pseudo_organization
 from .base import BaseModel, SourceMixin, AssociatedLinkMixin, cleanup_list
 from .schemas.bill import schema
@@ -73,13 +73,15 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         }
         # overwrite the id that exists
         if entity_type:
+            if not entity_id:
+                entity_id = _make_pseudo_id(name=name)
             sp[entity_type + '_id'] = entity_id
         self.sponsorships.append(sp)
 
     def add_sponsorship_by_identifier(self, name, classification, entity_type,
                                       primary, *, scheme, identifier, chamber=None):
         return self.add_sponsorship(name, classification, entity_type, primary,
-                                    chamber=chamber, entity_id=make_pseudo_id(
+                                    chamber=chamber, entity_id=_make_pseudo_id(
                                         identifiers__scheme=scheme,
                                         identifiers__identifier=identifier)
                                     )
@@ -96,13 +98,17 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
     def add_identifier(self, identifier, note='', scheme=''):
         self.other_identifiers.append({"note": note, "identifier": identifier, 'scheme': scheme})
 
-    def add_document_link(self, note, url, *, date='', media_type='', on_duplicate='error'):
+    def add_document_link(self, note, url, *, date='', media_type='', text='',
+                          on_duplicate='error'):
         return self._add_associated_link(collection='documents', note=note, url=url, date=date,
-                                         media_type=media_type, on_duplicate=on_duplicate)
+                                         text=text, media_type=media_type,
+                                         on_duplicate=on_duplicate)
 
-    def add_version_link(self, note, url, *, date='', media_type='', on_duplicate='error'):
+    def add_version_link(self, note, url, *, date='', media_type='', text='',
+                         on_duplicate='error'):
         return self._add_associated_link(collection='versions', note=note, url=url, date=date,
-                                         media_type=media_type, on_duplicate=on_duplicate)
+                                         text=text, media_type=media_type,
+                                         on_duplicate=on_duplicate)
 
     def __str__(self):
         return self.identifier + ' in ' + self.legislative_session
