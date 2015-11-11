@@ -21,7 +21,6 @@ class PersonImporter(BaseImporter):
 
         by_name = defaultdict(list)
         for _, person in dicts:
-            # take into account other_names?
             by_name[person['name']].append(person)
             for other in person['other_names']:
                 by_name[other['name']].append(person)
