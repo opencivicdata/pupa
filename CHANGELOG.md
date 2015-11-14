@@ -1,10 +1,11 @@
 # pupa changelog
 
-## 0.5.1
+## 0.5.1 - November 13 2015
 
 * use other\_names for psuedo\_id resolution on people
 * fix for postgis:// on Heroku
 * remove dump command that required imago
+* require py-ocd-django 0.8.0 models
 
 ## 0.5.0 - October 8 2015
 
