@@ -1,5 +1,5 @@
-Django>=1.9a
-opencivicdata-django>=0.7.0a1
+Django>=1.9b
+opencivicdata-django==0.8.0
 
 dj_database_url
 psycopg2
@@ -12,5 +12,3 @@ pytest
 pytest-cov
 pytest-django
 coveralls
-
--e git://github.com/sunlightlabs/waterfall.git#egg=waterfall
