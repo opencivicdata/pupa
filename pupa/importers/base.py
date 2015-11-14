@@ -3,9 +3,12 @@ import copy
 import glob
 import json
 import logging
+
+from django.db.models import Q
+
+from opencivicdata.models import LegislativeSession
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id, utcnow
-from opencivicdata.models import LegislativeSession
 from pupa.exceptions import UnresolvedIdError, DataImportError
 
 
@@ -134,9 +137,11 @@ class BaseImporter(object):
                 spec = get_pseudo_id(json_id)
                 spec = self.limit_spec(spec)
 
-                ids = {each.id
-                       for each
-                       in self.model_class.objects.filter(**spec)}
+                if isinstance(spec, Q):
+                    objects = self.model_class.objects.filter(spec)
+                else:
+                    objects = self.model_class.objects.filter(**spec)
+                ids = {each.id for each in objects}
                 if len(ids) == 1:
                     self.pseudo_id_cache[json_id] = ids.pop()
                 elif not ids:

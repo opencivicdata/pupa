@@ -40,6 +40,10 @@ class PersonImporter(BaseImporter):
         based on the memberships -> organization -> jurisdiction, so we scope
         the resolution.
         """
+        if list(spec.keys()) == ['name']:
+            # if we're just resolving on name, include other names
+            return ((Q(name=spec['name']) | Q(other_names__name=spec['name']))
+                    & Q(memberships__organization__jurisdiction_id=self.jurisdiction_id))
         spec['memberships__organization__jurisdiction_id'] = self.jurisdiction_id
         return spec
 
