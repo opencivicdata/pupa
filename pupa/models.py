@@ -17,16 +17,10 @@ OBJECT_TYPES = (
 class RunPlan(models.Model):
     jurisdiction = models.ForeignKey(Jurisdiction, related_name='runs')
     success = models.BooleanField(default=True)
-
-    @property
-    def start_time(self):
-        try:
-            return self.scrapers.all()[0].start_time
-        except IndexError:
-            try:
-                return self.imported_objects.all()[0].start_time
-            except IndexError:
-                return 'unknown'
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    exception = models.TextField(blank=True, default='')
+    traceback = models.TextField(blank=True, default='')
 
 
 class ScrapeReport(models.Model):
