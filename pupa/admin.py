@@ -30,7 +30,8 @@ class ImportObjectsInline(admin.TabularInline):
 class RunPlanAdmin(admin.ModelAdmin):
     actions = None
 
-    readonly_fields = ('jurisdiction', 'success')
+    readonly_fields = ('jurisdiction', 'success', 'start_time', 'end_time',
+                       'exception', 'traceback')
     list_filter = ('jurisdiction__name', 'success')
     list_display = ('jurisdiction', 'success', 'start_time')
     inlines = [
