@@ -3,6 +3,7 @@
 ## 0.5.2 -
 
 * show run logs in the admin
+* start tracking failed runs
 
 ## 0.5.1 - November 13 2015
 
