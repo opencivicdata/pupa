@@ -18,6 +18,16 @@ class RunPlan(models.Model):
     jurisdiction = models.ForeignKey(Jurisdiction, related_name='runs')
     success = models.BooleanField(default=True)
 
+    @property
+    def start_time(self):
+        try:
+            return self.scrapers.all()[0].start_time
+        except IndexError:
+            try:
+                return self.imported_objects.all()[0].start_time
+            except IndexError:
+                return 'unknown'
+
 
 class ScrapeReport(models.Model):
     plan = models.ForeignKey(RunPlan, related_name='scrapers')
