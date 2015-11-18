@@ -2,6 +2,7 @@ import os
 import glob
 import json
 import importlib
+import traceback
 from collections import OrderedDict
 
 from django.db import transaction
@@ -55,7 +56,16 @@ def forward_report(report, jurisdiction):
 def save_report(report, jurisdiction):
     from pupa.models import RunPlan
 
-    plan = RunPlan.objects.create(jurisdiction_id=jurisdiction, success=report['success'])
+    # set end time
+    report['end'] = utils.utcnow()
+
+    plan = RunPlan.objects.create(jurisdiction_id=jurisdiction,
+                                  success=report['success'],
+                                  start_time=report['start'],
+                                  end_time=report['end'],
+                                  exception=report.get('exception', ''),
+                                  traceback=report.get('traceback', ''),
+                                  )
 
     for scraper, details in report.get('scrape', {}).items():
         args = ' '.join('{k}={v}'.format(k=k, v=v)
@@ -233,17 +243,26 @@ class Command(BaseCommand):
             args.actions = ALL_ACTIONS
 
         # print the plan
-        report = {'plan': {'module': args.module, 'actions': args.actions, 'scrapers': scrapers}}
+        report = {'plan': {'module': args.module, 'actions': args.actions, 'scrapers': scrapers},
+                  'start': utils.utcnow(),
+                  }
         print_report(report)
 
         self.check_session_list(juris)
 
-        if 'scrape' in args.actions:
-            report['scrape'] = self.do_scrape(juris, args, scrapers)
-        if 'import' in args.actions:
-            report['import'] = self.do_import(juris, args)
-
-        report['success'] = True
+        try:
+            if 'scrape' in args.actions:
+                report['scrape'] = self.do_scrape(juris, args, scrapers)
+            if 'import' in args.actions:
+                report['import'] = self.do_import(juris, args)
+            report['success'] = True
+        except Exception as exc:
+            report['success'] = False
+            report['exception'] = exc
+            report['traceback'] = traceback.format_exc()
+            if 'import' in args.actions:
+                save_report(report, juris.jurisdiction_id)
+            raise
 
         if 'import' in args.actions:
             save_report(report, juris.jurisdiction_id)
