@@ -1,5 +1,9 @@
 # pupa changelog
 
+## 0.5.2 -
+
+* show run logs in the admin
+
 ## 0.5.1 - November 13 2015
 
 * use other\_names for psuedo\_id resolution on people
