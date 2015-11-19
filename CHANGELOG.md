@@ -1,6 +1,6 @@
 # pupa changelog
 
-## 0.5.2 -
+## 0.5.2 - November 18 2015
 
 * show run logs in the admin
 * start tracking failed runs
