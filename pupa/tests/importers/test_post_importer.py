@@ -2,7 +2,7 @@ import pytest
 from pupa.scrape import Post as ScrapePost
 from pupa.importers import PostImporter, OrganizationImporter
 from opencivicdata.models import Organization, Post
-
+import datetime
 
 @pytest.mark.django_db
 def test_full_post():
@@ -10,7 +10,9 @@ def test_full_post():
                                       classification="executive",
                                       jurisdiction_id="jurisdiction-id")
     post = ScrapePost(label='executive', role='President',
-                      organization_id='~{"classification": "executive"}')
+                      organization_id='~{"classification": "executive"}',
+                      start_date=datetime.date(2015, 5, 18),
+                      end_date='2015-05-19')
     post.add_contact_detail(type='phone', value='555-555-1234', note='this is fake')
     post.add_link('http://example.com/link')
 
@@ -30,6 +32,9 @@ def test_full_post():
     assert p.contact_details.all()[0].note == 'this is fake'
 
     assert p.links.all()[0].url == 'http://example.com/link'
+
+    assert p.start_date == '2015-05-18'
+    assert p.end_date == '2015-05-19'
 
 
 @pytest.mark.django_db
