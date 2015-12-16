@@ -183,3 +183,15 @@ def test_same_name_second_import():
 
     with pytest.raises(SameNameError):
         PersonImporter('jurisdiction-id').import_data([p3.as_dict()])
+
+
+@pytest.mark.django_db
+def test_resolve_json_id():
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    p = Person.objects.create(name='Dwayne Johnson')
+    p.other_names.create(name='Rock')
+    p.memberships.create(organization=o)
+
+    pi = PersonImporter('jurisdiction-id')
+    assert pi.resolve_json_id('~{"name": "Dwayne Johnson"}') == p.id
+    assert pi.resolve_json_id('~{"name": "Rock"}') == p.id

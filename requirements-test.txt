@@ -1,12 +1,10 @@
-Django>=1.8
+Django>=1.9
+opencivicdata-django==0.8.0
+
 dj_database_url
-django-uuidfield
-djorm-pgarray
-jsonfield==0.9.20
--e git://github.com/opencivicdata/python-opencivicdata-django.git#egg=opencivicdata-django
 psycopg2
 scrapelib
-validictory
+validictory>=1.0.1
 pytz
 
 mock
@@ -14,5 +12,3 @@ pytest
 pytest-cov
 pytest-django
 coveralls
-
--e git://github.com/sunlightlabs/waterfall.git#egg=waterfall

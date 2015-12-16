@@ -50,12 +50,12 @@ def test_agenda_add_person():
     e.validate()
 
 
-def test_agenda_add_vote():
+def test_agenda_add_vote_event():
     e = event_obj()
     agenda = e.add_agenda_item("foo bar")
     assert agenda['related_entities'] == []
 
-    agenda.add_vote(vote='Roll no. 12')
+    agenda.add_vote_event(vote_event='Roll no. 12')
     assert len(e.agenda[0]['related_entities']) == 1
     e.validate()
 
@@ -96,7 +96,7 @@ def test_add_document():
     assert len(e.documents) == 1
     o = e.documents[0]
     assert o['note'] == 'hello'
-    assert o['links'] == [{'url': 'http://example.com', 'media_type': 'text/html'}]
+    assert o['links'] == [{'url': 'http://example.com', 'media_type': 'text/html', 'text': ''}]
     e.validate()
 
 

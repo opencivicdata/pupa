@@ -2,6 +2,7 @@ import os
 import glob
 import json
 import importlib
+import traceback
 from collections import OrderedDict
 
 from django.db import transaction
@@ -55,7 +56,16 @@ def forward_report(report, jurisdiction):
 def save_report(report, jurisdiction):
     from pupa.models import RunPlan
 
-    plan = RunPlan.objects.create(jurisdiction_id=jurisdiction, success=report['success'])
+    # set end time
+    report['end'] = utils.utcnow()
+
+    plan = RunPlan.objects.create(jurisdiction_id=jurisdiction,
+                                  success=report['success'],
+                                  start_time=report['start'],
+                                  end_time=report['end'],
+                                  exception=report.get('exception', ''),
+                                  traceback=report.get('traceback', ''),
+                                  )
 
     for scraper, details in report.get('scrape', {}).items():
         args = ' '.join('{k}={v}'.format(k=k, v=v)
@@ -146,7 +156,7 @@ class Command(BaseCommand):
         # import inside here because to avoid loading Django code unnecessarily
         from pupa.importers import (JurisdictionImporter, OrganizationImporter, PersonImporter,
                                     PostImporter, MembershipImporter, BillImporter,
-                                    VoteImporter, EventImporter)
+                                    VoteEventImporter, EventImporter)
         datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
 
         juris_importer = JurisdictionImporter(juris.jurisdiction_id)
@@ -156,8 +166,8 @@ class Command(BaseCommand):
         membership_importer = MembershipImporter(juris.jurisdiction_id, person_importer,
                                                  org_importer, post_importer)
         bill_importer = BillImporter(juris.jurisdiction_id, org_importer, person_importer)
-        vote_importer = VoteImporter(juris.jurisdiction_id, person_importer, org_importer,
-                                     bill_importer)
+        vote_event_importer = VoteEventImporter(juris.jurisdiction_id, person_importer,
+                                                org_importer, bill_importer)
         event_importer = EventImporter(juris.jurisdiction_id)
 
         report = {}
@@ -177,8 +187,8 @@ class Command(BaseCommand):
             report.update(bill_importer.import_directory(datadir))
             print('import events...')
             report.update(event_importer.import_directory(datadir))
-            print('import votes...')
-            report.update(vote_importer.import_directory(datadir))
+            print('import vote events...')
+            report.update(vote_event_importer.import_directory(datadir))
 
         return report
 
@@ -233,17 +243,26 @@ class Command(BaseCommand):
             args.actions = ALL_ACTIONS
 
         # print the plan
-        report = {'plan': {'module': args.module, 'actions': args.actions, 'scrapers': scrapers}}
+        report = {'plan': {'module': args.module, 'actions': args.actions, 'scrapers': scrapers},
+                  'start': utils.utcnow(),
+                  }
         print_report(report)
 
         self.check_session_list(juris)
 
-        if 'scrape' in args.actions:
-            report['scrape'] = self.do_scrape(juris, args, scrapers)
-        if 'import' in args.actions:
-            report['import'] = self.do_import(juris, args)
-
-        report['success'] = True
+        try:
+            if 'scrape' in args.actions:
+                report['scrape'] = self.do_scrape(juris, args, scrapers)
+            if 'import' in args.actions:
+                report['import'] = self.do_import(juris, args)
+            report['success'] = True
+        except Exception as exc:
+            report['success'] = False
+            report['exception'] = exc
+            report['traceback'] = traceback.format_exc()
+            if 'import' in args.actions:
+                save_report(report, juris.jurisdiction_id)
+            raise
 
         if 'import' in args.actions:
             save_report(report, juris.jurisdiction_id)

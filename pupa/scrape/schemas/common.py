@@ -23,10 +23,20 @@ identifiers = {
     "type": "array",
 }
 
-fuzzy_date = {"type": "string", "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}$"}
-fuzzy_date_blank = {"type": "string", "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}$", "blank": True}
-fuzzy_datetime_blank = {"type": "string",
-                        "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}( [0-9]{2}:[0-9]{2}:[0-9]{2})?$",
+fuzzy_date_string = {"type": "string", 
+                     "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}$"}
+fuzzy_date_string_blank = {"type": "string", 
+                           "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}$", 
+                           "blank": True}
+fuzzy_datetime_string_blank = {"type": "string",
+                               "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}( [0-9]{2}:[0-9]{2}:[0-9]{2})?$",
+                               "blank": True}
+
+fuzzy_date = {"type" : [fuzzy_date_string, "datetime"]}
+fuzzy_date_blank = {"type": [fuzzy_date_string_blank, "datetime"], 
+                    "blank": True}
+
+fuzzy_datetime_blank = {"type": [fuzzy_datetime_string_blank, "datetime"], 
                         "blank": True}
 
 other_names = {
@@ -35,9 +45,9 @@ other_names = {
             "name": {"type": "string"},
             "start_date": fuzzy_date_blank,
             "end_date": fuzzy_date_blank,
-            "note": {"type": "string", "blank": True },
-        "type": "object",
-        }
+            "note": {"type": "string", "blank": True }
+            },
+        "type": "object"
     },
     "type": "array"
 }

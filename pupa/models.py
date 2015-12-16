@@ -9,7 +9,7 @@ OBJECT_TYPES = (
     ('post', 'Post'),
     ('membership', 'Membership'),
     ('bill', 'Bill'),
-    ('vote', 'Vote'),
+    ('vote_event', 'VoteEvent'),
     ('event', 'Event'),
 )
 
@@ -17,6 +17,10 @@ OBJECT_TYPES = (
 class RunPlan(models.Model):
     jurisdiction = models.ForeignKey(Jurisdiction, related_name='runs')
     success = models.BooleanField(default=True)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    exception = models.TextField(blank=True, default='')
+    traceback = models.TextField(blank=True, default='')
 
 
 class ScrapeReport(models.Model):

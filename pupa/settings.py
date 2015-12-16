@@ -21,16 +21,6 @@ SCRAPELIB_RETRY_WAIT_SECONDS = 20
 CACHE_DIR = os.path.join(os.getcwd(), '_cache')
 SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 
-ENABLE_ELASTICSEARCH = False
-ELASTICSEARCH_HOST = 'localhost'
-ELASTICSEARCH_TIMEOUT = 2
-
-# dump settings
-
-API_KEY = os.environ.get('PUPA_API_KEY', None)
-AWS_KEY = os.environ.get('AWS_KEY', None)
-AWS_SECRET = os.environ.get('AWS_SECRET', None)
-
 # Django settings
 DEBUG = False
 TEMPLATE_DEBUG = False
@@ -76,3 +66,4 @@ else:
 
 
 DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
