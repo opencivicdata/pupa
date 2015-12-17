@@ -1,3 +1,4 @@
+from ..utils import _make_pseudo_id
 from .base import BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin
 from .schemas.event import schema
 
@@ -23,7 +24,7 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
         self.add_entity(name=vote_event, entity_type='vote_event', id=id, note=note)
 
     def add_committee(self, committee, *, id=None, note='participant'):
-        self.add_entity(name=committee, entity_type='committee', id=id, note=note)
+        self.add_entity(name=committee, entity_type='organization', id=id, note=note)
 
     def add_bill(self, bill, *, id=None, note='consideration'):
         self.add_entity(name=bill, entity_type='bill', id=id, note=note)
@@ -44,6 +45,17 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
         }
         if id:
             ret['id'] = id
+        elif entity_type:
+            if entity_type in ('organization', 'person'):
+                id = _make_pseudo_id(name=name)
+            elif entity_type == 'bill':
+                id = _make_pseudo_id(identifier=name)
+            elif entity_type == 'vote_event':
+                id = _make_pseudo_id(identifier=name)
+            else:
+                raise NotImplementedError('{} entity type not implemented'.format(entity_type))
+            ret[entity_type + '_id'] = id
+        
         self['related_entities'].append(ret)
 
 
@@ -86,6 +98,10 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         }
         if id:
             p['id'] = id
+        elif type:
+            id = _make_pseudo_id(name=name)
+            p[type + '_id'] = id
+
         self.participants.append(p)
 
     def add_person(self, name, *, id=None, note='participant'):

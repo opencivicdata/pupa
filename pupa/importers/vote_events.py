@@ -50,6 +50,10 @@ class VoteEventImporter(BaseImporter):
 
         return self.model_class.objects.prefetch_related('votes__voter').get(**spec)
 
+    def limit_spec(self, spec):
+        spec['legislative_session__jurisdiction_id'] = self.jurisdiction_id
+        return spec
+
     def prepare_for_db(self, data):
         data['legislative_session_id'] = self.get_session_id(data.pop('legislative_session'))
         data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
