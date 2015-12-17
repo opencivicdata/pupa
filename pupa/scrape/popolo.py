@@ -78,7 +78,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
                  gender='', national_identity='',
                  # specialty fields
                  district=None, party=None, primary_org='', role='member',
-                 start_date='', end_date=''):
+                 start_date='', end_date='', primary_org_name=None):
         super(Person, self).__init__()
         self.name = name
         self.birth_date = birth_date
@@ -90,7 +90,8 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         self.national_identity = national_identity
         if primary_org:
             self.add_term(role, primary_org, district=district,
-                          start_date=start_date, end_date=end_date)
+                          start_date=start_date, end_date=end_date, 
+                          org_name=primary_org_name)
         if party:
             self.add_party(party)
 
@@ -111,9 +112,13 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
             role='member', **kwargs)
         self._related.append(membership)
 
-    def add_term(self, role, org_classification, *, district=None, start_date='', end_date='',
-                 label=''):
-        org_id = _make_pseudo_id(classification=org_classification)
+    def add_term(self, role, org_classification, *, district=None,
+                 start_date='', end_date='', label='', org_name=None):
+        if org_name:
+            org_id = _make_pseudo_id(classification=org_classification,
+                                     name=org_name)
+        else:
+            org_id = _make_pseudo_id(classification=org_classification)
         if district:
             post_id = _make_pseudo_id(label=district,
                                       role=role,
