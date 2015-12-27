@@ -28,6 +28,18 @@ class EventImporter(BaseImporter):
     }
     preserve_order = ('agenda',)
 
+    def __init__(self, 
+                 jurisdiction_id, 
+                 org_importer, 
+                 person_importer, 
+                 bill_importer,
+                 vote_event_importer):
+        super(EventImporter, self).__init__(jurisdiction_id)
+        self.org_importer = org_importer
+        self.person_importer = person_importer
+        self.bill_importer = bill_importer
+        self.vote_event_importer = vote_event_importer
+
     def get_object(self, event):
         spec = {
             'name': event['name'],
@@ -54,5 +66,34 @@ class EventImporter(BaseImporter):
 
         data['start_time'] = gdt(data['start_time'])
         data['end_time'] = gdt(data.get('end_time', None))
+
+        for participant in data['participants']:
+            if 'person_id' in participant:
+                participant['person_id'] = self.person_importer.resolve_json_id(
+                    participant['person_id'], 
+                    allow_no_match=True)
+            elif 'organization_id' in participant:
+                participant['organization_id'] = self.org_importer.resolve_json_id(
+                    participant['organization_id'], 
+                    allow_no_match=True)
+
+        for item in data['agenda']:
+            for entity in item['related_entities']:
+                if 'person_id' in entity:
+                    entity['person_id'] = self.person_importer.resolve_json_id(
+                        entity['person_id'], 
+                        allow_no_match=True)
+                elif 'organization_id' in entity:
+                    entity['organization_id'] = self.org_importer.resolve_json_id(
+                        entity['organization_id'], 
+                        allow_no_match=True)
+                elif 'bill_id' in entity:
+                    entity['bill_id'] = self.bill_importer.resolve_json_id(
+                        entity['bill_id'], 
+                        allow_no_match=True)
+                elif 'vote_event_id' in entity:
+                    entity['vote_event_id'] = self.vote_event_importer.resolve_json_id(
+                        entity['vote_event_id'],
+                        allow_no_match=True)
 
         return data

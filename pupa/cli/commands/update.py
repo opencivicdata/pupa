@@ -168,7 +168,11 @@ class Command(BaseCommand):
         bill_importer = BillImporter(juris.jurisdiction_id, org_importer, person_importer)
         vote_event_importer = VoteEventImporter(juris.jurisdiction_id, person_importer,
                                                 org_importer, bill_importer)
-        event_importer = EventImporter(juris.jurisdiction_id)
+        event_importer = EventImporter(juris.jurisdiction_id,
+                                       org_importer,
+                                       person_importer,
+                                       bill_importer,
+                                       vote_event_importer)
 
         report = {}
 
