@@ -132,6 +132,10 @@ schema = {
                 "properties": {
                     "description": { "type": "string", },
 
+                    "classification": {
+                        "type": ["string", "null"],
+                    },
+
                     "order": {
                         "type": ["string", "null"],
                     },
