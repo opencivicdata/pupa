@@ -71,6 +71,17 @@ def test_agenda_add_subject():
 
     e.validate()
 
+def test_agenda_add_classification():
+    e = event_obj()
+    agenda = e.add_agenda_item("foo bar")
+
+    agenda.add_classification('test')
+    assert e.agenda[0]['classification'] == ['test']
+    agenda.add_classification('test2')
+    assert e.agenda[0]['classification'] == ['test', 'test2']
+
+    e.validate()
+
 
 def test_add_committee():
     e = event_obj()
