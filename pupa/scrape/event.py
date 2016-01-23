@@ -9,7 +9,7 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
     def __init__(self, description, event):
         super(EventAgendaItem, self).__init__({
             "description": description,
-            "classification": str(),
+            "classification": [],
             "related_entities": [],
             "subjects": [],
             "media": [],

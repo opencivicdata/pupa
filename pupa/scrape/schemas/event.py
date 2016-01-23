@@ -133,7 +133,8 @@ schema = {
                     "description": { "type": "string", },
 
                     "classification": {
-                        "type": ["string", "null"],
+                        "items": {"type": "string"},
+                        "type": "array",
                     },
 
                     "order": {
