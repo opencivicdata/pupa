@@ -81,35 +81,37 @@ class Command(BaseCommand):
         self.add_argument('module', type=str, help='name of the new scraper module')
 
     def handle(self, args, other):
+        if os.path.exists(args.module):
+            raise CommandError('Directory {} already exists'.format(repr(args.module)))
 
-        name = prompt('jurisdiction name (e.g. City of Seattle): ')
-        division = prompt('division id (look this up in the opencivicdata/ocd-division-ids '
-                          'repository): ')
-        classification = prompt('classification (can be: {}): '
-                                .format(', '.join(JURISDICTION_CLASSIFICATIONS)))
-        url = prompt('official URL: ')
+        division = None
+        while not division:
+            division = prompt('division id (see https://github.com/opencivicdata/ocd-division-ids/tree/master/identifiers): ')
+            if not division:
+                print("\nERROR: Division ID is required.\n")
 
         try:
             Division.get(division)
-        except ValueError:
-            print("\nERROR: Division ID is invalid.",
-                  "Please find the correct division_id here",
-                  "https://github.com/opencivicdata/ocd-division-ids/tree/master/identifiers",
-                  "or contact open-civic-data@googlegroups.org to add a new country\n")
-            sys.exit(1)
+        except (ValueError, IndexError):
+            raise CommandError('Division ID {} is invalid'.format(repr(division)))
 
-        if os.path.exists(args.module):
-            raise CommandError(args.module + ' directory already exists')
+        name = prompt('jurisdiction name (e.g. City of Seattle): ')
+        classification = prompt('classification (can be: {}): '
+                                .format(', '.join(JURISDICTION_CLASSIFICATIONS)))
+        url = prompt('official url (e.g. http://www.seattle.gov/): ')
+
         os.makedirs(args.module)
 
-        # will default to True until they pick one, then defaults to False
-        scraper_types = CLASS_DICT.keys()
+        # Will default to True until they pick one, then defaults to False.
         selected_scraper_types = []
-        for stype in scraper_types:
-            prompt_str = 'create {} scraper? {}: '.format(
-                stype, '[y/N]' if selected_scraper_types else '[Y/n]')
-            default = 'N' if selected_scraper_types else 'Y'
-            result = prompt(prompt_str, default).upper()
+        for stype in CLASS_DICT.keys():
+            if selected_scraper_types:
+                default = 'N'
+                hint = '[y/N]'
+            else:
+                default = 'Y'
+                hint = '[Y/n]'
+            result = prompt('create {} scraper? {}: '.format(stype, hint), default).upper()
             if result == 'Y':
                 selected_scraper_types.append(stype)
 
