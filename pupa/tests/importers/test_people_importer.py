@@ -2,7 +2,7 @@ import pytest
 from pupa.scrape import Person as ScrapePerson
 from pupa.importers import PersonImporter
 from opencivicdata.models import Person, Organization, Membership
-from pupa.exceptions import SameNameError
+from pupa.exceptions import DuplicateItemError, SameNameError
 
 
 @pytest.mark.django_db
@@ -118,27 +118,41 @@ def test_multiple_memberships():
 
 @pytest.mark.django_db
 def test_same_name_people():
-    # ensure two people with the same name don't import without birthdays
     o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+
+    # importing two people with the same name to a pristine database should error
     p1 = ScrapePerson('Dwayne Johnson', image='http://example.com/1')
     p2 = ScrapePerson('Dwayne Johnson', image='http://example.com/2')
-
-    # the people have the same name but are apparently different
     with pytest.raises(SameNameError):
         PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
 
-    # when we give them birth dates all is well though
+    # importing one person should pass
+    PersonImporter('jurisdiction-id').import_data([p1.as_dict()])
+    # create fake memberships so that future lookups work on the imported people
+    for p in Person.objects.all():
+        Membership.objects.create(person=p, organization=o)
+
+    # importing another person with the same name should fail
+    with pytest.raises(SameNameError):
+        PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+
+    # adding birth dates should pass
     p1.birth_date = '1970'
     p2.birth_date = '1930'
     resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
-    assert resp['person']['insert'] == 2
+    assert resp['person']['insert'] == 1
     assert resp['person']['noop'] == 0
-    assert resp['person']['update'] == 0
+    assert resp['person']['update'] == 1
     assert Person.objects.count() == 2
-
-    # fake some memberships so future lookups work on these people
+    # create fake memberships so that future lookups work on the imported people
     for p in Person.objects.all():
         Membership.objects.create(person=p, organization=o)
+
+    # adding a third person with the same name but without a birthday should error
+    p3 = ScrapePerson('Dwayne Johnson', image='http://example.com/3')
+
+    with pytest.raises(SameNameError):
+        PersonImporter('jurisdiction-id').import_data([p3.as_dict()])
 
     # and now test that an update works and we can insert a new one with the same name
     p1.image = 'http://example.com/1.jpg'

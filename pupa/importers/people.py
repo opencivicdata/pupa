@@ -49,24 +49,28 @@ class PersonImporter(BaseImporter):
 
     def get_object(self, person):
         all_names = [person['name']] + [o['name'] for o in person['other_names']]
+
         matches = list(self.model_class.objects.filter(
             Q(memberships__organization__jurisdiction_id=self.jurisdiction_id),
             (Q(name__in=all_names) | Q(other_names__name__in=all_names))
         ).distinct('id'))
-        if len(matches) == 1:
-            return matches[0]
-        elif len(matches) == 0:
-            raise self.model_class.DoesNotExist('No Person: {} in {}'.format(all_names,
-                                                                             self.jurisdiction_id))
-        else:
-            # try and match based on birth_date
-            if person['birth_date']:
-                for m in matches:
-                    if person['birth_date'] and m.birth_date == person['birth_date']:
-                        return m
 
-                # if we got here, no match based on birth_date, a new person?
-                raise self.model_class.DoesNotExist('No Person: {} in {} with birth_date {}'
-                                                    .format(all_names, self.jurisdiction_id,
-                                                            person['birth_date']))
+        matches_length = len(matches)
+        if matches_length == 1 and not matches[0].birth_date:
+            return matches[0]
+        elif matches_length == 0:
+            raise self.model_class.DoesNotExist(
+                'No Person: {} in {}'.format(all_names, self.jurisdiction_id))
+        else:
+            # Try and match based on birth_date.
+            if person['birth_date']:
+                for match in matches:
+                    if person['birth_date'] and match.birth_date == person['birth_date']:
+                        return match
+
+                # If we got here, no match based on birth_date, a new person?
+                raise self.model_class.DoesNotExist(
+                    'No Person: {} in {} with birth_date {}'.format(
+                        all_names, self.jurisdiction_id, person['birth_date']))
+
             raise SameNameError(person['name'])
