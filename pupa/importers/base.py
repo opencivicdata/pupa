@@ -255,12 +255,11 @@ class BaseImporter(object):
                 if getattr(obj, key) != value and key not in obj.locked_fields:
                     setattr(obj, key, value)
                     what = 'update'
-            if what == 'update':
-                obj.save()
 
             updated = self._update_related(obj, related, self.related_models)
-            if updated:
+            if what == 'update' or updated:
                 what = 'update'
+                obj.save()
 
         # need to create the data
         else:

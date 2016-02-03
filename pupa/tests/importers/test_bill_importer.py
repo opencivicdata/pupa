@@ -165,6 +165,7 @@ def test_bill_update_because_of_subitem():
     assert result['bill']['insert'] == 1
     obj = Bill.objects.get()
     assert obj.actions.count() == 1
+    last_updated = obj.updated_at
 
     # now let's make sure we get updated when there are second actions
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
@@ -174,6 +175,7 @@ def test_bill_update_because_of_subitem():
     assert result['bill']['update'] == 1
     obj = Bill.objects.get()
     assert obj.actions.count() == 2
+    assert obj.updated_at > last_updated
 
     # same 2 actions, noop
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
