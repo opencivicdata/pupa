@@ -1,3 +1,4 @@
+import django
 from django.db import connection
 from django.core.management import call_command
 
@@ -42,6 +43,8 @@ class Command(BaseCommand):
                           help='country to load divisions for')
 
     def handle(self, args, other):
+        django.setup()
+
         if args.partial_reset:
             copy_tmp('opencivicdata_division')
             drop_tables()

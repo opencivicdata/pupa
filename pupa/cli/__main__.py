@@ -1,10 +1,9 @@
 import os
 import sys
-import logging
+import logging.config
 import argparse
 import importlib
 import traceback
-import django
 from django.conf import settings
 from pupa.cli.commands.base import CommandError
 
@@ -29,11 +28,6 @@ def main():
     # configure Django before model imports
     if os.environ.get("DJANGO_SETTINGS_MODULE") is None:
         os.environ['DJANGO_SETTINGS_MODULE'] = 'pupa.settings'
-
-    try:
-        django.setup()
-    except django.db.utils.OperationalError:
-        pass
 
     subcommands = {}
     for mod in COMMAND_MODULES:

@@ -5,6 +5,7 @@ import importlib
 import traceback
 from collections import OrderedDict
 
+import django
 from django.db import transaction
 
 from .base import BaseCommand, CommandError
@@ -118,15 +119,15 @@ class Command(BaseCommand):
         module = importlib.import_module(module_name)
         for obj in module.__dict__.values():
             # ensure we're dealing with a subclass of Jurisdiction
-            if (isinstance(obj, type)
-               and issubclass(obj, Jurisdiction)
-               and getattr(obj, 'division_id', None)
-               and obj.classification):
+            if (isinstance(obj, type) and
+               issubclass(obj, Jurisdiction) and
+               getattr(obj, 'division_id', None) and
+               obj.classification):
                 return obj()
-        raise CommandError('Unable to import Jurisdiction subclass from '
-                           + module_name
-                           + '. Jurisdiction subclass may be missing a '
-                           + 'division_id and classification.')
+        raise CommandError('Unable to import Jurisdiction subclass from ' +
+                           module_name +
+                           '. Jurisdiction subclass may be missing a ' +
+                           'division_id or classification.')
 
     def do_scrape(self, juris, args, scrapers):
         # make output and cache dirs
@@ -245,6 +246,9 @@ class Command(BaseCommand):
         # modify args in-place so we can pass them around
         if not args.actions:
             args.actions = ALL_ACTIONS
+
+        if 'import' in args.actions:
+            django.setup()
 
         # print the plan
         report = {'plan': {'module': args.module, 'actions': args.actions, 'scrapers': scrapers},
