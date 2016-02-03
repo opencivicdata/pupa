@@ -90,7 +90,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         self.national_identity = national_identity
         if primary_org:
             self.add_term(role, primary_org, district=district,
-                          start_date=start_date, end_date=end_date, 
+                          start_date=start_date, end_date=end_date,
                           org_name=primary_org_name)
         if party:
             self.add_party(party)

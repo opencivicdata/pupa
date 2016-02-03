@@ -4,6 +4,7 @@ from pupa.importers import PostImporter, OrganizationImporter
 from opencivicdata.models import Organization, Post
 import datetime
 
+
 @pytest.mark.django_db
 def test_full_post():
     org = Organization.objects.create(name="United States Executive Branch",

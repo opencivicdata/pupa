@@ -108,9 +108,9 @@ def test_multiple_orgs_of_same_class():
                         primary_org_name='Foundation')
 
     picard = ScrapePerson('Jean Luc Picard',
-                        primary_org='foundation',
-                        role='founder',
-                        primary_org_name='Federation')
+                          primary_org='foundation',
+                          role='founder',
+                          primary_org_name='Federation')
 
     person_imp = PersonImporter('fnd-jid')
     person_imp.import_data([hari.as_dict()])
@@ -121,8 +121,7 @@ def test_multiple_orgs_of_same_class():
     dumb_imp = DumbMockImporter()
     memimp = MembershipImporter('fnd-jid', person_imp, org_imp, dumb_imp)
 
-    memimp.import_data([hari._related[0].as_dict(), 
-                        picard._related[0].as_dict()])
+    memimp.import_data([hari._related[0].as_dict(), picard._related[0].as_dict()])
 
     assert Person.objects.get(name='Hari Seldon').memberships.get().organization.name == 'Foundation'
     assert Person.objects.get(name='Jean Luc Picard').memberships.get().organization.name == 'Federation'

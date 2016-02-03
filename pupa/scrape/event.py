@@ -55,7 +55,7 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
             else:
                 raise NotImplementedError('{} entity type not implemented'.format(entity_type))
             ret[entity_type + '_id'] = id
-        
+
         self['related_entities'].append(ret)
 
 

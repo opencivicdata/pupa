@@ -1,7 +1,10 @@
 import pytest
 from pupa.scrape import Event as ScrapeEvent
-from pupa.importers import EventImporter, OrganizationImporter, PersonImporter, BillImporter, VoteEventImporter
-from opencivicdata.models import Jurisdiction, Event, Person, Membership, Organization, Bill, VoteEvent
+from pupa.importers import (EventImporter, OrganizationImporter, PersonImporter, BillImporter,
+                            VoteEventImporter)
+from opencivicdata.models import (Jurisdiction, Event, Person, Membership, Organization, Bill,
+                                  VoteEvent)
+
 
 def ge():
     event = ScrapeEvent(
@@ -17,6 +20,7 @@ oi = OrganizationImporter('jid')
 pi = PersonImporter('jid')
 bi = BillImporter('jid', oi, pi)
 vei = VoteEventImporter('jid', pi, oi, bi)
+
 
 @pytest.mark.django_db
 def test_related_people_event():
@@ -51,14 +55,14 @@ def test_related_vote_event():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     session = j.legislative_sessions.create(name='1900', identifier='1900')
     org = Organization.objects.create(id='org-id', name='House', classification='lower')
-    bill = Bill.objects.create(id='bill-1', identifier='HB 1', 
+    bill = Bill.objects.create(id='bill-1', identifier='HB 1',
                                legislative_session=session)
-    vote = VoteEvent.objects.create(id='vote-1', 
+    vote = VoteEvent.objects.create(id='vote-1',
                                     identifier="Roll no. 12",
-                                    bill=bill, 
+                                    bill=bill,
                                     legislative_session=session,
                                     organization=org)
-                               
+
     event1 = ge()
     event2 = ge()
 
@@ -80,7 +84,7 @@ def test_related_bill_event():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     session = j.legislative_sessions.create(name='1900', identifier='1900')
     org = Organization.objects.create(id='org-id', name='House', classification='lower')
-    bill = Bill.objects.create(id='bill-1', identifier='HB 101', 
+    bill = Bill.objects.create(id='bill-1', identifier='HB 101',
                                legislative_session=session)
     event1 = ge()
     event2 = ge()
@@ -102,10 +106,10 @@ def test_related_bill_event():
 def test_related_committee_event():
     j = Jurisdiction.objects.create(id='jid', division_id='did')
     session = j.legislative_sessions.create(name='1900', identifier='1900')
-    org = Organization.objects.create(id='org-id', name='House', 
-                                      classification='lower', 
+    org = Organization.objects.create(id='org-id', name='House',
+                                      classification='lower',
                                       jurisdiction=j)
-    com = Organization.objects.create(id='fiscal', name="Fiscal Committee", 
+    com = Organization.objects.create(id='fiscal', name="Fiscal Committee",
                                       classification='committee',
                                       parent=org,
                                       jurisdiction=j)
@@ -177,7 +181,7 @@ def test_full_event():
     assert result['event']['insert'] == 1
 
     event = ge()
-    
+
     result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
     assert result['event']['noop'] == 1
 
