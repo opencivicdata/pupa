@@ -32,7 +32,8 @@ def main():
 
     try:
         django.setup()
-    except django.db.utils.OperationalError:
+    except django.db.utils.OperationalError as e:
+        logger.warning('django.setup() failed with exception "%s"', e)
         pass
 
     subcommands = {}
