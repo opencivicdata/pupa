@@ -257,8 +257,10 @@ class BaseImporter(object):
                     what = 'update'
 
             updated = self._update_related(obj, related, self.related_models)
-            if what == 'update' or updated:
+            if updated:
                 what = 'update'
+
+            if what == 'update':
                 obj.save()
 
         # need to create the data
