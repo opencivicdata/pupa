@@ -95,13 +95,19 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         if party:
             self.add_party(party)
 
-    def add_membership(self, organization, role='member', **kwargs):
+    def add_membership(self, name_or_org, role='member', **kwargs):
         """
             add a membership in an organization and return the membership
             object in case there are more details to add
         """
-        membership = Membership(person_id=self._id, organization_id=organization._id,
-                                role=role, **kwargs)
+        if isinstance(name_or_org, Organization):
+            membership = Membership(person_id=self._id,
+                                    organization_id=name_or_org._id,
+                                    role=role, **kwargs)
+        else:
+            membership = Membership(person_id=self._id,
+                                    organization_id=_make_pseudo_id(name=name_or_org),
+                                    role=role, **kwargs)
         self._related.append(membership)
         return membership
 
