@@ -25,6 +25,10 @@ class NoMembershipsError(DataImportError):
         )
 
 
+class SkipImportItemError(SkipImportItemError):
+    """ An attempt was made to import an item that must be skipped. """
+
+
 class SameNameError(DataImportError):
     """ Attempt was made to import two people with the same name. """
 

@@ -9,7 +9,7 @@ from django.db.models import Q
 from opencivicdata.models import LegislativeSession
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id, utcnow
-from pupa.exceptions import UnresolvedIdError, DataImportError
+from pupa.exceptions import SkipImportItemError, UnresolvedIdError, DataImportError
 
 
 def omnihash(obj):
@@ -214,7 +214,10 @@ class BaseImporter(object):
         }
 
         for json_id, data in self._prepare_imports(data_items):
-            obj_id, what = self.import_item(data)
+            try:
+                obj_id, what = self.import_item(data)
+            except SkipImportItemError:
+                continue
             self.json_to_db_id[json_id] = obj_id
             record['records'][what].append(obj_id)
             record[what] += 1
