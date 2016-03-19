@@ -25,7 +25,7 @@ class NoMembershipsError(DataImportError):
         )
 
 
-class SkipImportItemError(SkipImportItemError):
+class SkipImportItemError(DataImportError):
     """ An attempt was made to import an item that must be skipped. """
 
 
