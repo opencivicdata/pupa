@@ -1,5 +1,5 @@
 Django>=1.9
-opencivicdata-django==0.8.0
+-e git+https://github.com/opencivicdata/python-opencivicdata-django.git@master#egg=opencivicdata-django
 
 dj_database_url
 psycopg2
