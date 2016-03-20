@@ -1,6 +1,7 @@
 import pytest
 from pupa.scrape import Membership as ScrapeMembership
 from pupa.scrape import Person as ScrapePerson
+from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import MembershipImporter, PersonImporter, OrganizationImporter
 from pupa.exceptions import NoMembershipsError
 from opencivicdata.models import Organization, Post, Person
@@ -31,8 +32,13 @@ def test_full_membership():
     m2 = ScrapeMembership(person_id=robot.id, organization_id=org.id, label='member',
                           role='member')
 
+    o = ScrapeOrganization(org.name)
+
+    org_imp = OrganizationImporter('fnd')
+    org_imp.import_data([o.as_dict()])
+
     dumb_imp = DumbMockImporter()
-    memimp = MembershipImporter('fnd-jid', dumb_imp, dumb_imp, dumb_imp)
+    memimp = MembershipImporter('fnd-jid', dumb_imp, org_imp, dumb_imp)
     memimp.import_data([m1.as_dict(), m2.as_dict()])
 
     # ensure that the memberships attached in the right places
@@ -62,7 +68,8 @@ def test_no_membership_for_person():
 
     # try to import a membership
     dumb_imp = DumbMockImporter()
-    memimp = MembershipImporter('fnd-jid', person_imp, dumb_imp, dumb_imp)
+    org_imp = OrganizationImporter('fnd')
+    memimp = MembershipImporter('fnd-jid', person_imp, org_imp, dumb_imp)
 
     with pytest.raises(NoMembershipsError):
         memimp.import_data([])
@@ -85,7 +92,8 @@ def test_no_membership_for_person_including_party():
 
     # try to import a membership
     dumb_imp = DumbMockImporter()
-    memimp = MembershipImporter('fnd-jid', person_imp, dumb_imp, dumb_imp)
+    org_imp = OrganizationImporter('fnd')
+    memimp = MembershipImporter('fnd-jid', person_imp, org_imp, dumb_imp)
 
     with pytest.raises(NoMembershipsError):
         memimp.import_data([p._related[0].as_dict()])
@@ -117,8 +125,8 @@ def test_multiple_orgs_of_same_class():
     person_imp.import_data([picard.as_dict()])
 
     # try to import a membership
-    org_imp = OrganizationImporter('fnd-jid')
     dumb_imp = DumbMockImporter()
+    org_imp = OrganizationImporter('fnd')
     memimp = MembershipImporter('fnd-jid', person_imp, org_imp, dumb_imp)
 
     memimp.import_data([hari._related[0].as_dict(), picard._related[0].as_dict()])
