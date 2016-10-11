@@ -1,4 +1,4 @@
-Django>=1.9
+Django<1.10
 opencivicdata-django==0.8.0
 
 dj_database_url
