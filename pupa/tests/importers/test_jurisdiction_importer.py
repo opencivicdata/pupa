@@ -1,11 +1,11 @@
 import pytest
 from pupa.scrape import Jurisdiction as JurisdictionBase
 from pupa.importers import JurisdictionImporter
-from opencivicdata.models import Jurisdiction, LegislativeSession
+from opencivicdata.models import Jurisdiction, LegislativeSession, Division
 
 
 class FakeJurisdiction(JurisdictionBase):
-    division_id = 'division-id'
+    division_id = 'ocd-division/country:us'
     name = 'test'
     url = 'http://example.com'
     classification = 'government'
@@ -18,6 +18,7 @@ class FakeJurisdiction(JurisdictionBase):
 
 @pytest.mark.django_db
 def test_jurisdiction_import():
+    Division.objects.create(id='ocd-division/country:us', name='USA')
     tj = FakeJurisdiction()
     juris_dict = tj.as_dict()
     JurisdictionImporter('jurisdiction-id').import_data([juris_dict])
@@ -31,6 +32,7 @@ def test_jurisdiction_import():
 
 @pytest.mark.django_db
 def test_jurisdiction_update():
+    Division.objects.create(id='ocd-division/country:us', name='USA')
     tj = FakeJurisdiction()
     ji = JurisdictionImporter('jurisdiction-id')
     _, what = ji.import_item(tj.as_dict())
@@ -49,6 +51,7 @@ def test_jurisdiction_update():
 
 @pytest.mark.django_db
 def test_jurisdiction_merge_related():
+    Division.objects.create(id='ocd-division/country:us', name='USA')
     # need to ensure legislative_sessions don't get deleted
     ji = JurisdictionImporter('jurisdiction-id')
     tj = FakeJurisdiction()

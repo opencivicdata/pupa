@@ -1,15 +1,23 @@
 import pytest
 from pupa.scrape import Post as ScrapePost
 from pupa.importers import PostImporter, OrganizationImporter
-from opencivicdata.models import Organization, Post
+from opencivicdata.models import Organization, Post, Division, Jurisdiction
 import datetime
+
+
+def create_jurisdictions():
+    d = Division.objects.create(id='ocd-division/country:us', name='USA')
+    d = Division.objects.create(id='ocd-division/country:us/state:nc', name='NC')
+    j = Jurisdiction.objects.create(id='us', division_id='ocd-division/country:us')
+    j = Jurisdiction.objects.create(id='nc', division_id='ocd-division/country:us/state:nc')
 
 
 @pytest.mark.django_db
 def test_full_post():
+    create_jurisdictions()
     org = Organization.objects.create(name="United States Executive Branch",
                                       classification="executive",
-                                      jurisdiction_id="jurisdiction-id")
+                                      jurisdiction_id="us")
     post = ScrapePost(label='executive', role='President',
                       organization_id='~{"classification": "executive"}',
                       start_date=datetime.date(2015, 5, 18),
@@ -18,7 +26,7 @@ def test_full_post():
     post.add_link('http://example.com/link')
 
     # import post
-    oi = OrganizationImporter('jurisdiction-id')
+    oi = OrganizationImporter('us')
     PostImporter('jurisdiction-id', oi).import_data([post.as_dict()])
 
     # get person from db and assert it imported correctly
@@ -40,6 +48,7 @@ def test_full_post():
 
 @pytest.mark.django_db
 def test_deduplication():
+    create_jurisdictions()
     Organization.objects.create(id='us', name="United States Executive Branch",
                                 classification="executive", jurisdiction_id="us")
     Organization.objects.create(id='nc', name="North Carolina Executive Branch",
@@ -63,6 +72,7 @@ def test_deduplication():
 
 @pytest.mark.django_db
 def test_resolve_special_json_id():
+    create_jurisdictions()
     Organization.objects.create(id='us', name="United States Executive Branch",
                                 classification="executive", jurisdiction_id="us")
     Organization.objects.create(id='nc', name="North Carolina Executive Branch",
