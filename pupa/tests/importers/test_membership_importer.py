@@ -3,7 +3,7 @@ from pupa.scrape import Membership as ScrapeMembership
 from pupa.scrape import Person as ScrapePerson
 from pupa.importers import MembershipImporter, PersonImporter, OrganizationImporter
 from pupa.exceptions import NoMembershipsError
-from opencivicdata.models import Organization, Post, Person
+from opencivicdata.models import Organization, Post, Person, Division, Jurisdiction
 
 
 class DumbMockImporter(object):
@@ -13,9 +13,14 @@ class DumbMockImporter(object):
     def resolve_json_id(self, json_id):
         return json_id
 
+def create_jurisdiction():
+    d = Division.objects.create(id='ocd-division/country:us', name='USA')
+    j = Jurisdiction.objects.create(id='fnd-jid', division_id='ocd-division/country:us')
+
 
 @pytest.mark.django_db
 def test_full_membership():
+    create_jurisdiction()
     org = Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
                                       jurisdiction_id="fnd-jid")
     hari = Person.objects.create(id="hs", name="Hari Seldon")
@@ -52,6 +57,7 @@ def test_full_membership():
 
 @pytest.mark.django_db
 def test_no_membership_for_person():
+    create_jurisdiction()
     Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
                                 jurisdiction_id="fnd-jid")
 
@@ -74,6 +80,7 @@ def test_no_membership_for_person_including_party():
     even though party is specified we should still get a no memberships error because it doesn't
     bind the person to a jurisdiction, thus causing duplication
     """
+    create_jurisdiction()
     Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
                                 jurisdiction_id="fnd-jid")
     Organization.objects.create(id="dem", name="Democratic", classification="party")
@@ -81,11 +88,12 @@ def test_no_membership_for_person_including_party():
     # import a person with no memberships
     p = ScrapePerson('a man without a country', party='Democratic')
     person_imp = PersonImporter('fnd-jid')
+    org_imp = OrganizationImporter('fnd-jid')
     person_imp.import_data([p.as_dict()])
 
     # try to import a membership
     dumb_imp = DumbMockImporter()
-    memimp = MembershipImporter('fnd-jid', person_imp, dumb_imp, dumb_imp)
+    memimp = MembershipImporter('fnd-jid', person_imp, org_imp, dumb_imp)
 
     with pytest.raises(NoMembershipsError):
         memimp.import_data([p._related[0].as_dict()])
@@ -97,6 +105,7 @@ def test_multiple_orgs_of_same_class():
     We should be able to set memberships on organizations with the
     same classification within the same jurisdictions
     """
+    create_jurisdiction()
     Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
                                 jurisdiction_id="fnd-jid")
     Organization.objects.create(id="fdr", name="Federation", classification="foundation",

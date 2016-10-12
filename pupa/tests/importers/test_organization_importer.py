@@ -1,12 +1,18 @@
 import pytest
-from opencivicdata.models import Organization
+from opencivicdata.models import Organization, Jurisdiction, Division
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import OrganizationImporter
 from pupa.exceptions import UnresolvedIdError
 
+def create_jurisdictions():
+    d = Division.objects.create(id='ocd-division/country:us', name='USA')
+    j = Jurisdiction.objects.create(id='jid1', division_id='ocd-division/country:us')
+    j = Jurisdiction.objects.create(id='jid2', division_id='ocd-division/country:us')
+
 
 @pytest.mark.django_db
 def test_full_organization():
+    create_jurisdictions()
     org = ScrapeOrganization('United Nations', classification='international')
     org.add_identifier('un')
     org.add_name('UN', start_date='1945')
@@ -16,7 +22,7 @@ def test_full_organization():
 
     # import org
     od = org.as_dict()
-    OrganizationImporter('jurisdiction-id').import_data([od])
+    OrganizationImporter('jid1').import_data([od])
 
     # get person from db and assert it imported correctly
     o = Organization.objects.get()
@@ -39,6 +45,7 @@ def test_full_organization():
 
 @pytest.mark.django_db
 def test_deduplication_similar_but_different():
+    create_jurisdictions()
     o1 = ScrapeOrganization('United Nations', classification='international')
     # different classification
     o2 = ScrapeOrganization('United Nations', classification='global')
@@ -49,41 +56,44 @@ def test_deduplication_similar_but_different():
 
     # similar, but no duplicates
     orgs = [o1.as_dict(), o2.as_dict(), o3.as_dict(), o4.as_dict()]
-    OrganizationImporter('jurisdiction-id').import_data(orgs)
+    OrganizationImporter('jid1').import_data(orgs)
     assert Organization.objects.count() == 4
 
     # should get a new one  when jurisdiction_id changes
     o5 = ScrapeOrganization('United Nations', classification='international')
-    OrganizationImporter('new-jurisdiction-id').import_data([o5.as_dict()])
+    OrganizationImporter('jid2').import_data([o5.as_dict()])
     assert Organization.objects.count() == 5
 
 
 @pytest.mark.django_db
 def test_deduplication_parties():
+    create_jurisdictions()
     party = ScrapeOrganization('Wild', classification='party')
-    OrganizationImporter('jurisdiction-id').import_data([party.as_dict()])
+    OrganizationImporter('jid1').import_data([party.as_dict()])
     assert Organization.objects.count() == 1
 
     # parties shouldn't get jurisdiction id attached, so don't differ on import
     party = ScrapeOrganization('Wild', classification='party')
-    OrganizationImporter('new-jurisdiction-id').import_data([party.as_dict()])
+    OrganizationImporter('jid2').import_data([party.as_dict()])
     assert Organization.objects.count() == 1
 
 
 @pytest.mark.django_db
 def test_deduplication_prevents_identical():
+    create_jurisdictions()
     org1 = ScrapeOrganization('United Nations', classification='international')
     org2 = ScrapeOrganization('United Nations', classification='international',
                               founding_date='1945')
-    OrganizationImporter('jurisdiction-id').import_data([org1.as_dict()])
+    OrganizationImporter('jid1').import_data([org1.as_dict()])
     assert Organization.objects.count() == 1
 
-    OrganizationImporter('jurisdiction-id').import_data([org2.as_dict()])
+    OrganizationImporter('jid1').import_data([org2.as_dict()])
     assert Organization.objects.count() == 1
 
 
 @pytest.mark.django_db
 def test_pseudo_ids():
+    create_jurisdictions()
     wild = Organization.objects.create(id='1', name='Wild', classification='party')
     senate = Organization.objects.create(id='2', name='Senate', classification='upper',
                                          jurisdiction_id='jid1')
@@ -107,9 +117,10 @@ def test_pseudo_ids():
 
 @pytest.mark.django_db
 def test_parent_id_resolution():
+    create_jurisdictions()
     parent = ScrapeOrganization('UN', classification='international')
     child = ScrapeOrganization('UNESCO', classification='unknown', parent_id=parent._id)
-    OrganizationImporter('jurisdiction-id').import_data([parent.as_dict(), child.as_dict()])
+    OrganizationImporter('jid1').import_data([parent.as_dict(), child.as_dict()])
     assert Organization.objects.count() == 2
     assert Organization.objects.get(name='UN').children.count() == 1
     assert Organization.objects.get(name='UNESCO').parent.name == 'UN'
@@ -117,10 +128,11 @@ def test_parent_id_resolution():
 
 @pytest.mark.django_db
 def test_pseudo_parent_id_resolution():
+    create_jurisdictions()
     parent = ScrapeOrganization('UN', classification='international')
     child = ScrapeOrganization('UNESCO', classification='unknown',
                                parent_id='~{"classification": "international"}')
-    OrganizationImporter('jurisdiction-id').import_data([parent.as_dict(), child.as_dict()])
+    OrganizationImporter('jid1').import_data([parent.as_dict(), child.as_dict()])
     assert Organization.objects.count() == 2
     assert Organization.objects.get(name='UN').children.count() == 1
     assert Organization.objects.get(name='UNESCO').parent.name == 'UN'
@@ -128,10 +140,11 @@ def test_pseudo_parent_id_resolution():
 
 @pytest.mark.django_db
 def test_extras_organization():
+    create_jurisdictions()
     org = ScrapeOrganization('United Nations', classification='international')
     org.extras = {"hello": "world",
                   "foo": {"bar": "baz"}}
     od = org.as_dict()
-    OrganizationImporter('jurisdiction-id').import_data([od])
+    OrganizationImporter('jid1').import_data([od])
     o = Organization.objects.get()
     assert o.extras['foo']['bar'] == 'baz'
