@@ -1,8 +1,13 @@
 import pytest
 from pupa.scrape import Person as ScrapePerson
 from pupa.importers import PersonImporter
-from opencivicdata.models import Person, Organization, Membership
+from opencivicdata.models import Person, Organization, Membership, Division, Jurisdiction
 from pupa.exceptions import DuplicateItemError, SameNameError
+
+
+def create_jurisdiction():
+    d = Division.objects.create(id='ocd-division/country:us', name='USA')
+    j = Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
 
 
 @pytest.mark.django_db
@@ -16,7 +21,7 @@ def test_full_person():
 
     # import person
     pd = person.as_dict()
-    PersonImporter('jurisdiction-id').import_data([pd])
+    PersonImporter('jid').import_data([pd])
 
     # get person from db and assert it imported correctly
     p = Person.objects.get()
@@ -43,53 +48,58 @@ def create_person():
     # the deduplication tests
     p = Person.objects.create(name='Dwayne Johnson')
     p.other_names.create(name='Rocky')
-    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jid')
     Membership.objects.create(person=p, organization=o)
 
 
 @pytest.mark.django_db
 def test_deduplication_same_name():
+    create_jurisdiction()
     create_person()
     # simplest case- just the same name
     person = ScrapePerson('Dwayne Johnson')
     pd = person.as_dict()
-    PersonImporter('jurisdiction-id').import_data([pd])
+    PersonImporter('jid').import_data([pd])
     assert Person.objects.all().count() == 1
 
 
 @pytest.mark.django_db
 def test_deduplication_other_name_exists():
+    create_jurisdiction()
     create_person()
     # Rocky is already saved in other_names
     person = ScrapePerson('Rocky')
     pd = person.as_dict()
-    PersonImporter('jurisdiction-id').import_data([pd])
+    PersonImporter('jid').import_data([pd])
     assert Person.objects.all().count() == 1
 
 
 @pytest.mark.django_db
 def test_deduplication_other_name_overlaps():
+    create_jurisdiction()
     create_person()
     # Person has other_name that overlaps w/ existing name
     person = ScrapePerson('The Rock')
     person.add_name('Dwayne Johnson')
     pd = person.as_dict()
-    PersonImporter('jurisdiction-id').import_data([pd])
+    PersonImporter('jid').import_data([pd])
     assert Person.objects.all().count() == 1
 
 
 @pytest.mark.django_db
 def test_deduplication_no_name_overlap():
+    create_jurisdiction()
     create_person()
     # make sure we're not just being ridiculous and avoiding importing anything in the same org
     person = ScrapePerson('CM Punk')
     pd = person.as_dict()
-    PersonImporter('jurisdiction-id').import_data([pd])
+    PersonImporter('jid').import_data([pd])
     assert Person.objects.all().count() == 2
 
 
 @pytest.mark.django_db
 def test_deduplication_no_jurisdiction_overlap():
+    create_jurisdiction()
     create_person()
     # make sure we get a new person if we're in a different org
     person = ScrapePerson('Dwayne Johnson')
@@ -100,17 +110,18 @@ def test_deduplication_no_jurisdiction_overlap():
 
 @pytest.mark.django_db
 def test_multiple_memberships():
+    create_jurisdiction()
     # there was a bug where two or more memberships to the same jurisdiction
     # would cause an ORM error, this test ensures that it is fixed
     p = Person.objects.create(name='Dwayne Johnson')
-    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jid')
     Membership.objects.create(person=p, organization=o)
-    o = Organization.objects.create(name='WWF', jurisdiction_id='jurisdiction-id')
+    o = Organization.objects.create(name='WWF', jurisdiction_id='jid')
     Membership.objects.create(person=p, organization=o)
 
     person = ScrapePerson('Dwayne Johnson')
     pd = person.as_dict()
-    PersonImporter('jurisdiction-id').import_data([pd])
+    PersonImporter('jid').import_data([pd])
 
     # deduplication should still work
     assert Person.objects.all().count() == 1
@@ -118,28 +129,29 @@ def test_multiple_memberships():
 
 @pytest.mark.django_db
 def test_same_name_people():
-    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    create_jurisdiction()
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jid')
 
     # importing two people with the same name to a pristine database should error
     p1 = ScrapePerson('Dwayne Johnson', image='http://example.com/1')
     p2 = ScrapePerson('Dwayne Johnson', image='http://example.com/2')
     with pytest.raises(SameNameError):
-        PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+        PersonImporter('jid').import_data([p1.as_dict(), p2.as_dict()])
 
     # importing one person should pass
-    PersonImporter('jurisdiction-id').import_data([p1.as_dict()])
+    PersonImporter('jid').import_data([p1.as_dict()])
     # create fake memberships so that future lookups work on the imported people
     for p in Person.objects.all():
         Membership.objects.create(person=p, organization=o)
 
     # importing another person with the same name should fail
     with pytest.raises(SameNameError):
-        PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+        PersonImporter('jid').import_data([p1.as_dict(), p2.as_dict()])
 
     # adding birth dates should pass
     p1.birth_date = '1970'
     p2.birth_date = '1930'
-    resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+    resp = PersonImporter('jid').import_data([p1.as_dict(), p2.as_dict()])
     assert resp['person']['insert'] == 1
     assert resp['person']['noop'] == 0
     assert resp['person']['update'] == 1
@@ -152,12 +164,12 @@ def test_same_name_people():
     p3 = ScrapePerson('Dwayne Johnson', image='http://example.com/3')
 
     with pytest.raises(SameNameError):
-        PersonImporter('jurisdiction-id').import_data([p3.as_dict()])
+        PersonImporter('jid').import_data([p3.as_dict()])
 
     # and now test that an update works and we can insert a new one with the same name
     p1.image = 'http://example.com/1.jpg'
     p2.birth_date = '1931'  # change birth_date, means a new insert
-    resp = PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+    resp = PersonImporter('jid').import_data([p1.as_dict(), p2.as_dict()])
     assert Person.objects.count() == 3
     assert resp['person']['insert'] == 1
     assert resp['person']['noop'] == 0
@@ -166,28 +178,30 @@ def test_same_name_people():
 
 @pytest.mark.django_db
 def test_same_name_people_other_name():
+    create_jurisdiction()
     # ensure we're taking other_names into account for the name collision code
-    Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    Organization.objects.create(name='WWE', jurisdiction_id='jid')
     p1 = ScrapePerson('Dwayne Johnson', image='http://example.com/1')
     p2 = ScrapePerson('Rock', image='http://example.com/2')
     p2.add_name('Dwayne Johnson')
 
     # the people have the same name but are apparently different
     with pytest.raises(SameNameError):
-        PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+        PersonImporter('jid').import_data([p1.as_dict(), p2.as_dict()])
 
 
 @pytest.mark.django_db
 def test_same_name_second_import():
+    create_jurisdiction()
     # ensure two people with the same name don't import without birthdays
-    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jid')
     p1 = ScrapePerson('Dwayne Johnson', image='http://example.com/1')
     p2 = ScrapePerson('Dwayne Johnson', image='http://example.com/2')
     p1.birth_date = '1970'
     p2.birth_date = '1930'
 
     # when we give them birth dates all is well though
-    PersonImporter('jurisdiction-id').import_data([p1.as_dict(), p2.as_dict()])
+    PersonImporter('jid').import_data([p1.as_dict(), p2.as_dict()])
 
     # fake some memberships so future lookups work on these people
     for p in Person.objects.all():
@@ -196,16 +210,17 @@ def test_same_name_second_import():
     p3 = ScrapePerson('Dwayne Johnson', image='http://example.com/3')
 
     with pytest.raises(SameNameError):
-        PersonImporter('jurisdiction-id').import_data([p3.as_dict()])
+        PersonImporter('jid').import_data([p3.as_dict()])
 
 
 @pytest.mark.django_db
 def test_resolve_json_id():
-    o = Organization.objects.create(name='WWE', jurisdiction_id='jurisdiction-id')
+    create_jurisdiction()
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jid')
     p = Person.objects.create(name='Dwayne Johnson')
     p.other_names.create(name='Rock')
     p.memberships.create(organization=o)
 
-    pi = PersonImporter('jurisdiction-id')
+    pi = PersonImporter('jid')
     assert pi.resolve_json_id('~{"name": "Dwayne Johnson"}') == p.id
     assert pi.resolve_json_id('~{"name": "Rock"}') == p.id

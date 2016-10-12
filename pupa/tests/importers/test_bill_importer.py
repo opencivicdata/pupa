@@ -3,11 +3,12 @@ from pupa.scrape import Bill as ScrapeBill
 from pupa.scrape import Person as ScrapePerson
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import BillImporter, OrganizationImporter, PersonImporter
-from opencivicdata.models import Bill, Jurisdiction, Person, Organization, Membership
+from opencivicdata.models import Bill, Jurisdiction, Person, Organization, Membership, Division
 
 
 def create_jurisdiction():
-    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    d = Division.objects.create(id='ocd-division/country:us', name='USA')
+    j = Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
     j.legislative_sessions.create(identifier='1899', name='1899')
     j.legislative_sessions.create(identifier='1900', name='1900')
 
