@@ -3,8 +3,12 @@ from pupa.scrape import Event as ScrapeEvent
 from pupa.importers import (EventImporter, OrganizationImporter, PersonImporter, BillImporter,
                             VoteEventImporter)
 from opencivicdata.models import (Jurisdiction, Event, Person, Membership, Organization, Bill,
-                                  VoteEvent)
+                                  VoteEvent, Jurisdiction, Division)
 
+def create_jurisdiction():
+    d = Division.objects.create(id='ocd-division/country:us', name='USA')
+    j = Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
+    return j
 
 def ge():
     event = ScrapeEvent(
@@ -13,7 +17,6 @@ def ge():
         location_name="America",
         timezone="America/New_York",
         all_day=True)
-    event.add_person("George Washington")
     return event
 
 oi = OrganizationImporter('jid')
@@ -24,7 +27,7 @@ vei = VoteEventImporter('jid', pi, oi, bi)
 
 @pytest.mark.django_db
 def test_related_people_event():
-    Jurisdiction.objects.create(id='jid', division_id='did')
+    create_jurisdiction()
     george = Person.objects.create(id='gw', name='George Washington')
     john = Person.objects.create(id='jqp', name='John Q. Public')
     o = Organization.objects.create(name='Merica', jurisdiction_id='jid')
@@ -38,6 +41,7 @@ def test_related_people_event():
     for event in [event1, event2]:
         item = event.add_agenda_item("Cookies will be served")
         item.add_person(person="John Q. Public")
+        event.add_person("George Washington")
 
     result = EventImporter('jid', oi, pi, bi, vei).import_data([event1.as_dict()])
     assert result['event']['insert'] == 1
@@ -52,7 +56,7 @@ def test_related_people_event():
 
 @pytest.mark.django_db
 def test_related_vote_event():
-    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    j = create_jurisdiction()
     session = j.legislative_sessions.create(name='1900', identifier='1900')
     org = Organization.objects.create(id='org-id', name='House', classification='lower')
     bill = Bill.objects.create(id='bill-1', identifier='HB 1',
@@ -81,7 +85,7 @@ def test_related_vote_event():
 
 @pytest.mark.django_db
 def test_related_bill_event():
-    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    j = create_jurisdiction()
     session = j.legislative_sessions.create(name='1900', identifier='1900')
     org = Organization.objects.create(id='org-id', name='House', classification='lower')
     bill = Bill.objects.create(id='bill-1', identifier='HB 101',
@@ -104,7 +108,7 @@ def test_related_bill_event():
 
 @pytest.mark.django_db
 def test_related_committee_event():
-    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    j = create_jurisdiction()
     session = j.legislative_sessions.create(name='1900', identifier='1900')
     org = Organization.objects.create(id='org-id', name='House',
                                       classification='lower',
@@ -132,7 +136,7 @@ def test_related_committee_event():
 
 @pytest.mark.django_db
 def test_media_event():
-    Jurisdiction.objects.create(id='jid', division_id='did')
+    j = create_jurisdiction()
     event1 = ge()
     event2 = ge()
 
@@ -153,7 +157,7 @@ def test_media_event():
 
 @pytest.mark.django_db
 def test_media_document():
-    Jurisdiction.objects.create(id='jid', division_id='did')
+    j = create_jurisdiction()
     event1 = ge()
     event2 = ge()
 
@@ -170,7 +174,7 @@ def test_media_document():
 
 @pytest.mark.django_db
 def test_full_event():
-    Jurisdiction.objects.create(id='jid', division_id='did')
+    create_jurisdiction()
     george = Person.objects.create(id='gw', name='George Washington')
     o = Organization.objects.create(name='Merica', jurisdiction_id='jid')
     Membership.objects.create(person=george, organization=o)
@@ -193,7 +197,7 @@ def test_full_event():
 
 @pytest.mark.django_db
 def test_bad_event_time():
-    Jurisdiction.objects.create(id='jid', division_id='did')
+    create_jurisdiction()
     event = ge()
     event.start_time = "2014-07-04T05:00"
     pytest.raises(
@@ -205,7 +209,7 @@ def test_bad_event_time():
 
 @pytest.mark.django_db
 def test_top_level_media_event():
-    Jurisdiction.objects.create(id='jid', division_id='did')
+    create_jurisdiction()
     event1, event2 = ge(), ge()
 
     event1.add_media_link("fireworks", "http://example.com/fireworks.mov",
