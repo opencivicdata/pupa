@@ -14,6 +14,7 @@ setup(name='pupa',
       description='scraping framework for muncipal data',
       long_description=long_description,
       platforms=['any'],
+      zip_safe=False,
       entry_points='''[console_scripts]
 pupa = pupa.cli.__main__:main''',
       install_requires=[
