@@ -187,7 +187,7 @@ def test_bill_update_because_of_subitem():
     obj = Bill.objects.get()
     assert obj.actions.count() == 2
 
-    # same 2 actions, diiferen order, update
+    # same 2 actions, different order, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_action('this is a second action', chamber='lower', date='1900-01-02')
     bill.add_action('this is an action', chamber='lower', date='1900-01-01')
@@ -195,7 +195,6 @@ def test_bill_update_because_of_subitem():
     assert result['bill']['update'] == 1
     obj = Bill.objects.get()
     assert obj.actions.count() == 2
-
 
     # different 2 actions, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
