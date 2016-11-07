@@ -35,11 +35,13 @@ def items_differ(jsonitems, dbitems, subfield_dict):
         # if lengths differ, they're definitely different
         return True
 
+    original_jsonitems = jsonitems
     jsonitems = copy.deepcopy(jsonitems)
     keys = jsonitems[0].keys()
 
     # go over dbitems looking for matches
     for dbitem in dbitems:
+        order = getattr(dbitem, 'order', None)
         match = None
         for i, jsonitem in enumerate(jsonitems):
             # check if all keys (excluding subfields) match
@@ -54,6 +56,9 @@ def items_differ(jsonitems, dbitems, subfield_dict):
                     if items_differ(jsonsubitems, dbsubitems, subfield_dict[k][2]):
                         break
                 else:
+                    # if the dbitem sets 'order', then the order matters
+                    if order is not None and int(order) != original_jsonitems.index(jsonitem):
+                        break
                     # these items are equal, so let's mark it for removal
                     match = i
                     break
