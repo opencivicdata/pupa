@@ -209,11 +209,11 @@ class Command(BaseCommand):
             raise CommandError('no sessions from scrape_session_list()')
 
         # copy the list to avoid modifying it
-        sessions = list(juris.ignored_scraped_sessions)
+        sessions = set(juris.ignored_scraped_sessions)
         for session in juris.legislative_sessions:
-            sessions.append(session['name'])
+            sessions.add(session['identifier'])
 
-        unaccounted_sessions = list(set(scraped_sessions) - set(sessions))
+        unaccounted_sessions = list(set(scraped_sessions) - sessions)
         if unaccounted_sessions:
             raise CommandError('session(s) unaccounted for: %s' % ', '.join(unaccounted_sessions))
 
