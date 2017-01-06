@@ -198,7 +198,8 @@ class Command(BaseCommand):
         return report
 
     def check_session_list(self, juris):
-        if juris.check_sessions is False:
+        # if get_session_list was explicitly set to None, let it slide
+        if juris.get_session_list is None:
             print("Not checking sessions...")
             return
 
