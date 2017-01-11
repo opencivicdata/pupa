@@ -199,7 +199,7 @@ class Command(BaseCommand):
 
     def check_session_list(self, juris):
         # if get_session_list was explicitly set to None, let it slide
-        if juris.get_session_list is None:
+        if not hasattr(juris, "get_session_list"):
             print("Not checking sessions...")
             return
 
