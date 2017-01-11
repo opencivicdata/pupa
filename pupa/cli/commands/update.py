@@ -198,8 +198,8 @@ class Command(BaseCommand):
         return report
 
     def check_session_list(self, juris):
-        # if get_session_list was explicitly set to None, let it slide
-        if juris.get_session_list is None:
+        # if get_session_list is not defined, let it slide
+        if not hasattr(juris, "get_session_list"):
             print("Not checking sessions...")
             return
 
