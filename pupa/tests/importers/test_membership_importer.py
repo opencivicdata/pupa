@@ -134,3 +134,28 @@ def test_multiple_orgs_of_same_class():
 
     assert Person.objects.get(name='Hari Seldon').memberships.get().organization.name == 'Foundation'
     assert Person.objects.get(name='Jean Luc Picard').memberships.get().organization.name == 'Federation'
+
+@pytest.mark.django_db
+def test_multiple_posts_class():
+    create_jurisdiction()
+
+    org = Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
+                                      jurisdiction_id="fnd-jid")
+    hari = Person.objects.create(id="hs", name="Hari Seldon")
+    founder = Post.objects.create(id='f', label="founder", role="Founder", organization=org)
+    chair = Post.objects.create(id='c', label="chair", role="Chair", organization=org)
+
+    m1 = ScrapeMembership(person_id=hari.id, organization_id=org.id, post_id=founder.id)
+    m2 = ScrapeMembership(person_id=hari.id, organization_id=org.id, post_id=chair.id)
+
+    
+    dumb_imp = DumbMockImporter()
+    memimp = MembershipImporter('fnd-jid', dumb_imp, dumb_imp, dumb_imp)
+    memimp.import_data([m1.as_dict(), m2.as_dict()])
+
+    # ensure that the memberships attached in the right places
+    assert org.memberships.count() == 2
+    assert hari.memberships.count() == 2
+    assert founder.memberships.count() == 1
+    assert chair.memberships.count() == 1
+
