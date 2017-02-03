@@ -42,9 +42,6 @@ class Jurisdiction(BaseModel):
                 'legislative_sessions': self.legislative_sessions,
                 'feature_flags': self.feature_flags, 'extras': self.extras, }
 
-    def get_session_list(self):
-        raise NotImplementedError('get_session_list is not implemented')    # pragma: no cover
-
     def __str__(self):
         return self.name
 
