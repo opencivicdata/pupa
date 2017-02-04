@@ -206,7 +206,7 @@ class Command(BaseCommand):
         scraped_sessions = juris.get_session_list()
 
         if not scraped_sessions:
-            raise CommandError('no sessions from scrape_session_list()')
+            raise CommandError('no sessions from get_session_list()')
 
         # copy the list to avoid modifying it
         sessions = set(juris.ignored_scraped_sessions)
