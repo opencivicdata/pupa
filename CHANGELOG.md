@@ -1,5 +1,28 @@
 # pupa changelog
 
+## 0.5.3
+
+Backwards-incompatible changes:
+
+* Identify sessions by their identifiers instead of their names (update your `get_session_list()` methods)
+
+Improvements:
+
+* Check for the presence of a `get_session_list()` method instead of `check_sessions = True`
+* Resolve an event's participants and its agenda items' related entities #216, #217
+* Accept an organization name in `Person.add_membership` for the second parameter #233
+* Accept `datetime` dates wherever string dates are accepted #218
+* Improve error reporting #214, #230, #231
+* Compatible with Django 1.10
+
+Fixes:
+
+* Allow people to hold multiple posts in an organization #244
+* Add a `primary_org_name` parameter to `Person.add_term`, to disambiguate organizations with the same classification #223
+* Update an object if the explicit order of its related objects has changed #242
+* Touch an object's `updated_at` whenever its related objects are updated #226
+* Correctly resolve a new person with the same name #232
+
 ## 0.5.2 - November 18 2015
 
 * show run logs in the admin
