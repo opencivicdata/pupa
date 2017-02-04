@@ -22,6 +22,7 @@ Fixes:
 * Update an object if the explicit order of its related objects has changed #242
 * Touch an object's `updated_at` whenever its related objects are updated #226
 * Correctly resolve a new person with the same name #232
+* Don't raise a resolution error due to multiple matches in cases where zero matches are acceptable
 
 ## 0.5.2 - November 18 2015
 
