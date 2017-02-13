@@ -119,15 +119,20 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         self._related.append(membership)
 
     def add_term(self, role, org_classification, *, district=None,
-                 start_date='', end_date='', label='', org_name=None):
+                 start_date='', end_date='', label='', org_name=None,
+                 appointment=False):
         if org_name:
             org_id = _make_pseudo_id(classification=org_classification,
                                      name=org_name)
         else:
             org_id = _make_pseudo_id(classification=org_classification)
+
         if district:
             post_id = _make_pseudo_id(label=district,
                                       role=role,
+                                      organization__classification=org_classification)
+        elif appointment:
+            post_id = _make_pseudo_id(role=role,
                                       organization__classification=org_classification)
         else:
             post_id = None
