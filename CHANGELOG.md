@@ -17,7 +17,7 @@ Improvements:
 
 Fixes:
 
-* Allow people to hold multiple posts in an organization #244
+* Allow people to hold multiple posts in an organization #244, #247
 * Add a `primary_org_name` parameter to `Person.add_term`, to disambiguate organizations with the same classification #223
 * Update an object if the explicit order of its related objects has changed #242
 * Touch an object's `updated_at` whenever its related objects are updated #226
