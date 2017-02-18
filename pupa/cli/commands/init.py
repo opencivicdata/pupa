@@ -43,14 +43,14 @@ def write_jurisdiction_template(dirname, short_name, long_name, division_id, cla
     lines.append('        org = Organization(name="org_name", classification="legislature")')
     lines.append('')
 
-    lines.append('        # OPTIONAL: add posts to your organizaion using thi format,')
+    lines.append('        # OPTIONAL: add posts to your organizaion using this format,')
     lines.append('        # where label is a human-readable description of the post '
                  '(eg "Ward 8 councilmember")')
-    lines.append('        # and role is the positoin type (eg conucilmember, alderman, mayor...)')
+    lines.append('        # and role is the position type (eg councilmember, alderman, mayor...)')
     lines.append('        # skip entirely if you\'re not writing a people scraper.')
     lines.append('        org.add_post(label="position_description", role="position_type")')
     lines.append('')
-    lines.append('        #REQUIIRED: yield the organization')
+    lines.append('        #REQUIRED: yield the organization')
     lines.append('        yield org')
     lines.append('')
 
