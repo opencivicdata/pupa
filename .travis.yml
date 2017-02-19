@@ -4,7 +4,13 @@ addons:
 sudo: false
 python:
     - "3.5"
-install: pip install -r requirements-test.txt
+env:
+    - DJANGO_VERSION=1.9.10
+    - DJANGO_VERSION=1.10.5
+    - DJANGO_VERSION=1.11a1
+install: 
+    - pip install -r requirements-test.txt
+    - pip install Django==$DJANGO_VERSION
 before_script:
     - psql -c "CREATE USER test with PASSWORD 'test' CREATEDB SUPERUSER;" -U postgres
     - psql -c "CREATE DATABASE test;" -U postgres
@@ -14,4 +20,4 @@ after_success:
     - coveralls
 notifications:
     email:
-        - james.p.turk@gmail.com
+        - james@openstates.org
