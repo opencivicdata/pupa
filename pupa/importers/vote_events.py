@@ -1,4 +1,5 @@
 from opencivicdata.models import VoteEvent, VoteCount, PersonVote, VoteSource
+from pupa.utils import fix_bill_id
 from .base import BaseImporter
 from ..exceptions import InvalidVoteEventError
 
@@ -57,7 +58,7 @@ class VoteEventImporter(BaseImporter):
     def prepare_for_db(self, data):
         data['legislative_session_id'] = self.get_session_id(data.pop('legislative_session'))
         data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
-        data['bill_id'] = self.bill_importer.resolve_json_id(data.pop('bill'))
+        data['bill_id'] = self.bill_importer.resolve_json_id(fix_bill_id(data.pop('bill')))
         for vote in data['votes']:
             vote['voter_id'] = self.person_importer.resolve_json_id(vote['voter_id'],
                                                                     allow_no_match=True)
