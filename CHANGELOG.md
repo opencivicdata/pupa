@@ -9,7 +9,7 @@ Backwards-incompatible changes:
 Improvements:
 
 * Check for the presence of a `get_session_list()` method instead of `check_sessions = True`
-* Resolve an event's participants and its agenda items' related entities #216, #217
+* Resolve an event's participants and its agenda items' related entities #206, #207
 * Accept an organization name in `Person.add_membership` for the second parameter #233
 * Accept `datetime` dates wherever string dates are accepted #218
 * Improve error reporting #214, #230, #231
