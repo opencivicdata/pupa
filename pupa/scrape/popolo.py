@@ -43,7 +43,9 @@ class Membership(BaseModel, ContactDetailMixin, LinkMixin):
     _schema = membership_schema
 
     def __init__(self, *, person_id, organization_id, post_id=None, role='', label='',
-                 start_date='', end_date='', on_behalf_of_id=None):
+                 start_date='', end_date='', on_behalf_of_id=None,
+                 person_name=''
+                 ):
         """
         Constructor for the Membership object.
 
@@ -53,6 +55,7 @@ class Membership(BaseModel, ContactDetailMixin, LinkMixin):
         """
         super(Membership, self).__init__()
         self.person_id = person_id
+        self.person_name = person_name
         self.organization_id = organization_id
         self.post_id = post_id
         self.start_date = start_date
@@ -189,6 +192,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
                                     role=role, **kwargs)
         else:
             membership = Membership(person_id=_make_pseudo_id(name=name_or_person),
+                                    person_name=name_or_person,
                                     organization_id=self._id, role=role, **kwargs)
         self._related.append(membership)
         return membership
