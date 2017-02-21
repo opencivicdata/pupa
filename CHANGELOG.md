@@ -5,6 +5,8 @@
 Fixes:
 
 * pupa dbinit --reset now correctly drops dependent pupa tables and migrations
+* exit gracefully if the first scrape fails instead of complaining about RunPlan
+  DB constraint
 
 ## 0.6.0 - February 19 2017
 
