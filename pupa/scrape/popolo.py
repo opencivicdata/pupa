@@ -105,10 +105,12 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         """
         if isinstance(name_or_org, Organization):
             membership = Membership(person_id=self._id,
+                                    person_name=self.name,
                                     organization_id=name_or_org._id,
                                     role=role, **kwargs)
         else:
             membership = Membership(person_id=self._id,
+                                    person_name=self.name,
                                     organization_id=_make_pseudo_id(name=name_or_org),
                                     role=role, **kwargs)
         self._related.append(membership)
@@ -188,7 +190,9 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
 
     def add_member(self, name_or_person, role='member', **kwargs):
         if isinstance(name_or_person, Person):
-            membership = Membership(person_id=name_or_person._id, organization_id=self._id,
+            membership = Membership(person_id=name_or_person._id,
+                                    person_name=name_or_person.name,
+                                    organization_id=self._id,
                                     role=role, **kwargs)
         else:
             membership = Membership(person_id=_make_pseudo_id(name=name_or_person),

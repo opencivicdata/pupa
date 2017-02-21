@@ -10,8 +10,9 @@ class DumbMockImporter(object):
     """ this is a mock importer that implements a resolve_json_id that is just a pass-through """
     json_to_db_id = {}
 
-    def resolve_json_id(self, json_id):
+    def resolve_json_id(self, json_id, allow_no_match=False):
         return json_id
+
 
 def create_jurisdiction():
     d = Division.objects.create(id='ocd-division/country:us', name='USA')
@@ -148,7 +149,7 @@ def test_multiple_posts_class():
     m1 = ScrapeMembership(person_id=hari.id, organization_id=org.id, post_id=founder.id)
     m2 = ScrapeMembership(person_id=hari.id, organization_id=org.id, post_id=chair.id)
 
-    
+
     dumb_imp = DumbMockImporter()
     memimp = MembershipImporter('fnd-jid', dumb_imp, dumb_imp, dumb_imp)
     memimp.import_data([m1.as_dict(), m2.as_dict()])
@@ -159,3 +160,25 @@ def test_multiple_posts_class():
     assert founder.memberships.count() == 1
     assert chair.memberships.count() == 1
 
+
+@pytest.mark.django_db
+def test_unmatched_person():
+    create_jurisdiction()
+
+    org = Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
+                                      jurisdiction_id="fnd-jid")
+    # not a real person, won't have a person_id after import
+    m1 = ScrapeMembership(person_name='Harry Seldom', organization_id=org.id,
+                          person_id=None
+                          )
+
+    dumb_imp = DumbMockImporter()
+    memimp = MembershipImporter('fnd-jid', dumb_imp, dumb_imp, dumb_imp)
+    memimp.import_data([m1.as_dict()])
+
+    # ensure that the memberships attached in the right places
+    assert org.memberships.count() == 1
+
+    membership = org.memberships.get()
+    assert membership.person_id is None
+    assert membership.person_name == 'Harry Seldom'
