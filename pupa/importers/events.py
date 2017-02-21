@@ -1,5 +1,6 @@
 from .base import BaseImporter
-from ..utils.event import read_event_iso_8601
+from pupa.utils import fix_bill_id
+from pupa.utils.event import read_event_iso_8601
 from opencivicdata.models import (Event, EventLocation, EventSource, EventDocument,
                                   EventDocumentLink, EventLink, EventParticipant, EventMedia,
                                   EventMediaLink, EventAgendaItem, EventRelatedEntity,
@@ -87,7 +88,7 @@ class EventImporter(BaseImporter):
                         allow_no_match=True)
                 elif 'bill_id' in entity:
                     entity['bill_id'] = self.bill_importer.resolve_json_id(
-                        entity['bill_id'],
+                        fix_bill_id(entity['bill_id']),
                         allow_no_match=True)
                 elif 'vote_event_id' in entity:
                     entity['vote_event_id'] = self.vote_event_importer.resolve_json_id(
