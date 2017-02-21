@@ -1,5 +1,11 @@
 # pupa changelog
 
+## 0.6.1
+
+Fixes:
+
+* pupa dbinit --reset now correctly drops dependent pupa tables and migrations
+
 ## 0.6.0 - February 19 2017
 
 Backwards-incompatible changes:
