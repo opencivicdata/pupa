@@ -1,6 +1,7 @@
 import os
 import glob
 import json
+import logging
 import importlib
 import traceback
 from collections import OrderedDict
@@ -56,9 +57,22 @@ def forward_report(report, jurisdiction):
 @transaction.atomic
 def save_report(report, jurisdiction):
     from pupa.models import RunPlan
+    from opencivicdata.models import Jurisdiction as JurisdictionModel
 
     # set end time
     report['end'] = utils.utcnow()
+
+    # if there's an error on the first run, the jurisdiction doesn't exist
+    # yet, we opt for skipping creation of RunPlan until there's been at least
+    # one good run
+    try:
+        JurisdictionModel.objects.get(pk=jurisdiction)
+    except JurisdictionModel.DoesNotExist:
+        logger = logging.getLogger("pupa")
+        logger.warning('could not save RunPlan, no successful runs of {} yet'.format(
+            jurisdiction)
+        )
+        return
 
     plan = RunPlan.objects.create(jurisdiction_id=jurisdiction,
                                   success=report['success'],
