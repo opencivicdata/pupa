@@ -119,6 +119,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
     def add_party(self, party, **kwargs):
         membership = Membership(
             person_id=self._id,
+            person_name=self.name,
             organization_id=_make_pseudo_id(classification="party", name=party),
             role='member', **kwargs)
         self._related.append(membership)
@@ -141,7 +142,8 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
                                       organization__classification=org_classification)
         else:
             post_id = None
-        membership = Membership(person_id=self._id, organization_id=org_id, post_id=post_id,
+        membership = Membership(person_id=self._id, person_name=self.name,
+                                organization_id=org_id, post_id=post_id,
                                 role=role, start_date=start_date, end_date=end_date, label=label)
         self._related.append(membership)
         return membership

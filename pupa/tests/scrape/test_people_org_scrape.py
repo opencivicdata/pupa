@@ -58,6 +58,7 @@ def test_person_add_membership_org():
     assert p._related[0].start_date == '2007'
     assert p._related[0].end_date == datetime.date(2015, 5, 8)
 
+
 def test_basic_organization():
     org = Organization('some org', classification='committee')
     org.add_source('http://example.com')
@@ -143,6 +144,7 @@ def test_committee_add_member_name():
     assert c._related[0].organization_id == c._id
     assert c._related[0].role == 'member'
 
+
 def test_person_add_membership_name():
     p = Person('Leonardo DiCaprio')
     p.add_membership('Academy of Motion Picture Arts and Sciences', role='winner', start_date='2016')
@@ -151,3 +153,21 @@ def test_person_add_membership_name():
     assert p._related[0].person_id == p._id
     assert p._related[0].role == 'winner'
     assert p._related[0].start_date == '2016'
+
+
+def test_person_add_party():
+    p = Person('Groot')
+    p.add_party('Green')
+    p._related[0].validate()
+    assert get_pseudo_id(p._related[0].organization_id) == {'name': 'Green', 'classification': 'party'}
+
+
+def test_person_add_term():
+    p = Person('Eternal')
+    p.add_term('eternal', 'council', start_date='0001', end_date='9999')
+    p._related[0].validate()
+    assert get_pseudo_id(p._related[0].organization_id) == {
+        'classification': 'council',
+    }
+    assert p._related[0].start_date == '0001'
+    assert p._related[0].end_date == '9999'
