@@ -2,6 +2,11 @@
 
 ## 0.6.1
 
+Improvements:
+
+* allow Memberships to have unresolved `person_name` similar to how other
+  name resolutions work
+
 Fixes:
 
 * pupa dbinit --reset now correctly drops dependent pupa tables and migrations

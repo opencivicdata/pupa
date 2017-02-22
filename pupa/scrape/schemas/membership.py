@@ -4,10 +4,8 @@ schema = {
     "properties": {
         "label": { "type": "string", "blank": True },
         "role": { "type": "string", "blank": True },
-        # The membership's person may only be linked at import time, but objects
-        # are validated at scrape time; therefore, the person_id is allowed to
-        # have a type of "null" at scrape time.
         "person_id": { "type": ["string", "null"], },
+        "person_name": { "type": ["string"], },
         "organization_id": { "type": "string" },
         "post_id": { "type": ["string", "null"], },
         "on_behalf_of_id": { "type": ["string", "null"], },

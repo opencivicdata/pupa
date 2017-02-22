@@ -30,6 +30,9 @@ class MembershipImporter(BaseImporter):
         if membership['post_id']:
             spec['post_id'] = membership['post_id']
 
+        if membership['person_name']:
+            spec['person_name'] = membership['person_name']
+
         return self.model_class.objects.get(**spec)
 
     def prepare_for_db(self, data):
@@ -42,7 +45,7 @@ class MembershipImporter(BaseImporter):
             is_party = False
 
         data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
-        data['person_id'] = self.person_importer.resolve_json_id(data['person_id'])
+        data['person_id'] = self.person_importer.resolve_json_id(data['person_id'], allow_no_match=True)
         data['post_id'] = self.post_importer.resolve_json_id(data['post_id'])
         if not is_party:
             # track that we had a membership for this person
