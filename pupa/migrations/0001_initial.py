@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('opencivicdata', '__latest__'),
+        ('opencivicdata', '0001_initial'),
     ]
 
     operations = [
