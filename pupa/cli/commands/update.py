@@ -7,11 +7,14 @@ import traceback
 from collections import OrderedDict
 
 import django
+from django.conf import settings
 from django.db import transaction
+from django.test.utils import override_settings
+
+from pupa import utils
+from pupa.scrape import Jurisdiction, JurisdictionScraper
 
 from .base import BaseCommand, CommandError
-from pupa import settings, utils
-from pupa.scrape import Jurisdiction, JurisdictionScraper
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')
@@ -233,6 +236,12 @@ class Command(BaseCommand):
 
     def handle(self, args, other):
         juris = self.get_jurisdiction(args.module)
+        overrides = getattr(juris, 'settings', {})
+        overrides.update({key: value for key, value in vars(args) if value is not None})
+        with override_settings(overrides):
+            return self.do_handle(args, other, juris)
+
+    def do_handle(self, args, other, juris):
 
         available_scrapers = getattr(juris, 'scrapers', {})
         scrapers = OrderedDict()
