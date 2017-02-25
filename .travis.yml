@@ -5,12 +5,12 @@ sudo: false
 python:
     - "3.5"
 env:
-    - DJANGO_VERSION=1.9.10
-    - DJANGO_VERSION=1.10.5
-    - DJANGO_VERSION=1.11a1
-install: 
+    - DJANGO_VERSION=">=1.9,<1.10"
+    - DJANGO_VERSION=">=1.10,<1.11"
+    - DJANGO_VERSION="==1.11b1"
+install:
     - pip install -r requirements-test.txt
-    - pip install Django==$DJANGO_VERSION
+    - pip install Django$DJANGO_VERSION
 before_script:
     - psql -c "CREATE USER test with PASSWORD 'test' CREATEDB SUPERUSER;" -U postgres
     - psql -c "CREATE DATABASE test;" -U postgres
