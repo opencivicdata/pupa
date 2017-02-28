@@ -68,6 +68,7 @@ def main():
             subcommands[args.subcommand].handle(args, other)
         except CommandError as e:
             logger.critical(str(e))
+            sys.exit(1)
 
 
 if __name__ == '__main__':
