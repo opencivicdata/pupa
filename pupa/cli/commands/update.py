@@ -33,7 +33,7 @@ def override_settings(settings, overrides):
         setattr(settings, key, value)
     yield
     for key, value in original.items():
-        if key is UNSET:
+        if value is UNSET:
             delattr(settings, key)
         else:
             setattr(settings, key, value)
