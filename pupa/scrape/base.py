@@ -5,10 +5,10 @@ import logging
 from collections import defaultdict, OrderedDict
 
 import scrapelib
-from django.conf import settings
 from validictory import ValidationError
 
 from pupa import utils
+from pupa import settings
 
 
 class ScrapeError(Exception):
