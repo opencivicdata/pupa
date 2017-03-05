@@ -6,6 +6,7 @@ Improvements:
 
 * allow Memberships to have unresolved `person_name` similar to how other
   name resolutions work
+* add Scraper.latest\_session convienience method
 
 Fixes:
 

@@ -113,6 +113,9 @@ class Scraper(scrapelib.Scraper):
 
         return record
 
+    def latest_session(self):
+        return self.jurisdiction.legislative_sessions[-1]['identifier']
+
     def scrape(self, **kwargs):
         raise NotImplementedError(self.__class__.__name__ + ' must provide a scrape() method')
 
