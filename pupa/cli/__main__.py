@@ -19,8 +19,8 @@ COMMAND_MODULES = (
 
 def main():
     parser = argparse.ArgumentParser('pupa', description='pupa CLI')
-    parser.add_argument('--debug', nargs='?', const='pdb', default=None,
-                        help='drop into pdb (or set =ipdb =pudb)')
+    parser.add_argument('--debug', action='store_true',
+                        help='open debugger on error')
     parser.add_argument('--loglevel', default='INFO', help=('set log level. options are: '
                                                             'DEBUG|INFO|WARNING|ERROR|CRITICAL '
                                                             '(default is INFO)'))
@@ -48,14 +48,17 @@ def main():
 
     # turn debug on
     if args.debug:
-        _debugger = importlib.import_module(args.debug)
+        try:
+            debug_module = importlib.import_module('ipdb')
+        except ImportError:
+            debug_module = importlib.import_module('pdb')
 
         # turn on PDB-on-error mode
         # stolen from http://stackoverflow.com/questions/1237379/
         # if this causes problems in interactive mode check that page
         def _tb_info(type, value, tb):
             traceback.print_exception(type, value, tb)
-            _debugger.pm()
+            debug_module.pm()
         sys.excepthook = _tb_info
 
     if not args.subcommand:
@@ -65,6 +68,7 @@ def main():
             subcommands[args.subcommand].handle(args, other)
         except CommandError as e:
             logger.critical(str(e))
+            sys.exit(1)
 
 
 if __name__ == '__main__':
