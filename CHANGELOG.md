@@ -1,12 +1,14 @@
 # pupa changelog
 
-## 0.6.1
+## WIP
 
 Improvements:
 
 * allow Memberships to have unresolved `person_name` similar to how other
   name resolutions work
 * add Scraper.latest\_session convienience method
+* optionally allow setting \_scraped\_name on legislative\_session, which will
+  be used in session\_list checking if present
 
 Fixes:
 
