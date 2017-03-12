@@ -10,7 +10,7 @@ from opencivicdata.models import (VoteEvent, Jurisdiction, LegislativeSession, P
 class DumbMockImporter(object):
     """ this is a mock importer that implements a resolve_json_id that is just a pass-through """
 
-    def resolve_json_id(self, json_id):
+    def resolve_json_id(self, json_id, allow_no_match=False):
         return json_id
 
 
@@ -194,3 +194,136 @@ def test_vote_event_bill_clearing():
         vote_event2.as_dict()
     ])
     assert VoteEvent.objects.count() == 2
+
+
+@pytest.mark.django_db
+def test_vote_event_bill_actions():
+    j = create_jurisdiction()
+    j.legislative_sessions.create(name='1900', identifier='1900')
+    org1 = ScrapeOrganization(name='House', classification='lower')
+    org2 = ScrapeOrganization(name='Senate', classification='upper')
+    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act', from_organization=org1._id)
+
+    # add actions, passage of upper & lower on same day, something else,
+    # then passage in upper again on a different day
+    bill.add_action(description='passage', date='1900-04-01', chamber='upper')
+    bill.add_action(description='passage', date='1900-04-01', chamber='lower')
+    bill.add_action(description='other event', date='1900-04-01', chamber='lower')
+    bill.add_action(description='passage', date='1900-04-02', chamber='upper')
+
+    # four passage votes, one per chamber, one on 04-01, and one on 04-02
+    ve1 = ScrapeVoteEvent(legislative_session='1900', motion_text='passage',
+                          start_date='1900-04-01', classification='passage:bill',
+                          result='pass', bill_chamber='lower', bill='HB 1',
+                          bill_action='passage',
+                          organization=org1._id)
+    ve2 = ScrapeVoteEvent(legislative_session='1900', motion_text='passage',
+                          start_date='1900-04-01', classification='passage:bill',
+                          result='pass', bill_chamber='lower', bill='HB 1',
+                          bill_action='passage',
+                          organization=org2._id)
+    ve3 = ScrapeVoteEvent(legislative_session='1900', motion_text='passage',
+                          start_date='1900-04-02', classification='passage:bill',
+                          result='pass', bill_chamber='lower', bill='HB 1',
+                          bill_action='passage',
+                          organization=org1._id)
+    ve4 = ScrapeVoteEvent(legislative_session='1900', motion_text='passage',
+                          start_date='1900-04-02', classification='passage:bill',
+                          result='pass', bill_chamber='lower', bill='HB 1',
+                          bill_action='passage',
+                          organization=org2._id)
+
+    oi = OrganizationImporter('jid')
+    oi.import_data([org1.as_dict(), org2.as_dict()])
+
+    bi = BillImporter('jid', oi, DumbMockImporter())
+    bi.import_data([bill.as_dict()])
+
+    VoteEventImporter('jid', DumbMockImporter(), oi, bi).import_data([
+        ve1.as_dict(),
+        ve2.as_dict(),
+        ve3.as_dict(),
+        ve4.as_dict(),
+    ])
+
+    bill = Bill.objects.get()
+    votes = list(VoteEvent.objects.all())
+    actions = list(bill.actions.all())
+    assert len(actions) == 4
+    assert len(votes) == 4
+
+    votes = {(v.organization.classification, v.start_date): v.bill_action
+             for v in votes}
+
+    # ensure that votes are matched using action, chamber, and date
+    assert votes[('upper', '1900-04-01')] == actions[0]
+    assert votes[('lower', '1900-04-01')] == actions[1]
+    assert votes[('upper', '1900-04-02')] == actions[3]
+    assert votes[('lower', '1900-04-02')] == None
+
+
+@pytest.mark.django_db
+def test_vote_event_bill_actions_errors():
+    j = create_jurisdiction()
+    j.legislative_sessions.create(name='1900', identifier='1900')
+    org1 = ScrapeOrganization(name='House', classification='lower')
+    org2 = ScrapeOrganization(name='Senate', classification='upper')
+    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act', from_organization=org1._id)
+
+    # for this bill, two identical actions, so vote matching will fail
+    bill.add_action(description='passage', date='1900-04-01', chamber='lower')
+    bill.add_action(description='passage', date='1900-04-01', chamber='lower')
+    # this action is good, but two votes will try to match it
+    bill.add_action(description='passage', date='1900-04-02', chamber='lower')
+
+    # will match two actions
+    ve1 = ScrapeVoteEvent(legislative_session='1900', motion_text='passage',
+                          start_date='1900-04-01', classification='passage:bill',
+                          result='pass', bill_chamber='lower', bill='HB 1',
+                          identifier='1',
+                          bill_action='passage',
+                          organization=org1._id)
+    # will match no actions
+    ve2 = ScrapeVoteEvent(legislative_session='1900', motion_text='passage',
+                          start_date='1900-04-01', classification='passage:bill',
+                          result='pass', bill_chamber='lower', bill='HB 1',
+                          identifier='2',
+                          bill_action='committee result',
+                          organization=org1._id)
+    # these two votes will both match the same action
+    ve3 = ScrapeVoteEvent(legislative_session='1900', motion_text='passage',
+                          start_date='1900-04-02', classification='passage:bill',
+                          result='pass', bill_chamber='lower', bill='HB 1',
+                          identifier='3',
+                          bill_action='passage',
+                          organization=org1._id)
+    ve4 = ScrapeVoteEvent(legislative_session='1900', motion_text='passage-syz',
+                          start_date='1900-04-02', classification='passage:bill',
+                          result='fail', bill_chamber='lower', bill='HB 1',
+                          identifier='4',
+                          bill_action='passage',
+                          organization=org1._id)
+
+    oi = OrganizationImporter('jid')
+    oi.import_data([org1.as_dict(), org2.as_dict()])
+    bi = BillImporter('jid', oi, DumbMockImporter())
+    bi.import_data([bill.as_dict()])
+
+    VoteEventImporter('jid', DumbMockImporter(), oi, bi).import_data([
+        ve1.as_dict(),
+        ve2.as_dict(),
+        ve3.as_dict(),
+        ve4.as_dict(),
+    ])
+
+    bill = Bill.objects.get()
+    votes = list(VoteEvent.objects.all())
+
+    # isn't matched, was ambiguous across two actions
+    assert votes[0].bill_action is None
+    # isn't matched, no match in actions
+    assert votes[1].bill_action is None
+
+    # these both try to match the same action, only first will succeed
+    assert votes[2].bill_action is not None
+    assert votes[3].bill_action is None

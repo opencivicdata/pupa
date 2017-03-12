@@ -1,11 +1,13 @@
 # pupa changelog
 
-## 0.6.1
+## WIP
 
 Improvements:
 
 * allow Memberships to have unresolved `person_name` similar to how other
   name resolutions work
+* allow linking of VoteEvent to BillAction by setting a matching chamber,
+  date, and bill\_action
 * add Scraper.latest\_session convienience method
 
 Fixes:
