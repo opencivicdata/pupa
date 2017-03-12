@@ -9,6 +9,8 @@ Improvements:
 * allow linking of VoteEvent to BillAction by setting a matching chamber,
   date, and bill\_action
 * add Scraper.latest\_session convienience method
+* optionally allow setting \_scraped\_name on legislative\_session, which will
+  be used in session\_list checking if present
 
 Fixes:
 

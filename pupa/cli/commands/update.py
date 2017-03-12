@@ -226,7 +226,7 @@ class Command(BaseCommand):
         # copy the list to avoid modifying it
         sessions = set(juris.ignored_scraped_sessions)
         for session in juris.legislative_sessions:
-            sessions.add(session['identifier'])
+            sessions.add(session.get('_scraped_name', session['identifier']))
 
         unaccounted_sessions = list(set(scraped_sessions) - sessions)
         if unaccounted_sessions:
