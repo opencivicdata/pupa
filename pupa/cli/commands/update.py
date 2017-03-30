@@ -4,18 +4,39 @@ import json
 import logging
 import importlib
 import traceback
+import contextlib
 from collections import OrderedDict
 
 import django
 from django.db import transaction
 
-from .base import BaseCommand, CommandError
-from pupa import settings, utils
+from pupa import utils
+from pupa import settings
 from pupa.scrape import Jurisdiction, JurisdictionScraper
+
+from .base import BaseCommand, CommandError
 
 
 ALL_ACTIONS = ('scrape', 'import', 'report')
 
+
+class _Unset:
+    pass
+
+UNSET = _Unset()
+
+@contextlib.contextmanager
+def override_settings(settings, overrides):
+    original = {}
+    for key, value in overrides.items():
+        original[key] = getattr(settings, key, UNSET)
+        setattr(settings, key, value)
+    yield
+    for key, value in original.items():
+        if value is UNSET:
+            delattr(settings, key)
+        else:
+            setattr(settings, key, value)
 
 def print_report(report):
     plan = report['plan']
@@ -137,7 +158,7 @@ class Command(BaseCommand):
                issubclass(obj, Jurisdiction) and
                getattr(obj, 'division_id', None) and
                obj.classification):
-                return obj()
+                return obj(), module
         raise CommandError('Unable to import Jurisdiction subclass from ' +
                            module_name +
                            '. Jurisdiction subclass may be missing a ' +
@@ -226,7 +247,7 @@ class Command(BaseCommand):
         # copy the list to avoid modifying it
         sessions = set(juris.ignored_scraped_sessions)
         for session in juris.legislative_sessions:
-            sessions.add(session['identifier'])
+            sessions.add(session.get('_scraped_name', session['identifier']))
 
         unaccounted_sessions = list(set(scraped_sessions) - sessions)
         if unaccounted_sessions:
@@ -242,7 +263,17 @@ class Command(BaseCommand):
             )
 
     def handle(self, args, other):
-        juris = self.get_jurisdiction(args.module)
+        juris, module = self.get_jurisdiction(args.module)
+        overrides = {}
+        overrides.update(getattr(module, 'settings', {}))
+        overrides.update({
+            key: value for key, value in vars(args).items()
+            if value is not None
+        })
+        with override_settings(settings, overrides):
+            return self.do_handle(args, other, juris)
+
+    def do_handle(self, args, other, juris):
 
         available_scrapers = getattr(juris, 'scrapers', {})
         scrapers = OrderedDict()
