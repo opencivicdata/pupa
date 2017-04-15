@@ -62,6 +62,10 @@ class BillImporter(BaseImporter):
                 if 'organization_id' in entity:
                     entity['organization_id'] = self.org_importer.resolve_json_id(
                         entity['organization_id'])
+                elif 'person_id' in entity:
+                    entity['person_id'] = self.person_importer.resolve_json_id(
+                        entity['person_id'])
+
 
         for sponsor in data['sponsorships']:
             if 'person_id' in sponsor:
