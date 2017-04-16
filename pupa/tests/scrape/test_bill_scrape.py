@@ -73,6 +73,15 @@ def test_add_action():
     assert b.actions[0]['date'] == '2013-04-29'
     b.validate()
 
+def test_add_summary():
+    """ Make sure bill summaries work """
+    b = toy_bill()
+    b.add_summary('Introduced', 'Stopping Abusive Student Loan Collection Practices', date='2015-01-06')
+    assert len(b.summaries) == 1
+    assert b.summaries[0]['note'] == 'Introduced'
+    assert b.summaries[0]['text'] == 'Stopping Abusive Student Loan Collection Practices'
+    assert b.summaries[0]['date'] == '2015-01-06'
+    b.validate()
 
 def test_add_related_bill():
     """ Make sure related bills work """

@@ -34,6 +34,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.classification = cleanup_list(classification, ['bill'])
         self.from_organization = pseudo_organization(from_organization, chamber, 'legislature')
 
+        self.summaries = []
         self.actions = []
         self.other_identifiers = []
         self.other_titles = []
@@ -85,6 +86,9 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
                                         identifiers__scheme=scheme,
                                         identifiers__identifier=identifier)
                                     )
+
+    def add_summary(self, note, text, date=''):
+        self.summaries.append({'note':note, 'text':text, 'date':date})
 
     def add_subject(self, subject):
         self.subject.append(subject)
