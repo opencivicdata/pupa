@@ -95,6 +95,19 @@ def test_add_sponsor():
                                  'primary': True, 'organization_id': None}
     b.validate()
 
+def test_add_sponsorship_by_identifier():
+    b = toy_bill()
+    b.add_sponsorship_by_identifier(name="Virginia Foxx", classification="Author", entity_type="person",
+                                    primary=True, scheme="thomas_id", identifier="01791" chamber="upper")
+    assert len(b.sponsorships) == 1
+    assert b.sponsorships[0]['name'] == 'Joe Bleu'
+    assert b.sponsorships[0]['classification'] == 'Author'
+    assert b.sponsorships[0]['entity_type'] == 'person'
+    assert b.sponsorships[0]['primary'] == True
+    assert b.sponsorships[0]['organization_id'] == None
+    assert b.sponsorships[0]['chamber'] == 'upper'
+    assert get_pseudo_id(b.sponsorships[0]['person_id']) == {'identifiers__scheme':'thomas_id','identifiers__identifier':'01791'}
+    b.validate()
 
 def test_subjects():
     b = toy_bill()
