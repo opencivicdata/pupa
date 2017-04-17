@@ -74,6 +74,17 @@ def test_add_action():
     b.validate()
 
 
+def test_add_action_datetime():
+    """ Make sure actions work """
+    b = toy_bill()
+    b.add_action("Some dude liked it.", "2013-04-29 12:34:56", chamber='lower')
+    assert len(b.actions) == 1
+    assert b.actions[0]['description'] == 'Some dude liked it.'
+    assert get_pseudo_id(b.actions[0]['organization_id']) == {'classification': 'lower'}
+    assert b.actions[0]['date'] == '2013-04-29 12:34:56'
+    b.validate()
+
+
 def test_add_related_bill():
     """ Make sure related bills work """
     b = toy_bill()
