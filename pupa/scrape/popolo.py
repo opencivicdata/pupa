@@ -21,7 +21,7 @@ class Post(BaseModel, LinkMixin, ContactDetailMixin):
     _schema = post_schema
 
     def __init__(self, *, label, role, organization_id=None, chamber=None,
-                 division_id=None, start_date='', end_date=''):
+                 division_id=None, start_date='', end_date='', num_seats=1):
         super(Post, self).__init__()
         self.label = label
         self.role = role
@@ -29,6 +29,7 @@ class Post(BaseModel, LinkMixin, ContactDetailMixin):
         self.division_id = division_id
         self.start_date = start_date
         self.end_date = end_date
+        self.num_seats = num_seats
 
     def __str__(self):
         return self.label
