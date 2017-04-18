@@ -46,7 +46,7 @@ class Jurisdiction(BaseModel):
         return self.name
 
     def get_organizations(self):
-        raise NotImplementedError('get_organizations is not implemented')   # pragma: no cover
+        return []
 
 
 class JurisdictionScraper(Scraper):
