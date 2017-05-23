@@ -203,6 +203,35 @@ def test_full_event():
 
 
 @pytest.mark.django_db
+def test_pupa_identifier_event():
+    create_jurisdiction()
+    george = Person.objects.create(id='gw', name='George Washington')
+    o = Organization.objects.create(name='Merica', jurisdiction_id='jid')
+    Membership.objects.create(person=george, organization=o)
+
+    event = ge()
+    event.pupa_id = 'foo'
+
+    result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
+    assert result['event']['insert'] == 1
+
+    result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
+    assert result['event']['noop'] == 1
+
+    event.name="America's Anniversary",
+    event.location['name'] = "United States of America"
+    result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
+    assert result['event']['update'] == 1
+
+    event.pupa_id = 'bar'
+    result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
+    assert result['event']['insert'] == 1
+
+
+    
+
+
+@pytest.mark.django_db
 def test_bad_event_time():
     create_jurisdiction()
     event = ge()
