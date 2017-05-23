@@ -10,7 +10,7 @@ from opencivicdata.legislative.models import LegislativeSession
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id, utcnow
 from pupa.exceptions import UnresolvedIdError, DataImportError
-
+from pupa.models import Identifier
 
 def omnihash(obj):
     """ recursively hash unhashable objects """
@@ -240,7 +240,7 @@ class BaseImporter(object):
 
         # remove the JSON _id (may still be there if called directly)
         data.pop('_id', None)
-
+        
         # add fields/etc.
         data = self.prepare_for_db(data)
 
@@ -248,6 +248,9 @@ class BaseImporter(object):
             obj = self.get_object(data)
         except self.model_class.DoesNotExist:
             obj = None
+
+        # remove pupa_id which does not belong in the OCD data models
+        pupa_id = data.pop('pupa_id', None)
 
         # pull related fields off
         related = {}
@@ -280,6 +283,14 @@ class BaseImporter(object):
                 raise DataImportError('{} while importing {} as {}'.format(e, data,
                                                                            self.model_class))
             self._create_related(obj, related, self.related_models)
+
+        if pupa_id:
+            try:
+                p_id = Identifier.objects.get(identifier = pupa_id)
+            except Identifier.DoesNotExist:
+                p_id = Identifier(identifier = pupa_id,
+                                  content_object = obj)
+                p_id.save()
 
         return obj.id, what
 

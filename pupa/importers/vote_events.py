@@ -1,6 +1,7 @@
 from opencivicdata.legislative.models import (VoteEvent, VoteCount, PersonVote, VoteSource,
                                               BillAction)
 from pupa.utils import fix_bill_id, get_pseudo_id, _make_pseudo_id
+from ..models import Identifier
 
 from .base import BaseImporter
 from ..exceptions import InvalidVoteEventError
@@ -41,7 +42,13 @@ class VoteEventImporter(BaseImporter):
                 )
             spec['bill_id'] = vote_event['bill_id']
 
-        if vote_event['identifier']:
+        if vote_event.get('pupa_id'):
+            try:
+                ve = Identifier.objects.get(identifier=vote_event['pupa_id'])
+                spec = {'id': ve.object_id}
+            except Identifier.DoesNotExist:
+                return None
+        elif vote_event['identifier']:
             # if there's an identifier, just use it and the bill_id and the session
             spec['identifier'] = vote_event['identifier']
         else:
