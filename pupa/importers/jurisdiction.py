@@ -11,6 +11,7 @@ class JurisdictionImporter(BaseImporter):
     def get_object(self, data):
         return self.model_class.objects.get(division_id=data['division_id'],
                                             classification=data['classification'])
+
     def prepare_for_db(self, data):
         for s in data['legislative_sessions']:
             s.pop('_scraped_name', None)

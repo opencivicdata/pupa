@@ -22,7 +22,7 @@ class MembershipImporter(BaseImporter):
         spec = {'organization_id': membership['organization_id'],
                 'person_id': membership['person_id'],
                 'label': membership['label'],
-                'role' : membership['role'],
+                'role': membership['role'],
                 # if this is a historical role, only update historical roles
                 'end_date': membership['end_date']}
 
@@ -45,7 +45,8 @@ class MembershipImporter(BaseImporter):
             is_party = False
 
         data['organization_id'] = self.org_importer.resolve_json_id(data['organization_id'])
-        data['person_id'] = self.person_importer.resolve_json_id(data['person_id'], allow_no_match=True)
+        data['person_id'] = self.person_importer.resolve_json_id(data['person_id'],
+                                                                 allow_no_match=True)
         data['post_id'] = self.post_importer.resolve_json_id(data['post_id'])
         if not is_party:
             # track that we had a membership for this person
