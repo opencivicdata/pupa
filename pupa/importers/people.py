@@ -14,7 +14,7 @@ class PersonImporter(BaseImporter):
                       'contact_details': (PersonContactDetail, 'person_id', {}),
                       'links': (PersonLink, 'person_id', {}),
                       'sources': (PersonSource, 'person_id', {}),
-                     }
+                      }
 
     def _prepare_imports(self, dicts):
         dicts = list(super(PersonImporter, self)._prepare_imports(dicts))

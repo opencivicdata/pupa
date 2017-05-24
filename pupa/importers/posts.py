@@ -7,7 +7,7 @@ class PostImporter(BaseImporter):
     model_class = Post
     related_models = {'contact_details': (PostContactDetail, 'post_id', {}),
                       'links': (PostLink, 'post_id', {})
-                     }
+                      }
 
     def __init__(self, jurisdiction_id, org_importer):
         super(PostImporter, self).__init__(jurisdiction_id)
