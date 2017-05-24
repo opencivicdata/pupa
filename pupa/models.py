@@ -1,8 +1,7 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType    
+from django.contrib.contenttypes.models import ContentType
 from opencivicdata.core.models import Jurisdiction
-
 
 
 OBJECT_TYPES = (
@@ -48,6 +47,7 @@ class ImportObjects(models.Model):
     noop_count = models.PositiveIntegerField()
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+
 
 class Identifier(models.Model):
     identifier = models.CharField(max_length=300)

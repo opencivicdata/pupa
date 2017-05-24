@@ -218,7 +218,7 @@ def test_pupa_identifier_event():
     result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
     assert result['event']['noop'] == 1
 
-    event.name="America's Anniversary",
+    event.name = "America's Anniversary",
     event.location['name'] = "United States of America"
     result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
     assert result['event']['update'] == 1
@@ -226,9 +226,6 @@ def test_pupa_identifier_event():
     event.pupa_id = 'bar'
     result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
     assert result['event']['insert'] == 1
-
-
-    
 
 
 @pytest.mark.django_db

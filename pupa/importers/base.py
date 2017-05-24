@@ -12,6 +12,7 @@ from pupa.utils import get_pseudo_id, utcnow
 from pupa.exceptions import UnresolvedIdError, DataImportError
 from pupa.models import Identifier
 
+
 def omnihash(obj):
     """ recursively hash unhashable objects """
     if isinstance(obj, set):
@@ -286,10 +287,10 @@ class BaseImporter(object):
 
         if pupa_id:
             try:
-                p_id = Identifier.objects.get(identifier = pupa_id)
+                p_id = Identifier.objects.get(identifier=pupa_id)
             except Identifier.DoesNotExist:
-                p_id = Identifier(identifier = pupa_id,
-                                  content_object = obj)
+                p_id = Identifier(identifier=pupa_id,
+                                  content_object=obj)
                 p_id.save()
 
         return obj.id, what
