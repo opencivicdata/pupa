@@ -23,7 +23,9 @@ ALL_ACTIONS = ('scrape', 'import', 'report')
 class _Unset:
     pass
 
+
 UNSET = _Unset()
+
 
 @contextlib.contextmanager
 def override_settings(settings, overrides):
@@ -37,6 +39,7 @@ def override_settings(settings, overrides):
             delattr(settings, key)
         else:
             setattr(settings, key, value)
+
 
 def print_report(report):
     plan = report['plan']

@@ -1,5 +1,4 @@
 import os
-import sys
 
 from .base import BaseCommand, CommandError
 from opencivicdata.common import JURISDICTION_CLASSIFICATIONS
@@ -8,6 +7,7 @@ from opencivicdata.divisions import Division
 
 def prompt(ps, default=''):
     return input(ps).strip() or default
+
 
 CLASS_DICT = {'events': 'Event',
               'people': 'Person',
@@ -86,7 +86,8 @@ class Command(BaseCommand):
 
         division = None
         while not division:
-            division = prompt('division id (see https://github.com/opencivicdata/ocd-division-ids/tree/master/identifiers): ')
+            division = prompt('division id (see https://github.com/opencivicdata/'
+                              'ocd-division-ids/tree/master/identifiers): ')
             if not division:
                 print("\nERROR: Division ID is required.\n")
 
