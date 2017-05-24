@@ -4,10 +4,11 @@ from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import OrganizationImporter
 from pupa.exceptions import UnresolvedIdError
 
+
 def create_jurisdictions():
-    d = Division.objects.create(id='ocd-division/country:us', name='USA')
-    j = Jurisdiction.objects.create(id='jid1', division_id='ocd-division/country:us')
-    j = Jurisdiction.objects.create(id='jid2', division_id='ocd-division/country:us')
+    Division.objects.create(id='ocd-division/country:us', name='USA')
+    Jurisdiction.objects.create(id='jid1', division_id='ocd-division/country:us')
+    Jurisdiction.objects.create(id='jid2', division_id='ocd-division/country:us')
 
 
 @pytest.mark.django_db

@@ -73,9 +73,9 @@ def test_full_vote_event():
 def test_vote_event_identifier_dedupe():
     j = create_jurisdiction()
     j.legislative_sessions.create(name='1900', identifier='1900')
-    org = Organization.objects.create(id='org-id', name='Legislature',
-                                      classification='legislature',
-                                      jurisdiction=j)
+    Organization.objects.create(id='org-id', name='Legislature',
+                                classification='legislature',
+                                jurisdiction=j)
 
     vote_event = ScrapeVoteEvent(legislative_session='1900', start_date='2013',
                                  classification='anything', result='passed',
@@ -111,7 +111,8 @@ def test_vote_event_identifier_dedupe():
 def test_vote_event_bill_id_dedupe():
     j = create_jurisdiction()
     session = j.legislative_sessions.create(name='1900', identifier='1900')
-    org = Organization.objects.create(id='org-id', name='House', classification='lower', jurisdiction=j)
+    org = Organization.objects.create(id='org-id', name='House', classification='lower',
+                                      jurisdiction=j)
     bill = Bill.objects.create(id='bill-1', identifier='HB 1', legislative_session=session,
                                from_organization=org)
     bill2 = Bill.objects.create(id='bill-2', identifier='HB 2', legislative_session=session,
@@ -158,7 +159,8 @@ def test_vote_event_bill_clearing():
     # changes make it look like there are multiple vote events
     j = create_jurisdiction()
     session = j.legislative_sessions.create(name='1900', identifier='1900')
-    org = Organization.objects.create(id='org-id', name='House', classification='lower', jurisdiction=j)
+    org = Organization.objects.create(id='org-id', name='House', classification='lower',
+                                      jurisdiction=j)
     bill = Bill.objects.create(id='bill-1', identifier='HB 1', legislative_session=session,
                                from_organization=org)
     Bill.objects.create(id='bill-2', identifier='HB 2', legislative_session=session,
@@ -259,7 +261,7 @@ def test_vote_event_bill_actions():
     assert votes[('upper', '1900-04-01')] == actions[0]
     assert votes[('lower', '1900-04-01')] == actions[1]
     assert votes[('upper', '1900-04-02')] == actions[3]
-    assert votes[('lower', '1900-04-02')] == None
+    assert votes[('lower', '1900-04-02')] is None
 
 
 @pytest.mark.django_db

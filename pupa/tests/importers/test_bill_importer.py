@@ -7,7 +7,7 @@ from opencivicdata.models import Bill, Jurisdiction, Person, Organization, Membe
 
 
 def create_jurisdiction():
-    d = Division.objects.create(id='ocd-division/country:us', name='USA')
+    Division.objects.create(id='ocd-division/country:us', name='USA')
     j = Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
     j.legislative_sessions.create(identifier='1899', name='1899')
     j.legislative_sessions.create(identifier='1900', name='1900')

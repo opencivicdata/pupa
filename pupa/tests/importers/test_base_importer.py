@@ -13,8 +13,8 @@ from pupa.exceptions import UnresolvedIdError, DataImportError
 
 
 def create_jurisdiction():
-    d = Division.objects.create(id='ocd-division/country:us', name='USA')
-    j = Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
+    Division.objects.create(id='ocd-division/country:us', name='USA')
+    Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
 
 
 class FakeImporter(BaseImporter):

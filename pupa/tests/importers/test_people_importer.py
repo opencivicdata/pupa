@@ -2,12 +2,12 @@ import pytest
 from pupa.scrape import Person as ScrapePerson
 from pupa.importers import PersonImporter
 from opencivicdata.models import Person, Organization, Membership, Division, Jurisdiction
-from pupa.exceptions import DuplicateItemError, SameNameError
+from pupa.exceptions import SameNameError
 
 
 def create_jurisdiction():
-    d = Division.objects.create(id='ocd-division/country:us', name='USA')
-    j = Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
+    Division.objects.create(id='ocd-division/country:us', name='USA')
+    Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
 
 
 @pytest.mark.django_db
