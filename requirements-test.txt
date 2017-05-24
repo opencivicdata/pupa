@@ -12,3 +12,4 @@ pytest
 pytest-cov
 pytest-django
 coveralls
+flake8
