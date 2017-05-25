@@ -17,6 +17,7 @@ Improvements:
 * add Scraper.latest\_session convienience method
 * optionally allow setting \_scraped\_name on legislative\_session, which will
   be used in session\_list checking if present
+* allow fuzzy datetimes to be used for action.date
 
 Fixes:
 
