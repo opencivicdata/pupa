@@ -1,5 +1,5 @@
 import pytest
-from opencivicdata.models import Organization, Jurisdiction, Division
+from opencivicdata.core.models import Organization, Jurisdiction, Division
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import OrganizationImporter
 from pupa.exceptions import UnresolvedIdError

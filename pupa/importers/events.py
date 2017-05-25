@@ -1,10 +1,11 @@
 from .base import BaseImporter
 from pupa.utils import fix_bill_id, get_pseudo_id, _make_pseudo_id
 from pupa.utils.event import read_event_iso_8601
-from opencivicdata.models import (Event, EventLocation, EventSource, EventDocument,
-                                  EventDocumentLink, EventLink, EventParticipant, EventMedia,
-                                  EventMediaLink, EventAgendaItem, EventRelatedEntity,
-                                  EventAgendaMedia, EventAgendaMediaLink)
+from opencivicdata.legislative.models import (Event, EventLocation, EventSource, EventDocument,
+                                              EventDocumentLink, EventLink, EventParticipant,
+                                              EventMedia, EventMediaLink, EventAgendaItem,
+                                              EventRelatedEntity, EventAgendaMedia,
+                                              EventAgendaMediaLink)
 
 
 class EventImporter(BaseImporter):

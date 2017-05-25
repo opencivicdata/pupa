@@ -1,5 +1,5 @@
 from django.db import models
-from opencivicdata.models import Jurisdiction
+from opencivicdata.core.models import Jurisdiction
 
 
 OBJECT_TYPES = (

@@ -1,5 +1,6 @@
-from opencivicdata.models import (Organization, OrganizationIdentifier, OrganizationName,
-                                  OrganizationContactDetail, OrganizationLink, OrganizationSource)
+from opencivicdata.core.models import (Organization, OrganizationIdentifier, OrganizationName,
+                                       OrganizationContactDetail, OrganizationLink,
+                                       OrganizationSource)
 from .base import BaseImporter
 from ..utils import get_pseudo_id
 from ..utils.topsort import Network

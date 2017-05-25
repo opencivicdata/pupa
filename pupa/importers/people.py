@@ -1,7 +1,7 @@
 from collections import defaultdict
 from django.db.models import Q
-from opencivicdata.models import (Person, PersonIdentifier, PersonName, PersonContactDetail,
-                                  PersonLink, PersonSource)
+from opencivicdata.core.models import (Person, PersonIdentifier, PersonName, PersonContactDetail,
+                                       PersonLink, PersonSource)
 from .base import BaseImporter
 from ..exceptions import SameNameError
 

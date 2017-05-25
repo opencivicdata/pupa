@@ -1,7 +1,7 @@
 import pytest
 from pupa.scrape import Person as ScrapePerson
 from pupa.importers import PersonImporter
-from opencivicdata.models import Person, Organization, Membership, Division, Jurisdiction
+from opencivicdata.core.models import Person, Organization, Membership, Division, Jurisdiction
 from pupa.exceptions import SameNameError
 
 

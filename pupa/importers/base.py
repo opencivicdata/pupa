@@ -6,7 +6,7 @@ import logging
 
 from django.db.models import Q
 
-from opencivicdata.models import LegislativeSession
+from opencivicdata.legislative.models import LegislativeSession
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id, utcnow
 from pupa.exceptions import UnresolvedIdError, DataImportError

@@ -1,7 +1,7 @@
 import pytest
 from pupa.scrape import Post as ScrapePost
 from pupa.importers import PostImporter, OrganizationImporter
-from opencivicdata.models import Organization, Post, Division, Jurisdiction
+from opencivicdata.core.models import Organization, Post, Division, Jurisdiction
 import datetime
 
 

@@ -9,7 +9,7 @@ ADD . /opt/sunlightfoundation.com/pupa/
 RUN pip3 install -r /opt/sunlightfoundation.com/pupa/requirements-test.txt
 RUN pip3 install psycopg2
 RUN pip3 install -e /opt/sunlightfoundation.com/pupa/
-RUN pip3 install -e git://github.com/opencivicdata/python-opencivicdata-django.git#egg=opencivicdata-django
+RUN pip3 install -e git://github.com/opencivicdata/python-opencivicdata.git#egg=opencivicdata
 RUN pip3 install jsonfield django-uuidfield
 RUN pip3 install jsonfield kafka-python
 

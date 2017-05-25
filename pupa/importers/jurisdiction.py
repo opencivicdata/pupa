@@ -1,4 +1,5 @@
-from opencivicdata.models import Jurisdiction, LegislativeSession
+from opencivicdata.core.models import Jurisdiction
+from opencivicdata.legislative.models import LegislativeSession
 from .base import BaseImporter
 
 

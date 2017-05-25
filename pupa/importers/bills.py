@@ -1,8 +1,8 @@
 from pupa.utils import fix_bill_id
-from opencivicdata.models import (Bill, RelatedBill, BillAbstract, BillTitle, BillIdentifier,
-                                  BillAction, BillActionRelatedEntity,
-                                  BillSponsorship, BillSource, BillDocument, BillVersion,
-                                  BillDocumentLink, BillVersionLink)
+from opencivicdata.legislative.models import (Bill, RelatedBill, BillAbstract, BillTitle,
+                                              BillIdentifier, BillAction, BillActionRelatedEntity,
+                                              BillSponsorship, BillSource, BillDocument,
+                                              BillVersion, BillDocumentLink, BillVersionLink)
 from .base import BaseImporter
 from ..exceptions import PupaInternalError
 
