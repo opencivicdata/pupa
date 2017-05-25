@@ -39,5 +39,6 @@ schema = {
 
         'sources': sources,
         'extras': extras,
+        'pupa_id': {"type": ["string", "null"]},
     }
 }

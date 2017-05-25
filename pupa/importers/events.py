@@ -39,14 +39,21 @@ class EventImporter(BaseImporter):
         self.vote_event_importer = vote_event_importer
 
     def get_object(self, event):
-        spec = {
-            'name': event['name'],
-            'description': event['description'],
-            'start_time': event['start_time'],
-            'end_time': event['end_time'],
-            'timezone': event['timezone'],
-            'jurisdiction_id': self.jurisdiction_id
-        }
+        if event.get('pupa_id'):
+            e_id = self.lookup_obj_id(event['pupa_id'])
+            if e_id:
+                spec = {'id': e_id}
+            else:
+                return None
+        else:
+            spec = {
+                'name': event['name'],
+                'description': event['description'],
+                'start_time': event['start_time'],
+                'end_time': event['end_time'],
+                'timezone': event['timezone'],
+                'jurisdiction_id': self.jurisdiction_id
+            }
         return self.model_class.objects.get(**spec)
 
     def get_location(self, location_data):

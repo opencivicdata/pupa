@@ -108,6 +108,52 @@ def test_vote_event_identifier_dedupe():
 
 
 @pytest.mark.django_db
+def test_vote_event_pupa_identifier_dedupe():
+    j = create_jurisdiction()
+    j.legislative_sessions.create(name='1900', identifier='1900')
+    Organization.objects.create(id='org-id', name='Legislature',
+                                classification='legislature',
+                                jurisdiction=j)
+
+    vote_event = ScrapeVoteEvent(legislative_session='1900', start_date='2013',
+                                 classification='anything', result='passed',
+                                 motion_text='a vote on something',
+                                 identifier='Roll Call No. 1')
+    vote_event.pupa_id = 'foo'
+
+    dmi = DumbMockImporter()
+    oi = OrganizationImporter('jid')
+    bi = BillImporter('jid', dmi, oi)
+
+    _, what = VoteEventImporter('jid', dmi, oi, bi).import_item(vote_event.as_dict())
+    assert what == 'insert'
+    assert VoteEvent.objects.count() == 1
+
+    # same exact vote event, no changes
+    _, what = VoteEventImporter('jid', dmi, oi, bi).import_item(vote_event.as_dict())
+    assert what == 'noop'
+    assert VoteEvent.objects.count() == 1
+
+    # new info, update
+    vote_event.result = 'failed'
+    _, what = VoteEventImporter('jid', dmi, oi, bi).import_item(vote_event.as_dict())
+    assert what == 'update'
+    assert VoteEvent.objects.count() == 1
+
+    # new bill identifier, update
+    vote_event.identifier = 'First Roll Call'
+    _, what = VoteEventImporter('jid', dmi, oi, bi).import_item(vote_event.as_dict())
+    assert what == 'update'
+    assert VoteEvent.objects.count() == 1
+
+    # new pupa identifier, insert
+    vote_event.pupa_id = 'bar'
+    _, what = VoteEventImporter('jid', dmi, oi, bi).import_item(vote_event.as_dict())
+    assert what == 'insert'
+    assert VoteEvent.objects.count() == 2
+
+
+@pytest.mark.django_db
 def test_vote_event_bill_id_dedupe():
     j = create_jurisdiction()
     session = j.legislative_sessions.create(name='1900', identifier='1900')

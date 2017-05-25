@@ -41,7 +41,13 @@ class VoteEventImporter(BaseImporter):
                 )
             spec['bill_id'] = vote_event['bill_id']
 
-        if vote_event['identifier']:
+        if vote_event.get('pupa_id'):
+            ve_id = self.lookup_obj_id(vote_event['pupa_id'])
+            if ve_id:
+                spec = {'id': ve_id}
+            else:
+                return None
+        elif vote_event['identifier']:
             # if there's an identifier, just use it and the bill_id and the session
             spec['identifier'] = vote_event['identifier']
         else:
