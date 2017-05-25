@@ -1,7 +1,6 @@
 from .base import BaseImporter
 from pupa.utils import fix_bill_id, get_pseudo_id, _make_pseudo_id
 from pupa.utils.event import read_event_iso_8601
-from pupa.models import Identifier
 from opencivicdata.legislative.models import (Event, EventLocation, EventSource, EventDocument,
                                               EventDocumentLink, EventLink, EventParticipant,
                                               EventMedia, EventMediaLink, EventAgendaItem,
@@ -41,10 +40,10 @@ class EventImporter(BaseImporter):
 
     def get_object(self, event):
         if event.get('pupa_id'):
-            try:
-                e = Identifier.objects.get(identifier=event['pupa_id'])
-                spec = {'id': e.object_id}
-            except Identifier.DoesNotExist:
+            e_id = self.lookup_obj_id(event['pupa_id'])
+            if e_id:
+                spec = {'id': e_id}
+            else:
                 return None
         else:
             spec = {

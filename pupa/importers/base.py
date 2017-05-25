@@ -286,12 +286,8 @@ class BaseImporter(object):
             self._create_related(obj, related, self.related_models)
 
         if pupa_id:
-            try:
-                p_id = Identifier.objects.get(identifier=pupa_id)
-            except Identifier.DoesNotExist:
-                p_id = Identifier(identifier=pupa_id,
-                                  content_object=obj)
-                p_id.save()
+            Identifier.objects.get_or_create(identifier=pupa_id,
+                                             defaults={'content_object': obj})
 
         return obj.id, what
 
@@ -400,3 +396,11 @@ class BaseImporter(object):
             # after import the subobjects, import their subsubobjects
             for subobj, subrel in zip(subobjects, all_subrelated):
                 self._create_related(subobj, subrel, subsubdict)
+
+    def lookup_obj_id(self, pupa_id):
+        try:
+            obj_id = Identifier.objects.get(identifier=pupa_id).object_id
+        except Identifier.DoesNotExist:
+            obj_id = None
+
+        return obj_id
