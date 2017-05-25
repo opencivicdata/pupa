@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='runplan',
             name='jurisdiction',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='runs', to='opencivicdata.Jurisdiction'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='runs', to='core.Jurisdiction'),
         ),
         migrations.AlterField(
             model_name='scrapeobjects',

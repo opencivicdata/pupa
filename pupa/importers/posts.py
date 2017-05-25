@@ -1,4 +1,4 @@
-from opencivicdata.models import Post, PostContactDetail, PostLink
+from opencivicdata.core.models import Post, PostContactDetail, PostLink
 from .base import BaseImporter
 
 

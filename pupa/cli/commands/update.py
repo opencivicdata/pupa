@@ -81,7 +81,7 @@ def forward_report(report, jurisdiction):
 @transaction.atomic
 def save_report(report, jurisdiction):
     from pupa.models import RunPlan
-    from opencivicdata.models import Jurisdiction as JurisdictionModel
+    from opencivicdata.core.models import Jurisdiction as JurisdictionModel
 
     # set end time
     report['end'] = utils.utcnow()

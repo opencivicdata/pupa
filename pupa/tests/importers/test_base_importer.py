@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import mock
 import pytest
-from opencivicdata.models import Person, Organization, Jurisdiction, Division
+from opencivicdata.core.models import Person, Organization, Jurisdiction, Division
 from pupa.scrape import Person as ScrapePerson
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers.base import omnihash, BaseImporter

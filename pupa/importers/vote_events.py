@@ -1,4 +1,5 @@
-from opencivicdata.models import VoteEvent, VoteCount, PersonVote, VoteSource, BillAction
+from opencivicdata.legislative.models import (VoteEvent, VoteCount, PersonVote, VoteSource,
+                                              BillAction)
 from pupa.utils import fix_bill_id, get_pseudo_id, _make_pseudo_id
 
 from .base import BaseImporter

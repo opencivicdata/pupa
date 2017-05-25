@@ -3,8 +3,8 @@ from pupa.scrape import (VoteEvent as ScrapeVoteEvent, Bill as ScrapeBill, Organ
                          ScrapeOrganization, Person as ScrapePerson)
 from pupa.importers import (VoteEventImporter, BillImporter, MembershipImporter,
                             OrganizationImporter, PersonImporter)
-from opencivicdata.models import (VoteEvent, Jurisdiction, LegislativeSession, Person,
-                                  Organization, Bill, Division)
+from opencivicdata.core.models import (Jurisdiction, Person, Organization, Division)
+from opencivicdata.legislative.models import (VoteEvent, LegislativeSession, Bill)
 
 
 class DumbMockImporter(object):

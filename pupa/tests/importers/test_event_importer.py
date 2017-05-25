@@ -2,8 +2,8 @@ import pytest
 from pupa.scrape import Event as ScrapeEvent
 from pupa.importers import (EventImporter, OrganizationImporter, PersonImporter, BillImporter,
                             VoteEventImporter)
-from opencivicdata.models import (Event, Person, Membership, Organization, Bill,
-                                  VoteEvent, Jurisdiction, Division)
+from opencivicdata.legislative.models import VoteEvent, Bill, Event
+from opencivicdata.core.models import (Person, Membership, Organization, Jurisdiction, Division)
 
 
 def create_jurisdiction():
