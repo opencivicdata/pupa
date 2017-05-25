@@ -1,6 +1,12 @@
 # pupa changelog
 
-## WIP
+## 0.7.0 - May 25 2017
+
+Backwards-incompatible changes:
+
+* moves from split dependency of opencivicdata-divisions/opencivicdata-django
+  to new unified opencivicdata which also splits into two Django apps
+  (see python-opencivicdata release notes for more detail)
 
 Improvements:
 
