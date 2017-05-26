@@ -1,15 +1,15 @@
 import pytest
 from pupa.scrape import Post as ScrapePost
 from pupa.importers import PostImporter, OrganizationImporter
-from opencivicdata.models import Organization, Post, Division, Jurisdiction
+from opencivicdata.core.models import Organization, Post, Division, Jurisdiction
 import datetime
 
 
 def create_jurisdictions():
-    d = Division.objects.create(id='ocd-division/country:us', name='USA')
-    d = Division.objects.create(id='ocd-division/country:us/state:nc', name='NC')
-    j = Jurisdiction.objects.create(id='us', division_id='ocd-division/country:us')
-    j = Jurisdiction.objects.create(id='nc', division_id='ocd-division/country:us/state:nc')
+    Division.objects.create(id='ocd-division/country:us', name='USA')
+    Division.objects.create(id='ocd-division/country:us/state:nc', name='NC')
+    Jurisdiction.objects.create(id='us', division_id='ocd-division/country:us')
+    Jurisdiction.objects.create(id='nc', division_id='ocd-division/country:us/state:nc')
 
 
 @pytest.mark.django_db

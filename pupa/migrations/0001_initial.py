@@ -7,7 +7,8 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('opencivicdata', '0001_initial'),
+        ('core', '0001_initial'),
+        ('legislative', '0001_initial'),
     ]
 
     operations = [
@@ -31,7 +32,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('success', models.BooleanField(default=True)),
-                ('jurisdiction', models.ForeignKey(to='opencivicdata.Jurisdiction')),
+                ('jurisdiction', models.ForeignKey(to='core.Jurisdiction')),
             ],
             options={
             },

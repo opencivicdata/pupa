@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import mock
 import pytest
-from opencivicdata.models import Person, Organization, Jurisdiction, Division
+from opencivicdata.core.models import Person, Organization, Jurisdiction, Division
 from pupa.scrape import Person as ScrapePerson
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers.base import omnihash, BaseImporter
@@ -13,8 +13,8 @@ from pupa.exceptions import UnresolvedIdError, DataImportError
 
 
 def create_jurisdiction():
-    d = Division.objects.create(id='ocd-division/country:us', name='USA')
-    j = Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
+    Division.objects.create(id='ocd-division/country:us', name='USA')
+    Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
 
 
 class FakeImporter(BaseImporter):

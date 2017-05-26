@@ -1,10 +1,11 @@
 from .base import BaseImporter
 from pupa.utils import fix_bill_id, get_pseudo_id, _make_pseudo_id
 from pupa.utils.event import read_event_iso_8601
-from opencivicdata.models import (Event, EventLocation, EventSource, EventDocument,
-                                  EventDocumentLink, EventLink, EventParticipant, EventMedia,
-                                  EventMediaLink, EventAgendaItem, EventRelatedEntity,
-                                  EventAgendaMedia, EventAgendaMediaLink)
+from opencivicdata.legislative.models import (Event, EventLocation, EventSource, EventDocument,
+                                              EventDocumentLink, EventLink, EventParticipant,
+                                              EventMedia, EventMediaLink, EventAgendaItem,
+                                              EventRelatedEntity, EventAgendaMedia,
+                                              EventAgendaMediaLink)
 
 
 class EventImporter(BaseImporter):
@@ -38,14 +39,21 @@ class EventImporter(BaseImporter):
         self.vote_event_importer = vote_event_importer
 
     def get_object(self, event):
-        spec = {
-            'name': event['name'],
-            'description': event['description'],
-            'start_time': event['start_time'],
-            'end_time': event['end_time'],
-            'timezone': event['timezone'],
-            'jurisdiction_id': self.jurisdiction_id
-        }
+        if event.get('pupa_id'):
+            e_id = self.lookup_obj_id(event['pupa_id'])
+            if e_id:
+                spec = {'id': e_id}
+            else:
+                return None
+        else:
+            spec = {
+                'name': event['name'],
+                'description': event['description'],
+                'start_time': event['start_time'],
+                'end_time': event['end_time'],
+                'timezone': event['timezone'],
+                'jurisdiction_id': self.jurisdiction_id
+            }
         return self.model_class.objects.get(**spec)
 
     def get_location(self, location_data):

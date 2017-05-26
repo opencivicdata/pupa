@@ -6,6 +6,8 @@ from pupa.scrape.base import Scraper, ScrapeError, BaseBillScraper
 
 class FakeJurisdiction(Jurisdiction):
     jurisdiction_id = 'jurisdiction'
+
+
 juris = FakeJurisdiction()
 
 

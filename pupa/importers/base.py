@@ -6,10 +6,11 @@ import logging
 
 from django.db.models import Q
 
-from opencivicdata.models import LegislativeSession
+from opencivicdata.legislative.models import LegislativeSession
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id, utcnow
 from pupa.exceptions import UnresolvedIdError, DataImportError
+from pupa.models import Identifier
 
 
 def omnihash(obj):
@@ -249,6 +250,9 @@ class BaseImporter(object):
         except self.model_class.DoesNotExist:
             obj = None
 
+        # remove pupa_id which does not belong in the OCD data models
+        pupa_id = data.pop('pupa_id', None)
+
         # pull related fields off
         related = {}
         for field in self.related_models:
@@ -280,6 +284,10 @@ class BaseImporter(object):
                 raise DataImportError('{} while importing {} as {}'.format(e, data,
                                                                            self.model_class))
             self._create_related(obj, related, self.related_models)
+
+        if pupa_id:
+            Identifier.objects.get_or_create(identifier=pupa_id,
+                                             defaults={'content_object': obj})
 
         return obj.id, what
 
@@ -388,3 +396,11 @@ class BaseImporter(object):
             # after import the subobjects, import their subsubobjects
             for subobj, subrel in zip(subobjects, all_subrelated):
                 self._create_related(subobj, subrel, subsubdict)
+
+    def lookup_obj_id(self, pupa_id):
+        try:
+            obj_id = Identifier.objects.get(identifier=pupa_id).object_id
+        except Identifier.DoesNotExist:
+            obj_id = None
+
+        return obj_id

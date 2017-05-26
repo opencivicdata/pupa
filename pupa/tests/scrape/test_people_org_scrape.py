@@ -158,9 +158,11 @@ def test_committee_add_member_name():
 
 def test_person_add_membership_name():
     p = Person('Leonardo DiCaprio')
-    p.add_membership('Academy of Motion Picture Arts and Sciences', role='winner', start_date='2016')
+    p.add_membership('Academy of Motion Picture Arts and Sciences',
+                     role='winner', start_date='2016')
     p._related[0].validate()
-    assert get_pseudo_id(p._related[0].organization_id) == {'name': 'Academy of Motion Picture Arts and Sciences'}
+    assert get_pseudo_id(p._related[0].organization_id) == {
+        'name': 'Academy of Motion Picture Arts and Sciences'}
     assert p._related[0].person_id == p._id
     assert p._related[0].role == 'winner'
     assert p._related[0].start_date == '2016'
@@ -170,7 +172,8 @@ def test_person_add_party():
     p = Person('Groot')
     p.add_party('Green')
     p._related[0].validate()
-    assert get_pseudo_id(p._related[0].organization_id) == {'name': 'Green', 'classification': 'party'}
+    assert get_pseudo_id(p._related[0].organization_id) == {
+        'name': 'Green', 'classification': 'party'}
 
 
 def test_person_add_term():

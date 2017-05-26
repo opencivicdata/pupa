@@ -1,8 +1,8 @@
 from pupa.utils import fix_bill_id
-from opencivicdata.models import (Bill, RelatedBill, BillAbstract, BillTitle, BillIdentifier,
-                                  BillAction, BillActionRelatedEntity,
-                                  BillSponsorship, BillSource, BillDocument, BillVersion,
-                                  BillDocumentLink, BillVersionLink)
+from opencivicdata.legislative.models import (Bill, RelatedBill, BillAbstract, BillTitle,
+                                              BillIdentifier, BillAction, BillActionRelatedEntity,
+                                              BillSponsorship, BillSource, BillDocument,
+                                              BillVersion, BillDocumentLink, BillVersionLink)
 from .base import BaseImporter
 from ..exceptions import PupaInternalError
 
@@ -22,7 +22,7 @@ class BillImporter(BaseImporter):
                           'links': (BillDocumentLink, 'document_id', {})}),
                       'versions': (BillVersion, 'bill_id', {
                           'links': (BillVersionLink, 'version_id', {})}),
-                     }
+                      }
     preserve_order = {'actions'}
 
     def __init__(self, jurisdiction_id, org_importer, person_importer):
@@ -41,7 +41,7 @@ class BillImporter(BaseImporter):
         return self.model_class.objects.prefetch_related('actions__related_entities',
                                                          'versions__links',
                                                          'documents__links',
-                                                        ).get(**spec)
+                                                         ).get(**spec)
 
     def limit_spec(self, spec):
         spec['legislative_session__jurisdiction_id'] = self.jurisdiction_id
@@ -65,7 +65,6 @@ class BillImporter(BaseImporter):
                 elif 'person_id' in entity:
                     entity['person_id'] = self.person_importer.resolve_json_id(
                         entity['person_id'])
-
 
         for sponsor in data['sponsorships']:
             if 'person_id' in sponsor:

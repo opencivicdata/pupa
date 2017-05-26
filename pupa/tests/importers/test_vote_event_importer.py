@@ -3,8 +3,8 @@ from pupa.scrape import (VoteEvent as ScrapeVoteEvent, Bill as ScrapeBill, Organ
                          ScrapeOrganization, Person as ScrapePerson)
 from pupa.importers import (VoteEventImporter, BillImporter, MembershipImporter,
                             OrganizationImporter, PersonImporter)
-from opencivicdata.models import (VoteEvent, Jurisdiction, LegislativeSession, Person,
-                                  Organization, Bill, Division)
+from opencivicdata.core.models import (Jurisdiction, Person, Organization, Division)
+from opencivicdata.legislative.models import (VoteEvent, LegislativeSession, Bill)
 
 
 class DumbMockImporter(object):
@@ -73,9 +73,9 @@ def test_full_vote_event():
 def test_vote_event_identifier_dedupe():
     j = create_jurisdiction()
     j.legislative_sessions.create(name='1900', identifier='1900')
-    org = Organization.objects.create(id='org-id', name='Legislature',
-                                      classification='legislature',
-                                      jurisdiction=j)
+    Organization.objects.create(id='org-id', name='Legislature',
+                                classification='legislature',
+                                jurisdiction=j)
 
     vote_event = ScrapeVoteEvent(legislative_session='1900', start_date='2013',
                                  classification='anything', result='passed',
@@ -108,10 +108,57 @@ def test_vote_event_identifier_dedupe():
 
 
 @pytest.mark.django_db
+def test_vote_event_pupa_identifier_dedupe():
+    j = create_jurisdiction()
+    j.legislative_sessions.create(name='1900', identifier='1900')
+    Organization.objects.create(id='org-id', name='Legislature',
+                                classification='legislature',
+                                jurisdiction=j)
+
+    vote_event = ScrapeVoteEvent(legislative_session='1900', start_date='2013',
+                                 classification='anything', result='passed',
+                                 motion_text='a vote on something',
+                                 identifier='Roll Call No. 1')
+    vote_event.pupa_id = 'foo'
+
+    dmi = DumbMockImporter()
+    oi = OrganizationImporter('jid')
+    bi = BillImporter('jid', dmi, oi)
+
+    _, what = VoteEventImporter('jid', dmi, oi, bi).import_item(vote_event.as_dict())
+    assert what == 'insert'
+    assert VoteEvent.objects.count() == 1
+
+    # same exact vote event, no changes
+    _, what = VoteEventImporter('jid', dmi, oi, bi).import_item(vote_event.as_dict())
+    assert what == 'noop'
+    assert VoteEvent.objects.count() == 1
+
+    # new info, update
+    vote_event.result = 'failed'
+    _, what = VoteEventImporter('jid', dmi, oi, bi).import_item(vote_event.as_dict())
+    assert what == 'update'
+    assert VoteEvent.objects.count() == 1
+
+    # new bill identifier, update
+    vote_event.identifier = 'First Roll Call'
+    _, what = VoteEventImporter('jid', dmi, oi, bi).import_item(vote_event.as_dict())
+    assert what == 'update'
+    assert VoteEvent.objects.count() == 1
+
+    # new pupa identifier, insert
+    vote_event.pupa_id = 'bar'
+    _, what = VoteEventImporter('jid', dmi, oi, bi).import_item(vote_event.as_dict())
+    assert what == 'insert'
+    assert VoteEvent.objects.count() == 2
+
+
+@pytest.mark.django_db
 def test_vote_event_bill_id_dedupe():
     j = create_jurisdiction()
     session = j.legislative_sessions.create(name='1900', identifier='1900')
-    org = Organization.objects.create(id='org-id', name='House', classification='lower', jurisdiction=j)
+    org = Organization.objects.create(id='org-id', name='House', classification='lower',
+                                      jurisdiction=j)
     bill = Bill.objects.create(id='bill-1', identifier='HB 1', legislative_session=session,
                                from_organization=org)
     bill2 = Bill.objects.create(id='bill-2', identifier='HB 2', legislative_session=session,
@@ -158,7 +205,8 @@ def test_vote_event_bill_clearing():
     # changes make it look like there are multiple vote events
     j = create_jurisdiction()
     session = j.legislative_sessions.create(name='1900', identifier='1900')
-    org = Organization.objects.create(id='org-id', name='House', classification='lower', jurisdiction=j)
+    org = Organization.objects.create(id='org-id', name='House', classification='lower',
+                                      jurisdiction=j)
     bill = Bill.objects.create(id='bill-1', identifier='HB 1', legislative_session=session,
                                from_organization=org)
     Bill.objects.create(id='bill-2', identifier='HB 2', legislative_session=session,
@@ -259,7 +307,7 @@ def test_vote_event_bill_actions():
     assert votes[('upper', '1900-04-01')] == actions[0]
     assert votes[('lower', '1900-04-01')] == actions[1]
     assert votes[('upper', '1900-04-02')] == actions[3]
-    assert votes[('lower', '1900-04-02')] == None
+    assert votes[('lower', '1900-04-02')] is None
 
 
 @pytest.mark.django_db

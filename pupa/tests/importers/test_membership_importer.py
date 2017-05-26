@@ -3,7 +3,7 @@ from pupa.scrape import Membership as ScrapeMembership
 from pupa.scrape import Person as ScrapePerson
 from pupa.importers import MembershipImporter, PersonImporter, OrganizationImporter
 from pupa.exceptions import NoMembershipsError
-from opencivicdata.models import Organization, Post, Person, Division, Jurisdiction
+from opencivicdata.core.models import Organization, Post, Person, Division, Jurisdiction
 
 
 class DumbMockImporter(object):
@@ -15,8 +15,8 @@ class DumbMockImporter(object):
 
 
 def create_jurisdiction():
-    d = Division.objects.create(id='ocd-division/country:us', name='USA')
-    j = Jurisdiction.objects.create(id='fnd-jid', division_id='ocd-division/country:us')
+    Division.objects.create(id='ocd-division/country:us', name='USA')
+    Jurisdiction.objects.create(id='fnd-jid', division_id='ocd-division/country:us')
 
 
 @pytest.mark.django_db
@@ -133,8 +133,11 @@ def test_multiple_orgs_of_same_class():
 
     memimp.import_data([hari._related[0].as_dict(), picard._related[0].as_dict()])
 
-    assert Person.objects.get(name='Hari Seldon').memberships.get().organization.name == 'Foundation'
-    assert Person.objects.get(name='Jean Luc Picard').memberships.get().organization.name == 'Federation'
+    assert Person.objects.get(name='Hari Seldon'
+                              ).memberships.get().organization.name == 'Foundation'
+    assert Person.objects.get(name='Jean Luc Picard'
+                              ).memberships.get().organization.name == 'Federation'
+
 
 @pytest.mark.django_db
 def test_multiple_posts_class():
@@ -148,7 +151,6 @@ def test_multiple_posts_class():
 
     m1 = ScrapeMembership(person_id=hari.id, organization_id=org.id, post_id=founder.id)
     m2 = ScrapeMembership(person_id=hari.id, organization_id=org.id, post_id=chair.id)
-
 
     dumb_imp = DumbMockImporter()
     memimp = MembershipImporter('fnd-jid', dumb_imp, dumb_imp, dumb_imp)
