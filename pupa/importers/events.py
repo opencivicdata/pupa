@@ -1,6 +1,5 @@
 from .base import BaseImporter
 from pupa.utils import fix_bill_id, get_pseudo_id, _make_pseudo_id
-from pupa.utils.event import read_event_iso_8601
 from opencivicdata.legislative.models import (Event, EventLocation, EventSource, EventDocument,
                                               EventDocumentLink, EventLink, EventParticipant,
                                               EventMedia, EventMediaLink, EventAgendaItem,
@@ -49,8 +48,8 @@ class EventImporter(BaseImporter):
             spec = {
                 'name': event['name'],
                 'description': event['description'],
-                'start_time': event['start_time'],
-                'end_time': event['end_time'],
+                'start_date': event['start_date'],
+                'end_date': event['end_date'],
                 'timezone': event['timezone'],
                 'jurisdiction_id': self.jurisdiction_id
             }
@@ -67,12 +66,8 @@ class EventImporter(BaseImporter):
         data['jurisdiction_id'] = self.jurisdiction_id
         data['location'] = self.get_location(data['location'])
 
-        def gdt(x):
-            if x is not None:
-                return read_event_iso_8601(x)
-
-        data['start_time'] = gdt(data['start_time'])
-        data['end_time'] = gdt(data.get('end_time', None))
+        data['start_date'] = data['start_date']
+        data['end_date'] = data.get('end_date', "")
 
         for participant in data['participants']:
             if 'person_id' in participant:
