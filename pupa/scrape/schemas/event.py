@@ -2,7 +2,7 @@
     Schema for event objects.
 """
 
-from .common import sources, extras, fuzzy_date_blank
+from .common import sources, extras, fuzzy_date_blank, fuzzy_datetime, fuzzy_datetime_blank
 
 media_schema = {
     "items": {
@@ -30,10 +30,10 @@ media_schema = {
 schema = {
     "properties": {
         "name": { "type": "string" },
-        "start_time": { "type": "datetime", },
         "timezone": { "type": "string" },
         "all_day": { "type": "boolean" },
-        "end_time": { "type": ["datetime", "null"] },
+        'start_date': fuzzy_datetime,
+        'end_date': fuzzy_datetime_blank,
         "status": {
             "type": "string", "blank": True,
             "enum": ["cancelled", "tentative", "confirmed", "passed"],
