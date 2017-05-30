@@ -26,6 +26,16 @@ pupa = pupa.cli.__main__:main''',
           'psycopg2',
           'pytz',
       ],
+      extras_require={
+          'dev': [
+            'mock',
+            'pytest',
+            'pytest-cov',
+            'pytest-django',
+            'coveralls',
+            'flake8',
+          ],
+      },
       classifiers=["Development Status :: 4 - Beta",
                    "Intended Audience :: Developers",
                    "License :: OSI Approved :: BSD License",
@@ -36,4 +46,4 @@ pupa = pupa.cli.__main__:main''',
                    "Programming Language :: Python :: 3.6",
                    "Topic :: Software Development :: Libraries :: Python Modules",
                    ],
-)
+      )
