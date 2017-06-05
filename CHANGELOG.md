@@ -14,6 +14,7 @@ Improvements:
 
 * allow extras to be set on bill actions & event agenda items
 * bill actions can now specify times
+* add classification field to event agenda items
 
 ## 0.7.0 - June 5 2017
 
