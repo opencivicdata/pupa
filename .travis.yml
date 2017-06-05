@@ -10,6 +10,7 @@ env:
     - DJANGO_VERSION=">=1.11,<2"
 install:
     - pip install .[dev] Django$DJANGO_VERSION
+    - pip install -e git+git@github.com:opencivicdata/python-opencivicdata.git#egg=opencivicdata
 before_script:
     - psql -c "CREATE USER test with PASSWORD 'test' CREATEDB SUPERUSER;" -U postgres
     - psql -c "CREATE DATABASE test;" -U postgres
