@@ -74,6 +74,13 @@ def test_add_action():
     b.validate()
 
 
+def test_action_extra():
+    b = toy_bill()
+    b.add_action("an action with some extra information", '2017-01-01',
+                 extras=dict(sitting_chair='Adams'))
+    assert b.actions[0]['extras'] == {'sitting_chair': 'Adams'}
+
+
 def test_add_related_bill():
     """ Make sure related bills work """
     b = toy_bill()
