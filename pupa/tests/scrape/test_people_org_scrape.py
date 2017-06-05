@@ -100,8 +100,7 @@ def test_legislator_related_district():
     assert l._related[0].person_id == l._id
     assert get_pseudo_id(l._related[0].organization_id) == {'classification': 'legislature'}
     assert get_pseudo_id(l._related[0].post_id) == {"organization__classification": "legislature",
-                                                    "label": "1", "role": "member"}
-    assert l._related[0].role == 'member'
+                                                    "label": "1"}
 
 
 def test_legislator_related_chamber_district():
@@ -112,8 +111,19 @@ def test_legislator_related_chamber_district():
     assert l._related[0].person_id == l._id
     assert get_pseudo_id(l._related[0].organization_id) == {'classification': 'upper'}
     assert get_pseudo_id(l._related[0].post_id) == {"organization__classification": "upper",
-                                                    "label": "1", "role": "member"}
-    assert l._related[0].role == 'member'
+                                                    "label": "1"}
+
+
+def test_legislator_related_chamber_district_role():
+    l = Person('John Adams', district='1', primary_org='lower', role='Speaker')
+    l.pre_save('jurisdiction-id')
+
+    assert len(l._related) == 1
+    assert l._related[0].person_id == l._id
+    assert get_pseudo_id(l._related[0].organization_id) == {'classification': 'lower'}
+    assert get_pseudo_id(l._related[0].post_id) == {"organization__classification": "lower",
+                                                    "label": "1", "role": "Speaker"}
+    assert l._related[0].role == 'Speaker'
 
 
 def test_legislator_related_party():
