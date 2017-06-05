@@ -10,8 +10,10 @@ class VoteEvent(BaseModel, SourceMixin):
     _schema = schema
 
     def __init__(self, *, motion_text, start_date, classification, result,
-                 legislative_session=None,
-                 identifier='', bill=None, bill_chamber=None, organization=None, chamber=None):
+                 legislative_session=None, identifier='',
+                 bill=None, bill_chamber=None, bill_action=None,
+                 organization=None, chamber=None
+                 ):
         super(VoteEvent, self).__init__()
 
         self.legislative_session = legislative_session
@@ -20,6 +22,7 @@ class VoteEvent(BaseModel, SourceMixin):
         self.start_date = start_date
         self.result = result
         self.identifier = identifier
+        self.bill_action = bill_action
 
         self.set_bill(bill, chamber=bill_chamber)
 

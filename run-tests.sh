@@ -1,1 +1,2 @@
-export PYTHONPATH=.; py.test --cov pupa --cov-report html --ds=pupa.tests.django_settings
+#!/bin/sh
+export PYTHONPATH=.; pytest --cov pupa --cov-report html --ds=pupa.tests.django_settings

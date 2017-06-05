@@ -1,4 +1,7 @@
-from opencivicdata.models import VoteEvent, VoteCount, PersonVote, VoteSource
+from opencivicdata.legislative.models import (VoteEvent, VoteCount, PersonVote, VoteSource,
+                                              BillAction)
+from pupa.utils import fix_bill_id, get_pseudo_id, _make_pseudo_id
+
 from .base import BaseImporter
 from ..exceptions import InvalidVoteEventError
 
@@ -18,6 +21,7 @@ class VoteEventImporter(BaseImporter):
         self.bill_importer = bill_importer
         self.org_importer = org_importer
         self.seen_bill_ids = set()
+        self.seen_action_ids = set()
         self.vote_events_to_delete = set()
 
     def get_object(self, vote_event):
@@ -37,7 +41,13 @@ class VoteEventImporter(BaseImporter):
                 )
             spec['bill_id'] = vote_event['bill_id']
 
-        if vote_event['identifier']:
+        if vote_event.get('pupa_id'):
+            ve_id = self.lookup_obj_id(vote_event['pupa_id'])
+            if ve_id:
+                spec = {'id': ve_id}
+            else:
+                return None
+        elif vote_event['identifier']:
             # if there's an identifier, just use it and the bill_id and the session
             spec['identifier'] = vote_event['identifier']
         else:
@@ -57,7 +67,35 @@ class VoteEventImporter(BaseImporter):
     def prepare_for_db(self, data):
         data['legislative_session_id'] = self.get_session_id(data.pop('legislative_session'))
         data['organization_id'] = self.org_importer.resolve_json_id(data.pop('organization'))
-        data['bill_id'] = self.bill_importer.resolve_json_id(data.pop('bill'))
+
+        bill = data.pop('bill')
+        if bill and bill.startswith('~'):
+            bill = get_pseudo_id(bill)
+            bill['identifier'] = fix_bill_id(bill['identifier'])
+            bill = _make_pseudo_id(**bill)
+
+        data['bill_id'] = self.bill_importer.resolve_json_id(bill)
+        bill_action = data.pop('bill_action')
+        if bill_action:
+            try:
+                action = BillAction.objects.get(bill_id=data['bill_id'],
+                                                description=bill_action,
+                                                date=data['start_date'],
+                                                organization_id=data['organization_id'],
+                                                )
+                if action.id in self.seen_action_ids:
+                    self.warning('can not match two VoteEvents to %s: %s',
+                                 action.id, bill_action)
+                else:
+                    data['bill_action_id'] = action.id
+                    self.seen_action_ids.add(action.id)
+            except BillAction.DoesNotExist:
+                self.warning('could not match VoteEvent to %s %s %s',
+                             bill, bill_action, data['start_date'])
+            except BillAction.MultipleObjectsReturned as e:
+                self.warning('could not match VoteEvent to %s %s %s: %s',
+                             bill, bill_action, data['start_date'], e)
+
         for vote in data['votes']:
             vote['voter_id'] = self.person_importer.resolve_json_id(vote['voter_id'],
                                                                     allow_no_match=True)

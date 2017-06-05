@@ -15,6 +15,7 @@ schema = {
         'organization': {"type": ["string", "null"]},
         'legislative_session': {"type": "string"},
         'bill': {"type": ["string", "null"]},
+        'bill_action': {"type": ["string", "null"]},
         'votes': {
             "items": {
                 "type": "object",
@@ -38,5 +39,6 @@ schema = {
 
         'sources': sources,
         'extras': extras,
+        'pupa_id': {"type": ["string", "null"]},
     }
 }

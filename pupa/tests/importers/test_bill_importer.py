@@ -3,11 +3,13 @@ from pupa.scrape import Bill as ScrapeBill
 from pupa.scrape import Person as ScrapePerson
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import BillImporter, OrganizationImporter, PersonImporter
-from opencivicdata.models import Bill, Jurisdiction, Person, Organization, Membership
+from opencivicdata.core.models import Jurisdiction, Person, Organization, Membership, Division
+from opencivicdata.legislative.models import Bill
 
 
 def create_jurisdiction():
-    j = Jurisdiction.objects.create(id='jid', division_id='did')
+    Division.objects.create(id='ocd-division/country:us', name='USA')
+    j = Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
     j.legislative_sessions.create(identifier='1899', name='1899')
     j.legislative_sessions.create(identifier='1900', name='1900')
 
@@ -186,6 +188,15 @@ def test_bill_update_because_of_subitem():
     obj = Bill.objects.get()
     assert obj.actions.count() == 2
 
+    # same 2 actions, different order, update
+    bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
+    bill.add_action('this is a second action', chamber='lower', date='1900-01-02')
+    bill.add_action('this is an action', chamber='lower', date='1900-01-01')
+    result = BillImporter('jid', oi, pi).import_data([bill.as_dict()])
+    assert result['bill']['update'] == 1
+    obj = Bill.objects.get()
+    assert obj.actions.count() == 2
+
     # different 2 actions, update
     bill = ScrapeBill('HB 1', '1900', 'First Bill', chamber='lower')
     bill.add_action('this is an action', chamber='lower', date='1900-01-01')
@@ -347,3 +358,21 @@ def test_bill_sponsor_limit_lookup():
     (entry,) = obj.sponsorships.all()
     assert entry.person.name == "Zadock Snodgrass"
     assert entry.person.birth_date == "1800-01-01"
+
+
+@pytest.mark.django_db
+def test_bill_action_extras():
+    create_jurisdiction()
+    create_org()
+
+    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act',
+                      classification='tax bill', chamber='lower')
+    bill.add_action('sample', '1900-01-01', chamber='lower', extras={'test': 3})
+
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
+    BillImporter('jid', oi, pi).import_data([bill.as_dict()])
+
+    b = Bill.objects.get()
+    assert b.actions.all()[0].extras == {'test': 3}

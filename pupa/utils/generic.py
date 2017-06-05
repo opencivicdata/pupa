@@ -13,7 +13,8 @@ def utcnow():
 
 def _make_pseudo_id(**kwargs):
     """ pseudo ids are just JSON """
-    return '~' + json.dumps(kwargs)
+    # ensure keys are sorted so that these are deterministic
+    return '~' + json.dumps(kwargs, sort_keys=True)
 
 
 def get_pseudo_id(pid):

@@ -66,12 +66,19 @@ def test_from_organization():
 def test_add_action():
     """ Make sure actions work """
     b = toy_bill()
-    b.add_action("Some dude liked it.", "2013-04-29", chamber='lower')
+    b.add_action("Some dude liked it.", "2013-04-29T20:00Z", chamber='lower')
     assert len(b.actions) == 1
     assert b.actions[0]['description'] == 'Some dude liked it.'
     assert get_pseudo_id(b.actions[0]['organization_id']) == {'classification': 'lower'}
-    assert b.actions[0]['date'] == '2013-04-29'
+    assert b.actions[0]['date'] == '2013-04-29T20:00Z'
     b.validate()
+
+
+def test_action_extra():
+    b = toy_bill()
+    b.add_action("an action with some extra information", '2017-01-01',
+                 extras=dict(sitting_chair='Adams'))
+    assert b.actions[0]['extras'] == {'sitting_chair': 'Adams'}
 
 
 def test_add_related_bill():

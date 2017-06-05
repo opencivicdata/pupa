@@ -58,6 +58,7 @@ def test_person_add_membership_org():
     assert p._related[0].start_date == '2007'
     assert p._related[0].end_date == datetime.date(2015, 5, 8)
 
+
 def test_basic_organization():
     org = Organization('some org', classification='committee')
     org.add_source('http://example.com')
@@ -99,8 +100,7 @@ def test_legislator_related_district():
     assert l._related[0].person_id == l._id
     assert get_pseudo_id(l._related[0].organization_id) == {'classification': 'legislature'}
     assert get_pseudo_id(l._related[0].post_id) == {"organization__classification": "legislature",
-                                                    "label": "1", "role": "member"}
-    assert l._related[0].role == 'member'
+                                                    "label": "1"}
 
 
 def test_legislator_related_chamber_district():
@@ -111,8 +111,19 @@ def test_legislator_related_chamber_district():
     assert l._related[0].person_id == l._id
     assert get_pseudo_id(l._related[0].organization_id) == {'classification': 'upper'}
     assert get_pseudo_id(l._related[0].post_id) == {"organization__classification": "upper",
-                                                    "label": "1", "role": "member"}
-    assert l._related[0].role == 'member'
+                                                    "label": "1"}
+
+
+def test_legislator_related_chamber_district_role():
+    l = Person('John Adams', district='1', primary_org='lower', role='Speaker')
+    l.pre_save('jurisdiction-id')
+
+    assert len(l._related) == 1
+    assert l._related[0].person_id == l._id
+    assert get_pseudo_id(l._related[0].organization_id) == {'classification': 'lower'}
+    assert get_pseudo_id(l._related[0].post_id) == {"organization__classification": "lower",
+                                                    "label": "1", "role": "Speaker"}
+    assert l._related[0].role == 'Speaker'
 
 
 def test_legislator_related_party():
@@ -143,11 +154,33 @@ def test_committee_add_member_name():
     assert c._related[0].organization_id == c._id
     assert c._related[0].role == 'member'
 
+
 def test_person_add_membership_name():
     p = Person('Leonardo DiCaprio')
-    p.add_membership('Academy of Motion Picture Arts and Sciences', role='winner', start_date='2016')
+    p.add_membership('Academy of Motion Picture Arts and Sciences',
+                     role='winner', start_date='2016')
     p._related[0].validate()
-    assert get_pseudo_id(p._related[0].organization_id) == {'name': 'Academy of Motion Picture Arts and Sciences'}
+    assert get_pseudo_id(p._related[0].organization_id) == {
+        'name': 'Academy of Motion Picture Arts and Sciences'}
     assert p._related[0].person_id == p._id
     assert p._related[0].role == 'winner'
     assert p._related[0].start_date == '2016'
+
+
+def test_person_add_party():
+    p = Person('Groot')
+    p.add_party('Green')
+    p._related[0].validate()
+    assert get_pseudo_id(p._related[0].organization_id) == {
+        'name': 'Green', 'classification': 'party'}
+
+
+def test_person_add_term():
+    p = Person('Eternal')
+    p.add_term('eternal', 'council', start_date='0001', end_date='9999')
+    p._related[0].validate()
+    assert get_pseudo_id(p._related[0].organization_id) == {
+        'classification': 'council',
+    }
+    assert p._related[0].start_date == '0001'
+    assert p._related[0].end_date == '9999'

@@ -1,9 +1,10 @@
 from .base import BaseImporter
-from ..utils.event import read_event_iso_8601
-from opencivicdata.models import (Event, EventLocation, EventSource, EventDocument,
-                                  EventDocumentLink, EventLink, EventParticipant, EventMedia,
-                                  EventMediaLink, EventAgendaItem, EventRelatedEntity,
-                                  EventAgendaMedia, EventAgendaMediaLink)
+from pupa.utils import fix_bill_id, get_pseudo_id, _make_pseudo_id
+from opencivicdata.legislative.models import (Event, EventLocation, EventSource, EventDocument,
+                                              EventDocumentLink, EventLink, EventParticipant,
+                                              EventMedia, EventMediaLink, EventAgendaItem,
+                                              EventRelatedEntity, EventAgendaMedia,
+                                              EventAgendaMediaLink)
 
 
 class EventImporter(BaseImporter):
@@ -37,14 +38,20 @@ class EventImporter(BaseImporter):
         self.vote_event_importer = vote_event_importer
 
     def get_object(self, event):
-        spec = {
-            'name': event['name'],
-            'description': event['description'],
-            'start_time': event['start_time'],
-            'end_time': event['end_time'],
-            'timezone': event['timezone'],
-            'jurisdiction_id': self.jurisdiction_id
-        }
+        if event.get('pupa_id'):
+            e_id = self.lookup_obj_id(event['pupa_id'])
+            if e_id:
+                spec = {'id': e_id}
+            else:
+                return None
+        else:
+            spec = {
+                'name': event['name'],
+                'description': event['description'],
+                'start_date': event['start_date'],
+                'end_date': event['end_date'],
+                'jurisdiction_id': self.jurisdiction_id
+            }
         return self.model_class.objects.get(**spec)
 
     def get_location(self, location_data):
@@ -58,12 +65,8 @@ class EventImporter(BaseImporter):
         data['jurisdiction_id'] = self.jurisdiction_id
         data['location'] = self.get_location(data['location'])
 
-        def gdt(x):
-            if x is not None:
-                return read_event_iso_8601(x)
-
-        data['start_time'] = gdt(data['start_time'])
-        data['end_time'] = gdt(data.get('end_time', None))
+        data['start_date'] = data['start_date']
+        data['end_date'] = data.get('end_date', "")
 
         for participant in data['participants']:
             if 'person_id' in participant:
@@ -86,8 +89,11 @@ class EventImporter(BaseImporter):
                         entity['organization_id'],
                         allow_no_match=True)
                 elif 'bill_id' in entity:
+                    bill = get_pseudo_id(entity['bill_id'])
+                    bill['identifier'] = fix_bill_id(bill['identifier'])
+                    bill = _make_pseudo_id(**bill)
                     entity['bill_id'] = self.bill_importer.resolve_json_id(
-                        entity['bill_id'],
+                        bill,
                         allow_no_match=True)
                 elif 'vote_event_id' in entity:
                     entity['vote_event_id'] = self.vote_event_importer.resolve_json_id(

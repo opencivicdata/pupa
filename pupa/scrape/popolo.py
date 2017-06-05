@@ -43,7 +43,9 @@ class Membership(BaseModel, ContactDetailMixin, LinkMixin):
     _schema = membership_schema
 
     def __init__(self, *, person_id, organization_id, post_id=None, role='', label='',
-                 start_date='', end_date='', on_behalf_of_id=None):
+                 start_date='', end_date='', on_behalf_of_id=None,
+                 person_name=''
+                 ):
         """
         Constructor for the Membership object.
 
@@ -53,6 +55,7 @@ class Membership(BaseModel, ContactDetailMixin, LinkMixin):
         """
         super(Membership, self).__init__()
         self.person_id = person_id
+        self.person_name = person_name
         self.organization_id = organization_id
         self.post_id = post_id
         self.start_date = start_date
@@ -77,7 +80,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
     def __init__(self, name, *, birth_date='', death_date='', biography='', summary='', image='',
                  gender='', national_identity='',
                  # specialty fields
-                 district=None, party=None, primary_org='', role='member',
+                 district=None, party=None, primary_org='', role='',
                  start_date='', end_date='', primary_org_name=None):
         super(Person, self).__init__()
         self.name = name
@@ -102,10 +105,12 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
         """
         if isinstance(name_or_org, Organization):
             membership = Membership(person_id=self._id,
+                                    person_name=self.name,
                                     organization_id=name_or_org._id,
                                     role=role, **kwargs)
         else:
             membership = Membership(person_id=self._id,
+                                    person_name=self.name,
                                     organization_id=_make_pseudo_id(name=name_or_org),
                                     role=role, **kwargs)
         self._related.append(membership)
@@ -114,24 +119,35 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
     def add_party(self, party, **kwargs):
         membership = Membership(
             person_id=self._id,
+            person_name=self.name,
             organization_id=_make_pseudo_id(classification="party", name=party),
             role='member', **kwargs)
         self._related.append(membership)
 
     def add_term(self, role, org_classification, *, district=None,
-                 start_date='', end_date='', label='', org_name=None):
+                 start_date='', end_date='', label='', org_name=None,
+                 appointment=False):
         if org_name:
             org_id = _make_pseudo_id(classification=org_classification,
                                      name=org_name)
         else:
             org_id = _make_pseudo_id(classification=org_classification)
+
         if district:
-            post_id = _make_pseudo_id(label=district,
-                                      role=role,
+            if role:
+                post_id = _make_pseudo_id(label=district,
+                                          role=role,
+                                          organization__classification=org_classification)
+            else:
+                post_id = _make_pseudo_id(label=district,
+                                          organization__classification=org_classification)
+        elif appointment:
+            post_id = _make_pseudo_id(role=role,
                                       organization__classification=org_classification)
         else:
             post_id = None
-        membership = Membership(person_id=self._id, organization_id=org_id, post_id=post_id,
+        membership = Membership(person_id=self._id, person_name=self.name,
+                                organization_id=org_id, post_id=post_id,
                                 role=role, start_date=start_date, end_date=end_date, label=label)
         self._related.append(membership)
         return membership
@@ -180,10 +196,13 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
 
     def add_member(self, name_or_person, role='member', **kwargs):
         if isinstance(name_or_person, Person):
-            membership = Membership(person_id=name_or_person._id, organization_id=self._id,
+            membership = Membership(person_id=name_or_person._id,
+                                    person_name=name_or_person.name,
+                                    organization_id=self._id,
                                     role=role, **kwargs)
         else:
             membership = Membership(person_id=_make_pseudo_id(name=name_or_person),
+                                    person_name=name_or_person,
                                     organization_id=self._id, role=role, **kwargs)
         self._related.append(membership)
         return membership

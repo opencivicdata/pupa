@@ -1,7 +1,7 @@
 from collections import defaultdict
 from django.db.models import Q
-from opencivicdata.models import (Person, PersonIdentifier, PersonName, PersonContactDetail,
-                                  PersonLink, PersonSource)
+from opencivicdata.core.models import (Person, PersonIdentifier, PersonName, PersonContactDetail,
+                                       PersonLink, PersonSource)
 from .base import BaseImporter
 from ..exceptions import SameNameError
 
@@ -14,7 +14,7 @@ class PersonImporter(BaseImporter):
                       'contact_details': (PersonContactDetail, 'person_id', {}),
                       'links': (PersonLink, 'person_id', {}),
                       'sources': (PersonSource, 'person_id', {}),
-                     }
+                      }
 
     def _prepare_imports(self, dicts):
         dicts = list(super(PersonImporter, self)._prepare_imports(dicts))

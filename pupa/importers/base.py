@@ -6,10 +6,11 @@ import logging
 
 from django.db.models import Q
 
-from opencivicdata.models import LegislativeSession
+from opencivicdata.legislative.models import LegislativeSession
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id, utcnow
 from pupa.exceptions import UnresolvedIdError, DataImportError
+from pupa.models import Identifier
 
 
 def omnihash(obj):
@@ -35,11 +36,13 @@ def items_differ(jsonitems, dbitems, subfield_dict):
         # if lengths differ, they're definitely different
         return True
 
+    original_jsonitems = jsonitems
     jsonitems = copy.deepcopy(jsonitems)
     keys = jsonitems[0].keys()
 
     # go over dbitems looking for matches
     for dbitem in dbitems:
+        order = getattr(dbitem, 'order', None)
         match = None
         for i, jsonitem in enumerate(jsonitems):
             # check if all keys (excluding subfields) match
@@ -54,6 +57,9 @@ def items_differ(jsonitems, dbitems, subfield_dict):
                     if items_differ(jsonsubitems, dbsubitems, subfield_dict[k][2]):
                         break
                 else:
+                    # if the dbitem sets 'order', then the order matters
+                    if order is not None and int(order) != original_jsonitems.index(jsonitem):
+                        break
                     # these items are equal, so let's mark it for removal
                     match = i
                     break
@@ -144,18 +150,21 @@ class BaseImporter(object):
                 ids = {each.id for each in objects}
                 if len(ids) == 1:
                     self.pseudo_id_cache[json_id] = ids.pop()
+                    errmsg = None
                 elif not ids:
-                    msg = 'cannot resolve pseudo id to {}: {}'.format(
+                    errmsg = 'cannot resolve pseudo id to {}: {}'.format(
                         self.model_class.__name__, json_id)
-                    if not allow_no_match:
-                        raise UnresolvedIdError(msg)
-                    else:
-                        self.error(msg)
-                        self.pseudo_id_cache[json_id] = None
                 else:
-                    raise UnresolvedIdError(
-                        'multiple objects returned for {} pseudo id {}: {}'.format(
-                            self.model_class.__name__, json_id, ids))
+                    errmsg = 'multiple objects returned for {} pseudo id {}: {}'.format(
+                        self.model_class.__name__, json_id, ids)
+
+                # either raise or log error
+                if errmsg:
+                    if not allow_no_match:
+                        raise UnresolvedIdError(errmsg)
+                    else:
+                        self.error(errmsg)
+                        self.pseudo_id_cache[json_id] = None
 
             # return the cached object
             return self.pseudo_id_cache[json_id]
@@ -241,6 +250,9 @@ class BaseImporter(object):
         except self.model_class.DoesNotExist:
             obj = None
 
+        # remove pupa_id which does not belong in the OCD data models
+        pupa_id = data.pop('pupa_id', None)
+
         # pull related fields off
         related = {}
         for field in self.related_models:
@@ -272,6 +284,10 @@ class BaseImporter(object):
                 raise DataImportError('{} while importing {} as {}'.format(e, data,
                                                                            self.model_class))
             self._create_related(obj, related, self.related_models)
+
+        if pupa_id:
+            Identifier.objects.get_or_create(identifier=pupa_id,
+                                             defaults={'content_object': obj})
 
         return obj.id, what
 
@@ -380,3 +396,11 @@ class BaseImporter(object):
             # after import the subobjects, import their subsubobjects
             for subobj, subrel in zip(subobjects, all_subrelated):
                 self._create_related(subobj, subrel, subsubdict)
+
+    def lookup_obj_id(self, pupa_id):
+        try:
+            obj_id = Identifier.objects.get(identifier=pupa_id).object_id
+        except Identifier.DoesNotExist:
+            obj_id = None
+
+        return obj_id

@@ -4,12 +4,17 @@ import shutil
 import tempfile
 import mock
 import pytest
-from opencivicdata.models import Person, Organization
+from opencivicdata.core.models import Person, Organization, Jurisdiction, Division
 from pupa.scrape import Person as ScrapePerson
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers.base import omnihash, BaseImporter
 from pupa.importers import PersonImporter, OrganizationImporter
 from pupa.exceptions import UnresolvedIdError, DataImportError
+
+
+def create_jurisdiction():
+    Division.objects.create(id='ocd-division/country:us', name='USA')
+    Jurisdiction.objects.create(id='jid', division_id='ocd-division/country:us')
 
 
 class FakeImporter(BaseImporter):
@@ -70,6 +75,7 @@ def test_deduplication_identical_object():
 
 @pytest.mark.django_db
 def test_exception_on_identical_objects_in_import_stream():
+    create_jurisdiction()
     # these two objects aren't identical, but refer to the same thing
     # at the moment we consider this an error (but there may be a better way to handle this?)
     o1 = ScrapeOrganization('X-Men', classification='unknown').as_dict()
@@ -124,6 +130,7 @@ def test_invalid_fields_related_item():
 
 @pytest.mark.django_db
 def test_locked_field():
+    create_jurisdiction()
     org = ScrapeOrganization('SHIELD').as_dict()
     oi = OrganizationImporter('jid')
     oi.import_data([org])
@@ -155,6 +162,7 @@ def test_locked_field():
 
 @pytest.mark.django_db
 def test_locked_field_subitem():
+    create_jurisdiction()
     org = ScrapeOrganization('SHIELD')
     org.add_name('S.H.I.E.L.D.')
     oi = OrganizationImporter('jid')

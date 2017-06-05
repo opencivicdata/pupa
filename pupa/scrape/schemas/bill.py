@@ -2,7 +2,7 @@
     Schema for bill objects.
 """
 
-from .common import sources, extras, fuzzy_date_blank, fuzzy_date
+from .common import sources, extras, fuzzy_date_blank, fuzzy_datetime
 from opencivicdata import common
 
 versions_or_documents = {
@@ -71,7 +71,7 @@ schema = {
             "items": {
                 "properties": {
                     "organization": { "type": ["string", "null"] },
-                    "date": fuzzy_date,
+                    "date": fuzzy_datetime,
                     "description": { "type": "string" },
                     "classification": {"items": {"type": "string",
                                                   "enum": common.BILL_ACTION_CLASSIFICATIONS },

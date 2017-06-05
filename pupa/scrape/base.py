@@ -7,7 +7,8 @@ from collections import defaultdict, OrderedDict
 import scrapelib
 from validictory import ValidationError
 
-from pupa import utils, settings
+from pupa import utils
+from pupa import settings
 
 
 class ScrapeError(Exception):
@@ -107,11 +108,14 @@ class Scraper(scrapelib.Scraper):
         record['end'] = utils.utcnow()
         record['skipped'] = getattr(self, 'skipped', 0)
         if not self.output_names:
-            raise ScrapeError('no objects returned from scrape')
+            raise ScrapeError('no objects returned from {} scrape'.format(self.__class__.__name__))
         for _type, nameset in self.output_names.items():
             record['objects'][_type] += len(nameset)
 
         return record
+
+    def latest_session(self):
+        return self.jurisdiction.legislative_sessions[-1]['identifier']
 
     def scrape(self, **kwargs):
         raise NotImplementedError(self.__class__.__name__ + ' must provide a scrape() method')

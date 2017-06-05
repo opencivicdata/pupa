@@ -6,9 +6,8 @@ from pupa.scrape import Event
 def event_obj():
     e = Event(
         name="get-together",
-        start_time=datetime.datetime.utcnow(),
+        start_date=datetime.datetime.utcnow().isoformat().split('.')[0] + 'Z',
         location_name="Joe's Place",
-        timezone="America/New_York",
     )
     e.add_source(url='foobar')
     return e
@@ -26,7 +25,7 @@ def test_event_str():
 
 def test_bad_event():
     e = event_obj()
-    e.start_time = 6
+    e.start_date = 6
 
     with pytest.raises(ValueError):
         e.validate()
@@ -81,6 +80,14 @@ def test_agenda_add_classification():
     assert e.agenda[0]['classification'] == ['test', 'test2']
 
     e.validate()
+
+
+def test_agenda_add_extra():
+    e = event_obj()
+    a = e.add_agenda_item('foo bar')
+    a['extras'] = dict(foo=1, bar=['baz'])
+
+    assert e.agenda[0]['extras'] == {'foo': 1, 'bar': ['baz']}
 
 
 def test_add_committee():

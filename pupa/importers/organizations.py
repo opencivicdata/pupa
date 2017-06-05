@@ -1,5 +1,6 @@
-from opencivicdata.models import (Organization, OrganizationIdentifier, OrganizationName,
-                                  OrganizationContactDetail, OrganizationLink, OrganizationSource)
+from opencivicdata.core.models import (Organization, OrganizationIdentifier, OrganizationName,
+                                       OrganizationContactDetail, OrganizationLink,
+                                       OrganizationSource)
 from .base import BaseImporter
 from ..utils import get_pseudo_id
 from ..utils.topsort import Network
@@ -14,7 +15,7 @@ class OrganizationImporter(BaseImporter):
                       'contact_details': (OrganizationContactDetail, 'organization_id', {}),
                       'links': (OrganizationLink, 'organization_id', {}),
                       'sources': (OrganizationSource, 'organization_id', {}),
-                     }
+                      }
 
     def get_object(self, org):
         spec = {'classification': org['classification'],
