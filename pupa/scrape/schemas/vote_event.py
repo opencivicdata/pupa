@@ -5,8 +5,8 @@ from opencivicdata import common
 schema = {
     "type": "object",
     "properties": {
-        'identifier': {"type": "string", "blank": True,},
-        'motion_text': {"type": "string" },
+        'identifier': {"type": "string", "blank": True},
+        'motion_text': {"type": "string"},
         'motion_classification': {"items": {"type": "string"},
                                   "type": "array"},
         'start_date': fuzzy_datetime_blank,
@@ -20,7 +20,7 @@ schema = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "option": {"type": "string", "enum": common.VOTE_OPTIONS },
+                    "option": {"type": "string", "enum": common.VOTE_OPTIONS},
                     "voter_name": {"type": "string"},
                     "voter_id": {"type": "string"},
                     "note": {"type": "string", "blank": True},
@@ -30,7 +30,7 @@ schema = {
         'counts': {
             "items": {
                 "properties": {
-                    "option": {"type": "string", "enum": common.VOTE_OPTIONS },
+                    "option": {"type": "string", "enum": common.VOTE_OPTIONS},
                     "value": {"type": "integer", "minimum": 0},
                 },
                 "type": "object"

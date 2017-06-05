@@ -13,7 +13,7 @@ versions_or_documents = {
             "links": {
                 "items": {
                     "properties": {
-                        "media_type": {"type": "string", "blank": True },
+                        "media_type": {"type": "string", "blank": True},
                         "url": {"type": "string", "format": "uri"}
                     },
                     "type": "object"
@@ -32,10 +32,10 @@ schema = {
         "legislative_session": {"type": "string"},
         "identifier": {"type": "string"},
         "title": {"type": "string"},
-        "from_organization": { "type": ["string", "null"] },
+        "from_organization": {"type": ["string", "null"]},
         "classification": {"items": {"type": "string", "enum": common.BILL_CLASSIFICATIONS},
                            "type": "array"},
-        "subject": { "items": {"type": "string"}, "type": "array"},
+        "subject": {"items": {"type": "string"}, "type": "array"},
         "abstracts": {
             "items": {
                 "properties": {
@@ -70,13 +70,13 @@ schema = {
         "actions": {
             "items": {
                 "properties": {
-                    "organization": { "type": ["string", "null"] },
+                    "organization": {"type": ["string", "null"]},
                     "date": fuzzy_datetime,
-                    "description": { "type": "string" },
+                    "description": {"type": "string"},
                     "classification": {"items": {"type": "string",
-                                                  "enum": common.BILL_ACTION_CLASSIFICATIONS },
+                                                 "enum": common.BILL_ACTION_CLASSIFICATIONS},
                                        "type": "array",
-                                      },
+                                       },
                     "related_entities": {
                         "items": {
                             "properties": {
@@ -101,15 +101,15 @@ schema = {
         "sponsorships": {
             "items": {
                 "properties": {
-                    "primary": { "type": "boolean" },
-                    "classification": { "type": "string", },
-                    "name": {"type": "string" },
+                    "primary": {"type": "boolean"},
+                    "classification": {"type": "string"},
+                    "name": {"type": "string"},
                     "entity_type": {
                         "enum": ["organization", "person", ""],
                         "type": "string", "blank": True,
                     },
-                    "person_id": {"type": ["string", "null"] },
-                    "organization_id": {"type": ["string", "null"] },
+                    "person_id": {"type": ["string", "null"]},
+                    "organization_id": {"type": ["string", "null"]},
                 },
                 "type": "object"
             },

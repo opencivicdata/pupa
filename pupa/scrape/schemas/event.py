@@ -7,15 +7,15 @@ from .common import sources, extras, fuzzy_date_blank, fuzzy_datetime, fuzzy_dat
 media_schema = {
     "items": {
         "properties": {
-            "name": { "type": "string" },
-            "type": { "type": "string" },
+            "name": {"type": "string"},
+            "type": {"type": "string"},
             "date": fuzzy_date_blank,
-            "offset": { "type": ["number", "null"] },
+            "offset": {"type": ["number", "null"]},
             "links": {
                 "items": {
                     "properties": {
-                        "media_type": { "type": "string", "blank": True },
-                        "url": { "type": "string" },
+                        "media_type": {"type": "string", "blank": True},
+                        "url": {"type": "string"},
                     },
                     "type": "object"
                 },
@@ -29,22 +29,22 @@ media_schema = {
 
 schema = {
     "properties": {
-        "name": { "type": "string" },
-        "all_day": { "type": "boolean" },
+        "name": {"type": "string"},
+        "all_day": {"type": "boolean"},
         'start_date': fuzzy_datetime,
         'end_date': fuzzy_datetime_blank,
         "status": {
             "type": "string", "blank": True,
             "enum": ["cancelled", "tentative", "confirmed", "passed"],
         },
-        "classification": { "type": "string" }, # TODO: enum
-        "description": { "type": "string", "blank": True, },
+        "classification": {"type": "string"},    # TODO: enum
+        "description": {"type": "string", "blank": True},
 
         "location": {
             "type": "object",
             "properties": {
 
-                "name": { "type": "string", },
+                "name": {"type": "string", },
 
                 "note": {
                     "type": "string", "blank": True,
@@ -75,9 +75,9 @@ schema = {
         "documents": {
             "items": {
                 "properties": {
-                    "note": { "type": "string", },
-                    "url": { "type": "string", },
-                    "media_type": { "type": "string", },
+                    "note": {"type": "string", },
+                    "url": {"type": "string", },
+                    "media_type": {"type": "string", },
                 },
                 "type": "object"
             },
@@ -129,7 +129,7 @@ schema = {
         "agenda": {
             "items": {
                 "properties": {
-                    "description": { "type": "string", },
+                    "description": {"type": "string"},
 
                     "classification": {
                         "items": {"type": "string"},

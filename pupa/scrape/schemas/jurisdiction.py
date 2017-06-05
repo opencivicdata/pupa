@@ -1,6 +1,4 @@
 from .common import extras, fuzzy_date_blank
-from opencivicdata import common
-
 
 schema = {
     "type": "object",
@@ -17,7 +15,7 @@ schema = {
                 "end_date": fuzzy_date_blank,
             }},
         },
-        "feature_flags": { "type": "array", "items": {"type": "string"} },
+        "feature_flags": {"type": "array", "items": {"type": "string"}},
         "extras": extras,
     }
 }

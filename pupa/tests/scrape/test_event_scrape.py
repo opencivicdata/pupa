@@ -70,6 +70,7 @@ def test_agenda_add_subject():
 
     e.validate()
 
+
 def test_agenda_add_classification():
     e = event_obj()
     agenda = e.add_agenda_item("foo bar")
