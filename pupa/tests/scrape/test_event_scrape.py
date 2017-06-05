@@ -71,6 +71,14 @@ def test_agenda_add_subject():
     e.validate()
 
 
+def test_agenda_add_extra():
+    e = event_obj()
+    a = e.add_agenda_item('foo bar')
+    a['extras'] = dict(foo=1, bar=['baz'])
+
+    assert e.agenda[0]['extras'] == {'foo': 1, 'bar': ['baz']}
+
+
 def test_add_committee():
     e = event_obj()
     agenda = e.add_agenda_item("foo bar")
