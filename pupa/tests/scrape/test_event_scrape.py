@@ -6,9 +6,8 @@ from pupa.scrape import Event
 def event_obj():
     e = Event(
         name="get-together",
-        start_time=datetime.datetime.utcnow(),
+        start_date=datetime.datetime.utcnow().isoformat().split('.')[0] + 'Z',
         location_name="Joe's Place",
-        timezone="America/New_York",
     )
     e.add_source(url='foobar')
     return e
@@ -26,7 +25,7 @@ def test_event_str():
 
 def test_bad_event():
     e = event_obj()
-    e.start_time = 6
+    e.start_date = 6
 
     with pytest.raises(ValueError):
         e.validate()

@@ -15,9 +15,8 @@ def create_jurisdiction():
 def ge():
     event = ScrapeEvent(
         name="America's Birthday",
-        start_time="2014-07-04T05:00Z",
+        start_date="2014-07-04T05:00Z",
         location_name="America",
-        timezone="America/New_York",
         all_day=True)
     return event
 
@@ -228,16 +227,16 @@ def test_pupa_identifier_event():
     assert result['event']['insert'] == 1
 
 
-@pytest.mark.django_db
-def test_bad_event_time():
-    create_jurisdiction()
-    event = ge()
-    event.start_time = "2014-07-04T05:00"
-    pytest.raises(
-        ValueError,
-        EventImporter('jid', oi, pi, bi, vei).import_item,
-        event.as_dict()
-    )
+# @pytest.mark.django_db
+# def test_bad_event_date():
+#     create_jurisdiction()
+#     event = ge()
+#     event.start_date = '2017'
+#     pytest.raises(
+#         ValueError,
+#         EventImporter('jid', oi, pi, bi, vei).import_item,
+#         event.as_dict()
+#     )
 
 
 @pytest.mark.django_db

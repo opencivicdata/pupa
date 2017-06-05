@@ -66,13 +66,12 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     _type = 'event'
     _schema = schema
 
-    def __init__(self, name, start_date, timezone, location_name, *,
+    def __init__(self, name, start_date, location_name, *,
                  all_day=False, description="", end_date="",
                  status="confirmed", classification="event"
                  ):
         super(Event, self).__init__()
         self.start_date = start_date
-        self.timezone = timezone
         self.all_day = all_day
         self.end_date = end_date
         self.name = name

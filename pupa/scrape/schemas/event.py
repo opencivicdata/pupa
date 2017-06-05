@@ -30,7 +30,6 @@ media_schema = {
 schema = {
     "properties": {
         "name": { "type": "string" },
-        "timezone": { "type": "string" },
         "all_day": { "type": "boolean" },
         'start_date': fuzzy_datetime,
         'end_date': fuzzy_datetime_blank,
