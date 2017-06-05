@@ -254,3 +254,19 @@ def test_top_level_media_event():
 
     result = EventImporter('jid', oi, pi, bi, vei).import_data([event2.as_dict()])
     assert result['event']['noop'] == 1
+
+
+@pytest.mark.django_db
+def test_event_agenda_item():
+    create_jurisdiction()
+    event1 = ge()
+
+    agenda = event1.add_agenda_item("first item")
+    agenda['extras'] = {'one': 1, 'two': [2]}
+
+    result = EventImporter('jid', oi, pi, bi, vei).import_data([event1.as_dict()])
+    assert result['event']['insert'] == 1
+
+    e = Event.objects.get()
+    a = e.agenda.all()[0]
+    assert a.extras == {'one': 1, 'two': [2]}

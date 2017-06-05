@@ -358,3 +358,21 @@ def test_bill_sponsor_limit_lookup():
     (entry,) = obj.sponsorships.all()
     assert entry.person.name == "Zadock Snodgrass"
     assert entry.person.birth_date == "1800-01-01"
+
+
+@pytest.mark.django_db
+def test_bill_action_extras():
+    create_jurisdiction()
+    create_org()
+
+    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act',
+                      classification='tax bill', chamber='lower')
+    bill.add_action('sample', '1900-01-01', chamber='lower', extras={'test': 3})
+
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
+    BillImporter('jid', oi, pi).import_data([bill.as_dict()])
+
+    b = Bill.objects.get()
+    assert b.actions.all()[0].extras == {'test': 3}
