@@ -108,7 +108,7 @@ class Scraper(scrapelib.Scraper):
         record['end'] = utils.utcnow()
         record['skipped'] = getattr(self, 'skipped', 0)
         if not self.output_names:
-            raise ScrapeError('no objects returned from scrape')
+            raise ScrapeError('no objects returned from {} scrape'.format(self.__class__.__name__))
         for _type, nameset in self.output_names.items():
             record['objects'][_type] += len(nameset)
 

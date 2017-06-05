@@ -80,7 +80,7 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
     def __init__(self, name, *, birth_date='', death_date='', biography='', summary='', image='',
                  gender='', national_identity='',
                  # specialty fields
-                 district=None, party=None, primary_org='', role='member',
+                 district=None, party=None, primary_org='', role='',
                  start_date='', end_date='', primary_org_name=None):
         super(Person, self).__init__()
         self.name = name
@@ -134,9 +134,13 @@ class Person(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, IdentifierMi
             org_id = _make_pseudo_id(classification=org_classification)
 
         if district:
-            post_id = _make_pseudo_id(label=district,
-                                      role=role,
-                                      organization__classification=org_classification)
+            if role:
+                post_id = _make_pseudo_id(label=district,
+                                          role=role,
+                                          organization__classification=org_classification)
+            else:
+                post_id = _make_pseudo_id(label=district,
+                                          organization__classification=org_classification)
         elif appointment:
             post_id = _make_pseudo_id(role=role,
                                       organization__classification=org_classification)

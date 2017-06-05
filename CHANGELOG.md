@@ -1,6 +1,10 @@
 # pupa changelog
 
-## 0.7.0 - May 25 2017
+## 0.8.0 - WIP
+
+
+
+## 0.7.0 - June 5 2017
 
 Backwards-incompatible changes:
 
@@ -17,12 +21,15 @@ Improvements:
 * add Scraper.latest\_session convienience method
 * optionally allow setting \_scraped\_name on legislative\_session, which will
   be used in session\_list checking if present
+* add concept of Pupa identifiers, to aid in resolution
 
 Fixes:
 
 * pupa dbinit --reset now correctly drops dependent pupa tables and migrations
 * exit gracefully if the first scrape fails instead of complaining about RunPlan
   DB constraint
+* complex psuedo-ids are now deterministic (by sorting dict keys)
+
 
 ## 0.6.0 - February 19 2017
 

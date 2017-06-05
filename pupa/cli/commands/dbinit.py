@@ -27,7 +27,8 @@ def drop_tables(skip_divisions=False):
         if table.startswith(('opencivicdata_', 'pupa_')):
             print('dropping table ' + table)
             cursor.execute("DROP TABLE IF EXISTS {} CASCADE;".format(table))
-        cursor.execute("DELETE FROM django_migrations WHERE app='opencivicdata';")
+        cursor.execute("DELETE FROM django_migrations WHERE app='core';")
+        cursor.execute("DELETE FROM django_migrations WHERE app='legislative';")
         cursor.execute("DELETE FROM django_migrations WHERE app='pupa';")
 
 
