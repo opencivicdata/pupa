@@ -45,10 +45,11 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         self.versions = []
 
     def add_action(self, description, date, *, organization=None, chamber=None,
-                   classification=None, related_entities=None):
+                   classification=None, related_entities=None, **kwargs):
         action = Action(description=description, date=date,
                         organization_id=pseudo_organization(organization, chamber, 'legislature'),
-                        classification=cleanup_list(classification, []), related_entities=[])
+                        classification=cleanup_list(classification, []), related_entities=[],
+                        extras=kwargs)
         self.actions.append(action)
         return action
 

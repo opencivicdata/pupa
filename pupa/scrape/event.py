@@ -6,7 +6,7 @@ from .schemas.event import schema
 class EventAgendaItem(dict, AssociatedLinkMixin):
     event = None
 
-    def __init__(self, description, event):
+    def __init__(self, description, event, **kwargs):
         super(EventAgendaItem, self).__init__({
             "description": description,
             "related_entities": [],
@@ -14,6 +14,7 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
             "media": [],
             "notes": [],
             "order": str(len(event.agenda)),
+            "extras": kwargs,
         })
         self.event = event
 
@@ -110,8 +111,8 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     def add_committee(self, name, *, id=None, note='participant'):
         return self.add_participant(name=name, type='organization', id=id, note=note)
 
-    def add_agenda_item(self, description):
-        obj = EventAgendaItem(description, self)
+    def add_agenda_item(self, description, **kwargs):
+        obj = EventAgendaItem(description, self, **kwargs)
         self.agenda.append(obj)
         return obj
 
