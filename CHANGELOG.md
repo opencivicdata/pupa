@@ -7,8 +7,13 @@ Backwards-incompatible changes:
 * role no longer defaults to 'member' and is now optional in Person constructor
   when used w/ primary_org. if primary_org alone is unambiguous scrapers
   can set primary org alone and role will be set automatically
-* In accordance w/ OCDEP101, Event.start_time/end_time are now
+* in accordance w/ OCDEP101, Event.start_time/end_time are now
   Event.start_date/end_date
+
+Improvements:
+
+* allow extras to be set on bill actions & event agenda items
+* bill actions can now specify times
 
 ## 0.7.0 - June 5 2017
 
