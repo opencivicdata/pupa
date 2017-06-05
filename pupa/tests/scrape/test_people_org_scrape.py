@@ -101,7 +101,6 @@ def test_legislator_related_district():
     assert get_pseudo_id(l._related[0].organization_id) == {'classification': 'legislature'}
     assert get_pseudo_id(l._related[0].post_id) == {"organization__classification": "legislature",
                                                     "label": "1"}
-    #assert l._related[0].role == 'member'
 
 
 def test_legislator_related_chamber_district():
@@ -113,7 +112,6 @@ def test_legislator_related_chamber_district():
     assert get_pseudo_id(l._related[0].organization_id) == {'classification': 'upper'}
     assert get_pseudo_id(l._related[0].post_id) == {"organization__classification": "upper",
                                                     "label": "1"}
-    #assert l._related[0].role == 'member'
 
 
 def test_legislator_related_chamber_district_role():
@@ -126,6 +124,7 @@ def test_legislator_related_chamber_district_role():
     assert get_pseudo_id(l._related[0].post_id) == {"organization__classification": "lower",
                                                     "label": "1", "role": "Speaker"}
     assert l._related[0].role == 'Speaker'
+
 
 def test_legislator_related_party():
     l = Person('John Adams', party='Democratic-Republican')
