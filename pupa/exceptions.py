@@ -46,3 +46,7 @@ class DuplicateItemError(DataImportError):
 
 class UnresolvedIdError(DataImportError):
     """ Attempt was made to resolve an id that has no result. """
+
+
+class CommandError(PupaError):
+    """ Errors from within pupa CLI """
