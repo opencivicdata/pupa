@@ -280,7 +280,7 @@ class BaseImporter(object):
             what = 'insert'
             try:
                 obj = self.model_class.objects.create(**data)
-            except TypeError as e:
+            except Exception as e:
                 raise DataImportError('{} while importing {} as {}'.format(e, data,
                                                                            self.model_class))
             self._create_related(obj, related, self.related_models)
