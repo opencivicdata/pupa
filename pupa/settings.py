@@ -18,6 +18,10 @@ SCRAPELIB_TIMEOUT = 60
 SCRAPELIB_RETRY_ATTEMPTS = 3
 SCRAPELIB_RETRY_WAIT_SECONDS = 10
 
+KAFKA_SCRAPE = False
+KAFKA_TOPIC = 'scrape'
+KAFKA_SERVERS = 'localhost:9092'
+
 CACHE_DIR = os.path.join(os.getcwd(), '_cache')
 SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 

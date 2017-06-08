@@ -95,6 +95,49 @@ class Scraper(scrapelib.Scraper):
         for obj in obj._related:
             self.save_object(obj)
 
+    def save_object_kafka(self, obj):
+        kafka_servers = [] 
+        for server in settings.KAFKA_SERVERS.split():
+            kafka_servers.append(server)
+
+        self.info('save %s %s to topic %s', obj._type, obj, settings.KAFKA_TOPIC)
+        self.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
+                              cls=utils.JSONEncoderPlus, indent=4, separators=(',', ': ')))
+
+        self.output_names[obj._type].add(obj)
+
+        # Copy the original object so we can tack on jurisdiction and type
+        kafka_obj = obj.as_dict()
+        if self.jurisdiction:
+            kafka_obj['jurisdiction'] = self.jurisdiction.as_dict()
+
+        kafka_obj['type'] = obj._type
+        kafka_obj = OrderedDict(sorted(obj.as_dict().items()))
+        jd = json.dumps(kafka_obj,cls=utils.JSONEncoderPlus).encode()
+        self.send_kafka(kafka_servers, settings.KAFKA_TOPIC, jd)       
+
+        # validate after writing, allows for inspection on failure
+        try:
+            # Note we're validating the original object, not the kafka object,
+            # Because we add some relevant-to-kafka but out of schema metadata to the kafka object
+            obj.validate()
+        except ValueError as ve:
+            self.warning(ve)
+            if self.strict_validation:
+                raise ve
+
+        # after saving and validating, save subordinate objects
+        for obj in obj._related:
+            self.save_object_kafka(obj)
+
+
+    def send_kafka(self, servers, topic, message):
+        from kafka import KafkaProducer
+        from kafka.errors import KafkaError
+
+        producer = KafkaProducer(bootstrap_servers=servers)
+        producer.send(topic, message)
+    
     def do_scrape(self, **kwargs):
         record = {'objects': defaultdict(int)}
         self.output_names = defaultdict(set)
@@ -102,9 +145,16 @@ class Scraper(scrapelib.Scraper):
         for obj in self.scrape(**kwargs) or []:
             if hasattr(obj, '__iter__'):
                 for iterobj in obj:
-                    self.save_object(iterobj)
+                    if settings.KAFKA_SCRAPE:
+                        self.save_object_kafka(iterobj)
+                    else:
+                        self.save_object(iterobj)
             else:
-                self.save_object(obj)
+                if settings.KAFKA_SCRAPE:
+                    self.save_object_kafka(obj)
+                else:
+                    self.save_object(obj)
+
         record['end'] = utils.utcnow()
         record['skipped'] = getattr(self, 'skipped', 0)
         if not self.output_names:
@@ -113,7 +163,7 @@ class Scraper(scrapelib.Scraper):
             record['objects'][_type] += len(nameset)
 
         return record
-
+    
     def latest_session(self):
         return self.jurisdiction.legislative_sessions[-1]['identifier']
 

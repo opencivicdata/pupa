@@ -25,6 +25,7 @@ pupa = pupa.cli.__main__:main''',
           'validictory>=1.0.1',
           'psycopg2',
           'pytz',
+          'kafka-python>=1.3.3'
       ],
       extras_require={
           'dev': [

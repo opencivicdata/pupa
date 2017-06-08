@@ -133,6 +133,11 @@ class Command(BaseCommand):
         self.add_argument('--retries', help='scraper retries', type=int, dest='SCRAPELIB_RETRIES')
         self.add_argument('--retry_wait', help='scraper retry wait', type=int,
                           dest='SCRAPELIB_RETRY_WAIT_SECONDS')
+        self.add_argument('--kafka', help='output to kafka', dest='KAFKA_SCRAPE')
+        self.add_argument('--kafka_topic',
+                          help='kafka topic for scraper output', dest='KAFKA_TOPIC')
+        self.add_argument('--kafka_servers',
+                          help='comma seperated list of kafka servers', dest='KAFKA_SERVERS')
 
     def get_jurisdiction(self, module_name):
         # get the jurisdiction object
