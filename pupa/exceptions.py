@@ -45,7 +45,8 @@ class DuplicateItemError(DataImportError):
             'obj1 sources: {}\nobj2 sources: {}'.format(
                 data,
                 obj,
-                list(obj.sources.values_list('url', flat=True)),
+                list(obj.sources.values_list('url', flat=True)
+                     if hasattr(obj, 'sources') else []),
                 [s['url'] for s in data_sources or []]
             ))
 

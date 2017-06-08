@@ -261,7 +261,7 @@ class BaseImporter(object):
         # obj existed, check if we need to do an update
         if obj:
             if obj.id in self.json_to_db_id.values():
-                raise DuplicateItemError(data, obj, related['sources'])
+                raise DuplicateItemError(data, obj, related.get('sources', []))
             # check base object for changes
             for key, value in data.items():
                 if getattr(obj, key) != value and key not in obj.locked_fields:
