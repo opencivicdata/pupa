@@ -50,6 +50,15 @@ class Scraper(scrapelib.Scraper):
             self.requests_per_minute = 0
             self.cache_write_only = False
 
+        if settings.KAFKA_SCRAPE:
+            from kafka import KafkaProducer
+            from kafka.errors import KafkaError
+            kafka_servers = [] 
+            for server in settings.KAFKA_SERVERS.split():
+                kafka_servers.append(server)
+
+            self.producer = KafkaProducer(bootstrap_servers=kafka_servers)
+
         # validation
         self.strict_validation = strict_validation
 
@@ -96,9 +105,6 @@ class Scraper(scrapelib.Scraper):
             self.save_object(obj)
 
     def save_object_kafka(self, obj):
-        kafka_servers = [] 
-        for server in settings.KAFKA_SERVERS.split():
-            kafka_servers.append(server)
 
         self.info('save %s %s to topic %s', obj._type, obj, settings.KAFKA_TOPIC)
         self.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
@@ -108,13 +114,15 @@ class Scraper(scrapelib.Scraper):
 
         # Copy the original object so we can tack on jurisdiction and type
         kafka_obj = obj.as_dict()
+
         if self.jurisdiction:
             kafka_obj['jurisdiction'] = self.jurisdiction.as_dict()
 
         kafka_obj['type'] = obj._type
-        kafka_obj = OrderedDict(sorted(obj.as_dict().items()))
-        jd = json.dumps(kafka_obj,cls=utils.JSONEncoderPlus).encode()
-        self.send_kafka(kafka_servers, settings.KAFKA_TOPIC, jd)       
+
+        kafka_obj = OrderedDict(sorted(kafka_obj.items()))
+        message = json.dumps(kafka_obj,cls=utils.JSONEncoderPlus).encode()
+        self.send_kafka(settings.KAFKA_TOPIC, message)       
 
         # validate after writing, allows for inspection on failure
         try:
@@ -131,13 +139,14 @@ class Scraper(scrapelib.Scraper):
             self.save_object_kafka(obj)
 
 
-    def send_kafka(self, servers, topic, message):
-        from kafka import KafkaProducer
-        from kafka.errors import KafkaError
+    def send_kafka(self, topic, message):
+        try:
+            self.producer.send(topic, message)
+        except KafkaError as ke:
+            self.warning(ke)
+            if self.strict_validation:
+                raise ke
 
-        producer = KafkaProducer(bootstrap_servers=servers)
-        producer.send(topic, message)
-    
     def do_scrape(self, **kwargs):
         record = {'objects': defaultdict(int)}
         self.output_names = defaultdict(set)
