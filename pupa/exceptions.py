@@ -37,11 +37,18 @@ class SameNameError(DataImportError):
 class DuplicateItemError(DataImportError):
     """ Attempt was made to import items that resolve to the same database item. """
 
-    def __init__(self, data, obj):
-        super(DuplicateItemError, self).__init__('attempt to import data that would conflict with '
-                                                 'data already in the import: {} '
-                                                 '(already imported as {})'.format(
-                                                     data, obj))
+    def __init__(self, data, obj, data_sources=None):
+        super(DuplicateItemError, self).__init__(
+            'attempt to import data that would conflict with '
+            'data already in the import: {} '
+            '(already imported as {})\n'
+            'obj1 sources: {}\nobj2 sources: {}'.format(
+                data,
+                obj,
+                list(obj.sources.values_list('url', flat=True)
+                     if hasattr(obj, 'sources') else []),
+                [s['url'] for s in data_sources or []]
+            ))
 
 
 class UnresolvedIdError(DataImportError):

@@ -261,7 +261,7 @@ class BaseImporter(object):
         # obj existed, check if we need to do an update
         if obj:
             if obj.id in self.json_to_db_id.values():
-                raise DuplicateItemError(data, obj)
+                raise DuplicateItemError(data, obj, related.get('sources', []))
             # check base object for changes
             for key, value in data.items():
                 if getattr(obj, key) != value and key not in obj.locked_fields:
@@ -280,7 +280,7 @@ class BaseImporter(object):
             what = 'insert'
             try:
                 obj = self.model_class.objects.create(**data)
-            except TypeError as e:
+            except Exception as e:
                 raise DataImportError('{} while importing {} as {}'.format(e, data,
                                                                            self.model_class))
             self._create_related(obj, related, self.related_models)
