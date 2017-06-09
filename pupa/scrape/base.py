@@ -10,6 +10,8 @@ from validictory import ValidationError
 from pupa import utils
 from pupa import settings
 
+from kafka import KafkaProducer
+from kafka.errors import KafkaError
 
 class ScrapeError(Exception):
     pass
@@ -51,8 +53,6 @@ class Scraper(scrapelib.Scraper):
             self.cache_write_only = False
 
         if settings.KAFKA_SCRAPE:
-            from kafka import KafkaProducer
-            from kafka.errors import KafkaError
             kafka_servers = []
             for server in settings.KAFKA_SERVERS.split():
                 kafka_servers.append(server)
