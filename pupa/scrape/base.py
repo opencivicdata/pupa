@@ -159,8 +159,7 @@ class BaseModel(object):
         """
         Validate that we have a valid object.
 
-        On error, this will either raise a `ValueError` or a
-        `validictory.ValidationError` (a subclass of `ValueError`).
+        On error, this will raise a `ScrapeValueError`
 
         This also expects that the schemas assume that omitting required
         in the schema asserts the field is optional, not required. This is

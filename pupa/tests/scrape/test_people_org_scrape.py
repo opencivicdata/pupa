@@ -1,8 +1,8 @@
+import datetime
 import pytest
 from pupa.scrape import Person, Organization, Membership, Post
 from pupa.utils import get_pseudo_id
-from validictory import ValidationError
-import datetime
+from pupa.exceptions import ScrapeValueError
 
 
 def test_basic_post():
@@ -35,7 +35,7 @@ def test_basic_invalid_person():
 
     bob.name = None
 
-    with pytest.raises(ValidationError):
+    with pytest.raises(ScrapeValueError):
         bob.validate()
 
 
@@ -76,7 +76,7 @@ def test_basic_invalid_organization():
     orga = Organization("name")
 
     # no source
-    with pytest.raises(ValidationError):
+    with pytest.raises(ScrapeValueError):
         orga.validate()
 
 
