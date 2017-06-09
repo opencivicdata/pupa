@@ -9,10 +9,7 @@ from validictory import ValidationError
 
 from pupa import utils
 from pupa import settings
-
-
-class ScrapeError(Exception):
-    pass
+from pupa.exceptions import ScrapeError, ScrapeValueError
 
 
 def cleanup_list(obj, default):
@@ -178,7 +175,7 @@ class BaseModel(object):
         try:
             validator.validate(self.as_dict(), schema)
         except ValidationError as ve:
-            raise ValidationError('validation of {} {} failed: {}'.format(
+            raise ScrapeValueError('validation of {} {} failed: {}'.format(
                 self.__class__.__name__, self._id, ve)
             )
 
@@ -197,7 +194,7 @@ class BaseModel(object):
 
     def __setattr__(self, key, val):
         if key[0] != '_' and key not in self._schema['properties'].keys():
-            raise ValueError('property "{}" not in {} schema'.format(key, self._type))
+            raise ScrapeValueError('property "{}" not in {} schema'.format(key, self._type))
         super(BaseModel, self).__setattr__(key, val)
 
 
@@ -259,7 +256,7 @@ class AssociatedLinkMixin(object):
     def _add_associated_link(self, collection, note, url, *, media_type, text, on_duplicate,
                              date=''):
         if on_duplicate not in ['error', 'ignore']:
-            raise ValueError("on_duplicate must be 'error' or 'ignore'")
+            raise ScrapeValueError("on_duplicate must be 'error' or 'ignore'")
 
         try:
             associated = getattr(self, collection)
@@ -287,7 +284,7 @@ class AssociatedLinkMixin(object):
 
         if url in seen_links:
             if on_duplicate == 'error':
-                raise ValueError("Duplicate entry in '%s' - URL: '%s'" % (collection, url))
+                raise ScrapeValueError("Duplicate entry in '%s' - URL: '%s'" % (collection, url))
             else:
                 # This means we're in ignore mode. This situation right here
                 # means we should *skip* adding this link silently and continue
