@@ -116,11 +116,13 @@ class Scraper(scrapelib.Scraper):
         kafka_obj = obj.as_dict()
 
         if self.jurisdiction:
-            kafka_obj['jurisdiction'] = self.jurisdiction.as_dict()
+            kafka_obj['jurisdiction'] = self.jurisdiction.jurisdiction_id
 
         kafka_obj['type'] = obj._type
 
         kafka_obj = OrderedDict(sorted(kafka_obj.items()))
+
+        #TODO: Should probably add a messagepack CLI option
         message = json.dumps(kafka_obj,cls=utils.JSONEncoderPlus).encode()
         self.send_kafka(settings.KAFKA_TOPIC, message)       
 
