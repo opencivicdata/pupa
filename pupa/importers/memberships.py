@@ -22,7 +22,7 @@ class MembershipImporter(BaseImporter):
         spec = {'organization_id': membership['organization_id'],
                 'person_id': membership['person_id'],
                 'label': membership['label'],
-                'role': membership['role'],
+                # 'role': membership['role'],
                 # if this is a historical role, only update historical roles
                 'end_date': membership['end_date']}
 

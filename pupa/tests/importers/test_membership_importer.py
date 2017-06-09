@@ -146,8 +146,8 @@ def test_multiple_posts_class():
     org = Organization.objects.create(id="fnd", name="Foundation", classification="foundation",
                                       jurisdiction_id="fnd-jid")
     hari = Person.objects.create(id="hs", name="Hari Seldon")
-    founder = Post.objects.create(id='f', label="founder", role="Founder", organization=org)
-    chair = Post.objects.create(id='c', label="chair", role="Chair", organization=org)
+    founder = Post.objects.create(id='f', role="Founder", organization=org)
+    chair = Post.objects.create(id='c', role="Chair", organization=org)
 
     m1 = ScrapeMembership(person_id=hari.id, organization_id=org.id, post_id=founder.id)
     m2 = ScrapeMembership(person_id=hari.id, organization_id=org.id, post_id=chair.id)
