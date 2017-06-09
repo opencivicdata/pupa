@@ -129,7 +129,7 @@ class Scraper(scrapelib.Scraper):
             # Note we're validating the original object, not the kafka object,
             # Because we add some relevant-to-kafka but out of schema metadata to the kafka object
             obj.validate()
-        except ValueError as ve:
+        except KafkaError as ve:
             self.warning(ve)
             if self.strict_validation:
                 raise ve
