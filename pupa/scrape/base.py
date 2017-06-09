@@ -53,7 +53,7 @@ class Scraper(scrapelib.Scraper):
         if settings.KAFKA_SCRAPE:
             from kafka import KafkaProducer
             from kafka.errors import KafkaError
-            kafka_servers = [] 
+            kafka_servers = []
             for server in settings.KAFKA_SERVERS.split():
                 kafka_servers.append(server)
 
@@ -122,9 +122,9 @@ class Scraper(scrapelib.Scraper):
 
         kafka_obj = OrderedDict(sorted(kafka_obj.items()))
 
-        #TODO: Should probably add a messagepack CLI option
-        message = json.dumps(kafka_obj,cls=utils.JSONEncoderPlus).encode()
-        self.send_kafka(settings.KAFKA_TOPIC, message)       
+        # TODO: Should probably add a messagepack CLI option
+        message = json.dumps(kafka_obj, cls=utils.JSONEncoderPlus).encode()
+        self.send_kafka(settings.KAFKA_TOPIC, message)
 
         # validate after writing, allows for inspection on failure
         try:
@@ -139,7 +139,6 @@ class Scraper(scrapelib.Scraper):
         # after saving and validating, save subordinate objects
         for obj in obj._related:
             self.save_object_kafka(obj)
-
 
     def send_kafka(self, topic, message):
         try:
@@ -174,7 +173,7 @@ class Scraper(scrapelib.Scraper):
             record['objects'][_type] += len(nameset)
 
         return record
-    
+
     def latest_session(self):
         return self.jurisdiction.legislative_sessions[-1]['identifier']
 
