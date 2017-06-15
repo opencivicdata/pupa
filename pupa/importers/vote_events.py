@@ -42,7 +42,7 @@ class VoteEventImporter(BaseImporter):
             spec['bill_id'] = vote_event['bill_id']
 
         if vote_event.get('pupa_id'):
-            ve_id = self.lookup_obj_id(vote_event['pupa_id'])
+            ve_id = self.lookup_obj_id(vote_event['pupa_id'], VoteEvent)
             if ve_id:
                 spec = {'id': ve_id}
             else:
