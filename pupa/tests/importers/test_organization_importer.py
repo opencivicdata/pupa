@@ -10,6 +10,12 @@ def create_jurisdictions():
     Jurisdiction.objects.create(id='jid1', division_id='ocd-division/country:us')
     Jurisdiction.objects.create(id='jid2', division_id='ocd-division/country:us')
 
+def create_org():
+    o = Organization.objects.create(name='United Nations',
+                                    jurisdiction_id='jid1',
+                                    classification='international')
+    o.other_names.create(name='UN')
+
 
 @pytest.mark.django_db
 def test_full_organization():
@@ -65,6 +71,26 @@ def test_deduplication_similar_but_different():
     OrganizationImporter('jid2').import_data([o5.as_dict()])
     assert Organization.objects.count() == 5
 
+
+@pytest.mark.django_db
+def test_deduplication_other_name_exists():
+    create_jurisdictions()
+    create_org()
+    org = ScrapeOrganization('UN', classification='international')
+    od = org.as_dict()
+    OrganizationImporter('jid1').import_data([od])
+    assert Organization.objects.all().count() == 1
+
+
+@pytest.mark.django_db
+def test_deduplication_other_name_overlaps():
+    create_jurisdictions()
+    create_org()
+    org = ScrapeOrganization('The United Nations', classification='international')
+    org.add_name('United Nations')
+    od = org.as_dict()
+    OrganizationImporter('jid1').import_data([od])
+    assert Organization.objects.all().count() == 1
 
 @pytest.mark.django_db
 def test_deduplication_parties():

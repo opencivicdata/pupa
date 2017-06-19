@@ -1,10 +1,11 @@
+from django.db.models import Q
 from opencivicdata.core.models import (Organization, OrganizationIdentifier, OrganizationName,
                                        OrganizationContactDetail, OrganizationLink,
                                        OrganizationSource)
 from .base import BaseImporter
 from ..utils import get_pseudo_id
 from ..utils.topsort import Network
-from ..exceptions import UnresolvedIdError, PupaInternalError
+from ..exceptions import UnresolvedIdError, PupaInternalError, SameOrgNameError
 
 
 class OrganizationImporter(BaseImporter):
@@ -19,7 +20,6 @@ class OrganizationImporter(BaseImporter):
 
     def get_object(self, org):
         spec = {'classification': org['classification'],
-                'name': org['name'],
                 'parent_id': org['parent_id']}
 
         # add jurisdiction_id unless this is a party
@@ -27,7 +27,20 @@ class OrganizationImporter(BaseImporter):
         if jid:
             spec['jurisdiction_id'] = jid
 
-        return self.model_class.objects.get(**spec)
+        all_names = [org['name']] + [o['name'] for o in org['other_names']]
+
+        query = (Q(**spec) &
+                 (Q(name__in=all_names) | Q(other_names__name__in=all_names)))
+        matches = list(self.model_class.objects.filter(query).distinct('id'))
+        matches_length = len(matches)
+        if matches_length == 1:
+            return matches[0]
+        elif matches_length == 0:
+            raise self.model_class.DoesNotExist(
+                'No Organization: {} in {}'.format(all_names, self.jurisdiction_id))
+        else:
+            raise SameOrgNameError(org['name'])
+
 
     def prepare_for_db(self, data):
         data['parent_id'] = self.resolve_json_id(data['parent_id'])
@@ -39,6 +52,11 @@ class OrganizationImporter(BaseImporter):
     def limit_spec(self, spec):
         if spec.get('classification') != 'party':
             spec['jurisdiction_id'] = self.jurisdiction_id
+
+        name = spec.pop('name', None)
+        if name:
+            return (Q(**spec) &
+                    Q(name=name) | Q(other_names__name=name))
         return spec
 
     def _prepare_imports(self, dicts):
