@@ -38,7 +38,7 @@ class SameOrgNameError(DataImportError):
     """ Attempt was made to import two orgs with the same name. """
 
     def __init__(self, name):
-        super(SameNameError, self).__init__('multiple orgs with same name "{}" in Jurisdiction '
+        super(SameOrgNameError, self).__init__('multiple orgs with same name "{}" in Jurisdiction '
                                             .format(name))
 
 

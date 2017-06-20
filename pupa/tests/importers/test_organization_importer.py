@@ -2,7 +2,7 @@ import pytest
 from opencivicdata.core.models import Organization, Jurisdiction, Division
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import OrganizationImporter
-from pupa.exceptions import UnresolvedIdError
+from pupa.exceptions import UnresolvedIdError, SameOrgNameError
 
 
 def create_jurisdictions():
@@ -93,6 +93,26 @@ def test_deduplication_other_name_overlaps():
     OrganizationImporter('jid1').import_data([od])
     assert Organization.objects.all().count() == 1
 
+
+@pytest.mark.django_db
+def test_deduplication_error_overlaps():
+    create_jurisdictions()
+
+    wrestling = Organization.objects.create(name='World Wrestling Federation',
+                                            classification='international',
+                                            jurisdiction_id='jid1')
+    wildlife = Organization.objects.create(name='World Wildlife Fund',
+                                            classification='international',
+                                            jurisdiction_id='jid1')
+    
+    wildlife.other_names.create(name='WWF')
+
+    org = ScrapeOrganization('World Wrestling Federation', classification='international')
+    org.add_name('WWF')
+    od = org.as_dict()
+    with pytest.raises(SameOrgNameError):
+        OrganizationImporter('jid1').import_data([od])
+    
 
 @pytest.mark.django_db
 def test_deduplication_parties():
