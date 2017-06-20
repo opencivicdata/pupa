@@ -39,7 +39,7 @@ class SameOrgNameError(DataImportError):
 
     def __init__(self, name):
         super(SameOrgNameError, self).__init__('multiple orgs with same name "{}" in Jurisdiction '
-                                            .format(name))
+                                               .format(name))
 
 
 class DuplicateItemError(DataImportError):
