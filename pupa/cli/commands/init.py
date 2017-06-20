@@ -1,6 +1,7 @@
 import os
 
-from .base import BaseCommand, CommandError
+from .base import BaseCommand
+from pupa.exceptions import CommandError
 from opencivicdata.common import JURISDICTION_CLASSIFICATIONS
 from opencivicdata.divisions import Division
 

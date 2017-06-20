@@ -1,6 +1,7 @@
 from ..utils import _make_pseudo_id
 from .base import BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin
 from .schemas.event import schema
+from pupa.exceptions import ScrapeValueError
 
 
 class EventAgendaItem(dict, AssociatedLinkMixin):
@@ -53,12 +54,11 @@ class EventAgendaItem(dict, AssociatedLinkMixin):
         elif entity_type:
             if entity_type in ('organization', 'person'):
                 id = _make_pseudo_id(name=name)
-            elif entity_type == 'bill':
-                id = _make_pseudo_id(identifier=name)
-            elif entity_type == 'vote_event':
+            elif entity_type in ('bill', 'vote_event'):
                 id = _make_pseudo_id(identifier=name)
             else:
-                raise NotImplementedError('{} entity type not implemented'.format(entity_type))
+                raise ScrapeValueError('attempt to call add_entity with unsupported '
+                                       'entity type: {}'.format(entity_type))
             ret[entity_type + '_id'] = id
 
         self['related_entities'].append(ret)

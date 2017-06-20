@@ -12,8 +12,9 @@ from django.db import transaction
 from pupa import utils
 from pupa import settings
 from pupa.scrape import Jurisdiction, JurisdictionScraper
+from pupa.exceptions import CommandError
 
-from .base import BaseCommand, CommandError
+from .base import BaseCommand
 
 
 ALL_ACTIONS = ('scrape', 'import')

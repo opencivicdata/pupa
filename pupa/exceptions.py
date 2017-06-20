@@ -8,6 +8,13 @@ class PupaInternalError(PupaError):
     """ Indication something went wrong inside of Pupa that never should happen """
 
 
+class CommandError(PupaError):
+    """ Errors from within pupa CLI """
+
+
+# import-related errors
+
+
 class DataImportError(PupaError):
     """ A generic error related to the import process. """
 
@@ -53,3 +60,14 @@ class DuplicateItemError(DataImportError):
 
 class UnresolvedIdError(DataImportError):
     """ Attempt was made to resolve an id that has no result. """
+
+
+# scrape-related errors
+
+
+class ScrapeError(PupaError):
+    """ A generic error related to the scrape process. """
+
+
+class ScrapeValueError(PupaError, ValueError):
+    """ An invalid value was passed to a pupa scrape object. """

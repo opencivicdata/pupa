@@ -3,6 +3,7 @@ from .base import BaseModel, cleanup_list, SourceMixin
 from .bill import Bill
 from .popolo import pseudo_organization
 from .schemas.vote_event import schema
+from pupa.exceptions import ScrapeValueError
 
 
 class VoteEvent(BaseModel, SourceMixin):
@@ -30,7 +31,7 @@ class VoteEvent(BaseModel, SourceMixin):
             self.legislative_session = bill.legislative_session
 
         if not self.legislative_session:
-            raise ValueError('must set legislative_session or bill')
+            raise ScrapeValueError('must set legislative_session or bill')
 
         self.organization = pseudo_organization(organization, chamber, 'legislature')
         self.votes = []
@@ -45,7 +46,7 @@ class VoteEvent(BaseModel, SourceMixin):
             self.bill = None
         elif isinstance(bill_or_identifier, Bill):
             if chamber:
-                raise ValueError("set_bill takes no arguments when using a `Bill` object")
+                raise ScrapeValueError("set_bill takes no arguments when using a `Bill` object")
             self.bill = bill_or_identifier._id
         else:
             if chamber is None:

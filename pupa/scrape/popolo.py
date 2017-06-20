@@ -6,6 +6,7 @@ from .schemas.person import schema as person_schema
 from .schemas.membership import schema as membership_schema
 from .schemas.organization import schema as org_schema
 from ..utils import _make_pseudo_id
+from pupa.exceptions import ScrapeValueError
 
 # a copy of the org schema without sources
 org_schema_no_sources = copy.deepcopy(org_schema)
@@ -211,7 +212,7 @@ class Organization(BaseModel, SourceMixin, ContactDetailMixin, LinkMixin, Identi
 def pseudo_organization(organization, classification, default=None):
     """ helper for setting an appropriate ID for organizations """
     if organization and classification:
-        raise ValueError('cannot specify both classification and organization')
+        raise ScrapeValueError('cannot specify both classification and organization')
     elif classification:
         return _make_pseudo_id(classification=classification)
     elif organization:

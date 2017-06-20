@@ -5,7 +5,7 @@ import argparse
 import importlib
 import traceback
 from django.conf import settings
-from pupa.cli.commands.base import CommandError
+from pupa.exceptions import CommandError
 
 logger = logging.getLogger('pupa')
 

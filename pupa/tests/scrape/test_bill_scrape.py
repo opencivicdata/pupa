@@ -1,7 +1,7 @@
 import pytest
-from validictory import ValidationError
 from pupa.scrape import Bill
 from pupa.utils.generic import get_pseudo_id
+from pupa.exceptions import ScrapeValueError
 
 
 def toy_bill():
@@ -139,7 +139,7 @@ def test_add_documents():
 
     # an invalid document
     b.add_document_link(note="Fiscal Impact", date="2013-04", url=None, media_type='foo')
-    with pytest.raises(ValidationError):
+    with pytest.raises(ScrapeValueError):
         b.validate()
 
 
