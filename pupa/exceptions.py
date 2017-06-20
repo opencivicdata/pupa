@@ -33,6 +33,7 @@ class SameNameError(DataImportError):
                                             '- must provide birth_date to disambiguate'
                                             .format(name))
 
+
 class SameOrgNameError(DataImportError):
     """ Attempt was made to import two orgs with the same name. """
 
@@ -40,7 +41,6 @@ class SameOrgNameError(DataImportError):
         super(SameNameError, self).__init__('multiple orgs with same name "{}" in Jurisdiction '
                                             .format(name))
 
-        
 
 class DuplicateItemError(DataImportError):
     """ Attempt was made to import items that resolve to the same database item. """

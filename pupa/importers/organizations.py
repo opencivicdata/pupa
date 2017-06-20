@@ -41,7 +41,6 @@ class OrganizationImporter(BaseImporter):
         else:
             raise SameOrgNameError(org['name'])
 
-
     def prepare_for_db(self, data):
         data['parent_id'] = self.resolve_json_id(data['parent_id'])
 

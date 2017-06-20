@@ -10,6 +10,7 @@ def create_jurisdictions():
     Jurisdiction.objects.create(id='jid1', division_id='ocd-division/country:us')
     Jurisdiction.objects.create(id='jid2', division_id='ocd-division/country:us')
 
+
 def create_org():
     o = Organization.objects.create(name='United Nations',
                                     jurisdiction_id='jid1',
@@ -91,6 +92,7 @@ def test_deduplication_other_name_overlaps():
     od = org.as_dict()
     OrganizationImporter('jid1').import_data([od])
     assert Organization.objects.all().count() == 1
+
 
 @pytest.mark.django_db
 def test_deduplication_parties():
