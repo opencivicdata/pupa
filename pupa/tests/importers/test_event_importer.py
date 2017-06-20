@@ -18,7 +18,6 @@ def create_other_jurisdiction():
     return j
 
 
-
 def ge():
     event = ScrapeEvent(
         name="America's Birthday",
