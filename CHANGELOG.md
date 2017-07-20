@@ -1,6 +1,6 @@
 # pupa changelog
 
-## 0.8.0 - WIP
+## 0.8.0 - July 19 2017
 
 Backwards-incompatible changes:
 
