@@ -5,6 +5,7 @@ import json
 import logging
 
 from django.db.models import Q
+from django.contrib.contenttypes.models import ContentType
 
 from opencivicdata.legislative.models import LegislativeSession
 from pupa.exceptions import DuplicateItemError
@@ -287,6 +288,7 @@ class BaseImporter(object):
 
         if pupa_id:
             Identifier.objects.get_or_create(identifier=pupa_id,
+                                             jurisdiction_id=self.jurisdiction_id,
                                              defaults={'content_object': obj})
 
         return obj.id, what
@@ -397,9 +399,12 @@ class BaseImporter(object):
             for subobj, subrel in zip(subobjects, all_subrelated):
                 self._create_related(subobj, subrel, subsubdict)
 
-    def lookup_obj_id(self, pupa_id):
+    def lookup_obj_id(self, pupa_id, model):
+        content_type = ContentType.objects.get_for_model(model)
         try:
-            obj_id = Identifier.objects.get(identifier=pupa_id).object_id
+            obj_id = Identifier.objects.get(identifier=pupa_id,
+                                            content_type=content_type,
+                                            jurisdiction_id=self.jurisdiction_id).object_id
         except Identifier.DoesNotExist:
             obj_id = None
 

@@ -1,6 +1,9 @@
 # pupa changelog
 
-## 0.8.0 - WIP
+## WIP
+
+
+## 0.8.0 - July 19 2017
 
 Backwards-incompatible changes:
 
@@ -15,6 +18,7 @@ Improvements:
 * allow extras to be set on bill actions & event agenda items
 * bill actions can now specify times
 * add classification field to event agenda items
+* resolving organizations checks other names like we do for people
 
 ## 0.7.0 - June 5 2017
 

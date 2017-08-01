@@ -75,3 +75,7 @@ def convert_pdf(filename, type='xml'):
     data = pipe.read()
     pipe.close()
     return data
+
+
+def format_datetime(dt, timezone):
+    return pytz.timezone(timezone).localize(dt).replace(microsecond=0).isoformat()

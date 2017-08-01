@@ -39,7 +39,7 @@ class EventImporter(BaseImporter):
 
     def get_object(self, event):
         if event.get('pupa_id'):
-            e_id = self.lookup_obj_id(event['pupa_id'])
+            e_id = self.lookup_obj_id(event['pupa_id'], Event)
             if e_id:
                 spec = {'id': e_id}
             else:

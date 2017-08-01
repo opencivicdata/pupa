@@ -12,6 +12,12 @@ def create_jurisdiction():
     return j
 
 
+def create_other_jurisdiction():
+    Division.objects.create(id='ocd-division/country:ca', name='USA')
+    j = Jurisdiction.objects.create(id='ojid', division_id='ocd-division/country:ca')
+    return j
+
+
 def ge():
     event = ScrapeEvent(
         name="America's Birthday",
@@ -204,6 +210,7 @@ def test_full_event():
 @pytest.mark.django_db
 def test_pupa_identifier_event():
     create_jurisdiction()
+    create_other_jurisdiction()
     george = Person.objects.create(id='gw', name='George Washington')
     o = Organization.objects.create(name='Merica', jurisdiction_id='jid')
     Membership.objects.create(person=george, organization=o)
@@ -224,6 +231,9 @@ def test_pupa_identifier_event():
 
     event.pupa_id = 'bar'
     result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
+    assert result['event']['insert'] == 1
+
+    result = EventImporter('ojid', oi, pi, bi, vei).import_data([event.as_dict()])
     assert result['event']['insert'] == 1
 
 
