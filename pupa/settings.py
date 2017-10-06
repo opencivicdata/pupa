@@ -9,6 +9,7 @@ SECRET_KEY = 'non-secret'
 INSTALLED_APPS = ('django.contrib.contenttypes',
                   'opencivicdata.core.apps.BaseConfig',
                   'opencivicdata.legislative.apps.BaseConfig',
+                  'opencivicdata.elections.apps.BaseConfig',
                   'pupa')
 
 # scrape settings

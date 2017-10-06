@@ -17,7 +17,7 @@ OBJECT_TYPES = (
 
 
 class RunPlan(models.Model):
-    jurisdiction = models.ForeignKey(Jurisdiction, related_name='runs')
+    jurisdiction = models.ForeignKey(Jurisdiction, related_name='runs', on_delete=models.CASCADE)
     success = models.BooleanField(default=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
@@ -26,7 +26,7 @@ class RunPlan(models.Model):
 
 
 class ScrapeReport(models.Model):
-    plan = models.ForeignKey(RunPlan, related_name='scrapers')
+    plan = models.ForeignKey(RunPlan, related_name='scrapers', on_delete=models.CASCADE)
     scraper = models.CharField(max_length=300)
     args = models.CharField(max_length=300)
     start_time = models.DateTimeField()
@@ -34,13 +34,14 @@ class ScrapeReport(models.Model):
 
 
 class ScrapeObjects(models.Model):
-    report = models.ForeignKey(ScrapeReport, related_name='scraped_objects')
+    report = models.ForeignKey(ScrapeReport, related_name='scraped_objects',
+                               on_delete=models.CASCADE)
     object_type = models.CharField(max_length=20, choices=OBJECT_TYPES)
     count = models.PositiveIntegerField()
 
 
 class ImportObjects(models.Model):
-    report = models.ForeignKey(RunPlan, related_name='imported_objects')
+    report = models.ForeignKey(RunPlan, related_name='imported_objects', on_delete=models.CASCADE)
     object_type = models.CharField(max_length=20, choices=OBJECT_TYPES)
     insert_count = models.PositiveIntegerField()
     update_count = models.PositiveIntegerField()
