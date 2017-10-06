@@ -5,11 +5,17 @@ import logging
 import datetime
 from collections import defaultdict, OrderedDict
 
+from jsonschema import Draft3Validator, FormatChecker
 import scrapelib
 
 from pupa import utils
 from pupa import settings
 from pupa.exceptions import ScrapeError, ScrapeValueError
+
+
+@FormatChecker.cls_checks('uri-blank')
+def uri_blank(value):
+    return value == '' or FormatChecker().conforms(value, 'uri')
 
 
 def cleanup_list(obj, default):
@@ -170,10 +176,9 @@ class BaseModel(object):
         """
         if schema is None:
             schema = self._schema
-
-        from jsonschema import Draft3Validator
         validator = Draft3Validator(schema,
-                                    types={'datetime': (datetime.date, datetime.datetime)}
+                                    types={'datetime': (datetime.date, datetime.datetime)},
+                                    format_checker=FormatChecker()
                                     )
         errors = [str(error) for error in validator.iter_errors(self.as_dict())]
         if errors:
