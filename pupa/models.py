@@ -52,7 +52,10 @@ class ImportObjects(models.Model):
 
 class Identifier(models.Model):
     identifier = models.CharField(max_length=300)
-    jurisdiction = models.ForeignKey(Jurisdiction, related_name='pupa_ids')
+    jurisdiction = models.ForeignKey(Jurisdiction,
+                                     related_name='pupa_ids',
+                                     on_delete=models.CASCADE,
+                                     )
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.CharField(max_length=300)
     content_object = GenericForeignKey('content_type', 'object_id')
