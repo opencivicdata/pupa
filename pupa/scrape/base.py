@@ -2,10 +2,10 @@ import os
 import json
 import uuid
 import logging
+import datetime
 from collections import defaultdict, OrderedDict
 
 import scrapelib
-from validictory import ValidationError
 
 from pupa import utils
 from pupa import settings
@@ -165,18 +165,20 @@ class BaseModel(object):
         in the schema asserts the field is optional, not required. This is
         due to upstream schemas being in JSON Schema v3, and not validictory's
         modified syntax.
+        ^ TODO: FIXME
         """
         if schema is None:
             schema = self._schema
 
-        validator = utils.DatetimeValidator(required_by_default=False, fail_fast=False)
-
-        try:
-            validator.validate(self.as_dict(), schema)
-        except ValidationError as ve:
+        from jsonschema import Draft3Validator
+        validator = Draft3Validator(schema,
+                                    types={'datetime': (datetime.date, datetime.datetime)}
+                                    )
+        errors = [str(error) for error in validator.iter_errors(self.as_dict())]
+        if errors:
             raise ScrapeValueError('validation of {} {} failed: {}'.format(
-                self.__class__.__name__, self._id, ve)
-            )
+                self.__class__.__name__, self._id, '\n\t'+'\n\t'.join(errors)
+            ))
 
     def pre_save(self, jurisdiction_id):
         pass
