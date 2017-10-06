@@ -13,7 +13,7 @@ versions_or_documents = {
             "links": {
                 "items": {
                     "properties": {
-                        "media_type": {"type": "string" },
+                        "media_type": {"type": "string"},
                         "url": {"type": "string", "format": "uri"},
                     },
                     "type": "object"
