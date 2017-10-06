@@ -22,8 +22,9 @@ pupa = pupa.cli.__main__:main''',
           'opencivicdata',
           'dj_database_url==0.3.0',
           'scrapelib>=1.0',
-          'jsonschema',
+          'jsonschema==2.6.0',
           'psycopg2',
+          'rfc3987',        # for JSON Schema URIs
           'pytz',
       ],
       extras_require={
