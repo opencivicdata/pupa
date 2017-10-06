@@ -84,9 +84,10 @@ class Scraper(scrapelib.Scraper):
         try:
             obj.validate()
         except ValueError as ve:
-            self.warning(ve)
             if self.strict_validation:
                 raise ve
+            else:
+                self.warning(ve)
 
         # after saving and validating, save subordinate objects
         for obj in obj._related:
