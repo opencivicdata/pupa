@@ -1,6 +1,9 @@
 language: python
 addons:
     postgresql: "9.4"
+    apt:
+        packages:
+            - "postgresql-9.4-postgis-2.3"
 sudo: false
 python:
     - "3.5"
