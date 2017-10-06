@@ -115,7 +115,7 @@ def test_bill_scraper():
                 assert bill_id == '2'
                 assert kwargs == {}
                 b = Bill('1', self.legislative_session, 'title')
-                b.add_source('http;//example.com')
+                b.add_source('http://example.com')
                 return b
 
     bs = BillScraper(juris, '/tmp/')
