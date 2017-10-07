@@ -7,15 +7,15 @@ from .common import sources, extras, fuzzy_date_blank, fuzzy_datetime, fuzzy_dat
 media_schema = {
     "items": {
         "properties": {
-            "name": {"type": "string"},
-            "type": {"type": "string"},
+            "name": {"type": "string", "minLength": 1},
+            "type": {"type": "string", "minLength": 1},
             "date": fuzzy_date_blank,
             "offset": {"type": ["number", "null"]},
             "links": {
                 "items": {
                     "properties": {
-                        "media_type": {"type": "string", "blank": True},
-                        "url": {"type": "string"},
+                        "media_type": {"type": "string"},
+                        "url": {"type": "string", "format": "uri"},
                     },
                     "type": "object"
                 },
@@ -29,30 +29,30 @@ media_schema = {
 
 schema = {
     "properties": {
-        "name": {"type": "string"},
+        "name": {"type": "string", "minLength": 1},
         "all_day": {"type": "boolean"},
         'start_date': fuzzy_datetime,
         'end_date': fuzzy_datetime_blank,
         "status": {
-            "type": "string", "blank": True,
+            "type": "string",
             "enum": ["cancelled", "tentative", "confirmed", "passed"],
         },
-        "classification": {"type": "string"},    # TODO: enum
-        "description": {"type": "string", "blank": True},
+        "classification": {"type": "string", "minLength": 1},    # TODO: enum
+        "description": {"type": "string"},
 
         "location": {
             "type": "object",
             "properties": {
 
-                "name": {"type": "string", },
+                "name": {"type": "string", "minLength": 1},
 
                 "note": {
-                    "type": "string", "blank": True,
+                    "type": "string",
                 },
 
                 "url": {
-                    "required": False,
-                    "type": "string",
+                    "type": ["string", "null"],
+                    "format": "uri",
                 },
 
                 "coordinates": {
@@ -60,10 +60,11 @@ schema = {
                     "properties": {
                         "latitude": {
                             "type": "string",
+                            "minLength": 1,
                         },
-
                         "longitude": {
                             "type": "string",
+                            "minLength": 1,
                         }
                     }
                 },
@@ -75,9 +76,9 @@ schema = {
         "documents": {
             "items": {
                 "properties": {
-                    "note": {"type": "string", },
-                    "url": {"type": "string", },
-                    "media_type": {"type": "string", },
+                    "note": {"type": "string", "minLength": 1},
+                    "url": {"type": "string", "minLength": 1},
+                    "media_type": {"type": "string", "minLength": 1},
                 },
                 "type": "object"
             },
@@ -87,12 +88,9 @@ schema = {
         "links": {
             "items": {
                 "properties": {
-
                     "note": {
                         "type": "string",
-                        "blank": True,
                     },
-
                     "url": {
                         "format": "uri",
                         "type": "string"
@@ -109,6 +107,7 @@ schema = {
 
                     "name": {
                         "type": "string",
+                        "minLength": 1,
                     },
 
                     "type": {
@@ -118,6 +117,7 @@ schema = {
 
                     "note": {
                         "type": "string",
+                        "minLength": 1,
                     },
 
                 },
@@ -129,10 +129,10 @@ schema = {
         "agenda": {
             "items": {
                 "properties": {
-                    "description": {"type": "string"},
+                    "description": {"type": "string", "minLength": 1},
 
                     "classification": {
-                        "items": {"type": "string"},
+                        "items": {"type": "string", "minLength": 1},
                         "type": "array",
                     },
 
@@ -141,7 +141,7 @@ schema = {
                     },
 
                     "subjects": {
-                        "items": {"type": "string"},
+                        "items": {"type": "string", "minLength": 1},
                         "type": "array"
                     },
 
@@ -150,9 +150,9 @@ schema = {
                     "notes": {
                         "items": {
                             "type": "string",
+                            "minLength": 1,
                         },
                         "type": "array",
-                        "minItems": 0,
                     },
 
                     "related_entities": {
@@ -160,14 +160,17 @@ schema = {
                             "properties": {
                                 "entity_type": {
                                     "type": "string",
+                                    "minLength": 1,
                                 },
 
                                 "name": {
                                     "type": "string",
+                                    "minLength": 1,
                                 },
 
                                 "note": {
-                                    "type": ["string", "null"],
+                                    "type": ["string", "null", ],
+                                    "minLength": 1,
                                 },
                             },
                             "type": "object",
@@ -183,7 +186,9 @@ schema = {
         },
         "sources": sources,
         "extras": extras,
-        'pupa_id': {"type": ["string", "null"]},
+        'pupa_id': {"type": ["string", "null"],
+                    "minLength": 1,
+                    },
     },
     "type": "object"
 }

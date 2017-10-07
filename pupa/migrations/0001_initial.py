@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('success', models.BooleanField(default=True)),
-                ('jurisdiction', models.ForeignKey(to='core.Jurisdiction')),
+                ('jurisdiction', models.ForeignKey(to='core.Jurisdiction', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='importobjects',
             name='report',
-            field=models.ForeignKey(to='pupa.RunPlan'),
+            field=models.ForeignKey(to='pupa.RunPlan', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.CreateModel(
@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
                 ('args', models.CharField(max_length=300)),
                 ('start_time', models.DateTimeField()),
                 ('end_time', models.DateTimeField()),
-                ('plan', models.ForeignKey(to='pupa.RunPlan')),
+                ('plan', models.ForeignKey(to='pupa.RunPlan', on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='scrapeobjects',
             name='report',
-            field=models.ForeignKey(to='pupa.ScrapeReport'),
+            field=models.ForeignKey(to='pupa.ScrapeReport', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

@@ -5,25 +5,25 @@ from opencivicdata import common
 schema = {
     "type": "object",
     "properties": {
-        'identifier': {"type": "string", "blank": True},
-        'motion_text': {"type": "string"},
-        'motion_classification': {"items": {"type": "string"},
+        'identifier': {"type": "string"},
+        'motion_text': {"type": "string", "minLength": 1},
+        'motion_classification': {"items": {"type": "string", "minLength": 1},
                                   "type": "array"},
         'start_date': fuzzy_datetime_blank,
         'end_date': fuzzy_datetime_blank,
         'result': {"type": "string", "enum": common.VOTE_RESULTS},
-        'organization': {"type": ["string", "null"]},
-        'legislative_session': {"type": "string"},
-        'bill': {"type": ["string", "null"]},
-        'bill_action': {"type": ["string", "null"]},
+        'organization': {"type": ["string", "null"], "minLength": 1},
+        'legislative_session': {"type": "string", "minLength": 1},
+        'bill': {"type": ["string", "null"], "minLength": 1},
+        'bill_action': {"type": ["string", "null"], "minLength": 1},
         'votes': {
             "items": {
                 "type": "object",
                 "properties": {
                     "option": {"type": "string", "enum": common.VOTE_OPTIONS},
-                    "voter_name": {"type": "string"},
-                    "voter_id": {"type": "string"},
-                    "note": {"type": "string", "blank": True},
+                    "voter_name": {"type": "string", "minLength": 1},
+                    "voter_id": {"type": "string", "minLength": 1},
+                    "note": {"type": "string"},
                 },
             },
         },
@@ -39,6 +39,6 @@ schema = {
 
         'sources': sources,
         'extras': extras,
-        'pupa_id': {"type": ["string", "null"]},
+        'pupa_id': {"type": ["string", "null"], "minLength": 1},
     }
 }

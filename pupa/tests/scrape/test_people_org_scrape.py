@@ -30,7 +30,7 @@ def test_basic_invalid_membership():
 
 def test_basic_invalid_person():
     bob = Person("Bob B. Johnson")
-    bob.add_source(url='foo')
+    bob.add_source(url='http://example.com')
     bob.validate()
 
     bob.name = None
@@ -83,7 +83,7 @@ def test_basic_invalid_organization():
 def test_org_add_post():
     """ Test that we can hack posts in on the fly'"""
     orga = Organization("name", classification="committee")
-    orga.add_source(url='foo')
+    orga.add_source(url='http://example.com')
     orga.validate()
 
     orga.add_post("Human Readable Name", "Chef")

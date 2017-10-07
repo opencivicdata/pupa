@@ -2,14 +2,20 @@ import os
 import json
 import uuid
 import logging
+import datetime
 from collections import defaultdict, OrderedDict
 
+from jsonschema import Draft3Validator, FormatChecker
 import scrapelib
-from validictory import ValidationError
 
 from pupa import utils
 from pupa import settings
 from pupa.exceptions import ScrapeError, ScrapeValueError
+
+
+@FormatChecker.cls_checks('uri-blank')
+def uri_blank(value):
+    return value == '' or FormatChecker().conforms(value, 'uri')
 
 
 def cleanup_list(obj, default):
@@ -84,9 +90,10 @@ class Scraper(scrapelib.Scraper):
         try:
             obj.validate()
         except ValueError as ve:
-            self.warning(ve)
             if self.strict_validation:
                 raise ve
+            else:
+                self.warning(ve)
 
         # after saving and validating, save subordinate objects
         for obj in obj._related:
@@ -165,18 +172,19 @@ class BaseModel(object):
         in the schema asserts the field is optional, not required. This is
         due to upstream schemas being in JSON Schema v3, and not validictory's
         modified syntax.
+        ^ TODO: FIXME
         """
         if schema is None:
             schema = self._schema
-
-        validator = utils.DatetimeValidator(required_by_default=False, fail_fast=False)
-
-        try:
-            validator.validate(self.as_dict(), schema)
-        except ValidationError as ve:
+        validator = Draft3Validator(schema,
+                                    types={'datetime': (datetime.date, datetime.datetime)},
+                                    format_checker=FormatChecker()
+                                    )
+        errors = [str(error) for error in validator.iter_errors(self.as_dict())]
+        if errors:
             raise ScrapeValueError('validation of {} {} failed: {}'.format(
-                self.__class__.__name__, self._id, ve)
-            )
+                self.__class__.__name__, self._id, '\n\t'+'\n\t'.join(errors)
+            ))
 
     def pre_save(self, jurisdiction_id):
         pass
