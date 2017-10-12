@@ -18,6 +18,11 @@ def uri_blank(value):
     return value == '' or FormatChecker().conforms(value, 'uri')
 
 
+@FormatChecker.cls_checks('uri')
+def check_uri(val):
+    return val.startswith(('http://', 'https://', 'ftp://'))
+
+
 def cleanup_list(obj, default):
     if not obj:
         obj = default

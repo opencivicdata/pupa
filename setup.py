@@ -24,7 +24,6 @@ pupa = pupa.cli.__main__:main''',
           'scrapelib>=1.0',
           'jsonschema==2.6.0',
           'psycopg2',
-          'rfc3987',        # for JSON Schema URIs
           'pytz',
       ],
       extras_require={
