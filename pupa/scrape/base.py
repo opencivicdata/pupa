@@ -20,7 +20,7 @@ def uri_blank(value):
 
 @FormatChecker.cls_checks('uri')
 def check_uri(val):
-    return val.startswith(('http://', 'https://', 'ftp://'))
+    return val and val.startswith(('http://', 'https://', 'ftp://'))
 
 
 def cleanup_list(obj, default):
