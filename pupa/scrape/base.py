@@ -12,6 +12,7 @@ from pupa import utils
 from pupa import settings
 from pupa.exceptions import ScrapeError, ScrapeValueError
 
+import importlib
 
 @FormatChecker.cls_checks('uri-blank')
 def uri_blank(value):
@@ -37,6 +38,10 @@ class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
 
     def __init__(self, jurisdiction, datadir, *, strict_validation=True, fastmode=False):
+
+        # from pupa.scrape.outputs.kafka_scraper import KafkaScraper
+        from pupa.scrape.outputs.gcps_scraper import GcpsScraper
+
         super(Scraper, self).__init__()
 
         # set options
@@ -71,6 +76,18 @@ class Scraper(scrapelib.Scraper):
         self.warning = self.logger.warning
         self.error = self.logger.error
         self.critical = self.logger.critical
+
+        # Custom output
+        #self.custom_output = settings.OUTPUT_CLASS
+        self.custom_output = 'GcpsScraper'
+
+        if self.custom_output:
+            print("USING CUSTOM OUTPUT CLASS!")
+            #output_class = getattr(importlib.import_module("kafka_scraper", package="pupa.scrape.outputs"), "KafkaScraper")
+            self.output_class = GcpsScraper(self)
+        else:
+            print("USING BASE OUTPUT CLASS!")
+            self.output_class = self
 
     def save_object(self, obj):
         """
@@ -108,12 +125,14 @@ class Scraper(scrapelib.Scraper):
         record = {'objects': defaultdict(int)}
         self.output_names = defaultdict(set)
         record['start'] = utils.utcnow()
+
         for obj in self.scrape(**kwargs) or []:
             if hasattr(obj, '__iter__'):
                 for iterobj in obj:
-                    self.save_object(iterobj)
+                    self.output_class.save_object(iterobj)
             else:
-                self.save_object(obj)
+                self.output_class.save_object(obj)
+
         record['end'] = utils.utcnow()
         record['skipped'] = getattr(self, 'skipped', 0)
         if not self.output_names:
