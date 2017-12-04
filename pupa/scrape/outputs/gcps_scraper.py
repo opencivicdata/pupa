@@ -27,8 +27,8 @@ class GcpsScraper():
         self.publisher = pubsub.PublisherClient()
 
         self.topic = 'projects/{project_id}/topics/{topic}'.format(
-                    project_id=settings.GOOGLE_CLOUD_PROJECT,
-                    topic=settings.GOOGLE_CLOUD_TOPIC,
+                    project_id=os.getenv('GOOGLE_CLOUD_PROJECT'),
+                    topic=os.getenv('GOOGLE_CLOUD_TOPIC'),
                 )
 
         self.caller = caller
