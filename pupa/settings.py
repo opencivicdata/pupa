@@ -21,6 +21,12 @@ SCRAPELIB_RETRY_WAIT_SECONDS = 10
 CACHE_DIR = os.path.join(os.getcwd(), '_cache')
 SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 
+OUTPUT_CLASS = False
+
+GOOGLE_APPLICATION_CREDENTIALS = False
+GOOGLE_CLOUD_PROJECT = False
+GOOGLE_CLOUD_TOPIC = False
+
 # Django settings
 DEBUG = False
 TEMPLATE_DEBUG = False
