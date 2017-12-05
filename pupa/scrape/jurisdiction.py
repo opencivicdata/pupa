@@ -60,7 +60,8 @@ class JurisdictionScraper(Scraper):
             yield org
 
         if self.jurisdiction.parties:
-            warnings.warn('including parties on Jurisdiction is deprecated, use "pupa party" command instead')
+            warnings.warn('including parties on Jurisdiction is deprecated, '
+                          'use "pupa party" command instead')
         for party in self.jurisdiction.parties:
             org = Organization(classification='party', name=party['name'])
             yield org
