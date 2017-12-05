@@ -53,7 +53,7 @@ class GcpsScraper():
         self.caller = caller
 
         try:
-            self.publisher.create_topic(self.topic)  # raises conflict if topic exists
+            self.publisher.create_topic(self.topic) # raises conflict if topic exists
         except Exception:
             pass
 
