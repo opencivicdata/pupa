@@ -122,12 +122,16 @@ def test_deduplication_overlap_name_distinct_juris():
                                             jurisdiction_id='jid1')
     org_jid_1.other_names.create(name='WWF')
 
-    oi1 = OrganizationImporter('jid1')
-    assert oi1.resolve_json_id('~{"name":"WWF"}') == org_jid_1.id
+    org = ScrapeOrganization(name="WWF", classification="international")
+    org.add_name('WWF')
 
-    oi1 = OrganizationImporter('jid2')
-    with pytest.raises(UnresolvedIdError):
-        assert oi1.resolve_json_id('~{"name":"WWF"}')
+    oi1 = OrganizationImporter('jid1')
+    oi1.import_item(org.as_dict())
+    assert Organization.objects.count() == 1
+
+    oi2 = OrganizationImporter('jid2')
+    oi2.import_item(org.as_dict())
+    assert Organization.objects.count() == 2
 
 
 @pytest.mark.django_db
