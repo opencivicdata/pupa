@@ -1,1 +1,1 @@
-__all__ = ["kafka_scraper","gcps_scraper"]
+__all__ = ["kafka_scraper", 'google_cloud']

@@ -9,7 +9,7 @@ from google.oauth2 import service_account
 from google.cloud import pubsub
 
 
-class GcpsScraper():
+class GoogleCloudPubSub():
 
     def __init__(self, caller):
         project_id = os.environ.get('GOOGLE_CLOUD_PUBSUB_PROJECT_ID', '')
