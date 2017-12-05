@@ -120,7 +120,6 @@ class Scraper(scrapelib.Scraper):
                     self.output_target.save_object(iterobj)
             else:
                 self.output_target.save_object(obj)
-
         record['end'] = utils.utcnow()
         record['skipped'] = getattr(self, 'skipped', 0)
         if not self.output_names:
