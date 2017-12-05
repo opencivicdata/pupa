@@ -38,10 +38,6 @@ class Scraper(scrapelib.Scraper):
     """ Base class for all scrapers """
 
     def __init__(self, jurisdiction, datadir, *, strict_validation=True, fastmode=False):
-
-        # from pupa.scrape.outputs.kafka_scraper import KafkaScraper
-        from pupa.scrape.outputs.gcps_scraper import GcpsScraper
-
         super(Scraper, self).__init__()
 
         # set options
@@ -77,16 +73,10 @@ class Scraper(scrapelib.Scraper):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
-        # Custom output
-        #self.custom_output = settings.OUTPUT_CLASS
-        self.custom_output = 'GcpsScraper'
-
-        if self.custom_output:
-            print("USING CUSTOM OUTPUT CLASS!")
-            #output_class = getattr(importlib.import_module("kafka_scraper", package="pupa.scrape.outputs"), "KafkaScraper")
+        if settings.OUTPUT_CLASS == 'GOOGLE_CLOUD_PUBSUB':
+            from pupa.scrape.outputs.gcps_scraper import GcpsScraper
             self.output_class = GcpsScraper(self)
         else:
-            print("USING BASE OUTPUT CLASS!")
             self.output_class = self
 
     def save_object(self, obj):
