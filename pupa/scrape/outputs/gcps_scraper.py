@@ -1,18 +1,9 @@
 import os
 import json
-import uuid
-import logging
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict
 from datetime import datetime, timezone
 
-import scrapelib
-
 from pupa import utils
-from pupa import settings
-
-from pupa.scrape import Scraper, Bill, VoteEvent
-
-from pupa.exceptions import ScrapeError, ScrapeValueError
 
 from google.oauth2 import service_account
 from google.cloud import pubsub
@@ -27,14 +18,28 @@ class GcpsScraper():
         info = {
             'type': 'service_account',
             'project_id': project_id,
-            'private_key_id': os.environ.get('GOOGLE_CLOUD_PUBSUB_PRIVATE_KEY_ID', ''),
-            'private_key': os.environ.get('GOOGLE_CLOUD_PUBSUB_PRIVATE_KEY', ''),
-            'client_email': os.environ.get('GOOGLE_CLOUD_PUBSUB_CLIENT_EMAIL', ''),
+            'private_key_id': os.environ.get(
+                'GOOGLE_CLOUD_PUBSUB_PRIVATE_KEY_ID',
+                ''),
+            'private_key': os.environ.get(
+                'GOOGLE_CLOUD_PUBSUB_PRIVATE_KEY',
+                ''),
+            'client_email': os.environ.get(
+                'GOOGLE_CLOUD_PUBSUB_CLIENT_EMAIL',
+                ''),
             'client_id': os.environ.get('GOOGLE_CLOUD_PUBSUB_CLIENT_ID', ''),
-            'auth_uri': os.environ.get('GOOGLE_CLOUD_PUBSUB_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth'),
-            'token_uri': os.environ.get('GOOGLE_CLOUD_PUBSUB_TOKEN_URI', 'https://accounts.google.com/o/oauth2/token'),
-            'auth_provider_x509_cert_url': os.environ.get('GOOGLE_CLOUD_PUBSUB_AUTH_CERT_URL', 'https://www.googleapis.com/oauth2/v1/certs'),
-            'client_x509_cert_url': os.environ.get('GOOGLE_CLOUD_PUBSUB_CLIENT_CERT_URL', ''),
+            'auth_uri': os.environ.get(
+                'GOOGLE_CLOUD_PUBSUB_AUTH_URI',
+                'https://accounts.google.com/o/oauth2/auth'),
+            'token_uri': os.environ.get(
+                'GOOGLE_CLOUD_PUBSUB_TOKEN_URI',
+                'https://accounts.google.com/o/oauth2/token'),
+            'auth_provider_x509_cert_url': os.environ.get(
+                'GOOGLE_CLOUD_PUBSUB_AUTH_CERT_URL',
+                'https://www.googleapis.com/oauth2/v1/certs'),
+            'client_x509_cert_url': os.environ.get(
+                'GOOGLE_CLOUD_PUBSUB_CLIENT_CERT_URL',
+                ''),
         }
 
         credentials = service_account.Credentials.from_service_account_info(info)
@@ -53,10 +58,10 @@ class GcpsScraper():
             pass
 
     def save_object(self, obj):
-
         self.caller.info('save %s %s to topic %s', obj._type, obj, self.topic)
         self.caller.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
-                                cls=utils.JSONEncoderPlus, indent=4, separators=(',', ': ')))
+                                     cls=utils.JSONEncoderPlus,
+                                     indent=4, separators=(',', ': ')))
 
         self.caller.output_names[obj._type].add(obj)
 
@@ -73,7 +78,10 @@ class GcpsScraper():
         # TODO: Should add a messagepack CLI option
         message = json.dumps(output_obj, cls=utils.JSONEncoderPlus).encode()
 
-        self.publisher.publish(self.topic, message, pubdate=datetime.now(timezone.utc).strftime("%c"))
+        self.publisher.publish(
+            self.topic,
+            message,
+            pubdate=datetime.now(timezone.utc).strftime("%c"))
 
         # validate after writing, allows for inspection on failure
         try:
