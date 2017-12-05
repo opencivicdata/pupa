@@ -12,7 +12,6 @@ from pupa import utils
 from pupa import settings
 from pupa.exceptions import ScrapeError, ScrapeValueError
 
-import importlib
 
 @FormatChecker.cls_checks('uri-blank')
 def uri_blank(value):
