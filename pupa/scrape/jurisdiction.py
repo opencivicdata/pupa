@@ -1,3 +1,4 @@
+import warnings
 from .base import BaseModel, Scraper
 from .schemas.jurisdiction import schema
 from .popolo import Organization
@@ -58,6 +59,8 @@ class JurisdictionScraper(Scraper):
         for org in self.jurisdiction.get_organizations():
             yield org
 
+        if self.jurisdiction.parties:
+            warnings.warn('including parties on Jurisdiction is deprecated, use "pupa party" command instead')
         for party in self.jurisdiction.parties:
             org = Organization(classification='party', name=party['name'])
             yield org
