@@ -114,7 +114,6 @@ class Scraper(scrapelib.Scraper):
         record = {'objects': defaultdict(int)}
         self.output_names = defaultdict(set)
         record['start'] = utils.utcnow()
-
         for obj in self.scrape(**kwargs) or []:
             if hasattr(obj, '__iter__'):
                 for iterobj in obj:
