@@ -73,7 +73,7 @@ class Scraper(scrapelib.Scraper):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
-        if settings.OUTPUT_FORMAT == 'GOOGLE_CLOUD_PUBSUB':
+        if os.environ.get('OUTPUT_TARGET') == 'GOOGLE_CLOUD_PUBSUB':
             from pupa.scrape.outputs.gcps_scraper import GcpsScraper
             self.outputter = GcpsScraper(self)
         else:
