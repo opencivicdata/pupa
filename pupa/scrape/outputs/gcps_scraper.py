@@ -58,6 +58,8 @@ class GcpsScraper():
             pass
 
     def save_object(self, obj):
+        obj.pre_save(self.caller.jurisdiction.jurisdiction_id)
+
         self.caller.info('save %s %s to topic %s', obj._type, obj, self.topic)
         self.caller.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
                                      cls=utils.JSONEncoderPlus,
