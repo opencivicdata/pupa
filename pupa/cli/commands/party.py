@@ -1,5 +1,6 @@
 import django
-from .base import BaseCommand, CommandError
+from .base import BaseCommand
+from pupa.exceptions import CommandError
 
 
 class Command(BaseCommand):
