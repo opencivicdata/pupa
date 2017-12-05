@@ -83,7 +83,7 @@ class GoogleCloudPubSub():
         self.publisher.publish(
             self.topic,
             message,
-            pubdate=datetime.now(timezone.utc).strftime("%c"))
+            pubdate=datetime.now(timezone.utc).strftime('%c'))
 
         # validate after writing, allows for inspection on failure
         try:
