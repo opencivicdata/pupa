@@ -21,7 +21,7 @@ SCRAPELIB_RETRY_WAIT_SECONDS = 10
 CACHE_DIR = os.path.join(os.getcwd(), '_cache')
 SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 
-OUTPUT_CLASS = os.environ.get('OUTPUT_CLASS', False)
+OUTPUT_FORMAT = os.environ.get('OUTPUT_FORMAT', False)
 
 # Django settings
 DEBUG = False

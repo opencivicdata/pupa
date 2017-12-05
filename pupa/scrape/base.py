@@ -73,11 +73,11 @@ class Scraper(scrapelib.Scraper):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
-        if settings.OUTPUT_CLASS == 'GOOGLE_CLOUD_PUBSUB':
+        if settings.OUTPUT_FORMAT == 'GOOGLE_CLOUD_PUBSUB':
             from pupa.scrape.outputs.gcps_scraper import GcpsScraper
-            self.output_class = GcpsScraper(self)
+            self.outputter = GcpsScraper(self)
         else:
-            self.output_class = self
+            self.outputter = self
 
     def save_object(self, obj):
         """
@@ -119,9 +119,9 @@ class Scraper(scrapelib.Scraper):
         for obj in self.scrape(**kwargs) or []:
             if hasattr(obj, '__iter__'):
                 for iterobj in obj:
-                    self.output_class.save_object(iterobj)
+                    self.outputter.save_object(iterobj)
             else:
-                self.output_class.save_object(obj)
+                self.outputter.save_object(obj)
 
         record['end'] = utils.utcnow()
         record['skipped'] = getattr(self, 'skipped', 0)
