@@ -15,6 +15,8 @@ class GoogleCloudPubSub():
         project_id = os.environ.get('GOOGLE_CLOUD_PUBSUB_PROJECT_ID', '')
         topic = os.environ.get('GOOGLE_CLOUD_PUBSUB_TOPIC', '')
 
+        # TODO: Rmeove
+        print('in init')
         info = {
             'type': 'service_account',
             'project_id': project_id,
@@ -43,7 +45,8 @@ class GoogleCloudPubSub():
         }
 
         # TODO: Remove!
-        self.caller.info(json.dumps(info))
+        print('printing info')
+        print(info)
 
         credentials = service_account.Credentials.from_service_account_info(info)
 
