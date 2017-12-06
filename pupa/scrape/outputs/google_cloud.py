@@ -14,37 +14,12 @@ class GoogleCloudPubSub():
     def __init__(self, caller):
         project_id = os.environ.get('GOOGLE_CLOUD_PUBSUB_PROJECT_ID', '')
         topic = os.environ.get('GOOGLE_CLOUD_PUBSUB_TOPIC', '')
-
-        info = {
-            'type': 'service_account',
-            'project_id': project_id,
-            'private_key_id': os.environ.get(
-                'GOOGLE_CLOUD_PUBSUB_PRIVATE_KEY_ID',
-                ''),
-            'private_key': os.environ.get(
-                'GOOGLE_CLOUD_PUBSUB_PRIVATE_KEY',
-                ''),
-            'client_email': os.environ.get(
-                'GOOGLE_CLOUD_PUBSUB_CLIENT_EMAIL',
-                ''),
-            'client_id': os.environ.get('GOOGLE_CLOUD_PUBSUB_CLIENT_ID', ''),
-            'auth_uri': os.environ.get(
-                'GOOGLE_CLOUD_PUBSUB_AUTH_URI',
-                'https://accounts.google.com/o/oauth2/auth'),
-            'token_uri': os.environ.get(
-                'GOOGLE_CLOUD_PUBSUB_TOKEN_URI',
-                'https://accounts.google.com/o/oauth2/token'),
-            'auth_provider_x509_cert_url': os.environ.get(
-                'GOOGLE_CLOUD_PUBSUB_AUTH_CERT_URL',
-                'https://www.googleapis.com/oauth2/v1/certs'),
-            'client_x509_cert_url': os.environ.get(
-                'GOOGLE_CLOUD_PUBSUB_CLIENT_CERT_URL',
-                ''),
-        }
+        info = json.loads(os.environ.get('GOOGLE_CLOUD_PUBSUB_CREDENTIALS'))
+        scope = 'https://www.googleapis.com/auth/pubsub'
 
         credentials = service_account.Credentials.from_service_account_info(
             info,
-            scopes=('https://www.googleapis.com/auth/pubsub',))
+            scopes=(scope,))
 
         self.publisher = pubsub.PublisherClient(credentials=credentials)
 
