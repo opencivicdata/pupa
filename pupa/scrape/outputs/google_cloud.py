@@ -44,7 +44,7 @@ class GoogleCloudPubSub():
 
         credentials = service_account.Credentials.from_service_account_info(
             info,
-            scopes=['cloud-platform', 'pubsub'])
+            scopes=('https://www.googleapis.com/auth/pubsub',))
 
         self.publisher = pubsub.PublisherClient(credentials=credentials)
 
