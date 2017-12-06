@@ -43,6 +43,9 @@ class GoogleCloudPubSub():
         }
 
         credentials = service_account.Credentials.from_service_account_info(info)
+        credentials.with_scopes(
+            ['https://www.googleapis.com/auth/cloud-platform',
+             'https://www.googleapis.com/auth/pubsub'])
 
         self.publisher = pubsub.PublisherClient(credentials=credentials)
 
@@ -53,7 +56,8 @@ class GoogleCloudPubSub():
         self.caller = caller
 
         try:
-            self.publisher.create_topic(self.topic) # raises conflict if topic exists
+            # raises conflict if topic exists
+            self.publisher.create_topic(self.topic)
         except Exception:
             pass
 
