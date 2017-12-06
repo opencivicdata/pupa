@@ -42,11 +42,11 @@ class GoogleCloudPubSub():
                 ''),
         }
 
-        pubsub_scope = 'https://www.googleapis.com/auth/pubsub'
-        credentials = service_account.Credentials.from_service_account_info(info)
-        scoped_credentials = credentials.with_scopes([pubsub_scope])
+        credentials = service_account.Credentials.from_service_account_info(
+            info,
+            scopes=['cloud-platform', 'pubsub'])
 
-        self.publisher = pubsub.PublisherClient(credentials=scoped_credentials)
+        self.publisher = pubsub.PublisherClient(credentials=credentials)
 
         self.topic = 'projects/{project_id}/topics/{topic}'.format(
                     project_id=project_id,
