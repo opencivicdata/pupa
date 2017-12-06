@@ -42,6 +42,9 @@ class GoogleCloudPubSub():
                 ''),
         }
 
+        # TODO: Remove!
+        self.caller.info(json.dumps(info))
+
         credentials = service_account.Credentials.from_service_account_info(info)
 
         self.publisher = pubsub.PublisherClient(credentials=credentials)
