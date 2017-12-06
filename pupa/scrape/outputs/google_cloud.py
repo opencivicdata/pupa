@@ -94,9 +94,10 @@ class GoogleCloudPubSub():
             # Because we add some relevant-to-us but out of schema metadata to the output object
             obj.validate()
         except Exception as ve:
-            self.warning(ve)
-            if self.strict_validation:
+            if self.caller.strict_validation:
                 raise ve
+            else:
+                self.caller.warning(ve)
 
         # after saving and validating, save subordinate objects
         for obj in obj._related:
