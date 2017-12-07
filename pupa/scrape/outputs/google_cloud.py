@@ -12,7 +12,6 @@ from google.cloud import pubsub
 class GoogleCloudPubSub():
 
     def __init__(self, caller):
-        project_id = os.environ.get('GOOGLE_CLOUD_PROJECT', '')
         topic = os.environ.get('GOOGLE_CLOUD_PUBSUB_TOPIC', '')
         # @see https://github.com/GoogleCloudPlatform/google-auth-library-python/issues/225
         info = json.loads(os.environ.get('GOOGLE_CLOUD_PUBSUB_CREDENTIALS'))
@@ -25,7 +24,7 @@ class GoogleCloudPubSub():
         self.publisher = pubsub.PublisherClient(credentials=credentials)
 
         self.topic = 'projects/{project_id}/topics/{topic}'.format(
-                    project_id=project_id,
+                    project_id=os.environ.get('GOOGLE_CLOUD_PROJECT'),
                     topic=topic)
 
         self.caller = caller
