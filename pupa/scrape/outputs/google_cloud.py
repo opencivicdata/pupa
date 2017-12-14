@@ -51,8 +51,6 @@ class GoogleCloudPubSub():
 
         output_obj['type'] = obj._type
 
-        output_obj = OrderedDict(sorted(output_obj.items()))
-
         # TODO: Should add a messagepack CLI option
         message = json.dumps(output_obj,
                              cls=utils.JSONEncoderPlus,
