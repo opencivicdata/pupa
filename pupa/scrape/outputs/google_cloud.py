@@ -33,12 +33,6 @@ class GoogleCloudPubSub():
 
         self.caller = caller
 
-        try:
-            # raises conflict if topic exists
-            self.publisher.create_topic(self.topic_path)
-        except Exception:
-            pass
-
     def save_object(self, obj):
         obj.pre_save(self.caller.jurisdiction.jurisdiction_id)
 
