@@ -27,22 +27,22 @@ class GoogleCloudPubSub():
         else:
             self.publisher = pubsub.PublisherClient()
 
-        self.topic = 'projects/{project_id}/topics/{topic}'.format(
-                    project_id=os.environ.get('GOOGLE_CLOUD_PROJECT'),
-                    topic=os.environ.get('GOOGLE_CLOUD_PUBSUB_TOPIC'))
+        self.topic_path = self.publisher.topic_path(
+            os.environ.get('GOOGLE_CLOUD_PROJECT'),
+            os.environ.get('GOOGLE_CLOUD_PUBSUB_TOPIC'))
 
         self.caller = caller
 
         try:
             # raises conflict if topic exists
-            self.publisher.create_topic(self.topic)
+            self.publisher.create_topic(self.topic_path)
         except Exception:
             pass
 
     def save_object(self, obj):
         obj.pre_save(self.caller.jurisdiction.jurisdiction_id)
 
-        self.caller.info('save %s %s to topic %s', obj._type, obj, self.topic)
+        self.caller.info('save %s %s to topic %s', obj._type, obj, self.topic_path)
         self.caller.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
                                      cls=utils.JSONEncoderPlus,
                                      indent=4, separators=(',', ': ')))
@@ -65,7 +65,7 @@ class GoogleCloudPubSub():
                              separators=(',', ':')).encode('utf-8')
 
         self.publisher.publish(
-            self.topic,
+            self.topic_path,
             message,
             pubdate=datetime.now(timezone.utc).strftime('%c'))
 
