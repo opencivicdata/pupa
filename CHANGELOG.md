@@ -7,8 +7,10 @@ Improvements:
 * django 2.0 compatibility fixes (on_delete on models)
 * require python-opencivicdata 2.1 fixes
 * drop validictory for jsonschema
+* add 'pupa party' command for atomic addition of parties, deprecate Jurisdiction.parties
 
-FIxes:
+Fixes:
+
 * bugfix for OrganizationImporter other_names
 
 
