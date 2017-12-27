@@ -17,7 +17,7 @@ class GoogleCloudPubSub():
         # for credentials to be detected automatically
         #
         # @see http://google-cloud-python.readthedocs.io/en/latest/pubsub/index.html
-        service_account_data = os.environ.get('GOOGLE_CLOUD_PUBSUB_CREDENTIALS')
+        service_account_data = os.environ.get('GOOGLE_CLOUD_CREDENTIALS')
         if service_account_data:
             # @see https://github.com/GoogleCloudPlatform/google-auth-library-python/issues/225
             credentials = service_account.Credentials.from_service_account_info(
