@@ -10,7 +10,7 @@ python:
     - "3.6"
 env:
     - DJANGO_VERSION=">=1.11,<2"
-    - DJANGO_VERSION="==2.0a1"
+    - DJANGO_VERSION="==2.0"
 install:
     - pip install .[dev] --pre Django$DJANGO_VERSION
     - pip install -e git+https://github.com/opencivicdata/python-opencivicdata.git#egg=opencivicdata

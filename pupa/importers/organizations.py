@@ -55,7 +55,7 @@ class OrganizationImporter(BaseImporter):
         name = spec.pop('name', None)
         if name:
             return (Q(**spec) &
-                    Q(name=name) | Q(other_names__name=name))
+                    (Q(name=name) | Q(other_names__name=name)))
         return spec
 
     def _prepare_imports(self, dicts):

@@ -104,7 +104,6 @@ def test_deduplication_error_overlaps():
     wildlife = Organization.objects.create(name='World Wildlife Fund',
                                            classification='international',
                                            jurisdiction_id='jid1')
-
     wildlife.other_names.create(name='WWF')
 
     org = ScrapeOrganization('World Wrestling Federation', classification='international')
@@ -112,6 +111,27 @@ def test_deduplication_error_overlaps():
     od = org.as_dict()
     with pytest.raises(SameOrgNameError):
         OrganizationImporter('jid1').import_data([od])
+
+
+@pytest.mark.django_db
+def test_deduplication_overlap_name_distinct_juris():
+    create_jurisdictions()
+
+    org_jid_1 = Organization.objects.create(name='World Wrestling Federation',
+                                            classification='international',
+                                            jurisdiction_id='jid1')
+    org_jid_1.other_names.create(name='WWF')
+
+    org = ScrapeOrganization(name="WWF", classification="international")
+    org.add_name('WWF')
+
+    oi1 = OrganizationImporter('jid1')
+    oi1.import_item(org.as_dict())
+    assert Organization.objects.count() == 1
+
+    oi2 = OrganizationImporter('jid2')
+    oi2.import_item(org.as_dict())
+    assert Organization.objects.count() == 2
 
 
 @pytest.mark.django_db
