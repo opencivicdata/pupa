@@ -72,43 +72,14 @@ class Scraper(scrapelib.Scraper):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
-        if os.environ.get('OUTPUT_TARGET') == 'GOOGLE_CLOUD_PUBSUB':
+        self.output_target = self.get_output_target(os.environ.get('OUTPUT_TARGET'))
+
+    def get_output_target(self, output_target_name):
+        if output_target_name == 'GOOGLE_CLOUD_PUBSUB':
             from pupa.scrape.outputs.google_cloud import GoogleCloudPubSub
-            self.output_target = GoogleCloudPubSub(self)
-        else:
-            self.output_target = self
-
-    def save_object(self, obj):
-        """
-            Save object to disk as JSON.
-
-            Generally shouldn't be called directly.
-        """
-        obj.pre_save(self.jurisdiction.jurisdiction_id)
-
-        filename = '{0}_{1}.json'.format(obj._type, obj._id).replace('/', '-')
-
-        self.info('save %s %s as %s', obj._type, obj, filename)
-        self.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
-                              cls=utils.JSONEncoderPlus, indent=4, separators=(',', ': ')))
-
-        self.output_names[obj._type].add(filename)
-
-        with open(os.path.join(self.datadir, filename), 'w') as f:
-            json.dump(obj.as_dict(), f, cls=utils.JSONEncoderPlus)
-
-        # validate after writing, allows for inspection on failure
-        try:
-            obj.validate()
-        except ValueError as ve:
-            if self.strict_validation:
-                raise ve
-            else:
-                self.warning(ve)
-
-        # after saving and validating, save subordinate objects
-        for obj in obj._related:
-            self.save_object(obj)
+            return GoogleCloudPubSub(self)
+        from pupa.scrape.outputs.local_file import LocalFile
+        return LocalFile(self)
 
     def do_scrape(self, **kwargs):
         record = {'objects': defaultdict(int)}

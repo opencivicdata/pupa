@@ -4,14 +4,17 @@ from collections import OrderedDict
 from datetime import datetime, timezone
 
 from pupa import utils
+from pupa.scrape.outputs.output import Output
 
 from google.oauth2 import service_account
 from google.cloud import pubsub
 
 
-class GoogleCloudPubSub():
+class GoogleCloudPubSub(Output):
 
-    def __init__(self, caller):
+    def __init__(self, scraper):
+        super().__init__(scraper)
+
         # Allow users to explicitly provide service account info (i.e.,
         # stringified JSON) or, if on Google Cloud Platform, allow the chance
         # for credentials to be detected automatically
@@ -31,22 +34,18 @@ class GoogleCloudPubSub():
             os.environ.get('GOOGLE_CLOUD_PROJECT'),
             os.environ.get('GOOGLE_CLOUD_PUBSUB_TOPIC'))
 
-        self.caller = caller
+    def handle_output(self, obj):
+        self.scraper.info('save %s %s to topic %s', obj._type, obj, self.topic_path)
+        self.scraper.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
+                           cls=utils.JSONEncoderPlus,
+                           indent=4, separators=(',', ': ')))
 
-    def save_object(self, obj):
-        obj.pre_save(self.caller.jurisdiction.jurisdiction_id)
-
-        self.caller.info('save %s %s to topic %s', obj._type, obj, self.topic_path)
-        self.caller.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
-                                     cls=utils.JSONEncoderPlus,
-                                     indent=4, separators=(',', ': ')))
-
-        self.caller.output_names[obj._type].add(obj)
+        self.scraper.output_names[obj._type].add(obj)
 
         # Copy the original object so we can tack on jurisdiction and type
         output_obj = obj.as_dict()
 
-        if self.caller.jurisdiction:
+        if self.scraper.jurisdiction:
             output_obj['jurisdiction'] = self.caller.jurisdiction.jurisdiction_id
 
         output_obj['type'] = obj._type
@@ -60,18 +59,3 @@ class GoogleCloudPubSub():
             self.topic_path,
             message,
             pubdate=datetime.now(timezone.utc).strftime('%c'))
-
-        # validate after writing, allows for inspection on failure
-        try:
-            # Note we're validating the original object, not the output object,
-            # Because we add some relevant-to-us but out of schema metadata to the output object
-            obj.validate()
-        except Exception as ve:
-            if self.caller.strict_validation:
-                raise ve
-            else:
-                self.caller.warning(ve)
-
-        # after saving and validating, save subordinate objects
-        for obj in obj._related:
-            self.save_object(obj)
