@@ -8,9 +8,6 @@ from pupa.scrape.outputs.output import Output
 
 class LocalFile(Output):
 
-    def __init__(self, scraper):
-        super().__init__(scraper)
-
     def handle_output(self, obj):
         filename = '{0}_{1}.json'.format(obj._type, obj._id).replace('/', '-')
 
