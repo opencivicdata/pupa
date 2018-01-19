@@ -46,7 +46,7 @@ class GoogleCloudPubSub(Output):
         output_obj = obj.as_dict()
 
         if self.scraper.jurisdiction:
-            output_obj['jurisdiction'] = self.caller.jurisdiction.jurisdiction_id
+            output_obj['jurisdiction'] = self.scraper.jurisdiction.jurisdiction_id
 
         output_obj['type'] = obj._type
 
