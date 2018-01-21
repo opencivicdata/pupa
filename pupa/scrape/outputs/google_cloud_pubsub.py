@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from pupa import utils
 from pupa.scrape.outputs.output import Output
 
-from google.oauth2 import service_account
 from google.cloud import pubsub
 
 
@@ -15,21 +14,7 @@ class GoogleCloudPubSub(Output):
     def __init__(self, scraper):
         super().__init__(scraper)
 
-        # Allow users to explicitly provide service account info (i.e.,
-        # stringified JSON) or, if on Google Cloud Platform, allow the chance
-        # for credentials to be detected automatically
-        #
-        # @see http://google-cloud-python.readthedocs.io/en/latest/pubsub/index.html
-        service_account_data = os.environ.get('GOOGLE_CLOUD_CREDENTIALS')
-        if service_account_data:
-            # @see https://github.com/GoogleCloudPlatform/google-auth-library-python/issues/225
-            credentials = service_account.Credentials.from_service_account_info(
-                json.loads(service_account_data),
-                scopes=('https://www.googleapis.com/auth/pubsub',))
-            self.publisher = pubsub.PublisherClient(credentials=credentials)
-        else:
-            self.publisher = pubsub.PublisherClient()
-
+        self.publisher = pubsub.PublisherClient()
         self.topic_path = self.publisher.topic_path(
             os.environ.get('GOOGLE_CLOUD_PROJECT'),
             os.environ.get('GOOGLE_CLOUD_PUBSUB_TOPIC'))
