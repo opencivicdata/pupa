@@ -34,6 +34,6 @@ class AmazonSQS(Output):
 
         message = json.dumps(output_obj,
                              cls=utils.JSONEncoderPlus,
-                             separators=(',', ':')).encode('utf-8')
+                             separators=(',', ':'))
 
         self.queue.send_message(MessageBody=message)
