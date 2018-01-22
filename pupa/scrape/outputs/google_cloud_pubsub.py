@@ -17,6 +17,9 @@ class GoogleCloudPubSub(Output):
         self.topic_name = os.environ.get('GOOGLE_CLOUD_PUBSUB_TOPIC')
 
     def handle_output(self, obj):
+        publisher = pubsub.PublisherClient()
+        topic_path = publisher.topic_path(self.project, self.topic_name)
+
         self.scraper.info('save %s %s to topic %s', obj._type, obj, self.topic_path)
         self.scraper.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
                            cls=utils.JSONEncoderPlus,
@@ -24,8 +27,5 @@ class GoogleCloudPubSub(Output):
 
         self.add_output_name(obj, self.topic_path)
         obj_str = self.stringify_obj(obj, True, True)
-
-        publisher = pubsub.PublisherClient()
-        topic_path = publisher.topic_path(self.project, self.topic_name)
 
         publisher.publish(topic_path, obj_str.encode('utf-8'))
