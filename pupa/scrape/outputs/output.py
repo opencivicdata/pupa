@@ -1,6 +1,7 @@
 import json
 
 from abc import ABCMeta, abstractmethod
+from collections import OrderedDict
 from datetime import datetime, timezone
 
 from pupa import utils
@@ -13,6 +14,11 @@ class Output(metaclass=ABCMeta):
 
     def add_output_name(self, obj, output_name):
         self.scraper.output_names[obj._type].add(output_name)
+
+    def debug_obj(self, obj):
+        self.scraper.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
+                           cls=utils.JSONEncoderPlus,
+                           indent=4, separators=(',', ': ')))
 
     def get_obj_as_dict(self, obj, add_jurisdiction=False, add_type=False):
         obj_dict = obj.as_dict()

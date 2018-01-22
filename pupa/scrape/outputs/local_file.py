@@ -1,6 +1,5 @@
 import json
 import os
-from collections import OrderedDict
 
 from pupa import utils
 from pupa.scrape.outputs.output import Output
@@ -12,8 +11,7 @@ class LocalFile(Output):
         filename = '{0}_{1}.json'.format(obj._type, obj._id).replace('/', '-')
 
         self.scraper.info('save %s %s as %s', obj._type, obj, filename)
-        self.scraper.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
-                           cls=utils.JSONEncoderPlus, indent=4, separators=(',', ': ')))
+        self.debug_obj(obj)
 
         self.add_output_name(obj, filename)
 
