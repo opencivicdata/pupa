@@ -1,7 +1,6 @@
 import os
 import json
 from collections import OrderedDict
-from datetime import datetime, timezone
 
 from pupa import utils
 from pupa.scrape.outputs.output import Output
@@ -25,22 +24,7 @@ class GoogleCloudPubSub(Output):
                            cls=utils.JSONEncoderPlus,
                            indent=4, separators=(',', ': ')))
 
-        self.scraper.output_names[obj._type].add(obj)
+        self.add_output_name(obj, self.topic_path)
+        obj_str = self.stringify_obj(obj, True, True)
 
-        # Copy the original object so we can tack on jurisdiction and type
-        output_obj = obj.as_dict()
-
-        if self.scraper.jurisdiction:
-            output_obj['jurisdiction'] = self.scraper.jurisdiction.jurisdiction_id
-
-        output_obj['type'] = obj._type
-
-        # TODO: Should add a messagepack CLI option
-        message = json.dumps(output_obj,
-                             cls=utils.JSONEncoderPlus,
-                             separators=(',', ':')).encode('utf-8')
-
-        self.publisher.publish(
-            self.topic_path,
-            message,
-            pubdate=datetime.now(timezone.utc).strftime('%c'))
+        self.publisher.publish(self.topic_path, obj_str.encode('utf-8'))

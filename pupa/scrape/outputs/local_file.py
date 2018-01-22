@@ -15,7 +15,7 @@ class LocalFile(Output):
         self.scraper.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
                            cls=utils.JSONEncoderPlus, indent=4, separators=(',', ': ')))
 
-        self.scraper.output_names[obj._type].add(filename)
+        self.add_output_name(obj, filename)
 
         with open(os.path.join(self.scraper.datadir, filename), 'w') as f:
             json.dump(obj.as_dict(), f, cls=utils.JSONEncoderPlus)
