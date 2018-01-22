@@ -52,7 +52,9 @@ class VoteEvent(BaseModel, SourceMixin):
             if chamber is None:
                 chamber = 'legislature'
             kwargs = {'identifier': bill_or_identifier,
-                      'from_organization__classification': chamber}
+                      'from_organization__classification': chamber,
+                      'legislative_session__identifier': self.legislative_session
+                      }
             self.bill = _make_pseudo_id(**kwargs)
 
     def vote(self, option, voter, *, note=''):
