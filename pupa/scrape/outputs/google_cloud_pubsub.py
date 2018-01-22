@@ -7,6 +7,8 @@ from pupa.scrape.outputs.output import Output
 
 from google.cloud import pubsub
 
+import http.client
+
 
 class GoogleCloudPubSub(Output):
 
@@ -17,6 +19,8 @@ class GoogleCloudPubSub(Output):
         self.topic_name = os.environ.get('GOOGLE_CLOUD_PUBSUB_TOPIC')
 
     def handle_output(self, obj):
+        self.scraper.info('{} {}'.format(http.client.HTTPConnection._http_vsn,
+                                         http.client.HTTPConnection._http_vsn_str))
         publisher = pubsub.PublisherClient()
         topic_path = publisher.topic_path(self.project, self.topic_name)
 
