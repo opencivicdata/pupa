@@ -17,7 +17,8 @@ class AmazonSQS(Output):
         self.queue = self.sqs.get_queue_by_name(QueueName=self.queue_name)
 
     def handle_output(self, obj):
-        self.scraper.info('save %s %s to queue %s', obj._type, obj, self.queue_name)
+        self.scraper.info('publish %s %s to queue %s', obj._type, obj,
+                          self.queue_name)
         self.scraper.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
                            cls=utils.JSONEncoderPlus,
                            indent=4, separators=(',', ': ')))
