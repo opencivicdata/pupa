@@ -32,12 +32,12 @@ class AmazonSQS(Output):
         encoded_obj_str = obj_str.encode('utf-8')
 
         if len(encoded_obj_str) > MAX_BYTE_LENGTH:
-            key = str(uuid.uuid4())
+            key = 'S3:{}'.format(str(uuid.uuid4()))
 
             self.scraper.info('put %s %s to bucket %s/%s', obj._type, obj,
                               self.bucket_name, key)
 
             self.s3.Object(self.bucket_name, key).put(Body=encoded_obj_str)
-            self.queue.send_message(MessageBody='S3:{}'.format(key))
+            self.queue.send_message(MessageBody=key)
         else:
             self.queue.send_message(MessageBody=obj_str)
