@@ -17,24 +17,11 @@ class AmazonSQS(Output):
         self.queue = self.sqs.get_queue_by_name(QueueName=self.queue_name)
 
     def handle_output(self, obj):
-        self.scraper.info('publish %s %s to queue %s', obj._type, obj,
+        self.scraper.info('send %s %s to queue %s', obj._type, obj,
                           self.queue_name)
-        self.scraper.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
-                           cls=utils.JSONEncoderPlus,
-                           indent=4, separators=(',', ': ')))
+        self.debug_obj(obj)
 
-        self.scraper.output_names[obj._type].add(obj)
+        self.add_output_name(obj, self.queue_name)
+        obj_str = self.stringify_obj(obj, True, True)
 
-        # Copy the original object so we can tack on jurisdiction and type
-        output_obj = obj.as_dict()
-
-        if self.scraper.jurisdiction:
-            output_obj['jurisdiction'] = self.scraper.jurisdiction.jurisdiction_id
-
-        output_obj['type'] = obj._type
-
-        message = json.dumps(output_obj,
-                             cls=utils.JSONEncoderPlus,
-                             separators=(',', ':'))
-
-        self.queue.send_message(MessageBody=message)
+        self.queue.send_message(MessageBody=obj_str)
