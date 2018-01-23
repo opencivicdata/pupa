@@ -76,7 +76,7 @@ class Scraper(scrapelib.Scraper):
 
     def get_output_target(self, output_target_name):
         if output_target_name == 'GOOGLE_CLOUD_PUBSUB':
-            from pupa.scrape.outputs.google_cloud import GoogleCloudPubSub
+            from pupa.scrape.outputs.google_cloud_pubsub import GoogleCloudPubSub
             return GoogleCloudPubSub(self)
         from pupa.scrape.outputs.local_file import LocalFile
         return LocalFile(self)
