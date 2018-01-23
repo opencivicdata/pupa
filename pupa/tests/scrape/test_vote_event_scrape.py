@@ -85,7 +85,9 @@ def test_set_bill_pseudo_id():
     ve = toy_vote_event()
     ve.set_bill('HB 1', chamber='lower')
     assert get_pseudo_id(ve.bill) == {'identifier': 'HB 1',
-                                      'from_organization__classification': 'lower'}
+                                      'from_organization__classification': 'lower',
+                                      'legislative_session__identifier': '2009',
+                                      }
 
 
 def test_str():
