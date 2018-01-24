@@ -1,4 +1,4 @@
-from pupa.utils import fix_bill_id
+from pupa.filters import apply_filters, BILL_FILTERS
 from opencivicdata.legislative.models import (Bill, RelatedBill, BillAbstract, BillTitle,
                                               BillIdentifier, BillAction, BillActionRelatedEntity,
                                               BillSponsorship, BillSource, BillDocument,
@@ -48,7 +48,8 @@ class BillImporter(BaseImporter):
         return spec
 
     def prepare_for_db(self, data):
-        data['identifier'] = fix_bill_id(data['identifier'])
+        apply_filters(BILL_FILTERS, data)
+
         data['legislative_session_id'] = self.get_session_id(data.pop('legislative_session'))
 
         if data['from_organization']:
