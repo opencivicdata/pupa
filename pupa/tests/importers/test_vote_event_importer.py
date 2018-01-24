@@ -375,3 +375,34 @@ def test_vote_event_bill_actions_errors():
     # these both try to match the same action, only first will succeed
     assert votes[2].bill_action is not None
     assert votes[3].bill_action is None
+
+
+@pytest.mark.django_db
+def test_fix_bill_id():
+    j = create_jurisdiction()
+    j.legislative_sessions.create(name='1900', identifier='1900')
+
+    org1 = ScrapeOrganization(name='House', classification='lower')
+    bill = ScrapeBill('HB 1', '1900', 'Test Bill ID',
+                      classification='bill', chamber='lower')
+
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
+    oi.import_data([org1.as_dict()])
+    bi = BillImporter('jid', oi, DumbMockImporter())
+    bi.import_data([bill.as_dict()])
+
+    ve = ScrapeVoteEvent(legislative_session='1900', motion_text='passage',
+                         start_date='1900-04-02', classification='passage:bill',
+                         result='fail', bill_chamber='lower', bill='HB1',
+                         identifier='4',
+                         bill_action='passage',
+                         organization=org1._id)
+
+    VoteEventImporter('jid', DumbMockImporter(), oi, bi).import_data([
+        ve.as_dict(),
+    ])
+
+    ve = VoteEvent.objects.get()
+    ve.bill.identifier == 'HB 1'

@@ -376,3 +376,20 @@ def test_bill_action_extras():
 
     b = Bill.objects.get()
     assert b.actions.all()[0].extras == {'test': 3}
+
+
+@pytest.mark.django_db
+def test_fix_bill_id():
+    create_jurisdiction()
+    create_org()
+
+    bill = ScrapeBill('HB1', '1900', 'Test Bill ID',
+                      classification='bill', chamber='lower')
+
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
+    BillImporter('jid', oi, pi).import_data([bill.as_dict()])
+
+    b = Bill.objects.get()
+    assert b.identifier == 'HB 1'
