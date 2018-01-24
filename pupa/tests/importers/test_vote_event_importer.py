@@ -387,7 +387,6 @@ def test_fix_bill_id():
                       classification='bill', chamber='lower')
 
     oi = OrganizationImporter('jid')
-    pi = PersonImporter('jid')
 
     oi.import_data([org1.as_dict()])
     bi = BillImporter('jid', oi, DumbMockImporter())
