@@ -7,7 +7,7 @@ from collections import OrderedDict
 from pupa import utils
 from pupa.scrape.outputs.output import Output
 
-MAX_BYTE_LENGTH = 230_000
+MAX_BYTE_LENGTH = 230000
 
 
 class AmazonSQS(Output):
