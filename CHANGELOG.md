@@ -8,6 +8,7 @@ Improvements:
 * require python-opencivicdata 2.1 fixes
 * drop validictory for jsonschema
 * add 'pupa party' command for atomic addition of parties, deprecate Jurisdiction.parties
+* add IMPORT_TRANSFORMERS setting allowing alterations of data on import
 
 Fixes:
 
