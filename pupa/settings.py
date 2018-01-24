@@ -21,6 +21,12 @@ SCRAPELIB_RETRY_WAIT_SECONDS = 10
 CACHE_DIR = os.path.join(os.getcwd(), '_cache')
 SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 
+# import settings
+
+IMPORT_FILTERS = {
+    'bill': []
+}
+
 # Django settings
 DEBUG = False
 TEMPLATE_DEBUG = False

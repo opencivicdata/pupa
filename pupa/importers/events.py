@@ -1,6 +1,5 @@
 from .base import BaseImporter
 from pupa.utils import get_pseudo_id, _make_pseudo_id
-from pupa.filters import apply_filters, BILL_FILTERS
 from opencivicdata.legislative.models import (Event, EventLocation, EventSource, EventDocument,
                                               EventDocumentLink, EventLink, EventParticipant,
                                               EventMedia, EventMediaLink, EventAgendaItem,
@@ -92,7 +91,7 @@ class EventImporter(BaseImporter):
                 elif 'bill_id' in entity:
                     # unpack and repack bill psuedo id in case filters alter it
                     bill = get_pseudo_id(entity['bill_id'])
-                    apply_filters(BILL_FILTERS, bill)
+                    self.bill_importer.apply_filters(bill)
                     bill = _make_pseudo_id(**bill)
                     entity['bill_id'] = self.bill_importer.resolve_json_id(
                         bill,

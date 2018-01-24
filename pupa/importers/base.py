@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 
 from opencivicdata.legislative.models import LegislativeSession
+from pupa import settings
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id, utcnow
 from pupa.exceptions import UnresolvedIdError, DataImportError
@@ -94,6 +95,7 @@ class BaseImporter(object):
     related_models = {}
     preserve_order = set()
     merge_related = {}
+    cached_filters = {}
 
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
@@ -107,6 +109,10 @@ class BaseImporter(object):
         self.warning = self.logger.warning
         self.error = self.logger.error
         self.critical = self.logger.critical
+
+        # load filters from appropriate setting
+        if settings.IMPORT_FILTERS.get(self._type):
+            self.cached_filters = settings.IMPORT_FILTERS[self._type]
 
     def get_session_id(self, identifier):
         if identifier not in self.session_cache:
@@ -409,3 +415,16 @@ class BaseImporter(object):
             obj_id = None
 
         return obj_id
+
+    def apply_filters(self, data, filters=None):
+        if filters is None:
+            filters = self.cached_filters
+
+        for key, key_filters in filters.items():
+            if isinstance(key_filters, list):
+                for filter in key_filters:
+                    data[key] = filter(data[key])
+            elif isinstance(key_filters, dict):
+                self.apply_filters(data[key], key_filters[key])
+            else:
+                data[key] = key_filters(data[key])
