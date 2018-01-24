@@ -3,7 +3,7 @@ from pupa.scrape import Bill as ScrapeBill
 from pupa.scrape import Person as ScrapePerson
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import BillImporter, OrganizationImporter, PersonImporter
-from pupa.filters import fix_bill_id
+from pupa.transformers import fix_bill_id
 from opencivicdata.core.models import Jurisdiction, Person, Organization, Membership, Division
 from opencivicdata.legislative.models import Bill
 
@@ -390,11 +390,11 @@ def test_fix_bill_id():
     oi = OrganizationImporter('jid')
     pi = PersonImporter('jid')
 
-    from pupa.settings import IMPORT_FILTERS
-    IMPORT_FILTERS['bill'] = {'identifier': fix_bill_id}
+    from pupa.settings import IMPORT_TRANSFORMERS
+    IMPORT_TRANSFORMERS['bill'] = {'identifier': fix_bill_id}
     bi = BillImporter('jid', oi, pi)
     bi.import_data([bill.as_dict()])
-    IMPORT_FILTERS['bill'] = {}
+    IMPORT_TRANSFORMERS['bill'] = {}
 
     b = Bill.objects.get()
     assert b.identifier == 'HB 1'

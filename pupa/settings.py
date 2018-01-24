@@ -23,7 +23,7 @@ SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 
 # import settings
 
-IMPORT_FILTERS = {
+IMPORT_TRANSFORMERS = {
     'bill': []
 }
 

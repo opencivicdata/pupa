@@ -95,7 +95,7 @@ class BaseImporter(object):
     related_models = {}
     preserve_order = set()
     merge_related = {}
-    cached_filters = {}
+    cached_transformers = {}
 
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
@@ -110,9 +110,9 @@ class BaseImporter(object):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
-        # load filters from appropriate setting
-        if settings.IMPORT_FILTERS.get(self._type):
-            self.cached_filters = settings.IMPORT_FILTERS[self._type]
+        # load transformers from appropriate setting
+        if settings.IMPORT_TRANSFORMERS.get(self._type):
+            self.cached_transformers = settings.IMPORT_TRANSFORMERS[self._type]
 
     def get_session_id(self, identifier):
         if identifier not in self.session_cache:
@@ -416,15 +416,15 @@ class BaseImporter(object):
 
         return obj_id
 
-    def apply_filters(self, data, filters=None):
-        if filters is None:
-            filters = self.cached_filters
+    def apply_transformers(self, data, transformers=None):
+        if transformers is None:
+            transformers = self.cached_transformers
 
-        for key, key_filters in filters.items():
-            if isinstance(key_filters, list):
-                for filter in key_filters:
-                    data[key] = filter(data[key])
-            elif isinstance(key_filters, dict):
-                self.apply_filters(data[key], key_filters[key])
+        for key, key_transformers in transformers.items():
+            if isinstance(key_transformers, list):
+                for transformer in key_transformers:
+                    data[key] = transformer(data[key])
+            elif isinstance(key_transformers, dict):
+                self.apply_transformers(data[key], key_transformers[key])
             else:
-                data[key] = key_filters(data[key])
+                data[key] = key_transformers(data[key])

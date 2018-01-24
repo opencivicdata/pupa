@@ -71,7 +71,7 @@ class VoteEventImporter(BaseImporter):
         if bill and bill.startswith('~'):
             # unpack psuedo id and apply filter in case there are any that alter it
             bill = get_pseudo_id(bill)
-            self.bill_importer.apply_filters(bill)
+            self.bill_importer.apply_transformers(bill)
             bill = _make_pseudo_id(**bill)
 
         data['bill_id'] = self.bill_importer.resolve_json_id(bill)

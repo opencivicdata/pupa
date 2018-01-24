@@ -1,5 +1,5 @@
 import pytest
-from pupa.filters import fix_bill_id
+from pupa.transformers import fix_bill_id
 from pupa.scrape import (VoteEvent as ScrapeVoteEvent, Bill as ScrapeBill, Organization as
                          ScrapeOrganization, Person as ScrapePerson)
 from pupa.importers import (VoteEventImporter, BillImporter, MembershipImporter,
@@ -391,8 +391,8 @@ def test_fix_bill_id():
 
     oi.import_data([org1.as_dict()])
 
-    from pupa.settings import IMPORT_FILTERS
-    IMPORT_FILTERS['bill'] = {'identifier': fix_bill_id}
+    from pupa.settings import IMPORT_TRANSFORMERS
+    IMPORT_TRANSFORMERS['bill'] = {'identifier': fix_bill_id}
 
     bi = BillImporter('jid', oi, DumbMockImporter())
     bi.import_data([bill.as_dict()])
@@ -408,7 +408,7 @@ def test_fix_bill_id():
         ve.as_dict(),
     ])
 
-    IMPORT_FILTERS['bill'] = {}
+    IMPORT_TRANSFORMERS['bill'] = {}
 
     ve = VoteEvent.objects.get()
     ve.bill.identifier == 'HB 1'
