@@ -47,8 +47,6 @@ class BillImporter(BaseImporter):
         return spec
 
     def prepare_for_db(self, data):
-        self.apply_transformers(data)
-
         data['legislative_session_id'] = self.get_session_id(data.pop('legislative_session'))
 
         if data['from_organization']:

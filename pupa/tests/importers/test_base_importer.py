@@ -60,6 +60,26 @@ def test_import_directory():
     shutil.rmtree(datadir)
 
 
+def test_apply_transformers():
+    transformers = {
+        'capitalize': lambda x: x.upper(),
+        'cap_and_reverse': [lambda x: x.upper(), lambda y: y[::-1]],
+        'never_used': lambda x: 1/0,
+        'nested': {'replace': lambda x: 'replaced'},
+    }
+    data = {
+        'capitalize': 'words',
+        'cap_and_reverse': 'simple',
+        'nested': {'replace': None},
+    }
+    ti = FakeImporter('jid')
+    ti.cached_transformers = transformers
+    output = ti.apply_transformers(data)
+    assert output['capitalize'] == 'WORDS'
+    assert output['cap_and_reverse'] == 'ELPMIS'
+    assert output['nested']['replace'] == 'replaced'
+
+
 # doing these next few tests just on a Person because it is the same code that handles it
 # but for completeness maybe it is better to do these on each type?
 
