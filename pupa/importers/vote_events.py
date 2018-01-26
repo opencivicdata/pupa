@@ -1,7 +1,6 @@
 from opencivicdata.legislative.models import (VoteEvent, VoteCount, PersonVote, VoteSource,
                                               BillAction)
-from pupa.utils import fix_bill_id, get_pseudo_id, _make_pseudo_id
-
+from pupa.utils import get_pseudo_id, _make_pseudo_id
 from .base import BaseImporter
 from ..exceptions import InvalidVoteEventError
 
@@ -70,8 +69,9 @@ class VoteEventImporter(BaseImporter):
 
         bill = data.pop('bill')
         if bill and bill.startswith('~'):
+            # unpack psuedo id and apply filter in case there are any that alter it
             bill = get_pseudo_id(bill)
-            bill['identifier'] = fix_bill_id(bill['identifier'])
+            self.bill_importer.apply_transformers(bill)
             bill = _make_pseudo_id(**bill)
 
         data['bill_id'] = self.bill_importer.resolve_json_id(bill)

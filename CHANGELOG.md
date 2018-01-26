@@ -1,6 +1,10 @@
 # pupa changelog
 
-## WIP
+## 0.9.0
+
+Backwards-incompatible changes:
+
+* fix_bill_id is no longer called on bill identifiers
 
 Improvements: 
 
@@ -8,6 +12,7 @@ Improvements:
 * require python-opencivicdata 2.1 fixes
 * drop validictory for jsonschema
 * add 'pupa party' command for atomic addition of parties, deprecate Jurisdiction.parties
+* add IMPORT_TRANSFORMERS setting allowing alterations of data on import
 
 Fixes:
 
