@@ -1,9 +1,9 @@
+import re
 import pytest
 from pupa.scrape import Bill as ScrapeBill
 from pupa.scrape import Person as ScrapePerson
 from pupa.scrape import Organization as ScrapeOrganization
 from pupa.importers import BillImporter, OrganizationImporter, PersonImporter
-from pupa.transformers import fix_bill_id
 from opencivicdata.core.models import Jurisdiction, Person, Organization, Membership, Division
 from opencivicdata.legislative.models import Bill
 
@@ -391,7 +391,9 @@ def test_fix_bill_id():
     pi = PersonImporter('jid')
 
     from pupa.settings import IMPORT_TRANSFORMERS
-    IMPORT_TRANSFORMERS['bill'] = {'identifier': fix_bill_id}
+    IMPORT_TRANSFORMERS['bill'] = {
+        'identifier': lambda x: re.sub(r'([A-Z]*)\s*0*([-\d]+)', r'\1 \2', x, 1)
+    }
     bi = BillImporter('jid', oi, pi)
     bi.import_data([bill.as_dict()])
     IMPORT_TRANSFORMERS['bill'] = {}

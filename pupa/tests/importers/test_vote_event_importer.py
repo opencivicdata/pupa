@@ -1,5 +1,5 @@
+import re
 import pytest
-from pupa.transformers import fix_bill_id
 from pupa.scrape import (VoteEvent as ScrapeVoteEvent, Bill as ScrapeBill, Organization as
                          ScrapeOrganization, Person as ScrapePerson)
 from pupa.importers import (VoteEventImporter, BillImporter, MembershipImporter,
@@ -392,7 +392,9 @@ def test_fix_bill_id():
     oi.import_data([org1.as_dict()])
 
     from pupa.settings import IMPORT_TRANSFORMERS
-    IMPORT_TRANSFORMERS['bill'] = {'identifier': fix_bill_id}
+    IMPORT_TRANSFORMERS['bill'] = {
+        'identifier': lambda x: re.sub(r'([A-Z]*)\s*0*([-\d]+)', r'\1 \2', x, 1)
+    }
 
     bi = BillImporter('jid', oi, DumbMockImporter())
     bi.import_data([bill.as_dict()])
