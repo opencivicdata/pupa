@@ -1,6 +1,10 @@
 # pupa changelog
 
-## WIP
+## 0.9.0
+
+Backwards-incompatible changes:
+
+* fix_bill_id is no longer called on bill identifiers
 
 Improvements: 
 
