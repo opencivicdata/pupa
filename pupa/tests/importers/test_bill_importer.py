@@ -380,25 +380,6 @@ def test_bill_action_extras():
 
 
 @pytest.mark.django_db
-def test_bill_duplicate_action():
-    create_jurisdiction()
-    create_org()
-
-    bill = ScrapeBill('HB 1', '1900', 'Axe & Tack Tax Act',
-                      classification='tax bill', chamber='lower')
-    bill.add_action('sample', '1900-01-01', chamber='lower')
-    bill.add_action('sample', '1900-01-01', chamber='lower')
-
-    oi = OrganizationImporter('jid')
-    pi = PersonImporter('jid')
-
-    BillImporter('jid', oi, pi).import_data([bill.as_dict()])
-
-    b = Bill.objects.get()
-    assert b.actions.count() == 2
-
-
-@pytest.mark.django_db
 def test_fix_bill_id():
     create_jurisdiction()
     create_org()
