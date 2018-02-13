@@ -18,6 +18,7 @@ Fixes:
 
 * bugfix for OrganizationImporter other_names
 * bugfix for VoteEvent bill resolution
+* bugfix for VoteEvent bill action resolution (#307)
 
 
 ## 0.8.0 - July 19 2017
