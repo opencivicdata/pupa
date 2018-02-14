@@ -1,6 +1,6 @@
 # pupa changelog
 
-## 0.9.0
+## 0.9.0 - February 14 2018
 
 Backwards-incompatible changes:
 
