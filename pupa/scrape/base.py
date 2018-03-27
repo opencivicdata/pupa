@@ -78,6 +78,9 @@ class Scraper(scrapelib.Scraper):
         if output_target_name == 'GOOGLE_CLOUD_PUBSUB':
             from pupa.scrape.outputs.google_cloud_pubsub import GoogleCloudPubSub
             return GoogleCloudPubSub(self)
+        if output_target_name == 'AMAZON_SQS':
+            from pupa.scrape.outputs.amazon_sqs import AmazonSQS
+            return AmazonSQS(self)
         from pupa.scrape.outputs.local_file import LocalFile
         return LocalFile(self)
 
