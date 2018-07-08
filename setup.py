@@ -29,7 +29,7 @@ pupa = pupa.cli.__main__:main''',
       extras_require={
           'dev': [
             'mock',
-            'pytest',
+            'pytest>=3.6',
             'pytest-cov',
             'pytest-django',
             'coveralls',
