@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 
 from opencivicdata.legislative.models import LegislativeSession
+from pupa import settings
 from pupa.exceptions import DuplicateItemError
 from pupa.utils import get_pseudo_id, utcnow
 from pupa.exceptions import UnresolvedIdError, DataImportError
@@ -94,6 +95,7 @@ class BaseImporter(object):
     related_models = {}
     preserve_order = set()
     merge_related = {}
+    cached_transformers = {}
 
     def __init__(self, jurisdiction_id):
         self.jurisdiction_id = jurisdiction_id
@@ -107,6 +109,10 @@ class BaseImporter(object):
         self.warning = self.logger.warning
         self.error = self.logger.error
         self.critical = self.logger.critical
+
+        # load transformers from appropriate setting
+        if settings.IMPORT_TRANSFORMERS.get(self._type):
+            self.cached_transformers = settings.IMPORT_TRANSFORMERS[self._type]
 
     def get_session_id(self, identifier):
         if identifier not in self.session_cache:
@@ -244,6 +250,7 @@ class BaseImporter(object):
         data.pop('_id', None)
 
         # add fields/etc.
+        data = self.apply_transformers(data)
         data = self.prepare_for_db(data)
 
         try:
@@ -409,3 +416,20 @@ class BaseImporter(object):
             obj_id = None
 
         return obj_id
+
+    def apply_transformers(self, data, transformers=None):
+        if transformers is None:
+            transformers = self.cached_transformers
+
+        for key, key_transformers in transformers.items():
+            if key not in data:
+                continue
+            if isinstance(key_transformers, list):
+                for transformer in key_transformers:
+                    data[key] = transformer(data[key])
+            elif isinstance(key_transformers, dict):
+                self.apply_transformers(data[key], key_transformers)
+            else:
+                data[key] = key_transformers(data[key])
+
+        return data

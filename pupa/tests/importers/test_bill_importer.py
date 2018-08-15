@@ -1,3 +1,4 @@
+import re
 import pytest
 from pupa.scrape import Bill as ScrapeBill
 from pupa.scrape import Person as ScrapePerson
@@ -376,3 +377,26 @@ def test_bill_action_extras():
 
     b = Bill.objects.get()
     assert b.actions.all()[0].extras == {'test': 3}
+
+
+@pytest.mark.django_db
+def test_fix_bill_id():
+    create_jurisdiction()
+    create_org()
+
+    bill = ScrapeBill('HB1', '1900', 'Test Bill ID',
+                      classification='bill', chamber='lower')
+
+    oi = OrganizationImporter('jid')
+    pi = PersonImporter('jid')
+
+    from pupa.settings import IMPORT_TRANSFORMERS
+    IMPORT_TRANSFORMERS['bill'] = {
+        'identifier': lambda x: re.sub(r'([A-Z]*)\s*0*([-\d]+)', r'\1 \2', x, 1)
+    }
+    bi = BillImporter('jid', oi, pi)
+    bi.import_data([bill.as_dict()])
+    IMPORT_TRANSFORMERS['bill'] = {}
+
+    b = Bill.objects.get()
+    assert b.identifier == 'HB 1'
