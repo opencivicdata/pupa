@@ -72,37 +72,17 @@ class Scraper(scrapelib.Scraper):
         self.error = self.logger.error
         self.critical = self.logger.critical
 
-    def save_object(self, obj):
-        """
-            Save object to disk as JSON.
+        self.output_target = self.get_output_target(os.environ.get('OUTPUT_TARGET'))
 
-            Generally shouldn't be called directly.
-        """
-        obj.pre_save(self.jurisdiction.jurisdiction_id)
-
-        filename = '{0}_{1}.json'.format(obj._type, obj._id).replace('/', '-')
-
-        self.info('save %s %s as %s', obj._type, obj, filename)
-        self.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
-                              cls=utils.JSONEncoderPlus, indent=4, separators=(',', ': ')))
-
-        self.output_names[obj._type].add(filename)
-
-        with open(os.path.join(self.datadir, filename), 'w') as f:
-            json.dump(obj.as_dict(), f, cls=utils.JSONEncoderPlus)
-
-        # validate after writing, allows for inspection on failure
-        try:
-            obj.validate()
-        except ValueError as ve:
-            if self.strict_validation:
-                raise ve
-            else:
-                self.warning(ve)
-
-        # after saving and validating, save subordinate objects
-        for obj in obj._related:
-            self.save_object(obj)
+    def get_output_target(self, output_target_name):
+        if output_target_name == 'GOOGLE_CLOUD_PUBSUB':
+            from pupa.scrape.outputs.google_cloud_pubsub import GoogleCloudPubSub
+            return GoogleCloudPubSub(self)
+        if output_target_name == 'AMAZON_SQS':
+            from pupa.scrape.outputs.amazon_sqs import AmazonSQS
+            return AmazonSQS(self)
+        from pupa.scrape.outputs.local_file import LocalFile
+        return LocalFile(self)
 
     def do_scrape(self, **kwargs):
         record = {'objects': defaultdict(int)}
@@ -111,9 +91,9 @@ class Scraper(scrapelib.Scraper):
         for obj in self.scrape(**kwargs) or []:
             if hasattr(obj, '__iter__'):
                 for iterobj in obj:
-                    self.save_object(iterobj)
+                    self.output_target.save_object(iterobj)
             else:
-                self.save_object(obj)
+                self.output_target.save_object(obj)
         record['end'] = utils.utcnow()
         record['skipped'] = getattr(self, 'skipped', 0)
         if not self.output_names:
