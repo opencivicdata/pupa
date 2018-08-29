@@ -1,3 +1,5 @@
+import os
+
 from ..utils import _make_pseudo_id
 from .base import BaseModel, cleanup_list, SourceMixin
 from .bill import Bill
@@ -47,7 +49,11 @@ class VoteEvent(BaseModel, SourceMixin):
         elif isinstance(bill_or_identifier, Bill):
             if chamber:
                 raise ScrapeValueError("set_bill takes no arguments when using a `Bill` object")
-            self.bill = bill_or_identifier._id
+            if os.environ.get('VOTE_EVENT_NO_BILL_UUID') == 'true':
+                kwargs = {'identifier': bill_or_identifier.identifier}
+                self.bill = _make_pseudo_id(**kwargs)
+            else:
+                self.bill = bill_or_identifier._id
         else:
             if chamber is None:
                 chamber = 'legislature'
