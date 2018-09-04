@@ -23,7 +23,7 @@ pupa = pupa.cli.__main__:main''',
           'dj_database_url>=0.3.0',
           'scrapelib>=1.0',
           'jsonschema>=2.6.0',
-          'psycopg2',
+          'psycopg2-binary',
           'pytz',
       ],
       extras_require={
