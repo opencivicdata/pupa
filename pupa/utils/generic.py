@@ -58,4 +58,8 @@ def convert_pdf(filename, type='xml'):
 
 
 def format_datetime(dt, timezone):
+    """
+    Removes microseconds, converts to ISO format, and assigns timezone. dt must not have a
+    timezone already.
+    """
     return pytz.timezone(timezone).localize(dt).replace(microsecond=0).isoformat()
