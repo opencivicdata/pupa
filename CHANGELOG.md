@@ -1,12 +1,19 @@
 # pupa changelog
 
+## 0.9.1 - October 23 2018
+
+Fixes:
+
+* minor packaging fixes & dependency pinning tweaks
+
+
 ## 0.9.0 - February 14 2018
 
 Backwards-incompatible changes:
 
 * fix_bill_id is no longer called on bill identifiers
 
-Improvements: 
+Improvements:
 
 * django 2.0 compatibility fixes (on_delete on models)
 * require python-opencivicdata 2.1 fixes
