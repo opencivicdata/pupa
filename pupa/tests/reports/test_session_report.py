@@ -89,3 +89,63 @@ def test_votes_missing_voters():
     v.votes.create(option='yes', voter_name='Speaker')
     report = generate_session_report(session)
     assert report.votes_missing_voters == 1
+
+
+@pytest.mark.django_db
+def test_missing_yes_no_counts():
+    session, org, person = create_data()
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
+    v = VoteEvent.objects.create(legislative_session=session, motion_text='Passage', bill=b,
+                                 organization=org)
+    VoteEvent.objects.create(legislative_session=session, motion_text='Amendment', bill=b,
+                             organization=org)
+
+    report = generate_session_report(session)
+    assert report.votes_missing_yes_count == 2
+    assert report.votes_missing_no_count == 2
+
+    v.counts.create(option='yes', value=1)
+    report = generate_session_report(session)
+    assert report.votes_missing_yes_count == 1
+    assert report.votes_missing_no_count == 2
+
+    v.counts.create(option='no', value=0)
+    report = generate_session_report(session)
+    assert report.votes_missing_yes_count == 1
+    assert report.votes_missing_no_count == 1
+
+
+@pytest.mark.django_db
+def test_votes_with_bad_counts():
+    session, org, person = create_data()
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
+    v = VoteEvent.objects.create(legislative_session=session, motion_text='Passage', bill=b,
+                                 organization=org)
+
+    report = generate_session_report(session)
+    assert report.votes_with_bad_counts == 0
+
+    # add count, breaking
+    v.counts.create(option='yes', value=1)
+    report = generate_session_report(session)
+    assert report.votes_with_bad_counts == 1
+
+    # add voter, fixing
+    v.votes.create(option='yes', voter_name='One')
+    report = generate_session_report(session)
+    assert report.votes_with_bad_counts == 0
+
+    # add voter, breaking
+    v.votes.create(option='no', voter_name='Two')
+    report = generate_session_report(session)
+    assert report.votes_with_bad_counts == 1
+
+    # add count, still not equal
+    v.counts.create(option='no', value=2)
+    report = generate_session_report(session)
+    assert report.votes_with_bad_counts == 1
+
+    # add voter, fixing
+    v.votes.create(option='no', voter_name='Three')
+    report = generate_session_report(session)
+    assert report.votes_with_bad_counts == 0
