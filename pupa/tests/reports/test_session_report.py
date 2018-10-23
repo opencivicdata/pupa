@@ -10,7 +10,7 @@ def create_data():
     org = Organization.objects.create(jurisdiction=j, name='House', classification='lower')
     person = Person.objects.create(name='Roy')
     j.legislative_sessions.create(identifier='1899', name='1899')
-    session = j.legislative_sessions.create(identifier='1900', name='1900')
+    session = j.legislative_sessions.create(identifier='1900', name='1900').id
     return session, org, person
 
 

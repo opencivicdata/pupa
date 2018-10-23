@@ -5,7 +5,7 @@ from ..models import SessionDataQualityReport
 
 
 def _simple_count(ModelCls, session, **filter):
-    return ModelCls.objects.filter(legislative_session=session).filter(**filter).count()
+    return ModelCls.objects.filter(legislative_session_id=session).filter(**filter).count()
 
 
 def generate_session_report(session):
@@ -20,7 +20,7 @@ def generate_session_report(session):
         'votes_with_bad_counts': 0,
     }
 
-    voteevents = VoteEvent.objects.filter(legislative_session=session)
+    voteevents = VoteEvent.objects.filter(legislative_session_id=session)
     queryset = voteevents.annotate(
         yes_sum=Count('pk', filter=Q(votes__option='yes')),
         no_sum=Count('pk', filter=Q(votes__option='no')),
@@ -47,18 +47,18 @@ def generate_session_report(session):
             report['votes_with_bad_counts'] += 1
 
     # handle unmatched
-    queryset = BillSponsorship.objects.filter(bill__legislative_session=session,
+    queryset = BillSponsorship.objects.filter(bill__legislative_session_id=session,
                                               entity_type='person', person_id=None
                                               ).values('name').annotate(num=Count('name'))
     report['unmatched_sponsor_people'] = {item['name']: item['num'] for item in queryset}
-    queryset = BillSponsorship.objects.filter(bill__legislative_session=session,
+    queryset = BillSponsorship.objects.filter(bill__legislative_session_id=session,
                                               entity_type='organization', person_id=None
                                               ).values('name').annotate(num=Count('name'))
     report['unmatched_sponsor_organizations'] = {item['name']: item['num'] for item in queryset}
-    queryset = PersonVote.objects.filter(vote_event__legislative_session=session,
+    queryset = PersonVote.objects.filter(vote_event__legislative_session_id=session,
                                          voter__isnull=True).values(name=F('voter_name')).annotate(
                                              num=Count('voter_name')
                                          )
     report['unmatched_voters'] = {item['name']: item['num'] for item in queryset}
 
-    return SessionDataQualityReport(legislative_session=session, **report)
+    return SessionDataQualityReport(legislative_session_id=session, **report)
