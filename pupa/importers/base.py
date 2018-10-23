@@ -433,3 +433,6 @@ class BaseImporter(object):
                 data[key] = key_transformers(data[key])
 
         return data
+
+    def get_seen_sessions(self):
+        return self.session_cache.values()
