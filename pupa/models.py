@@ -72,10 +72,10 @@ class SessionDataQualityReport(models.Model):
     bills_missing_sponsors = models.PositiveIntegerField()
     bills_missing_versions = models.PositiveIntegerField()
 
-    votes_missing_bills = models.PositiveIntegerField()
     votes_missing_voters = models.PositiveIntegerField()
-    votes_missing_yes_counts = models.PositiveIntegerField()
-    votes_missing_no_counts = models.PositiveIntegerField()
+    votes_missing_bill = models.PositiveIntegerField()
+    votes_missing_yes_count = models.PositiveIntegerField()
+    votes_missing_no_count = models.PositiveIntegerField()
     votes_with_bad_counts = models.PositiveIntegerField()
 
     unmatched_sponsor_people = models.PositiveIntegerField()
