@@ -149,3 +149,58 @@ def test_votes_with_bad_counts():
     v.votes.create(option='no', voter_name='Three')
     report = generate_session_report(session)
     assert report.votes_with_bad_counts == 0
+
+
+@pytest.mark.django_db
+def test_unmatched_sponsors():
+    session, org, person = create_data()
+    b1 = Bill.objects.create(identifier='HB1', title='One', legislative_session=session)
+    b2 = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
+
+    b1.sponsorships.create(name='Roy', entity_type='person')
+    b1.sponsorships.create(name='Wendy', entity_type='person')
+    b1.sponsorships.create(name='Committee On Legislation', entity_type='organization')
+
+    b2.sponsorships.create(name='Wendy', entity_type='person')
+
+    report = generate_session_report(session)
+    assert len(report.unmatched_sponsor_people) == 2
+    assert report.unmatched_sponsor_people['Roy'] == 1
+    assert report.unmatched_sponsor_people['Wendy'] == 2
+    assert report.unmatched_sponsor_organizations == {'Committee On Legislation': 1}
+
+    # ensure that Roy goes away when linked
+    sp = b1.sponsorships.get(name='Roy')
+    sp.person_id = person.id
+    sp.save()
+    report = generate_session_report(session)
+    assert report.unmatched_sponsor_people == {'Wendy': 2}
+
+
+@pytest.mark.django_db
+def test_unmatched_voters():
+    session, org, person = create_data()
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
+    v1 = VoteEvent.objects.create(legislative_session=session, motion_text='Passage', bill=b,
+                                  organization=org)
+    v2 = VoteEvent.objects.create(legislative_session=session, motion_text='Override', bill=b,
+                                  organization=org)
+
+    report = generate_session_report(session)
+    assert report.unmatched_voters == {}
+
+    # add voters
+    v1.votes.create(option='yes', voter_name='Roy')
+    v1.votes.create(option='yes', voter_name='Wendy')
+    v2.votes.create(option='yes', voter_name='Wendy')
+    report = generate_session_report(session)
+    assert len(report.unmatched_voters) == 2
+    assert report.unmatched_voters['Roy'] == 1
+    assert report.unmatched_voters['Wendy'] == 2
+
+    # ensure that Roy goes away when linked
+    voter = v1.votes.get(voter_name='Roy')
+    voter.voter_id = person.id
+    voter.save()
+    report = generate_session_report(session)
+    assert report.unmatched_voters == {'Wendy': 2}
