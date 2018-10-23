@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from opencivicdata.core.models import Jurisdiction
+from opencivicdata.legislative.models import LegislativeSession
 
 
 OBJECT_TYPES = (
@@ -62,3 +63,21 @@ class Identifier(models.Model):
 
     def __str__(self):              # __unicode__ on Python 2
         return self.identifier
+
+
+class SessionDataQualityReport(models.Model):
+    legislative_session = models.ForeignKey(LegislativeSession, on_delete=models.CASCADE)
+
+    bills_missing_actions = models.PositiveIntegerField()
+    bills_missing_sponsors = models.PositiveIntegerField()
+    bills_missing_versions = models.PositiveIntegerField()
+
+    votes_missing_bills = models.PositiveIntegerField()
+    votes_missing_voters = models.PositiveIntegerField()
+    votes_missing_yes_counts = models.PositiveIntegerField()
+    votes_missing_no_counts = models.PositiveIntegerField()
+    votes_with_bad_counts = models.PositiveIntegerField()
+
+    unmatched_sponsor_people = models.PositiveIntegerField()
+    unmatched_sponsor_organizations = models.PositiveIntegerField()
+    unmatched_voters = models.PositiveIntegerField()
