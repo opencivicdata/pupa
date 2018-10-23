@@ -1,5 +1,12 @@
 # pupa changelog
 
+## 0.10.0 - WIP
+
+Improvements:
+
+* add data quality reports that update after each import (requires migration)
+
+
 ## 0.9.1 - October 23 2018
 
 Fixes:

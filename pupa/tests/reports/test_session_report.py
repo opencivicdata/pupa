@@ -17,8 +17,8 @@ def create_data():
 @pytest.mark.django_db
 def test_bills_missing_actions():
     session, org, person = create_data()
-    Bill.objects.create(identifier='HB1', title='One', legislative_session=session)
-    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
+    Bill.objects.create(identifier='HB1', title='One', legislative_session_id=session)
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session_id=session)
 
     report = generate_session_report(session)
     assert report.bills_missing_actions == 2
@@ -31,8 +31,8 @@ def test_bills_missing_actions():
 @pytest.mark.django_db
 def test_bills_missing_sponsors():
     session, org, person = create_data()
-    Bill.objects.create(identifier='HB1', title='One', legislative_session=session)
-    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
+    Bill.objects.create(identifier='HB1', title='One', legislative_session_id=session)
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session_id=session)
 
     report = generate_session_report(session)
     assert report.bills_missing_sponsors == 2
@@ -45,8 +45,8 @@ def test_bills_missing_sponsors():
 @pytest.mark.django_db
 def test_bills_missing_versions():
     session, org, person = create_data()
-    Bill.objects.create(identifier='HB1', title='One', legislative_session=session)
-    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
+    Bill.objects.create(identifier='HB1', title='One', legislative_session_id=session)
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session_id=session)
 
     report = generate_session_report(session)
     assert report.bills_missing_versions == 2
@@ -59,10 +59,10 @@ def test_bills_missing_versions():
 @pytest.mark.django_db
 def test_votes_missing_bill():
     session, org, person = create_data()
-    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
-    v = VoteEvent.objects.create(legislative_session=session, motion_text='Passage',
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session_id=session)
+    v = VoteEvent.objects.create(legislative_session_id=session, motion_text='Passage',
                                  organization=org)
-    VoteEvent.objects.create(legislative_session=session, motion_text='Amendment',
+    VoteEvent.objects.create(legislative_session_id=session, motion_text='Amendment',
                              organization=org)
 
     report = generate_session_report(session)
@@ -77,10 +77,10 @@ def test_votes_missing_bill():
 @pytest.mark.django_db
 def test_votes_missing_voters():
     session, org, person = create_data()
-    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
-    v = VoteEvent.objects.create(legislative_session=session, motion_text='Passage', bill=b,
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session_id=session)
+    v = VoteEvent.objects.create(legislative_session_id=session, motion_text='Passage', bill=b,
                                  organization=org)
-    VoteEvent.objects.create(legislative_session=session, motion_text='Amendment', bill=b,
+    VoteEvent.objects.create(legislative_session_id=session, motion_text='Amendment', bill=b,
                              organization=org)
 
     report = generate_session_report(session)
@@ -94,10 +94,10 @@ def test_votes_missing_voters():
 @pytest.mark.django_db
 def test_missing_yes_no_counts():
     session, org, person = create_data()
-    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
-    v = VoteEvent.objects.create(legislative_session=session, motion_text='Passage', bill=b,
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session_id=session)
+    v = VoteEvent.objects.create(legislative_session_id=session, motion_text='Passage', bill=b,
                                  organization=org)
-    VoteEvent.objects.create(legislative_session=session, motion_text='Amendment', bill=b,
+    VoteEvent.objects.create(legislative_session_id=session, motion_text='Amendment', bill=b,
                              organization=org)
 
     report = generate_session_report(session)
@@ -118,8 +118,8 @@ def test_missing_yes_no_counts():
 @pytest.mark.django_db
 def test_votes_with_bad_counts():
     session, org, person = create_data()
-    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
-    v = VoteEvent.objects.create(legislative_session=session, motion_text='Passage', bill=b,
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session_id=session)
+    v = VoteEvent.objects.create(legislative_session_id=session, motion_text='Passage', bill=b,
                                  organization=org)
 
     report = generate_session_report(session)
@@ -154,8 +154,8 @@ def test_votes_with_bad_counts():
 @pytest.mark.django_db
 def test_unmatched_sponsors():
     session, org, person = create_data()
-    b1 = Bill.objects.create(identifier='HB1', title='One', legislative_session=session)
-    b2 = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
+    b1 = Bill.objects.create(identifier='HB1', title='One', legislative_session_id=session)
+    b2 = Bill.objects.create(identifier='HB2', title='Two', legislative_session_id=session)
 
     b1.sponsorships.create(name='Roy', entity_type='person')
     b1.sponsorships.create(name='Wendy', entity_type='person')
@@ -180,10 +180,10 @@ def test_unmatched_sponsors():
 @pytest.mark.django_db
 def test_unmatched_voters():
     session, org, person = create_data()
-    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session=session)
-    v1 = VoteEvent.objects.create(legislative_session=session, motion_text='Passage', bill=b,
+    b = Bill.objects.create(identifier='HB2', title='Two', legislative_session_id=session)
+    v1 = VoteEvent.objects.create(legislative_session_id=session, motion_text='Passage', bill=b,
                                   organization=org)
-    v2 = VoteEvent.objects.create(legislative_session=session, motion_text='Override', bill=b,
+    v2 = VoteEvent.objects.create(legislative_session_id=session, motion_text='Override', bill=b,
                                   organization=org)
 
     report = generate_session_report(session)
