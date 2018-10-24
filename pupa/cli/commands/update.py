@@ -298,7 +298,8 @@ class Command(BaseCommand):
                   }
         print_report(report)
 
-        self.check_session_list(juris)
+        if 'scrape' in args.actions:
+            self.check_session_list(juris)
 
         try:
             if 'scrape' in args.actions:
