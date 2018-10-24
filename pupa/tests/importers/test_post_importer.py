@@ -21,13 +21,16 @@ def test_full_post():
     post = ScrapePost(label='executive', role='President',
                       organization_id='~{"classification": "executive"}',
                       start_date=datetime.date(2015, 5, 18),
-                      end_date='2015-05-19')
+                      end_date='2015-05-19',
+                      maximum_memberships=2
+                      )
     post.add_contact_detail(type='phone', value='555-555-1234', note='this is fake')
     post.add_link('http://example.com/link')
 
     # import post
     oi = OrganizationImporter('us')
     PostImporter('jurisdiction-id', oi).import_data([post.as_dict()])
+    print(post.as_dict())
 
     # get person from db and assert it imported correctly
     p = Post.objects.get()
@@ -35,6 +38,7 @@ def test_full_post():
     assert p.label == post.label
     assert p.role == post.role
     assert p.organization_id == org.id
+    assert p.maximum_memberships == 2
 
     assert p.contact_details.all()[0].type == 'phone'
     assert p.contact_details.all()[0].value == '555-555-1234'

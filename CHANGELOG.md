@@ -6,6 +6,8 @@ Fixes:
 
 * Fix warnings from obsolete usage of importlib & jsonschema
 * remove parties from tests
+* don't call check_session_list if running import only
+* add support for Post.maximum_memberships
 
 ## 0.9.1 - October 23 2018
 
