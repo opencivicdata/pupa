@@ -32,7 +32,7 @@ def generate_session_report(session):
         other_count=Subquery(VoteCount.objects.filter(vote_event=OuterRef('pk'),
                                                       option='other').values('value')),
     )
-    
+
     for vote in queryset:
         if vote.yes_count is None:
             report['votes_missing_yes_count'] += 1
@@ -45,9 +45,6 @@ def generate_session_report(session):
         if (vote.yes_sum != vote.yes_count or
                 vote.no_sum != vote.no_count or
                 vote.other_sum != vote.other_count):
-            print(list(PersonVote.objects.all()))
-            print(vote.yes_sum, vote.no_sum, vote.other_sum,
-                  vote.yes_count, vote.no_count, vote.other_count)
             report['votes_with_bad_counts'] += 1
 
     # handle unmatched
