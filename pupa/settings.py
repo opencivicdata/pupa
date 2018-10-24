@@ -64,7 +64,7 @@ LOGGING = {
 
 
 sys.path.insert(1, os.getcwd())
-loader = importlib.find_loader('pupa_settings')
+loader = importlib.util.find_spec('pupa_settings')
 if loader is None:
     print('no pupa_settings on path, using defaults')
 else:
