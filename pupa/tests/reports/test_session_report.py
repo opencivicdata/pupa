@@ -1,4 +1,5 @@
 import pytest
+import django
 from opencivicdata.core.models import Jurisdiction, Division, Organization, Person
 from opencivicdata.legislative.models import Bill, VoteEvent
 from pupa.reports import generate_session_report
@@ -115,6 +116,7 @@ def test_missing_yes_no_counts():
     assert report.votes_missing_no_count == 1
 
 
+@pytest.mark.skipif(django.VERSION[0] < 2, reason="bug in Django 1.11")
 @pytest.mark.django_db
 def test_votes_with_bad_counts():
     session, org, person = create_data()
