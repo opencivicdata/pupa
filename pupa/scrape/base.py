@@ -5,6 +5,7 @@ import logging
 import datetime
 from collections import defaultdict, OrderedDict
 
+import jsonschema
 from jsonschema import Draft3Validator, FormatChecker
 import scrapelib
 
@@ -181,10 +182,13 @@ class BaseModel(object):
         """
         if schema is None:
             schema = self._schema
-        validator = Draft3Validator(schema,
-                                    types={'datetime': (datetime.date, datetime.datetime)},
-                                    format_checker=FormatChecker()
-                                    )
+
+        type_checker = Draft3Validator.TYPE_CHECKER.redefine(
+            "datetime", lambda c, d: isinstance(d, (datetime.date, datetime.datetime))
+        )
+        ValidatorCls = jsonschema.validators.extend(Draft3Validator, type_checker=type_checker)
+        validator = ValidatorCls(schema, format_checker=FormatChecker())
+
         errors = [str(error) for error in validator.iter_errors(self.as_dict())]
         if errors:
             raise ScrapeValueError('validation of {} {} failed: {}'.format(
