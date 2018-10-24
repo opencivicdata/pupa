@@ -7,7 +7,6 @@ class FakeJurisdiction(Jurisdiction):
     classification = 'government'
     name = 'Test'
     url = 'http://example.com'
-    parties = [{'name': 'Republican'}, {'name': 'Democratic'}]
 
     def get_organizations(self):
         parent = Organization('Congress', classification='legislature')
@@ -68,6 +67,6 @@ def test_jurisdiction_bicameral_scrape():
         obj_types[type(o)] += 1
 
     # ensure Jurisdiction and 5 organizations were found
-    assert obj_names == {'Test', 'Congress', 'House', 'Senate', 'Democratic', 'Republican'}
+    assert obj_names == {'Test', 'Congress', 'House', 'Senate'}
     assert obj_types[FakeJurisdiction] == 1
-    assert obj_types[Organization] == 5
+    assert obj_types[Organization] == 3

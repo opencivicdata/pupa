@@ -1,5 +1,12 @@
 # pupa changelog
 
+## 0.10.0 - WIP
+
+Fixes:
+
+* Fix warnings from obsolete usage of importlib & jsonschema
+* remove parties from tests
+
 ## 0.9.1 - October 23 2018
 
 Fixes:
