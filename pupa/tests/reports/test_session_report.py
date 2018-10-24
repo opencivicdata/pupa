@@ -123,6 +123,7 @@ def test_votes_with_bad_counts():
                                  organization=org)
 
     report = generate_session_report(session)
+    print(VoteEvent.objects.all())
     assert report.votes_with_bad_counts == 0
 
     # add count, breaking
