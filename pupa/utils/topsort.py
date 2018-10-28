@@ -36,7 +36,7 @@ class Network(object):
 
                   [ FROM ] ------> [ TO ]
         Committee on Finance -> Subcommittee of the Finance Committee on Budget
-                            \-> Subcommittee of the Finance Committee on Roads
+                             -> Subcommittee of the Finance Committee on Roads
         """
         self.add_node(fro)
         self.add_node(to)
