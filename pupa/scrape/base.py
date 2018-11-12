@@ -49,7 +49,7 @@ class Scraper(scrapelib.Scraper):
         self.requests_per_minute = settings.SCRAPELIB_RPM
         self.retry_attempts = settings.SCRAPELIB_RETRY_ATTEMPTS
         self.retry_wait_seconds = settings.SCRAPELIB_RETRY_WAIT_SECONDS
-        self.follow_robots = False
+        self.verify = settings.SCRAPELIB_VERIFY
 
         # caching
         if settings.CACHE_DIR:
