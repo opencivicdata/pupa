@@ -131,7 +131,7 @@ class Command(BaseCommand):
         self.add_argument('--cachedir', help='cache directory', dest='CACHE_DIR')
         self.add_argument('-r', '--rpm', help='scraper rpm', type=int, dest='SCRAPELIB_RPM')
         self.add_argument('--timeout', help='scraper timeout', type=int, dest='SCRAPELIB_TIMEOUT')
-        self.add_argument('--no-verify', help='skip tls verification', type=bool,
+        self.add_argument('--no-verify', help='skip tls verification',
                           action='store_false', dest='SCRAPELIB_VERIFY')
         self.add_argument('--retries', help='scraper retries', type=int, dest='SCRAPELIB_RETRIES')
         self.add_argument('--retry_wait', help='scraper retry wait', type=int,
