@@ -8,6 +8,7 @@ Fixes:
 * remove parties from tests
 * don't call check_session_list if running import only
 * add support for Post.maximum_memberships
+* stop testing on Postgres 9.x
 
 ## 0.9.1 - October 23 2018
 
