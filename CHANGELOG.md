@@ -2,6 +2,10 @@
 
 ## 0.10.0 - WIP
 
+Improvements:
+
+* add data quality reports that update after each import (requires migration)
+
 Fixes:
 
 * Fix warnings from obsolete usage of importlib & jsonschema

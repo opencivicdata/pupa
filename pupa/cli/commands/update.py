@@ -181,6 +181,8 @@ class Command(BaseCommand):
         from pupa.importers import (JurisdictionImporter, OrganizationImporter, PersonImporter,
                                     PostImporter, MembershipImporter, BillImporter,
                                     VoteEventImporter, EventImporter)
+        from pupa.reports import generate_session_report
+        from pupa.models import SessionDataQualityReport
         datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
 
         juris_importer = JurisdictionImporter(juris.jurisdiction_id)
@@ -217,6 +219,16 @@ class Command(BaseCommand):
             report.update(event_importer.import_directory(datadir))
             print('import vote events...')
             report.update(vote_event_importer.import_directory(datadir))
+
+        # compile info on all sessions that were updated in this run
+        seen_sessions = set()
+        seen_sessions.update(bill_importer.get_seen_sessions())
+        seen_sessions.update(vote_event_importer.get_seen_sessions())
+        for session in seen_sessions:
+            new_report = generate_session_report(session)
+            with transaction.atomic():
+                SessionDataQualityReport.objects.filter(legislative_session=session).delete()
+                new_report.save()
 
         return report
 

@@ -1,7 +1,9 @@
 from django.db import models
+from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from opencivicdata.core.models import Jurisdiction
+from opencivicdata.legislative.models import LegislativeSession
 
 
 OBJECT_TYPES = (
@@ -62,3 +64,22 @@ class Identifier(models.Model):
 
     def __str__(self):              # __unicode__ on Python 2
         return self.identifier
+
+
+class SessionDataQualityReport(models.Model):
+    legislative_session = models.ForeignKey(LegislativeSession, on_delete=models.CASCADE)
+
+    bills_missing_actions = models.PositiveIntegerField()
+    bills_missing_sponsors = models.PositiveIntegerField()
+    bills_missing_versions = models.PositiveIntegerField()
+
+    votes_missing_voters = models.PositiveIntegerField()
+    votes_missing_bill = models.PositiveIntegerField()
+    votes_missing_yes_count = models.PositiveIntegerField()
+    votes_missing_no_count = models.PositiveIntegerField()
+    votes_with_bad_counts = models.PositiveIntegerField()
+
+    # these fields store lists of names mapped to numbers of occurances
+    unmatched_sponsor_people = JSONField()
+    unmatched_sponsor_organizations = JSONField()
+    unmatched_voters = JSONField()
