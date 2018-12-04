@@ -44,3 +44,37 @@ class RunPlanAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+
+@admin.register(models.SessionDataQualityReport)
+class SessionDataQualityAdmin(admin.ModelAdmin):
+    actions = None
+
+    readonly_fields = ('legislative_session',
+                       'bills_missing_actions',
+                       'bills_missing_sponsors',
+                       'bills_missing_versions',
+                       'votes_missing_voters',
+                       'votes_missing_bill',
+                       'votes_missing_yes_count',
+                       'votes_missing_no_count',
+                       'votes_with_bad_counts',
+                       'unmatched_sponsor_people',
+                       'unmatched_sponsor_organizations',
+                       'unmatched_voters',
+                       )
+    list_display = ('jurisdiction_name',
+                    'legislative_session',
+                    'bills_missing_actions',
+                    'bills_missing_sponsors',
+                    'bills_missing_versions',
+                    'votes_missing_voters',
+                    'votes_missing_bill',
+                    'votes_missing_yes_count',
+                    'votes_missing_no_count',
+                    'votes_with_bad_counts',
+                    )
+    list_filter = ('legislative_session__jurisdiction__name',)
+
+    def jurisdiction_name(self, obj):
+        return obj.legislative_session.jurisdiction.name
