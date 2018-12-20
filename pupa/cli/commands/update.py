@@ -205,20 +205,24 @@ class Command(BaseCommand):
         with transaction.atomic():
             print('import jurisdictions...')
             report.update(juris_importer.import_directory(datadir))
-            print('import organizations...')
-            report.update(org_importer.import_directory(datadir))
-            print('import people...')
-            report.update(person_importer.import_directory(datadir))
-            print('import posts...')
-            report.update(post_importer.import_directory(datadir))
-            print('import memberships...')
-            report.update(membership_importer.import_directory(datadir))
-            print('import bills...')
-            report.update(bill_importer.import_directory(datadir))
-            print('import events...')
-            report.update(event_importer.import_directory(datadir))
-            print('import vote events...')
-            report.update(vote_event_importer.import_directory(datadir))
+            if settings.ENABLE_PEOPLE_AND_ORGS:
+                print('import organizations...')
+                report.update(org_importer.import_directory(datadir))
+                print('import people...')
+                report.update(person_importer.import_directory(datadir))
+                print('import posts...')
+                report.update(post_importer.import_directory(datadir))
+                print('import memberships...')
+                report.update(membership_importer.import_directory(datadir))
+            if settings.ENABLE_BILLS:
+                print('import bills...')
+                report.update(bill_importer.import_directory(datadir))
+            if settings.ENABLE_EVENTS:
+                print('import events...')
+                report.update(event_importer.import_directory(datadir))
+            if settings.ENABLE_VOTES:
+                print('import vote events...')
+                report.update(vote_event_importer.import_directory(datadir))
 
         # compile info on all sessions that were updated in this run
         seen_sessions = set()
@@ -276,6 +280,7 @@ class Command(BaseCommand):
     def do_handle(self, args, other, juris):
 
         available_scrapers = getattr(juris, 'scrapers', {})
+        default_scrapers = getattr(juris, 'default_scrapers', None)
         scrapers = OrderedDict()
 
         if not available_scrapers:
@@ -296,6 +301,8 @@ class Command(BaseCommand):
                 else:
                     raise CommandError('no such scraper: module={} scraper={}'.format(args.module,
                                                                                       arg))
+        elif default_scrapers is not None:
+            scrapers = {s: {} for s in default_scrapers}
         else:
             scrapers = {key: {} for key in available_scrapers.keys()}
 

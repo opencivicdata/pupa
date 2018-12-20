@@ -5,6 +5,7 @@
 Improvements:
 
 * add data quality reports that update after each import (requires migration)
+* add flags to disable person, bill, vote, event import
 
 Fixes:
 

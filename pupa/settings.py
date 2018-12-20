@@ -24,6 +24,11 @@ SCRAPED_DATA_DIR = os.path.join(os.getcwd(), '_data')
 
 # import settings
 
+ENABLE_PEOPLE_AND_ORGS = True
+ENABLE_BILLS = True
+ENABLE_VOTES = True
+ENABLE_EVENTS = True
+
 IMPORT_TRANSFORMERS = {
     'bill': []
 }
