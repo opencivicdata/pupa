@@ -4,7 +4,7 @@ from .bill import Bill
 from .popolo import pseudo_organization
 from .schemas.vote_event import schema
 from pupa.exceptions import ScrapeValueError
-
+import re
 
 class VoteEvent(BaseModel, SourceMixin):
     _type = 'vote_event'
@@ -74,3 +74,70 @@ class VoteEvent(BaseModel, SourceMixin):
                 break
         else:
             self.counts.append({'option': option, 'value': value})
+
+
+class OrderVoteEvent:
+    """ A functor for applying order to voteEvents.
+        A new functor object must be constructed for each bill.
+        The vote events of each billl must be processed in chronological order for this to work
+        correctly, but the processing of bills may be interleaved (needed in e.g. NH).
+        Currently, it only fudges midnight dates by adding the event sequence number in seconds
+            to the start_date and end_date (if they are well-formed string dates)
+        In the future, if and when there is an 'order' field on voteEvents,
+            it should fill that as well.
+        This fails softly and silently;
+            if a valid string date is not found in start_date or end_date,
+            the date is left unmodified
+        See the unit tests for more behavior expectations.
+    """
+    _midnight = r'\d\d\d\d-\d\d-\d\dT00:00:00.*'
+    _timeless = r'\d\d\d\d-\d\d-\d\d'
+
+
+    class OrderBillVoteEvent:
+        """ Order VoteEvents for a single bill
+        """
+
+        def __init__(self):
+            self.order = 0      # voteEvent sequence number. 1st voteEvent is 1.
+
+        def __call__(self, voteEvent):
+
+            self.order += 1
+            voteEvent.start_date = self._adjust_date(voteEvent.start_date)
+            voteEvent.end_date = self._adjust_date(voteEvent.end_date)
+
+        def _adjust_date(self, date):
+
+            if not isinstance(date, str):
+                return date
+
+            if re.fullmatch(OrderVoteEvent._timeless, date):
+                d2 = date + 'T00:00:00'
+            elif re.fullmatch(OrderVoteEvent._midnight, date):
+                d2 = date
+            else:
+                return date
+
+            assert self.order <= 60*60
+            mins = '{:02d}'.format(self.order // 60)
+            secs = '{:02d}'.format(self.order % 60)
+
+            # yyyy-mm-ddThh:mm:dd+05:00
+            # 0123456789012345678
+            return d2[:14] + mins + ':' + secs + d2[19:]
+
+    def __init__(self):
+        self.orderers = {}
+
+    def __call__(self, bill_id, voteEvent):
+        bill_orderer = self.orderers.get(bill_id)
+
+        if not bill_orderer:
+            bill_orderer = self.OrderBillVoteEvent()
+            self.orderers[bill_id] = bill_orderer
+
+        bill_orderer(voteEvent)
+
+
+
