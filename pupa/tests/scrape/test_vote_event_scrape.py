@@ -2,6 +2,7 @@ import pytest
 from pupa.scrape import VoteEvent, Bill, Organization, OrderVoteEvent
 from pupa.utils import get_pseudo_id
 
+
 def toy_vote_event():
     ve = VoteEvent(legislative_session="2009", motion_text="passage of the bill",
                    start_date="2009-01-07", result='pass', classification='bill-passage')
@@ -96,7 +97,6 @@ def test_str():
     assert ve.motion_text in s
 
 
-
 def test_order_vote_event():
     ve = toy_vote_event()
     order_vote_event = OrderVoteEvent()
@@ -139,6 +139,3 @@ def test_order_vote_event():
     ve.start_date = '2019-01-01T00:00:55+05:00'
     order_vote_event('2019', '1', ve)
     assert ve.start_date == '2019-01-01T00:00:55+05:00'
-
-
-

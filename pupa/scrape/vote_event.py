@@ -6,6 +6,7 @@ from .schemas.vote_event import schema
 from pupa.exceptions import ScrapeValueError
 import re
 
+
 class VoteEvent(BaseModel, SourceMixin):
     _type = 'vote_event'
     _schema = schema
@@ -108,7 +109,7 @@ class OrderVoteEvent:
 
             self.order += 1
             voteEvent.start_date = self._adjust_date(voteEvent.start_date)
-            if hasattr(voteEvent,'end_date'):
+            if hasattr(voteEvent, 'end_date'):
                 voteEvent.end_date = self._adjust_date(voteEvent.end_date)
 
         def _adjust_date(self, date):
@@ -147,7 +148,7 @@ class OrderVoteEvent:
         :param voteEvent:
         :return: None
         """
-        bill_orderer = self.orderers.get((session_id,bill_id))
+        bill_orderer = self.orderers.get((session_id, bill_id))
 
         if not bill_orderer:
             bill_orderer = self.OrderBillVoteEvent()
