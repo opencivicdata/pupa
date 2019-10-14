@@ -78,21 +78,24 @@ class VoteEvent(BaseModel, SourceMixin):
 
 class OrderVoteEvent:
     """ A functor for applying order to voteEvents.
-        A new functor object must be constructed for each bill.
-        The vote events of each billl must be processed in chronological order for this to work
-        correctly, but the processing of bills may be interleaved (needed in e.g. NH).
-        Currently, it only fudges midnight dates by adding the event sequence number in seconds
+        A single OrderVoteEvent instance should be used for all bills in a scrape.
+        The vote events of each bill must be processed in chronological order,
+            but the processing of bills may be interleaved (needed in e.g. NH).
+        Currently, it only fudges midnight dates (start_date and end_date)
+            by adding the event sequence number in seconds
             to the start_date and end_date (if they are well-formed string dates)
-        In the future, if and when there is an 'order' field on voteEvents,
+        In the future, when there is an 'order' field on voteEvents,
             it should fill that as well.
         This fails softly and silently;
-            if a valid string date is not found in start_date or end_date,
-            the date is left unmodified
-        See the unit tests for more behavior expectations.
+            if a valid string date is not found in start_date or end_date, the date is not touched.
+        This assumes that times are reported as local time, not UTC.
+            A UTC time that is local midnight will not be touched.
+        Sometimes one chamber reports the time of a vote,
+            but the other chamber reports only the date.  This is handled.
+        See the unit tests for examples and more behavior.
     """
     _midnight = r'\d\d\d\d-\d\d-\d\dT00:00:00.*'
     _timeless = r'\d\d\d\d-\d\d-\d\d'
-
 
     class OrderBillVoteEvent:
         """ Order VoteEvents for a single bill
@@ -105,7 +108,8 @@ class OrderVoteEvent:
 
             self.order += 1
             voteEvent.start_date = self._adjust_date(voteEvent.start_date)
-            voteEvent.end_date = self._adjust_date(voteEvent.end_date)
+            if hasattr(voteEvent,'end_date'):
+                voteEvent.end_date = self._adjust_date(voteEvent.end_date)
 
         def _adjust_date(self, date):
 
@@ -130,14 +134,23 @@ class OrderVoteEvent:
     def __init__(self):
         self.orderers = {}
 
-    def __call__(self, bill_id, voteEvent):
-        bill_orderer = self.orderers.get(bill_id)
+    def __call__(self, session_id, bill_id, voteEvent):
+        """
+        Record order of voteEvent within bill.
+
+        The "order" field is not yet implemented; this fudges voteEvent start_date and end_date.
+        See OrderVoteEvent docstring for details.
+
+        :param session_id: session id
+        :param bill_id: an identifier for the vote's bill
+            that is at least unique within the session.
+        :param voteEvent:
+        :return: None
+        """
+        bill_orderer = self.orderers.get((session_id,bill_id))
 
         if not bill_orderer:
             bill_orderer = self.OrderBillVoteEvent()
-            self.orderers[bill_id] = bill_orderer
+            self.orderers[(session_id, bill_id)] = bill_orderer
 
         bill_orderer(voteEvent)
-
-
-
