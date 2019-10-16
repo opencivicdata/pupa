@@ -1,5 +1,5 @@
 import pytest
-from pupa.scrape import VoteEvent, Bill, Organization
+from pupa.scrape import VoteEvent, Bill, Organization, OrderVoteEvent
 from pupa.utils import get_pseudo_id
 
 
@@ -95,3 +95,47 @@ def test_str():
     s = str(ve)
     assert ve.legislative_session in s
     assert ve.motion_text in s
+
+
+def test_order_vote_event():
+    ve = toy_vote_event()
+    order_vote_event = OrderVoteEvent()
+
+    # add order as seconds to date with no time
+    ve.start_date = '2019-01-01'
+    ve.end_date = None
+    order_vote_event('2019', '1', ve)
+    assert ve.start_date == '2019-01-01T00:00:01'
+    assert ve.end_date is None
+
+    # add order as seconds to time with explicit midnight time and zone, preserving timezone
+    ve.start_date = '2019-01-01T00:00:00+05:00'
+    ve.end_date = ''
+    order_vote_event('2019', '1', ve)
+    assert ve.start_date == '2019-01-01T00:00:02+05:00'
+    assert ve.end_date == ''
+
+    # a second bill should start with '00:00:01' again
+    ve.start_date = '2019-01-01'
+    ve.end_date = None
+    order_vote_event('2019', '2', ve)
+    assert ve.start_date == '2019-01-01T00:00:01'
+    assert ve.end_date is None
+
+    # the same bill id in a different session should start with '00:00:01' again
+    ve.start_date = '2019-01-01'
+    ve.end_date = None
+    order_vote_event('2020', '1', ve)
+    assert ve.start_date == '2019-01-01T00:00:01'
+    assert ve.end_date is None
+
+    # add order as seconds to time with explicit midnight time and no timezone
+    ve.start_date = ve.end_date = '2019-01-01T00:00:00'
+    order_vote_event('2019', '1', ve)
+    assert ve.start_date == '2019-01-01T00:00:03'
+    assert ve.end_date == '2019-01-01T00:00:03'
+
+    # don't change a date with a non-midnight time
+    ve.start_date = '2019-01-01T00:00:55+05:00'
+    order_vote_event('2019', '1', ve)
+    assert ve.start_date == '2019-01-01T00:00:55+05:00'
