@@ -79,6 +79,7 @@ schema = {
                     "note": {"type": "string", "minLength": 1},
                     "url": {"type": "string", "minLength": 1},
                     "media_type": {"type": "string", "minLength": 1},
+                    "date": fuzzy_date_blank,
                 },
                 "type": "object"
             },

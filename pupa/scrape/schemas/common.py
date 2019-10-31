@@ -26,15 +26,15 @@ identifiers = {
 fuzzy_date_string = {"type": "string",
                      "pattern": "^[0-9]{4}(-[0-9]{2}){0,2}$"}
 fuzzy_date_string_blank = {"type": "string",
-                           "pattern": "(^[0-9]{4})?(-[0-9]{2}){0,2}$",
+                           "pattern": "^([0-9]{4})?(-[0-9]{2}){0,2}$",
                            }
 fuzzy_datetime_string_blank = {"type": "string",
                                "pattern": ("^([0-9]{4}((-[0-9]{2}){0,2}|(-[0-9]{2}){2}T"
                                            "[0-9]{2}(:[0-9]{2}){0,2}"
                                            "(Z|[+-][0-9]{2}(:[0-9]{2})?))?)?$"),
                                }
-fuzzy_date = {"type": [fuzzy_date_string, "datetime"]}
-fuzzy_date_blank = {"type": [fuzzy_date_string_blank, "datetime"]}
+fuzzy_date = {"type": [fuzzy_date_string, "date"]}
+fuzzy_date_blank = {"type": [fuzzy_date_string_blank, "date"]}
 fuzzy_datetime = {"type": [fuzzy_datetime_string_blank, "datetime"]}
 fuzzy_datetime_blank = {"type": [fuzzy_datetime_string_blank, "datetime"]}
 
