@@ -123,8 +123,8 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     def add_media_link(self, note, url, media_type, *, text='', type='media',
                        on_duplicate='error', date=''):
         return self._add_associated_link(collection='media', note=note, url=url, text=text,
-                                         media_type=media_type, on_duplicate=on_duplicate)
+                                         media_type=media_type, on_duplicate=on_duplicate, date=date)
 
     def add_document(self, note, url, *, text='', media_type='', on_duplicate='error', date=''):
         return self._add_associated_link(collection='documents', note=note, url=url, text=text,
-                                         media_type=media_type, on_duplicate=on_duplicate)
+                                         media_type=media_type, on_duplicate=on_duplicate, date=date)
