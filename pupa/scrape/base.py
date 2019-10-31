@@ -186,6 +186,11 @@ class BaseModel(object):
         type_checker = Draft3Validator.TYPE_CHECKER.redefine(
             "datetime", lambda c, d: isinstance(d, (datetime.date, datetime.datetime))
         )
+        type_checker = type_checker.redefine(
+            "date", lambda c, d: (isinstance(d, datetime.date)
+                                  and not isinstance(d, datetime.datetime))
+        )
+
         ValidatorCls = jsonschema.validators.extend(Draft3Validator, type_checker=type_checker)
         validator = ValidatorCls(schema, format_checker=FormatChecker())
 
