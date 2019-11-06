@@ -7,6 +7,8 @@ schema = {
         "other_names": other_names,
         "identifiers": identifiers,
         "sort_name": {"type": "string"},
+        "family_name": {"type": "string"},
+        "given_name": {"type": "string"},
         "gender": {"type": "string"},
         "birth_date": fuzzy_date_blank,
         "death_date": fuzzy_date_blank,
