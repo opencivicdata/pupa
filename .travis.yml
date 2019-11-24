@@ -1,5 +1,5 @@
 language: python
-dist: xenial
+dist: bionic
 addons:
     postgresql: "10"
     apt:
@@ -8,10 +8,11 @@ addons:
 sudo: false
 python:
     - "3.6"
+    - "3.7"
+    - "3.8"
 env:
-    - DJANGO_VERSION=">=1.11,<2"
-    - DJANGO_VERSION="==2.0"
-    - DJANGO_VERSION="==2.1"
+    - DJANGO_VERSION="==2.2"
+    - DJANGO_VERSION="==3.0rc1"
 install:
     - pip install .[dev] --pre Django$DJANGO_VERSION
     - pip install -e git+https://github.com/opencivicdata/python-opencivicdata.git#egg=opencivicdata

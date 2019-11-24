@@ -6,6 +6,7 @@ Improvements:
 
 * add data quality reports that update after each import (requires migration)
 * add flags to disable person, bill, vote, event import
+* let date be set on event media & document
 
 Fixes:
 
@@ -13,6 +14,7 @@ Fixes:
 * remove parties from tests
 * don't call check_session_list if running import only
 * add support for Post.maximum_memberships
+* add support for Person given & family names
 * stop testing on Postgres 9.x
 
 ## 0.9.1 - October 23 2018
