@@ -1,6 +1,6 @@
 # pupa changelog
 
-## 0.10.0 - WIP
+## 0.10.0 - December 11 2019
 
 Improvements:
 
