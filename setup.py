@@ -18,11 +18,11 @@ setup(name='pupa',
       entry_points='''[console_scripts]
 pupa = pupa.cli.__main__:main''',
       install_requires=[
-          'Django>=1.11',
-          'opencivicdata>=2.1.0',
+          'Django>=2.2',
+          'opencivicdata>=3.0.0',
           'dj_database_url>=0.3.0',
           'scrapelib>=1.0',
-          'jsonschema>=3.0.0a1',  # TODO: Drop alpha release once stable release is available
+          'jsonschema>=3.0.0',  # TODO: Drop alpha release once stable release is available
           'psycopg2-binary',
           'pytz',
       ],
@@ -43,6 +43,8 @@ pupa = pupa.cli.__main__:main''',
                    "Operating System :: OS Independent",
                    "Programming Language :: Python :: 3.5",
                    "Programming Language :: Python :: 3.6",
+                   "Programming Language :: Python :: 3.7",
+                   "Programming Language :: Python :: 3.8",
                    "Topic :: Software Development :: Libraries :: Python Modules",
                    ],
       )
