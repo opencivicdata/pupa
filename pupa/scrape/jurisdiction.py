@@ -20,7 +20,7 @@ class Jurisdiction(BaseModel):
 
     # non-db properties
     scrapers = {}
-    default_scrapers = {}
+    default_scrapers = None
     parties = []
     ignored_scraped_sessions = []
 
