@@ -2,7 +2,7 @@ import pytest
 from pupa.scrape import Person as ScrapePerson
 from pupa.importers import PersonImporter
 from opencivicdata.core.models import Person, Organization, Membership, Division, Jurisdiction
-from pupa.exceptions import SameNameError
+from pupa.exceptions import UnresolvedIdError, SameNameError
 
 
 def create_jurisdiction():
@@ -217,10 +217,30 @@ def test_same_name_second_import():
 def test_resolve_json_id():
     create_jurisdiction()
     o = Organization.objects.create(name='WWE', jurisdiction_id='jid')
-    p = Person.objects.create(name='Dwayne Johnson')
+    p = Person.objects.create(name='Dwayne Johnson', family_name='Johnson')
     p.other_names.create(name='Rock')
     p.memberships.create(organization=o)
 
     pi = PersonImporter('jid')
     assert pi.resolve_json_id('~{"name": "Dwayne Johnson"}') == p.id
     assert pi.resolve_json_id('~{"name": "Rock"}') == p.id
+    assert pi.resolve_json_id('~{"name": "Johnson"}') == p.id
+
+
+@pytest.mark.django_db
+def test_resolve_json_id_multiple_family_name():
+    create_jurisdiction()
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jid')
+    p1 = Person.objects.create(name='Dwayne Johnson', family_name='Johnson')
+    p1.other_names.create(name='Rock')
+    p2 = Person.objects.create(name='Adam Johnson', family_name='Johnson')
+    for p in Person.objects.all():
+        Membership.objects.create(person=p, organization=o)
+
+    # If there are multiple people with a family name, full name/other name
+    # lookups should work but family name lookups should fail.
+    pi = PersonImporter('jid')
+    assert pi.resolve_json_id('~{"name": "Dwayne Johnson"}') == p1.id
+    assert pi.resolve_json_id('~{"name": "Adam Johnson"}') == p2.id
+    with pytest.raises(UnresolvedIdError):
+        pi.resolve_json_id('~{"name": "Johnson"}')
