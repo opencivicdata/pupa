@@ -41,8 +41,9 @@ class PersonImporter(BaseImporter):
         the resolution.
         """
         if list(spec.keys()) == ['name']:
-            # if we're just resolving on name, include other names
-            return ((Q(name=spec['name']) | Q(other_names__name=spec['name'])) &
+            # if we're just resolving on name, include other names and family name
+            name = spec['name']
+            return ((Q(name=name) | Q(other_names__name=name) | Q(family_name=name)) &
                     Q(memberships__organization__jurisdiction_id=self.jurisdiction_id))
         spec['memberships__organization__jurisdiction_id'] = self.jurisdiction_id
         return spec
