@@ -5,6 +5,7 @@ import json
 import logging
 
 from django.db.models import Q
+from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
 
 from opencivicdata.legislative.models import LegislativeSession
@@ -293,9 +294,9 @@ class BaseImporter(object):
                                                                            self.model_class))
             self._create_related(obj, related, self.related_models)
 
-            # Save object after related objects are created to allow for
-            # post-save signals that depend on related objects
-            obj.save()
+            # Fire post-save signal after related objects are created to allow
+            # for handlers make use of related objects
+            post_save.send(sender=self.model_class, instance=obj, created=True)
 
         if pupa_id:
             Identifier.objects.get_or_create(identifier=pupa_id,
