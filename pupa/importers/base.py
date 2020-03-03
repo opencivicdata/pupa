@@ -293,6 +293,10 @@ class BaseImporter(object):
                                                                            self.model_class))
             self._create_related(obj, related, self.related_models)
 
+            # Save object after related objects are created to allow for
+            # post-save signals that depend on related objects
+            obj.save()
+
         if pupa_id:
             Identifier.objects.get_or_create(identifier=pupa_id,
                                              jurisdiction_id=self.jurisdiction_id,
