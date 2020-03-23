@@ -1,5 +1,16 @@
 # pupa changelog
 
+## 0.10.1 - March 23 2020
+
+Improvements:
+
+* fire post-save hook on imports
+* check family_name when resolving names
+
+Fixes:
+
+* if scrapers are omitted on command line, use all scrapers again
+
 ## 0.10.0 - December 11 2019
 
 Improvements:
