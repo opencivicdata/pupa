@@ -181,3 +181,12 @@ def test_versions():
 def test_str():
     b = toy_bill()
     assert b.identifier in str(b)
+
+
+def test_no_whitespace_in_uri():
+    b = Bill(identifier="HB 2017", legislative_session="2012A",
+             title="A bill for an act to raise the cookie budget by 200%",
+             from_organization="Foo Senate", classification="bill")
+    b.add_source("http://uri.example.com/fail here", note="foo")
+    with pytest.raises(ScrapeValueError):
+        b.validate()
