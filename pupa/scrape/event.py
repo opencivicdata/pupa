@@ -71,7 +71,8 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
     _type = 'event'
     _schema = schema
 
-    def __init__(self, name, start_date, location_name, *,
+    def __init__(self, name, start_date, *,
+                 location_name=None,
                  all_day=False, description="", end_date="",
                  status="confirmed", classification="event"
                  ):
@@ -83,7 +84,8 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         self.description = description
         self.status = status
         self.classification = classification
-        self.location = {"name": location_name, "note": "", "coordinates": None}
+        if location_name:
+            self.location = {"name": location_name, "note": "", "coordinates": None}
         self.documents = []
         self.participants = []
         self.media = []

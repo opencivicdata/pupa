@@ -206,6 +206,10 @@ def test_full_event():
     result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
     assert result['event']['update'] == 1
 
+    event.location = None
+    result = EventImporter('jid', oi, pi, bi, vei).import_data([event.as_dict()])
+    assert result['event']['update'] == 1
+
 
 @pytest.mark.django_db
 def test_pupa_identifier_event():

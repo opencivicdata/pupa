@@ -18,6 +18,15 @@ def test_basic_event():
     e.validate()
 
 
+def test_no_location():
+    e = Event(
+        name="get-together",
+        start_date=datetime.datetime.utcnow().isoformat().split('.')[0] + 'Z',
+    )
+    e.add_source(url='http://example.com/foobar')
+    e.validate()
+
+
 def test_event_str():
     e = event_obj()
     assert e.name in str(e)
