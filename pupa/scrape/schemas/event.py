@@ -41,7 +41,7 @@ schema = {
         "description": {"type": "string"},
 
         "location": {
-            "type": "object",
+            "type": ["object", "null"],
             "properties": {
 
                 "name": {"type": "string", "minLength": 1},

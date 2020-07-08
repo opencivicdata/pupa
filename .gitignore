@@ -10,3 +10,4 @@ _cache/
 build/
 .cache/
 .idea/
+.env/

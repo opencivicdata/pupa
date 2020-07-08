@@ -63,7 +63,8 @@ class EventImporter(BaseImporter):
 
     def prepare_for_db(self, data):
         data['jurisdiction_id'] = self.jurisdiction_id
-        data['location'] = self.get_location(data['location'])
+        if data['location']:
+            data['location'] = self.get_location(data['location'])
 
         data['start_date'] = data['start_date']
         data['end_date'] = data.get('end_date', "")
