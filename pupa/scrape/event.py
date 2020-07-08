@@ -86,6 +86,8 @@ class Event(BaseModel, SourceMixin, AssociatedLinkMixin, LinkMixin):
         self.classification = classification
         if location_name:
             self.location = {"name": location_name, "note": "", "coordinates": None}
+        else:
+            self.location = None
         self.documents = []
         self.participants = []
         self.media = []
