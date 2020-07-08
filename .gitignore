@@ -9,4 +9,5 @@ _data/
 _cache/
 build/
 .cache/
+.idea/
 .env/
