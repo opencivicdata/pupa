@@ -28,14 +28,15 @@ def test_full_membership():
     robot = Person.objects.create(id="robot", name="R. Daneel Olivaw")
     post = Post.objects.create(id='f', label="founder", role="Founder", organization=org)
 
-    # add a membership through a post
-    m1 = ScrapeMembership(person_id=hari.id, organization_id=org.id, post_id=post.id)
+    # add a membership through a post, with a start date
+    m1 = ScrapeMembership(person_id=hari.id, organization_id=org.id,
+                          post_id=post.id, start_date='2020-03-10')
     m1.add_contact_detail(type='phone', value='555-555-1234', note='this is fake')
     m1.add_link('http://example.com/link')
 
-    # add a membership direct to an organization
+    # add a membership direct to an organization, with an end date
     m2 = ScrapeMembership(person_id=robot.id, organization_id=org.id, label='member',
-                          role='member')
+                          role='member', end_date='2019-11-09')
 
     dumb_imp = DumbMockImporter()
     memimp = MembershipImporter('fnd-jid', dumb_imp, dumb_imp, dumb_imp)
@@ -54,6 +55,24 @@ def test_full_membership():
     assert cd.value == '555-555-1234'
     assert cd.note == 'this is fake'
     assert m.links.all()[0].url == 'http://example.com/link'
+
+    # update the imported memberships (i.e., change attributes that are not
+    # in the spec) and confirm they resolve correctly
+    memimp2 = MembershipImporter('fnd-jid', dumb_imp, dumb_imp, dumb_imp)
+
+    m1.end_date = '2022-03-10'
+    m2.extras = {'note': 'bleep blorp'}
+
+    import_log = memimp2.import_data([m1.as_dict(), m2.as_dict()])
+
+    assert import_log['membership']['insert'] == 0
+    assert import_log['membership']['update'] == 2
+
+    assert hari.memberships.count() == 1
+    assert hari.memberships.get().end_date == '2022-03-10'
+
+    assert robot.memberships.count() == 1
+    assert robot.memberships.get().extras == {'note': 'bleep blorp'}
 
 
 @pytest.mark.django_db
