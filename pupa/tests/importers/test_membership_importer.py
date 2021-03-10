@@ -30,7 +30,7 @@ def test_full_membership():
 
     # add a membership through a post, with a start date
     m1 = ScrapeMembership(person_id=hari.id, organization_id=org.id,
-                          post_id=post.id, start_date='2020-03-10')
+                          post_id=post.id, start_date='2020-03-10', end_date='2021-06-30')
     m1.add_contact_detail(type='phone', value='555-555-1234', note='this is fake')
     m1.add_link('http://example.com/link')
 
@@ -68,9 +68,11 @@ def test_full_membership():
     assert import_log['membership']['insert'] == 0
     assert import_log['membership']['update'] == 2
 
+    # confirm the membership resolved based on start date and its end date was updated
     assert hari.memberships.count() == 1
     assert hari.memberships.get().end_date == '2022-03-10'
 
+    # confirm the membership resolved based on end date and its extras were updated
     assert robot.memberships.count() == 1
     assert robot.memberships.get().extras == {'note': 'bleep blorp'}
 
