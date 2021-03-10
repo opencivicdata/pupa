@@ -22,9 +22,7 @@ class MembershipImporter(BaseImporter):
         spec = {'organization_id': membership['organization_id'],
                 'person_id': membership['person_id'],
                 'label': membership['label'],
-                'role': membership['role'],
-                # if this is a historical role, only update historical roles
-                'end_date': membership['end_date']}
+                'role': membership['role']}
 
         # post_id is optional - might exist in DB but not scraped here?
         if membership['post_id']:
@@ -32,6 +30,12 @@ class MembershipImporter(BaseImporter):
 
         if membership['person_name']:
             spec['person_name'] = membership['person_name']
+
+        if membership['start_date']:
+            spec['start_date'] = membership['start_date']
+        else:
+            # if this is a historical role, only update historical roles
+            spec['end_date'] = membership['end_date']
 
         return self.model_class.objects.get(**spec)
 
