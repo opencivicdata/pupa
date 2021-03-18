@@ -42,8 +42,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install .[dev] --pre Django==${{ matrix.django-series }}
         pip install -e git+https://github.com/opencivicdata/python-opencivicdata.git#egg=opencivicdata
-      with:
-        django-series: ${{ matrix.django-series }}
     - name: Lint with flake8
       run: |
         flake8 pupa
