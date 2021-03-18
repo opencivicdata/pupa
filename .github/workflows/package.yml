@@ -1,4 +1,4 @@
-name: Python package
+name: Test and build Python package
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-18.04
     services:
       postgres:
@@ -46,6 +46,16 @@ jobs:
     - name: Test with pytest
       run: |
         ./run-tests.sh
+    - name: Calculate test coverage
+      run: |
+        coveralls
+
+  build:
+    needs: test
+    name: Build package and upload to PyPI
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
     - name: Build and publish
       if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
       env:
