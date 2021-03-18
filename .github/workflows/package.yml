@@ -39,7 +39,6 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y gdal-bin
-        python -m pip install --upgrade pip
         pip install .[dev] --pre Django==${{ matrix.django-series }}
         pip install -e git+https://github.com/opencivicdata/python-opencivicdata.git#egg=opencivicdata
     - name: Lint with flake8
