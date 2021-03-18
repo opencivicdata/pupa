@@ -25,6 +25,3 @@ script:
   - flake8 pupa
 after_success:
     - coveralls
-notifications:
-    email:
-        - james@openstates.org
