@@ -1,5 +1,16 @@
 # pupa changelog
 
+## 0.10.2 - March 18 2021
+
+Improvements:
+
+* allow null event locations
+* resolve memberships based on start date, falling back to end date if no start date is available
+
+Fixes:
+
+* raise exception for whitespace in urls
+
 ## 0.10.1 - March 23 2020
 
 Improvements:
