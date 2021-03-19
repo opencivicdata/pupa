@@ -11,6 +11,7 @@ DATABASES = {
         'USER': 'test',
         'PASSWORD': 'test',
         'HOST': 'localhost',
+        'PORT': 5432,
     }
 }
 MIDDLEWARE_CLASSES = ()
