@@ -282,7 +282,10 @@ class BaseImporter(object):
                 what = 'update'
 
             if what == 'update':
-                obj.save()
+                obj.last_updated = utcnow()
+
+            # Refresh the object's last_seen field whether or not we updated
+            obj.save()
 
         # need to create the data
         else:

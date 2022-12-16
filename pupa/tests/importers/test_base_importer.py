@@ -85,6 +85,33 @@ def test_apply_transformers():
 
 
 @pytest.mark.django_db
+def test_last_seen_updates_on_scrape():
+    create_jurisdiction()
+    o = Organization.objects.create(name='WWE', jurisdiction_id='jid')
+
+    p = Person.objects.create(name='George Washington', family_name='Washington')
+    p.memberships.create(organization=o)
+
+    expected_updated_at = p.updated_at
+    last_seen_before_scrape = p.last_seen
+
+    # Simulate no-op scrape
+    scraped_p = ScrapePerson('George Washington').as_dict()
+    PersonImporter('jid').import_data([scraped_p])
+
+    p.refresh_from_db()
+
+    assert p.updated_at < p.last_seen, "Should refresh last_seen but not updated_at"
+    assert (
+        p.updated_at == expected_updated_at
+    ), "Should not refresh updated_at when there's no update"
+
+    assert (
+        p.last_seen > last_seen_before_scrape
+    ), "Should refresh last_seen even when there's no update"
+
+
+@pytest.mark.django_db
 def test_deduplication_identical_object():
     p1 = ScrapePerson('Dwayne').as_dict()
     p2 = ScrapePerson('Dwayne').as_dict()
