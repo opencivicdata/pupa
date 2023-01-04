@@ -14,16 +14,14 @@ from pupa import settings
 from pupa.exceptions import ScrapeError, ScrapeValueError
 
 
-@FormatChecker.cls_checks('uri-blank')
+@FormatChecker.cls_checks("uri-blank")
 def uri_blank(value):
-    return value == '' or FormatChecker().conforms(value, 'uri')
+    return value == "" or FormatChecker().conforms(value, "uri")
 
 
-@FormatChecker.cls_checks('uri')
+@FormatChecker.cls_checks("uri")
 def check_uri(val):
-    return val \
-           and val.startswith(('http://', 'https://', 'ftp://')) \
-           and ' ' not in val
+    return val and val.startswith(("http://", "https://", "ftp://")) and " " not in val
 
 
 def cleanup_list(obj, default):
@@ -37,9 +35,11 @@ def cleanup_list(obj, default):
 
 
 class Scraper(scrapelib.Scraper):
-    """ Base class for all scrapers """
+    """Base class for all scrapers"""
 
-    def __init__(self, jurisdiction, datadir, *, strict_validation=True, fastmode=False):
+    def __init__(
+        self, jurisdiction, datadir, *, strict_validation=True, fastmode=False
+    ):
         super(Scraper, self).__init__()
 
         # set options
@@ -77,21 +77,27 @@ class Scraper(scrapelib.Scraper):
 
     def save_object(self, obj):
         """
-            Save object to disk as JSON.
+        Save object to disk as JSON.
 
-            Generally shouldn't be called directly.
+        Generally shouldn't be called directly.
         """
         obj.pre_save(self.jurisdiction.jurisdiction_id)
 
-        filename = '{0}_{1}.json'.format(obj._type, obj._id).replace('/', '-')
+        filename = "{0}_{1}.json".format(obj._type, obj._id).replace("/", "-")
 
-        self.info('save %s %s as %s', obj._type, obj, filename)
-        self.debug(json.dumps(OrderedDict(sorted(obj.as_dict().items())),
-                              cls=utils.JSONEncoderPlus, indent=4, separators=(',', ': ')))
+        self.info("save %s %s as %s", obj._type, obj, filename)
+        self.debug(
+            json.dumps(
+                OrderedDict(sorted(obj.as_dict().items())),
+                cls=utils.JSONEncoderPlus,
+                indent=4,
+                separators=(",", ": "),
+            )
+        )
 
         self.output_names[obj._type].add(filename)
 
-        with open(os.path.join(self.datadir, filename), 'w') as f:
+        with open(os.path.join(self.datadir, filename), "w") as f:
             json.dump(obj.as_dict(), f, cls=utils.JSONEncoderPlus)
 
         # validate after writing, allows for inspection on failure
@@ -108,36 +114,41 @@ class Scraper(scrapelib.Scraper):
             self.save_object(obj)
 
     def do_scrape(self, **kwargs):
-        record = {'objects': defaultdict(int)}
+        record = {"objects": defaultdict(int)}
         self.output_names = defaultdict(set)
-        record['start'] = utils.utcnow()
+        record["start"] = utils.utcnow()
         for obj in self.scrape(**kwargs) or []:
-            if hasattr(obj, '__iter__'):
+            if hasattr(obj, "__iter__"):
                 for iterobj in obj:
                     self.save_object(iterobj)
             else:
                 self.save_object(obj)
-        record['end'] = utils.utcnow()
-        record['skipped'] = getattr(self, 'skipped', 0)
+        record["end"] = utils.utcnow()
+        record["skipped"] = getattr(self, "skipped", 0)
         if not self.output_names:
-            raise ScrapeError('no objects returned from {} scrape'.format(self.__class__.__name__))
+            raise ScrapeError(
+                "no objects returned from {} scrape".format(self.__class__.__name__)
+            )
         for _type, nameset in self.output_names.items():
-            record['objects'][_type] += len(nameset)
+            record["objects"][_type] += len(nameset)
 
         return record
 
     def latest_session(self):
-        return self.jurisdiction.legislative_sessions[-1]['identifier']
+        return self.jurisdiction.legislative_sessions[-1]["identifier"]
 
     def scrape(self, **kwargs):
-        raise NotImplementedError(self.__class__.__name__ + ' must provide a scrape() method')
+        raise NotImplementedError(
+            self.__class__.__name__ + " must provide a scrape() method"
+        )
 
 
 class BaseBillScraper(Scraper):
     skipped = 0
 
     class ContinueScraping(Exception):
-        """ indicate that scraping should continue without saving an object """
+        """indicate that scraping should continue without saving an object"""
+
         pass
 
     def scrape(self, legislative_session, **kwargs):
@@ -146,7 +157,7 @@ class BaseBillScraper(Scraper):
             try:
                 yield self.get_bill(bill_id, **extras)
             except self.ContinueScraping as exc:
-                self.warning('skipping %s: %r', bill_id, exc)
+                self.warning("skipping %s: %r", bill_id, exc)
                 self.skipped += 1
                 continue
 
@@ -189,35 +200,43 @@ class BaseModel(object):
             "datetime", lambda c, d: isinstance(d, (datetime.date, datetime.datetime))
         )
         type_checker = type_checker.redefine(
-            "date", lambda c, d: (isinstance(d, datetime.date)
-                                  and not isinstance(d, datetime.datetime))
+            "date",
+            lambda c, d: (
+                isinstance(d, datetime.date) and not isinstance(d, datetime.datetime)
+            ),
         )
 
-        ValidatorCls = jsonschema.validators.extend(Draft3Validator, type_checker=type_checker)
+        ValidatorCls = jsonschema.validators.extend(
+            Draft3Validator, type_checker=type_checker
+        )
         validator = ValidatorCls(schema, format_checker=FormatChecker())
 
         errors = [str(error) for error in validator.iter_errors(self.as_dict())]
         if errors:
-            raise ScrapeValueError('validation of {} {} failed: {}'.format(
-                self.__class__.__name__, self._id, '\n\t'+'\n\t'.join(errors)
-            ))
+            raise ScrapeValueError(
+                "validation of {} {} failed: {}".format(
+                    self.__class__.__name__, self._id, "\n\t" + "\n\t".join(errors)
+                )
+            )
 
     def pre_save(self, jurisdiction_id):
         pass
 
     def as_dict(self):
         d = {}
-        for attr in self._schema['properties'].keys():
+        for attr in self._schema["properties"].keys():
             if hasattr(self, attr):
                 d[attr] = getattr(self, attr)
-        d['_id'] = self._id
+        d["_id"] = self._id
         return d
 
     # operators
 
     def __setattr__(self, key, val):
-        if key[0] != '_' and key not in self._schema['properties'].keys():
-            raise ScrapeValueError('property "{}" not in {} schema'.format(key, self._type))
+        if key[0] != "_" and key not in self._schema["properties"].keys():
+            raise ScrapeValueError(
+                'property "{}" not in {} schema'.format(key, self._type)
+            )
         super(BaseModel, self).__setattr__(key, val)
 
 
@@ -226,9 +245,9 @@ class SourceMixin(object):
         super(SourceMixin, self).__init__()
         self.sources = []
 
-    def add_source(self, url, *, note=''):
-        """ Add a source URL from which data was collected """
-        new = {'url': url, 'note': note}
+    def add_source(self, url, *, note=""):
+        """Add a source URL from which data was collected"""
+        new = {"url": url, "note": note}
         self.sources.append(new)
 
 
@@ -237,7 +256,7 @@ class ContactDetailMixin(object):
         super(ContactDetailMixin, self).__init__()
         self.contact_details = []
 
-    def add_contact_detail(self, *, type, value, note=''):
+    def add_contact_detail(self, *, type, value, note=""):
         self.contact_details.append({"type": type, "value": value, "note": note})
 
 
@@ -246,7 +265,7 @@ class LinkMixin(object):
         super(LinkMixin, self).__init__()
         self.links = []
 
-    def add_link(self, url, *, note=''):
+    def add_link(self, url, *, note=""):
         self.links.append({"note": note, "url": url})
 
 
@@ -255,7 +274,7 @@ class IdentifierMixin(object):
         super(IdentifierMixin, self).__init__()
         self.identifiers = []
 
-    def add_identifier(self, identifier, *, scheme=''):
+    def add_identifier(self, identifier, *, scheme=""):
         self.identifiers.append({"identifier": identifier, "scheme": scheme})
 
 
@@ -264,21 +283,22 @@ class OtherNameMixin(object):
         super(OtherNameMixin, self).__init__()
         self.other_names = []
 
-    def add_name(self, name, *, start_date='', end_date='', note=''):
-        other_name = {'name': name}
+    def add_name(self, name, *, start_date="", end_date="", note=""):
+        other_name = {"name": name}
         if start_date:
-            other_name['start_date'] = start_date
+            other_name["start_date"] = start_date
         if end_date:
-            other_name['end_date'] = end_date
+            other_name["end_date"] = end_date
         if note:
-            other_name['note'] = note
+            other_name["note"] = note
         self.other_names.append(other_name)
 
 
 class AssociatedLinkMixin(object):
-    def _add_associated_link(self, collection, note, url, *, media_type, text, on_duplicate,
-                             date=''):
-        if on_duplicate not in ['error', 'ignore']:
+    def _add_associated_link(
+        self, collection, note, url, *, media_type, text, on_duplicate, date=""
+    ):
+        if on_duplicate not in ["error", "ignore"]:
             raise ScrapeValueError("on_duplicate must be 'error' or 'ignore'")
 
         try:
@@ -286,28 +306,30 @@ class AssociatedLinkMixin(object):
         except AttributeError:
             associated = self[collection]
 
-        ver = {'note': note, 'links': [], 'date': date}
+        ver = {"note": note, "links": [], "date": date}
 
-        # keep a list of the links we've seen, we need to iterate over whole list on each add
-        # unfortunately this means adds are O(n)
+        # keep a list of the links we've seen, we need to iterate over whole
+        # list on each add unfortunately this means adds are O(n)
         seen_links = set()
 
         matches = 0
         for item in associated:
-            for link in item['links']:
-                seen_links.add(link['url'])
+            for link in item["links"]:
+                seen_links.add(link["url"])
 
             if all(ver.get(x) == item.get(x) for x in ["note", "date"]):
                 matches = matches + 1
                 ver = item
 
-        # it should be impossible to have multiple matches found unless someone is bypassing
-        # _add_associated_link
+        # it should be impossible to have multiple matches found unless someone
+        # is bypassing _add_associated_link
         assert matches <= 1, "multiple matches found in _add_associated_link"
 
         if url in seen_links:
-            if on_duplicate == 'error':
-                raise ScrapeValueError("Duplicate entry in '%s' - URL: '%s'" % (collection, url))
+            if on_duplicate == "error":
+                raise ScrapeValueError(
+                    "Duplicate entry in '%s' - URL: '%s'" % (collection, url)
+                )
             else:
                 # This means we're in ignore mode. This situation right here
                 # means we should *skip* adding this link silently and continue
@@ -319,9 +341,9 @@ class AssociatedLinkMixin(object):
                 return None
 
         # OK. This is either new or old. Let's just go for it.
-        ret = {'url': url, 'media_type': media_type, 'text': text}
+        ret = {"url": url, "media_type": media_type, "text": text}
 
-        ver['links'].append(ret)
+        ver["links"].append(ret)
 
         if matches == 0:
             # in the event we've got a new entry; let's just insert it into

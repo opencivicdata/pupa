@@ -22,7 +22,7 @@ pupa = pupa.cli.__main__:main''',
           'opencivicdata>=3.0.0',
           'dj_database_url>=0.3.0',
           'scrapelib>=1.0',
-          'jsonschema>=3.0.0',  # TODO: Drop alpha release once stable release is available
+          'jsonschema>=3.0.0',  # TODO: Drop alpha release once stable release available
           'psycopg2-binary',
           'pytz',
       ],

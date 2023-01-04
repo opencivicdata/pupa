@@ -16,12 +16,12 @@ versions_or_documents = {
                         "media_type": {"type": "string"},
                         "url": {"type": "string", "format": "uri"},
                     },
-                    "type": "object"
+                    "type": "object",
                 },
                 "type": "array",
             },
         },
-        "type": "object"
+        "type": "object",
     },
     "type": "array",
 }
@@ -33,8 +33,10 @@ schema = {
         "identifier": {"type": "string", "minLength": 1},
         "title": {"type": "string", "minLength": 1},
         "from_organization": {"type": ["string", "null"]},
-        "classification": {"items": {"type": "string", "enum": common.BILL_CLASSIFICATIONS},
-                           "type": "array"},
+        "classification": {
+            "items": {"type": "string", "enum": common.BILL_CLASSIFICATIONS},
+            "type": "array",
+        },
         "subject": {"items": {"type": "string", "minLength": 1}, "type": "array"},
         "abstracts": {
             "items": {
@@ -43,7 +45,8 @@ schema = {
                     "note": {"type": "string"},
                     "date": {"type": "string"},
                 },
-                "type": "object"},
+                "type": "object",
+            },
             "type": "array",
         },
         "other_titles": {
@@ -52,7 +55,7 @@ schema = {
                     "title": {"type": "string", "minLength": 1},
                     "note": {"type": "string"},
                 },
-                "type": "object"
+                "type": "object",
             },
             "type": "array",
         },
@@ -63,7 +66,7 @@ schema = {
                     "note": {"type": "string"},
                     "scheme": {"type": "string"},
                 },
-                "type": "object"
+                "type": "object",
             },
             "type": "array",
         },
@@ -73,10 +76,13 @@ schema = {
                     "organization": {"type": ["string", "null"]},
                     "date": fuzzy_datetime,
                     "description": {"type": "string", "minLength": 1},
-                    "classification": {"items": {"type": "string",
-                                                 "enum": common.BILL_ACTION_CLASSIFICATIONS},
-                                       "type": "array",
-                                       },
+                    "classification": {
+                        "items": {
+                            "type": "string",
+                            "enum": common.BILL_ACTION_CLASSIFICATIONS,
+                        },
+                        "type": "array",
+                    },
                     "related_entities": {
                         "items": {
                             "properties": {
@@ -88,16 +94,15 @@ schema = {
                                 "person_id": {"type": ["string", "null"]},
                                 "organization_id": {"type": ["string", "null"]},
                             },
-                            "type": "object"
+                            "type": "object",
                         },
                         "type": "array",
                     },
                 },
-                "type": "object"
+                "type": "object",
             },
             "type": "array",
         },
-
         "sponsorships": {
             "items": {
                 "properties": {
@@ -111,26 +116,27 @@ schema = {
                     "person_id": {"type": ["string", "null"]},
                     "organization_id": {"type": ["string", "null"]},
                 },
-                "type": "object"
+                "type": "object",
             },
             "type": "array",
         },
-
         "related_bills": {
             "items": {
                 "properties": {
                     "identifier": {"type": "string", "minLength": 1},
                     "legislative_session": {"type": "string", "minLength": 1},
-                    "relation_type": {"enum": common.BILL_RELATION_TYPES, "type": "string"},
+                    "relation_type": {
+                        "enum": common.BILL_RELATION_TYPES,
+                        "type": "string",
+                    },
                 },
-                "type": "object"
+                "type": "object",
             },
             "type": "array",
         },
-
         "versions": versions_or_documents,
         "documents": versions_or_documents,
         "sources": sources,
         "extras": extras,
-    }
+    },
 }

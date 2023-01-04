@@ -1,1 +1,1 @@
-from .session import generate_session_report    # noqa
+from .session import generate_session_report  # noqa
