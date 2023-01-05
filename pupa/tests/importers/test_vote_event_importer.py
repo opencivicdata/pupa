@@ -546,7 +546,7 @@ def test_vote_event_bill_actions_errors():
     )
 
     bill = Bill.objects.get()
-    votes = list(VoteEvent.objects.all())
+    votes = list(VoteEvent.objects.all().order_by("identifier"))
 
     # isn't matched, was ambiguous across two actions
     assert votes[0].bill_action is None
