@@ -295,7 +295,7 @@ class BaseImporter(object):
                 what = "update"
 
             if what == "update":
-                obj.last_updated = utcnow()
+                obj.updated_at = utcnow()
 
             # Refresh the object's last_seen field whether or not we updated
             obj.save()
