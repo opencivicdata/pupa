@@ -8,10 +8,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'test',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'USER': 'test',
+        'PASSWORD': 'test',
         'HOST': 'localhost',
-        'PORT': 32001,
+        'PORT': 5432,
     }
 }
 MIDDLEWARE_CLASSES = ()
