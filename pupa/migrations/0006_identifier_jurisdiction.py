@@ -9,15 +9,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0001_initial'),
-        ('pupa', '0005_auto_20170522_1935'),
+        ("core", "0001_initial"),
+        ("pupa", "0005_auto_20170522_1935"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='identifier',
-            name='jurisdiction',
-            field=models.ForeignKey(default='', on_delete=django.db.models.deletion.CASCADE, related_name='pupa_ids', to='core.Jurisdiction'),
+            model_name="identifier",
+            name="jurisdiction",
+            field=models.ForeignKey(
+                default="",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="pupa_ids",
+                to="core.Jurisdiction",
+            ),
             preserve_default=False,
         ),
     ]

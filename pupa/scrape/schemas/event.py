@@ -2,7 +2,13 @@
     Schema for event objects.
 """
 
-from .common import sources, extras, fuzzy_date_blank, fuzzy_datetime, fuzzy_datetime_blank
+from .common import (
+    sources,
+    extras,
+    fuzzy_date_blank,
+    fuzzy_datetime,
+    fuzzy_datetime_blank,
+)
 
 media_schema = {
     "items": {
@@ -17,44 +23,39 @@ media_schema = {
                         "media_type": {"type": "string"},
                         "url": {"type": "string", "format": "uri"},
                     },
-                    "type": "object"
+                    "type": "object",
                 },
-                "type": "array"
+                "type": "array",
             },
         },
-        "type": "object"
+        "type": "object",
     },
-    "type": "array"
+    "type": "array",
 }
 
 schema = {
     "properties": {
         "name": {"type": "string", "minLength": 1},
         "all_day": {"type": "boolean"},
-        'start_date': fuzzy_datetime,
-        'end_date': fuzzy_datetime_blank,
+        "start_date": fuzzy_datetime,
+        "end_date": fuzzy_datetime_blank,
         "status": {
             "type": "string",
             "enum": ["cancelled", "tentative", "confirmed", "passed"],
         },
-        "classification": {"type": "string", "minLength": 1},    # TODO: enum
+        "classification": {"type": "string", "minLength": 1},  # TODO: enum
         "description": {"type": "string"},
-
         "location": {
             "type": ["object", "null"],
             "properties": {
-
                 "name": {"type": "string", "minLength": 1},
-
                 "note": {
                     "type": "string",
                 },
-
                 "url": {
                     "type": ["string", "null"],
                     "format": "uri",
                 },
-
                 "coordinates": {
                     "type": ["object", "null"],
                     "properties": {
@@ -65,14 +66,12 @@ schema = {
                         "longitude": {
                             "type": "string",
                             "minLength": 1,
-                        }
-                    }
+                        },
+                    },
                 },
             },
         },
-
         "media": media_schema,
-
         "documents": {
             "items": {
                 "properties": {
@@ -81,73 +80,58 @@ schema = {
                     "media_type": {"type": "string", "minLength": 1},
                     "date": fuzzy_date_blank,
                 },
-                "type": "object"
+                "type": "object",
             },
-            "type": "array"
+            "type": "array",
         },
-
         "links": {
             "items": {
                 "properties": {
                     "note": {
                         "type": "string",
                     },
-                    "url": {
-                        "format": "uri",
-                        "type": "string"
-                    }
+                    "url": {"format": "uri", "type": "string"},
                 },
-                "type": "object"
+                "type": "object",
             },
-            "type": "array"
+            "type": "array",
         },
-
         "participants": {
             "items": {
                 "properties": {
-
                     "name": {
                         "type": "string",
                         "minLength": 1,
                     },
-
                     "type": {
                         "enum": ["organization", "person"],
                         "type": "string",
                     },
-
                     "note": {
                         "type": "string",
                         "minLength": 1,
                     },
-
                 },
-                "type": "object"
+                "type": "object",
             },
-            "type": "array"
+            "type": "array",
         },
-
         "agenda": {
             "items": {
                 "properties": {
                     "description": {"type": "string", "minLength": 1},
-
                     "classification": {
                         "items": {"type": "string", "minLength": 1},
                         "type": "array",
                     },
-
                     "order": {
                         "type": ["string", "null"],
                     },
-
                     "subjects": {
                         "items": {"type": "string", "minLength": 1},
-                        "type": "array"
+                        "type": "array",
                     },
-
                     "media": media_schema,
-
                     "notes": {
                         "items": {
                             "type": "string",
@@ -155,7 +139,6 @@ schema = {
                         },
                         "type": "array",
                     },
-
                     "related_entities": {
                         "items": {
                             "properties": {
@@ -163,14 +146,15 @@ schema = {
                                     "type": "string",
                                     "minLength": 1,
                                 },
-
                                 "name": {
                                     "type": "string",
                                     "minLength": 1,
                                 },
-
                                 "note": {
-                                    "type": ["string", "null", ],
+                                    "type": [
+                                        "string",
+                                        "null",
+                                    ],
                                     "minLength": 1,
                                 },
                             },
@@ -180,16 +164,17 @@ schema = {
                         "type": "array",
                     },
                 },
-                "type": "object"
+                "type": "object",
             },
             "minItems": 0,
-            "type": "array"
+            "type": "array",
         },
         "sources": sources,
         "extras": extras,
-        'pupa_id': {"type": ["string", "null"],
-                    "minLength": 1,
-                    },
+        "pupa_id": {
+            "type": ["string", "null"],
+            "minLength": 1,
+        },
     },
-    "type": "object"
+    "type": "object",
 }
