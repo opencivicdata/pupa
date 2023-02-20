@@ -58,21 +58,21 @@ class Command(BaseCommand):
             type=int,
             default=7,
             help=(
-                "Objects not seen in this many days will be deleted from the database"
+                "objects not seen in this many days will be deleted from the database"
             ),
         )
         self.add_argument(
             "--report",
             action="store_true",
             help=(
-                "Will only generate a report of what objects this command"
-                "would delete without making any changes to the database"
+                "generate a report of what objects this command"
+                " would delete without making any changes to the database"
             ),
         )
         self.add_argument(
             "--noinput",
             action="store_true",
-            help="Will delete objects without getting user confirmation",
+            help="delete objects without getting user confirmation",
         )
 
     def handle(self, args, other):
@@ -89,7 +89,7 @@ class Command(BaseCommand):
             if not args.noinput:
                 print(
                     "This will permanently delete all objects from your database"
-                    f"that have not been scraped within the last {args.window}"
+                    f" that have not been scraped within the last {args.window}"
                     " days. Are you sure? (Y/N)"
                 )
                 resp = input()
