@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime, timezone, timedelta
 
 import django
@@ -15,24 +16,6 @@ def get_subclasses(app_list, abstract_class):
             if issubclass(model, abstract_class) and model is not abstract_class:
                 result.append(model)
         return result
-
-
-def get_stale_objects(window):
-    """
-    Find all database objects that haven't seen been in {window} days.
-    """
-
-    from opencivicdata.core.models.base import OCDBase
-
-    ocd_apps = ["core", "legislative"]
-    # Check all subclasses of OCDBase
-    models = get_subclasses(ocd_apps, OCDBase)
-
-    for model in models:
-        # Jurisdictions are protected from deletion
-        if "Jurisdiction" not in model.__name__:
-            cutoff_date = datetime.now(tz=timezone.utc) - timedelta(days=window)
-            yield from model.objects.filter(last_seen__lte=cutoff_date).iterator()
 
 
 class Command(BaseCommand):
@@ -62,20 +45,37 @@ class Command(BaseCommand):
             help="delete objects without getting user confirmation",
         )
 
-    def remove_stale_objects(window):
+    def get_stale_objects(self, window):
+        """
+        Find all database objects that haven't seen been in {window} days.
+        """
+
+        from opencivicdata.core.models.base import OCDBase
+
+        ocd_apps = ["core", "legislative"]
+        # Check all subclasses of OCDBase
+        models = get_subclasses(ocd_apps, OCDBase)
+
+        for model in models:
+            # Jurisdictions are protected from deletion
+            if "Jurisdiction" not in model.__name__:
+                cutoff_date = datetime.now(tz=timezone.utc) - timedelta(days=window)
+                yield from model.objects.filter(last_seen__lte=cutoff_date).iterator()
+
+    def remove_stale_objects(self, window):
         """
         Remove all database objects that haven't seen been in {window} days.
         """
 
-        for obj in get_stale_objects(window):
+        for obj in self.get_stale_objects(window):
             print(f"Deleting {obj}...")
             obj.delete()
 
-    def report_stale_objects(window):
+    def report_stale_objects(self, window):
         """
         Print all database objects that haven't seen been in {window} days.
         """
-        for obj in get_stale_objects(window):
+        for obj in self.get_stale_objects(window):
             print(obj)
 
     def handle(self, args, other):
@@ -96,7 +96,7 @@ class Command(BaseCommand):
                 )
                 resp = input()
                 if resp != "Y":
-                    return
+                    sys.exit()
 
             print(
                 "Removing objects that haven't been seen in a scrape within"
