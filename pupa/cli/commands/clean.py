@@ -1,4 +1,3 @@
-import itertools
 from datetime import datetime, timezone, timedelta
 
 import django
@@ -29,20 +28,18 @@ def get_stale_objects(window):
     # Check all subclasses of OCDBase
     models = get_subclasses(ocd_apps, OCDBase)
 
-    results = []
     for model in models:
         # Jurisdictions are protected from deletion
         if "Jurisdiction" not in model.__name__:
             cutoff_date = datetime.now(tz=timezone.utc) - timedelta(days=window)
-            results.append(model.objects.filter(last_seen__lte=cutoff_date))
-
-    return itertools.chain(*results)
+            yield from model.objects.filter(last_seen__lte=cutoff_date).iterator()
 
 
 def remove_stale_objects(window):
     """
     Remove all database objects that haven't seen been in {window} days.
     """
+
     for obj in get_stale_objects(window):
         print(f"Deleting {obj}...")
         obj.delete()
