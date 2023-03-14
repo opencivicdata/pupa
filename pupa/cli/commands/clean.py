@@ -35,16 +35,6 @@ def get_stale_objects(window):
             yield from model.objects.filter(last_seen__lte=cutoff_date).iterator()
 
 
-def remove_stale_objects(window):
-    """
-    Remove all database objects that haven't seen been in {window} days.
-    """
-
-    for obj in get_stale_objects(window):
-        print(f"Deleting {obj}...")
-        obj.delete()
-
-
 class Command(BaseCommand):
     name = "clean"
     help = "Removes database objects that haven't been seen in recent scrapes"
@@ -72,6 +62,22 @@ class Command(BaseCommand):
             help="delete objects without getting user confirmation",
         )
 
+    def remove_stale_objects(window):
+        """
+        Remove all database objects that haven't seen been in {window} days.
+        """
+
+        for obj in get_stale_objects(window):
+            print(f"Deleting {obj}...")
+            obj.delete()
+
+    def report_stale_objects(window):
+        """
+        Print all database objects that haven't seen been in {window} days.
+        """
+        for obj in get_stale_objects(window):
+            print(obj)
+
     def handle(self, args, other):
         django.setup()
 
@@ -80,8 +86,7 @@ class Command(BaseCommand):
                 "These objects have not been seen in a scrape within the last"
                 f" {args.window} days:"
             )
-            for obj in get_stale_objects(args.window):
-                print(obj)
+            self.report_stale_objects()
         else:
             if not args.noinput:
                 print(
@@ -97,4 +102,4 @@ class Command(BaseCommand):
                 "Removing objects that haven't been seen in a scrape within"
                 f" the last {args.window} days..."
             )
-            remove_stale_objects(args.window)
+            self.remove_stale_objects(args.window)
