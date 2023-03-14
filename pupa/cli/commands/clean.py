@@ -90,7 +90,9 @@ class Command(BaseCommand):
         else:
             if not args.noinput:
                 print(
-                    "This will permanently delete all objects from your database"
+                    f"This will permanently delete"
+                    f" {len(self.get_stale_objects(args.window))}"
+                    " objects from your database"
                     f" that have not been scraped within the last {args.window}"
                     " days. Are you sure? (Y/N)"
                 )
