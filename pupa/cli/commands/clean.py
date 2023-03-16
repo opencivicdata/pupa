@@ -91,7 +91,7 @@ class Command(BaseCommand):
             if not args.noinput:
                 print(
                     f"This will permanently delete"
-                    f" {len(self.get_stale_objects(args.window))}"
+                    f" {len(list(self.get_stale_objects(args.window)))}"
                     " objects from your database"
                     f" that have not been scraped within the last {args.window}"
                     " days. Are you sure? (Y/N)"
