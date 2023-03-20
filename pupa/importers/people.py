@@ -63,7 +63,7 @@ class PersonImporter(BaseImporter):
             self.model_class.objects.filter(
                 Q(memberships__organization__jurisdiction_id=self.jurisdiction_id),
                 (Q(name__in=all_names) | Q(other_names__name__in=all_names)),
-            ).distinct("id")
+            ).distinct()
         )
 
         matches_length = len(matches)

@@ -77,4 +77,3 @@ else:
 
 
 DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
-DATABASES["default"]["ENGINE"] = "django.contrib.gis.db.backends.postgis"

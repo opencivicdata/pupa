@@ -35,7 +35,7 @@ class OrganizationImporter(BaseImporter):
         all_names = [org["name"]] + [o["name"] for o in org["other_names"]]
 
         query = Q(**spec) & (Q(name__in=all_names) | Q(other_names__name__in=all_names))
-        matches = list(self.model_class.objects.filter(query).distinct("id"))
+        matches = list(self.model_class.objects.filter(query).distinct())
         matches_length = len(matches)
         if matches_length == 1:
             return matches[0]
