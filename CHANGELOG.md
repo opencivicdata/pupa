@@ -1,6 +1,6 @@
 # pupa changelog
 
-## 0.10.3 - April 3 2023
+## 0.11.0 - April 3 2023
 
 Improvements:
 
