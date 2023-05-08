@@ -19,7 +19,7 @@ setup(name='pupa',
 pupa = pupa.cli.__main__:main''',
       install_requires=[
           'Django>=2.2',
-          'opencivicdata @ git+https://github.com/opencivicdata/python-opencivicdata@last-seen',
+          'opencivicdata>=3.3.0',
           'dj_database_url>=0.3.0',
           'scrapelib>=1.0',
           'jsonschema>=3.0.0',  # TODO: Drop alpha release once stable release available
