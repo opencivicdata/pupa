@@ -88,11 +88,21 @@ class Command(BaseCommand):
             )
             self.report_stale_objects()
         else:
-            if not args.noinput:
+            num_stale_objects = len(list(self.get_stale_objects(args.window)))
+
+            if args.noinput:
+                # Fail-safe to avoid deleting a large amount of objects
+                # without explicit confimation
+                if num_stale_objects > 10:
+                    print(
+                        "This command would delete more than 10 objects."
+                        "If you're sure, re-run without --noinput to provide confirmation."
+                    )
+                    sys.exit(1)
+            else:
                 print(
                     f"This will permanently delete"
-                    f" {len(list(self.get_stale_objects(args.window)))}"
-                    " objects from your database"
+                    f" {num_stale_objects} objects from your database"
                     f" that have not been scraped within the last {args.window}"
                     " days. Are you sure? (Y/N)"
                 )
