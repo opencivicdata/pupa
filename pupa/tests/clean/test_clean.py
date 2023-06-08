@@ -97,3 +97,25 @@ def test_clean_command(subparsers):
         for obj in expected_not_stale_objects:
             was_not_deleted = type(obj).objects.filter(id=obj.id).exists()
             assert was_not_deleted
+
+
+@pytest.mark.django_db
+def test_clean_command_failsafe(subparsers):
+    _ = create_jurisdiction()
+    o = Organization.objects.create(name="WWE", jurisdiction_id="jid")
+
+    stale_people = [
+        Person.objects.create(name="George Washington", family_name="Washington")
+        for i in range(20)
+    ]
+    stale_memberships = [ # noqa
+        p.memberships.create(organization=o) for p in stale_people
+    ]
+
+    a_week_from_now = datetime.now(tz=timezone.utc) + timedelta(days=7)
+    with freeze_time(a_week_from_now):
+        with pytest.raises(SystemExit):
+            # Should trigger failsafe exist when deleting more than 10 objects
+            Command(subparsers).handle(
+                argparse.Namespace(noinput=True, report=False, window=7), []
+            )
