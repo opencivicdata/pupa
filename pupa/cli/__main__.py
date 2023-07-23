@@ -7,28 +7,34 @@ import traceback
 from django.conf import settings
 from pupa.exceptions import CommandError
 
-logger = logging.getLogger('pupa')
+logger = logging.getLogger("pupa")
 
 COMMAND_MODULES = (
-    'pupa.cli.commands.init',
-    'pupa.cli.commands.dbinit',
-    'pupa.cli.commands.update',
-    'pupa.cli.commands.party',
+    "pupa.cli.commands.init",
+    "pupa.cli.commands.dbinit",
+    "pupa.cli.commands.update",
+    "pupa.cli.commands.party",
+    "pupa.cli.commands.clean",
 )
 
 
 def main():
-    parser = argparse.ArgumentParser('pupa', description='pupa CLI')
-    parser.add_argument('--debug', action='store_true',
-                        help='open debugger on error')
-    parser.add_argument('--loglevel', default='INFO', help=('set log level. options are: '
-                                                            'DEBUG|INFO|WARNING|ERROR|CRITICAL '
-                                                            '(default is INFO)'))
-    subparsers = parser.add_subparsers(dest='subcommand')
+    parser = argparse.ArgumentParser("pupa", description="pupa CLI")
+    parser.add_argument("--debug", action="store_true", help="open debugger on error")
+    parser.add_argument(
+        "--loglevel",
+        default="INFO",
+        help=(
+            "set log level. options are: "
+            "DEBUG|INFO|WARNING|ERROR|CRITICAL "
+            "(default is INFO)"
+        ),
+    )
+    subparsers = parser.add_subparsers(dest="subcommand")
 
     # configure Django before model imports
     if os.environ.get("DJANGO_SETTINGS_MODULE") is None:
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'pupa.settings'
+        os.environ["DJANGO_SETTINGS_MODULE"] = "pupa.settings"
 
     subcommands = {}
     for mod in COMMAND_MODULES:
@@ -42,16 +48,16 @@ def main():
     args, other = parser.parse_known_args()
 
     # set log level from command line
-    handler_level = getattr(logging, args.loglevel.upper(), 'INFO')
-    settings.LOGGING['handlers']['default']['level'] = handler_level
+    handler_level = getattr(logging, args.loglevel.upper(), "INFO")
+    settings.LOGGING["handlers"]["default"]["level"] = handler_level
     logging.config.dictConfig(settings.LOGGING)
 
     # turn debug on
     if args.debug:
         try:
-            debug_module = importlib.import_module('ipdb')
+            debug_module = importlib.import_module("ipdb")
         except ImportError:
-            debug_module = importlib.import_module('pdb')
+            debug_module = importlib.import_module("pdb")
 
         # turn on PDB-on-error mode
         # stolen from http://stackoverflow.com/questions/1237379/
@@ -59,6 +65,7 @@ def main():
         def _tb_info(type, value, tb):
             traceback.print_exception(type, value, tb)
             debug_module.pm()
+
         sys.excepthook = _tb_info
 
     if not args.subcommand:
@@ -71,5 +78,5 @@ def main():
             sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

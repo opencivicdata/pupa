@@ -214,8 +214,6 @@ def test_cycles_complex():
     # with open("/home/tag/debug.dot", 'w') as fd:
     #     fd.write(network.dot())
 
-    assert chash(network.cycles()) == chash([
-        ('B', 'C', 'B'),
-        ('C', 'D', 'C'),
-        ('A', 'B', 'D', 'A')
-    ])
+    assert chash(network.cycles()) == chash(
+        [("B", "C", "B"), ("C", "D", "C"), ("A", "B", "D", "A")]
+    )

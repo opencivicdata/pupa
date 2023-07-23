@@ -9,28 +9,44 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pupa', '0001_initial'),
+        ("pupa", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='importobjects',
-            name='report',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='imported_objects', to='pupa.RunPlan'),
+            model_name="importobjects",
+            name="report",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="imported_objects",
+                to="pupa.RunPlan",
+            ),
         ),
         migrations.AlterField(
-            model_name='runplan',
-            name='jurisdiction',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='runs', to='core.Jurisdiction'),
+            model_name="runplan",
+            name="jurisdiction",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="runs",
+                to="core.Jurisdiction",
+            ),
         ),
         migrations.AlterField(
-            model_name='scrapeobjects',
-            name='report',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='scraped_objects', to='pupa.ScrapeReport'),
+            model_name="scrapeobjects",
+            name="report",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="scraped_objects",
+                to="pupa.ScrapeReport",
+            ),
         ),
         migrations.AlterField(
-            model_name='scrapereport',
-            name='plan',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='scrapers', to='pupa.RunPlan'),
+            model_name="scrapereport",
+            name="plan",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="scrapers",
+                to="pupa.RunPlan",
+            ),
         ),
     ]

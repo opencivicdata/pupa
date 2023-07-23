@@ -14,10 +14,9 @@ schema = {
         "contact_details": contact_details,
         "links": links,
         "extras": extras,
-
         # division & jurisdiction are additions to popolo
         "division_id": {"type": ["string", "null"]},
         "jurisdiction_id": {"type": "string", "minLength": 1},
     },
-    "type": "object"
+    "type": "object",
 }

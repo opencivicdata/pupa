@@ -13,5 +13,5 @@ schema = {
         "links": links,
         "extras": extras,
     },
-    "type": "object"
+    "type": "object",
 }

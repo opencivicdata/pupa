@@ -1,5 +1,11 @@
 # pupa changelog
 
+## 0.11.0 - April 3 2023
+
+Improvements:
+
+* Add `pupa clean` command to delete database objects that haven't been seen in recent scrapes
+
 ## 0.10.2 - March 18 2021
 
 Improvements:

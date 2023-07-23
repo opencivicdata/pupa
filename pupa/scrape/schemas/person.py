@@ -1,5 +1,12 @@
-from .common import (links, contact_details, identifiers, other_names, sources, extras,
-                     fuzzy_date_blank)
+from .common import (
+    links,
+    contact_details,
+    identifiers,
+    other_names,
+    sources,
+    extras,
+    fuzzy_date_blank,
+)
 
 schema = {
     "properties": {
@@ -21,5 +28,5 @@ schema = {
         "sources": sources,
         "extras": extras,
     },
-    "type": "object"
+    "type": "object",
 }
