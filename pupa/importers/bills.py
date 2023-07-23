@@ -53,18 +53,27 @@ class BillImporter(BaseImporter):
         self.person_importer = person_importer
 
     def get_object(self, bill):
-        spec = {
-            "legislative_session_id": bill["legislative_session_id"],
-            "identifier": bill["identifier"],
-        }
-        if "from_organization_id" in bill:
-            spec["from_organization_id"] = bill["from_organization_id"]
 
-        return self.model_class.objects.prefetch_related(
+        all_identifiers = [bill["identifier"]] + [
+            o["identifier"] for o in bill["other_identifiers"]
+        ]
+
+        query = self.model_class.objects.prefetch_related(
             "actions__related_entities",
             "versions__links",
             "documents__links",
-        ).get(**spec)
+        ).filter(
+            Q(legislative_session_id=bill["legislative_session_id"]),
+            (
+                Q(identifier__in=all_identifiers)
+                | Q(other_identifiers__identifier__in=all_identifiers)
+            ),
+        )
+
+        if "from_organization_id" in bill:
+            query = query.filter(from_organization_id=bill["from_organization_id"])
+
+        return query.distinct("id").get()
 
     def limit_spec(self, spec):
         spec["legislative_session__jurisdiction_id"] = self.jurisdiction_id
