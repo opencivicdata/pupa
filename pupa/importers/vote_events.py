@@ -99,8 +99,9 @@ class VoteEventImporter(BaseImporter):
                     organization_id=data["organization_id"],
                 )
                 if action.id in self.seen_action_ids:
-                    self.warning('can not match two VoteEvents to %s: %s',
-                                 action.id, bill_action)
+                    self.warning(
+                        "can not match two VoteEvents to %s: %s", action.id, bill_action
+                    )
                 else:
                     data["bill_action_id"] = action.id
                     self.seen_action_ids.add(action.id)

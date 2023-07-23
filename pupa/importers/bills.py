@@ -111,13 +111,18 @@ class BillImporter(BaseImporter):
         # go through all RelatedBill objs that are attached to a bill in this
         # jurisdiction and are currently unresolved
         for rb in RelatedBill.objects.filter(
-                bill__legislative_session__jurisdiction_id=self.jurisdiction_id,
-                related_bill=None):
-            candidates = list(Bill.objects.filter(
-                Q(legislative_session__identifier=rb.legislative_session,
-                  legislative_session__jurisdiction_id=self.jurisdiction_id),
-                Q(identifier=rb.identifier) |
-                Q(other_identifiers__identifier=rb.identifier))
+            bill__legislative_session__jurisdiction_id=self.jurisdiction_id,
+            related_bill=None,
+        ):
+            candidates = list(
+                Bill.objects.filter(
+                    Q(
+                        legislative_session__identifier=rb.legislative_session,
+                        legislative_session__jurisdiction_id=self.jurisdiction_id,
+                    ),
+                    Q(identifier=rb.identifier)
+                    | Q(other_identifiers__identifier=rb.identifier),
+                )
             )
             if len(candidates) == 1:
                 rb.related_bill = candidates[0]
