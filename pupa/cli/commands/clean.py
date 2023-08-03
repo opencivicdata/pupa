@@ -88,15 +88,17 @@ class Command(BaseCommand):
             )
             self.report_stale_objects()
         else:
-            num_stale_objects = len(list(self.get_stale_objects(args.window)))
+            stale_objects = list(self.get_stale_objects(args.window))
+            num_stale_objects = len(stale_objects)
 
             if args.noinput:
                 # Fail-safe to avoid deleting a large amount of objects
                 # without explicit confimation
                 if num_stale_objects > 10:
                     print(
-                        "This command would delete more than 10 objects."
-                        "If you're sure, re-run without --noinput to provide confirmation."
+                        f"This command would delete {num_stale_objects} objects: "
+                        f"\n{stale_objects}"
+                        "\nIf you're sure, re-run without --noinput to provide confirmation."
                     )
                     sys.exit(1)
             else:
