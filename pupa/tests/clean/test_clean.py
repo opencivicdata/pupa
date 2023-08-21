@@ -85,7 +85,7 @@ def test_clean_command(subparsers):
 
         # Call clean command
         Command(subparsers).handle(
-            argparse.Namespace(noinput=True, report=False, window=7), []
+            argparse.Namespace(noinput=True, report=False, window=7, yes=False), []
         )
 
         expected_stale_objects = {stale_person, stale_membership}
@@ -117,5 +117,5 @@ def test_clean_command_failsafe(subparsers):
         with pytest.raises(SystemExit):
             # Should trigger failsafe exist when deleting more than 10 objects
             Command(subparsers).handle(
-                argparse.Namespace(noinput=True, report=False, window=7), []
+                argparse.Namespace(noinput=True, report=False, window=7, yes=False), []
             )

@@ -47,7 +47,8 @@ class Command(BaseCommand):
         self.add_argument(
             "--yes",
             action="store_true",
-            help="delete objects without getting user confirmation",
+            help="assumes an answer of 'yes' to all interactive prompts",
+            default=False,
         )
 
     def get_stale_objects(self, window):
@@ -96,10 +97,14 @@ class Command(BaseCommand):
             stale_objects = list(self.get_stale_objects(args.window))
             num_stale_objects = len(stale_objects)
 
+            if args.noinput and args.yes:
+                self.remove_stale_objects(args.window)
+                sys.exit()
+
             if args.noinput:
                 # Fail-safe to avoid deleting a large amount of objects
                 # without explicit confimation
-                if num_stale_objects > 10 and not args.yes:
+                if num_stale_objects > 10:
                     print(
                         f"This command would delete {num_stale_objects} objects: "
                         f"\n{stale_objects}"
