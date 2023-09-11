@@ -57,6 +57,10 @@ class VoteEventImporter(BaseImporter):
         elif vote_event["identifier"]:
             # if there's an identifier, just use it and the bill_id and the session
             spec["identifier"] = vote_event["identifier"]
+        elif vote_event["bill_action_id"]:
+            # there's at most a one-to-one relationship between vote events and
+            # bill actions
+            spec["bill_action_id"] = vote_event["bill_action_id"]
         else:
             # otherwise use the motion, start_date, and org as well
             spec.update(
