@@ -73,7 +73,16 @@ class BillImporter(BaseImporter):
         if "from_organization_id" in bill:
             query = query.filter(from_organization_id=bill["from_organization_id"])
 
-        return query.distinct("id").get()
+        try:
+            obj = query.distinct("id").get()
+        except self.model_class.MultipleObjectsReturned as exc:
+            raise PupaInternalError(
+                "multiple bill candidates found with identifiers: {}".format(
+                    ", ".join(all_identifiers)
+                )
+            ) from exc
+
+        return obj
 
     def limit_spec(self, spec):
         spec["legislative_session__jurisdiction_id"] = self.jurisdiction_id
