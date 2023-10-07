@@ -86,6 +86,13 @@ class BillImporter(BaseImporter):
 
     def limit_spec(self, spec):
         spec["legislative_session__jurisdiction_id"] = self.jurisdiction_id
+
+        if "identifier" in spec:
+            identifier = spec.pop("identifier")
+            return Q(identifier=identifier) | Q(
+                other_identifiers__identifier=identifier
+            ) & Q(**spec)
+
         return spec
 
     def prepare_for_db(self, data):
