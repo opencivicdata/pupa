@@ -1,3 +1,4 @@
+from django.db.models import Q
 from opencivicdata.legislative.models import (
     VoteEvent,
     VoteCount,
@@ -75,6 +76,11 @@ class VoteEventImporter(BaseImporter):
 
     def limit_spec(self, spec):
         spec["legislative_session__jurisdiction_id"] = self.jurisdiction_id
+        if "bill__identifier" in spec:
+            identifier = spec.pop("bill__identifier")
+            return Q(bill__identifier=identifier) | Q(
+                bill__other_identifiers__identifier=identifier
+            ) & Q(**spec)
         return spec
 
     def prepare_for_db(self, data):
