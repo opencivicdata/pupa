@@ -82,6 +82,13 @@ class BillImporter(BaseImporter):
                 )
             ) from exc
 
+        if (
+            obj.identifier != bill["identifier"]
+            and obj.identifier not in bill["other_identifers"]
+        ):
+
+            bill["other_identifiers"].append(obj.identifier)
+
         return obj
 
     def limit_spec(self, spec):
