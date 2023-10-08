@@ -83,11 +83,10 @@ class BillImporter(BaseImporter):
                 )
             ) from exc
 
-        if (
-            obj.identifier != bill["identifier"]
-            and obj.identifier not in bill["other_identifiers"]
-        ):
-            bill["other_identifiers"].append(obj.identifier)
+        if obj.identifier not in all_identifiers:
+            bill["other_identifiers"].append(
+                {"note": "", "identifier": obj.identifier, "scheme": ""}
+            )
 
         return obj
 
