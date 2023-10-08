@@ -46,7 +46,7 @@ class BillImporter(BaseImporter):
         ),
     }
     preserve_order = {"actions"}
-    merge_related = {"other_identifiers"}
+    merge_related = {"other_identifiers": ["identifier"]}
 
     def __init__(self, jurisdiction_id, org_importer, person_importer):
         super(BillImporter, self).__init__(jurisdiction_id)
