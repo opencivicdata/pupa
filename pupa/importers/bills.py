@@ -46,6 +46,7 @@ class BillImporter(BaseImporter):
         ),
     }
     preserve_order = {"actions"}
+    merge_related = {"other_identifers"}
 
     def __init__(self, jurisdiction_id, org_importer, person_importer):
         super(BillImporter, self).__init__(jurisdiction_id)
@@ -86,7 +87,6 @@ class BillImporter(BaseImporter):
             obj.identifier != bill["identifier"]
             and obj.identifier not in bill["other_identifers"]
         ):
-
             bill["other_identifiers"].append(obj.identifier)
 
         return obj
