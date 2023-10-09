@@ -44,7 +44,7 @@ class Bill(SourceMixin, AssociatedLinkMixin, BaseModel):
         )
 
         self.actions = []
-        self.other_identifiers = []
+        self.other_identifiers = [{"note": "", "identifier": identifier, "scheme": ""}]
         self.other_titles = []
         self.documents = []
         self.related_bills = []

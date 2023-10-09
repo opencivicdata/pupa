@@ -1,5 +1,3 @@
-from django.db.models import Q
-
 from opencivicdata.legislative.models import (
     Bill,
     RelatedBill,
@@ -55,38 +53,28 @@ class BillImporter(BaseImporter):
 
     def get_object(self, bill):
 
-        all_identifiers = [bill["identifier"]] + [
-            o["identifier"] for o in bill["other_identifiers"]
-        ]
+        identifiers = [o["identifier"] for o in bill["other_identifiers"]]
 
         query = self.model_class.objects.prefetch_related(
             "actions__related_entities",
             "versions__links",
             "documents__links",
         ).filter(
-            Q(legislative_session_id=bill["legislative_session_id"]),
-            (
-                Q(identifier__in=all_identifiers)
-                | Q(other_identifiers__identifier__in=all_identifiers)
-            ),
+            legislative_session_id=bill["legislative_session_id"],
+            other_identifiers__identifier__in=identifiers,
         )
 
         if "from_organization_id" in bill:
             query = query.filter(from_organization_id=bill["from_organization_id"])
 
         try:
-            obj = query.distinct("id").get()
+            obj = query.distinct().get()
         except self.model_class.MultipleObjectsReturned as exc:
             raise PupaInternalError(
                 "multiple bill candidates found with identifiers: {}".format(
-                    ", ".join(all_identifiers)
+                    ", ".join(identifiers)
                 )
             ) from exc
-
-        if obj.identifier not in all_identifiers:
-            bill["other_identifiers"].append(
-                {"note": "", "identifier": obj.identifier, "scheme": ""}
-            )
 
         return obj
 
@@ -95,9 +83,7 @@ class BillImporter(BaseImporter):
 
         if "identifier" in spec:
             identifier = spec.pop("identifier")
-            return Q(identifier=identifier) | Q(
-                other_identifiers__identifier=identifier
-            ) & Q(**spec)
+            spec["other_identifiers__identifier"] = identifier
 
         return spec
 
@@ -147,12 +133,9 @@ class BillImporter(BaseImporter):
         ):
             candidates = list(
                 Bill.objects.filter(
-                    Q(
-                        legislative_session__identifier=rb.legislative_session,
-                        legislative_session__jurisdiction_id=self.jurisdiction_id,
-                    ),
-                    Q(identifier=rb.identifier)
-                    | Q(other_identifiers__identifier=rb.identifier),
+                    legislative_session__identifier=rb.legislative_session,
+                    legislative_session__jurisdiction_id=self.jurisdiction_id,
+                    other_identifiers__identifier=rb.identifier,
                 )
             )
             if len(candidates) == 1:
@@ -161,5 +144,10 @@ class BillImporter(BaseImporter):
             elif len(candidates) > 1:  # pragma: no cover
                 # if we ever see this, we need to add additional fields on the relation
                 raise PupaInternalError(
-                    "multiple related_bill candidates found for {}".format(rb)
+                    "multiple related_bill candidates found for {related_bill}: {candidates}".format(
+                        related_bill=rb,
+                        candidates=", ".join(
+                            candidate.identifier for candidate in candidates
+                        ),
+                    )
                 )
