@@ -98,9 +98,7 @@ class VoteEventImporter(BaseImporter):
                     date=data["start_date"],
                     organization_id=data["organization_id"],
                 )
-                # seen_action_ids is for ones being added in this import
-                # action.vote is already set if action was set on prior import
-                if action.id in self.seen_action_ids or hasattr(action, "vote"):
+                if action.id in self.seen_action_ids:
                     self.warning(
                         "can not match two VoteEvents to %s: %s", action.id, bill_action
                     )
