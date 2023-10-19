@@ -60,7 +60,6 @@ class BillImporter(BaseImporter):
             "versions__links",
             "documents__links",
         ).filter(
-            legislative_session_id=bill["legislative_session_id"],
             other_identifiers__identifier__in=identifiers,
         )
 
