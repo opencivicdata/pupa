@@ -41,7 +41,7 @@ def items_differ(jsonitems, dbitems, subfield_dict):
 
     original_jsonitems = jsonitems
     jsonitems = copy.deepcopy(jsonitems)
-    keys = jsonitems[0].keys()
+    keys = {key for item in jsonitems for key in item}
 
     # go over dbitems looking for matches
     for dbitem in dbitems:
