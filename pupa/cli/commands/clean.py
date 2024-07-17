@@ -100,7 +100,7 @@ class Command(BaseCommand):
 
             print(
                 f"{num_stale_objects} objects in your database have not been seen "
-                f"in {args.window} days:\n{stale_objects}"
+                f"in {args.window} days."
             )
 
             if num_stale_objects > args.max:
