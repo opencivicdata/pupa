@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, timedelta
+import sys
 
 import django
 from django.apps import apps
@@ -104,8 +105,10 @@ class Command(BaseCommand):
 
             if num_stale_objects > args.max:
                 print(
-                    f"WARNING: {num_stale_objects} exceeds the failsafe limit of {args.max}."
+                    f"{num_stale_objects} exceeds the failsafe limit of {args.max}. "
+                    "Run this command with a larger --max value to proceed."
                 )
+                sys.exit()
 
             if args.yes:
                 print("Proceeding to deletion because you specified --yes.")
