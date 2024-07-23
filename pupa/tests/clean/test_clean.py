@@ -24,40 +24,58 @@ def subparsers():
     return parser.add_subparsers(dest="subcommand")
 
 
-def create_jurisdiction():
+@pytest.fixture
+def jurisdiction():
     Division.objects.create(id="ocd-division/country:us", name="USA")
     return Jurisdiction.objects.create(id="jid", division_id="ocd-division/country:us")
 
 
-@pytest.mark.django_db
-def test_get_stale_objects(subparsers):
-    _ = create_jurisdiction()
-    o = Organization.objects.create(name="WWE", jurisdiction_id="jid")
-    p = Person.objects.create(name="George Washington", family_name="Washington")
-    m = p.memberships.create(organization=o)
+@pytest.fixture
+def organization(jurisdiction):
+    return Organization.objects.create(name="WWE", jurisdiction_id="jid")
 
-    expected_stale_objects = {p, o, m}
+
+@pytest.fixture
+def person():
+    class PersonFactory:
+        def build(self, **kwargs):
+            person_info = {
+                "name": "George Washington",
+                "family_name": "Washington",
+            }
+
+            person_info.update(kwargs)
+
+            return Person.objects.create(**person_info)
+
+    return PersonFactory()
+
+
+@pytest.mark.django_db
+def test_get_stale_objects(subparsers, organization, person):
+    stale_person = person.build()
+    membership = stale_person.memberships.create(organization=organization)
+
+    expected_stale_objects = {stale_person, organization, membership}
 
     a_week_from_now = datetime.now(tz=timezone.utc) + timedelta(days=7)
     with freeze_time(a_week_from_now):
-        p = Person.objects.create(name="Thomas Jefferson", family_name="Jefferson")
-        p.memberships.create(organization=o)
+        fresh_person = person.build(name="Thomas Jefferson", family_name="Jefferson")
+        fresh_person.memberships.create(organization=organization)
         assert set(Command(subparsers).get_stale_objects(7)) == expected_stale_objects
 
 
 @pytest.mark.django_db
-def test_remove_stale_objects(subparsers):
-    _ = create_jurisdiction()
-    o = Organization.objects.create(name="WWE", jurisdiction_id="jid")
-    p = Person.objects.create(name="George Washington", family_name="Washington")
-    m = p.memberships.create(organization=o)
+def test_remove_stale_objects(subparsers, organization, person):
+    stale_person = person.build()
+    membership = stale_person.memberships.create(organization=organization)
 
-    expected_stale_objects = {p, o, m}
+    expected_stale_objects = {stale_person, organization, membership}
 
     a_week_from_now = datetime.now(tz=timezone.utc) + timedelta(days=7)
     with freeze_time(a_week_from_now):
-        p = Person.objects.create(name="Thomas Jefferson", family_name="Jefferson")
-        p.memberships.create(organization=o)
+        fresh_person = person.build(name="Thomas Jefferson", family_name="Jefferson")
+        fresh_person.memberships.create(organization=organization)
 
         Command(subparsers).remove_stale_objects(7)
         for obj in expected_stale_objects:
@@ -66,26 +84,21 @@ def test_remove_stale_objects(subparsers):
 
 
 @pytest.mark.django_db
-def test_clean_command(subparsers):
-    _ = create_jurisdiction()
-    o = Organization.objects.create(name="WWE", jurisdiction_id="jid")
-
-    stale_person = Person.objects.create(
-        name="George Washington", family_name="Washington"
-    )
-    stale_membership = stale_person.memberships.create(organization=o)
+def test_clean_command(subparsers, organization, person):
+    stale_person = person.build()
+    stale_membership = stale_person.memberships.create(organization=organization)
 
     a_week_from_now = datetime.now(tz=timezone.utc) + timedelta(days=7)
     with freeze_time(a_week_from_now):
-        not_stale_person = Person.objects.create(
-            name="Thomas Jefferson", family_name="Jefferson"
+        fresh_person = person.build(name="Thomas Jefferson", family_name="Jefferson")
+        not_stale_membership = fresh_person.memberships.create(
+            organization=organization
         )
-        not_stale_membership = not_stale_person.memberships.create(organization=o)
-        o.save()  # Update org's last_seen field
+        organization.save()  # Update org's last_seen field
 
         # Call clean command
         Command(subparsers).handle(
-            argparse.Namespace(noinput=True, report=False, window=7, yes=False), []
+            argparse.Namespace(report=False, window=7, yes=True, max=10), []
         )
 
         expected_stale_objects = {stale_person, stale_membership}
@@ -93,29 +106,35 @@ def test_clean_command(subparsers):
             was_deleted = not type(obj).objects.filter(id=obj.id).exists()
             assert was_deleted
 
-        expected_not_stale_objects = {o, not_stale_person, not_stale_membership}
+        expected_not_stale_objects = {organization, fresh_person, not_stale_membership}
         for obj in expected_not_stale_objects:
             was_not_deleted = type(obj).objects.filter(id=obj.id).exists()
             assert was_not_deleted
 
 
 @pytest.mark.django_db
-def test_clean_command_failsafe(subparsers):
-    _ = create_jurisdiction()
-    o = Organization.objects.create(name="WWE", jurisdiction_id="jid")
-
-    stale_people = [
-        Person.objects.create(name="George Washington", family_name="Washington")
-        for i in range(20)
-    ]
-    stale_memberships = [ # noqa
-        p.memberships.create(organization=o) for p in stale_people
-    ]
+def test_clean_command_failsafe(subparsers, organization, person):
+    stale_people = [person.build() for i in range(20)]
+    for p in stale_people:
+        p.memberships.create(organization=organization)
 
     a_week_from_now = datetime.now(tz=timezone.utc) + timedelta(days=7)
     with freeze_time(a_week_from_now):
         with pytest.raises(SystemExit):
             # Should trigger failsafe exist when deleting more than 10 objects
             Command(subparsers).handle(
-                argparse.Namespace(noinput=True, report=False, window=7, yes=False), []
+                argparse.Namespace(report=False, window=7, yes=False, max=10), []
             )
+
+        with pytest.raises(SystemExit):
+            # Should trigger failsafe exist when deleting more than 10 objects,
+            # even when yes is specified
+            Command(subparsers).handle(
+                argparse.Namespace(report=False, window=7, yes=True, max=10), []
+            )
+
+        # Should proceed without error, since max is increased (1 organization,
+        # 20 people, 20 memberships)
+        Command(subparsers).handle(
+            argparse.Namespace(report=False, window=7, max=41, yes=True), []
+        )

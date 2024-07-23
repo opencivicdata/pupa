@@ -1,5 +1,5 @@
-import sys
 from datetime import datetime, timezone, timedelta
+import sys
 
 import django
 from django.apps import apps
@@ -32,17 +32,18 @@ class Command(BaseCommand):
             ),
         )
         self.add_argument(
+            "--max",
+            type=int,
+            default=10,
+            help="max number of objects to delete without triggering failsafe",
+        )
+        self.add_argument(
             "--report",
             action="store_true",
             help=(
                 "generate a report of what objects this command"
                 " would delete without making any changes to the database"
             ),
-        )
-        self.add_argument(
-            "--noinput",
-            action="store_true",
-            help="delete objects without getting user confirmation",
         )
         self.add_argument(
             "--yes",
@@ -97,34 +98,25 @@ class Command(BaseCommand):
             stale_objects = list(self.get_stale_objects(args.window))
             num_stale_objects = len(stale_objects)
 
-            if args.noinput and args.yes:
-                self.remove_stale_objects(args.window)
+            print(
+                f"{num_stale_objects} objects in your database have not been seen "
+                f"in {args.window} days."
+            )
+
+            if num_stale_objects > args.max:
+                print(
+                    f"{num_stale_objects} exceeds the failsafe limit of {args.max}. "
+                    "Run this command with a larger --max value to proceed."
+                )
                 sys.exit()
 
-            if args.noinput:
-                # Fail-safe to avoid deleting a large amount of objects
-                # without explicit confimation
-                if num_stale_objects > 10:
-                    print(
-                        f"This command would delete {num_stale_objects} objects: "
-                        f"\n{stale_objects}"
-                        "\nIf you're sure, re-run without --noinput to provide confirmation."
-                        "\nOr re-run with --yes to assume a yes answer to all prompts."
-                    )
-                    sys.exit(1)
-            else:
-                print(
-                    f"This will permanently delete"
-                    f" {num_stale_objects} objects from your database"
-                    f" that have not been scraped within the last {args.window}"
-                    " days. Are you sure? (Y/N)"
-                )
-                resp = input()
-                if resp != "Y":
-                    sys.exit()
+            if args.yes:
+                print("Proceeding to deletion because you specified --yes.")
 
-            print(
-                "Removing objects that haven't been seen in a scrape within"
-                f" the last {args.window} days..."
-            )
-            self.remove_stale_objects(args.window)
+            else:
+                print(f"Permanently delete {num_stale_objects} objects? [Y/n]")
+                response = input()
+
+            if args.yes or response == "Y":
+                self.remove_stale_objects(args.window)
+                print(f"Removed {num_stale_objects} from your database.")
