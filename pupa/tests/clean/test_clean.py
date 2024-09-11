@@ -3,9 +3,9 @@ import argparse
 from datetime import datetime, timezone, timedelta
 from freezegun import freeze_time
 
-from opencivicdata.core.models import Person, Organization, Jurisdiction, Division
+from opencivicdata.core.models import Person, Organization, Jurisdiction, Division, Post
 
-from pupa.cli.commands.clean import Command
+from pupa.cli.commands.clean import Command as CleanCommand
 
 
 @pytest.fixture
@@ -25,14 +25,23 @@ def subparsers():
 
 
 @pytest.fixture
-def jurisdiction():
-    Division.objects.create(id="ocd-division/country:us", name="USA")
-    return Jurisdiction.objects.create(id="jid", division_id="ocd-division/country:us")
+def division():
+    return Division.objects.create(id="ocd-division/country:us", name="USA")
+
+
+@pytest.fixture
+def jurisdiction(division):
+    return Jurisdiction.objects.create(id="jid", division=division)
 
 
 @pytest.fixture
 def organization(jurisdiction):
-    return Organization.objects.create(name="WWE", jurisdiction_id="jid")
+    return Organization.objects.create(name="WWE", jurisdiction=jurisdiction)
+
+
+@pytest.fixture
+def post(organization):
+    return Post.objects.create(organization=organization, label="Some post", role="Some post")
 
 
 @pytest.fixture
@@ -52,17 +61,24 @@ def person():
 
 
 @pytest.mark.django_db
-def test_get_stale_objects(subparsers, organization, person):
+def test_get_stale_objects(subparsers, division, jurisdiction, organization, post, person):
     stale_person = person.build()
     membership = stale_person.memberships.create(organization=organization)
 
+    protected_objects = {division, jurisdiction, post}
     expected_stale_objects = {stale_person, organization, membership}
 
     a_week_from_now = datetime.now(tz=timezone.utc) + timedelta(days=7)
     with freeze_time(a_week_from_now):
         fresh_person = person.build(name="Thomas Jefferson", family_name="Jefferson")
         fresh_person.memberships.create(organization=organization)
-        assert set(Command(subparsers).get_stale_objects(7)) == expected_stale_objects
+
+        stale_objects = set(CleanCommand(subparsers).get_stale_objects(7))
+        assert stale_objects == expected_stale_objects
+
+        # This is implied by the above check, but it's important, so we'll check
+        # for it explicitly.
+        assert protected_objects not in stale_objects
 
 
 @pytest.mark.django_db
@@ -77,7 +93,7 @@ def test_remove_stale_objects(subparsers, organization, person):
         fresh_person = person.build(name="Thomas Jefferson", family_name="Jefferson")
         fresh_person.memberships.create(organization=organization)
 
-        Command(subparsers).remove_stale_objects(7)
+        CleanCommand(subparsers).remove_stale_objects(7)
         for obj in expected_stale_objects:
             was_deleted = not type(obj).objects.filter(id=obj.id).exists()
             assert was_deleted
@@ -97,7 +113,7 @@ def test_clean_command(subparsers, organization, person):
         organization.save()  # Update org's last_seen field
 
         # Call clean command
-        Command(subparsers).handle(
+        CleanCommand(subparsers).handle(
             argparse.Namespace(report=False, window=7, yes=True, max=10), []
         )
 
@@ -118,23 +134,25 @@ def test_clean_command_failsafe(subparsers, organization, person):
     for p in stale_people:
         p.memberships.create(organization=organization)
 
+    cmd = CleanCommand(subparsers)
+
     a_week_from_now = datetime.now(tz=timezone.utc) + timedelta(days=7)
     with freeze_time(a_week_from_now):
         with pytest.raises(SystemExit):
             # Should trigger failsafe exist when deleting more than 10 objects
-            Command(subparsers).handle(
+            cmd.handle(
                 argparse.Namespace(report=False, window=7, yes=False, max=10), []
             )
 
         with pytest.raises(SystemExit):
             # Should trigger failsafe exist when deleting more than 10 objects,
             # even when yes is specified
-            Command(subparsers).handle(
+            cmd.handle(
                 argparse.Namespace(report=False, window=7, yes=True, max=10), []
             )
 
         # Should proceed without error, since max is increased (1 organization,
         # 20 people, 20 memberships)
-        Command(subparsers).handle(
+        cmd.handle(
             argparse.Namespace(report=False, window=7, max=41, yes=True), []
         )

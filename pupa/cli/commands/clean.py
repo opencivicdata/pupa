@@ -62,10 +62,11 @@ class Command(BaseCommand):
         ocd_apps = ["core", "legislative"]
         # Check all subclasses of OCDBase
         models = get_subclasses(ocd_apps, OCDBase)
+        # Top-level models are protected from deletion
+        protected_models = ("Division", "Jurisdiction", "Post")
 
         for model in models:
-            # Jurisdictions are protected from deletion
-            if "Jurisdiction" not in model.__name__:
+            if model.__name__ not in protected_models:
                 cutoff_date = datetime.now(tz=timezone.utc) - timedelta(days=window)
                 yield from model.objects.filter(last_seen__lte=cutoff_date).iterator()
 
