@@ -72,7 +72,7 @@ def test_get_stale_objects(subparsers, division, jurisdiction, organization, pos
     with freeze_time(a_week_from_now):
         fresh_person = person.build(name="Thomas Jefferson", family_name="Jefferson")
         fresh_person.memberships.create(organization=organization)
-        
+
         stale_objects = set(CleanCommand(subparsers).get_stale_objects(7))
         assert stale_objects == expected_stale_objects
 
