@@ -93,7 +93,7 @@ class Command(BaseCommand):
                 "These objects have not been seen in a scrape within the last"
                 f" {args.window} days:"
             )
-            self.report_stale_objects()
+            self.report_stale_objects(args.window)
         else:
             stale_objects = list(self.get_stale_objects(args.window))
             num_stale_objects = len(stale_objects)
