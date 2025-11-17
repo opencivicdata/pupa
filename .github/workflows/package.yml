@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgis/postgis:10-2.5
@@ -27,7 +27,7 @@ jobs:
           - 5432:5432
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8']
+        python-version: ['3.8', '3.9', '3.10']
         django-series: ['2.2', '3.0']
     steps:
     - uses: actions/checkout@v2
@@ -55,7 +55,7 @@ jobs:
   build:
     needs: test
     name: Build package and upload to PyPI
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Build and publish

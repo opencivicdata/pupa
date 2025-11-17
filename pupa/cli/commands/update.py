@@ -7,7 +7,9 @@ import contextlib
 from collections import OrderedDict
 
 import django
+from django.conf import settings as django_settings
 from django.db import transaction
+from django.utils.module_loading import import_string
 
 from pupa import utils
 from pupa import settings
@@ -119,6 +121,33 @@ def save_report(report, jurisdiction):
             )
 
 
+# default importer class paths (fallbacks)
+_DEFAULT_IMPORTERS = {
+    "JurisdictionImporter": "pupa.importers.JurisdictionImporter",
+    "OrganizationImporter": "pupa.importers.OrganizationImporter",
+    "PersonImporter": "pupa.importers.PersonImporter",
+    "PostImporter": "pupa.importers.PostImporter",
+    "MembershipImporter": "pupa.importers.MembershipImporter",
+    "BillImporter": "pupa.importers.BillImporter",
+    "VoteEventImporter": "pupa.importers.VoteEventImporter",
+    "EventImporter": "pupa.importers.EventImporter",
+}
+
+
+def resolve_importer(name):
+    """
+    Retrieve custom entity importer, if configured, else packaged default.
+    """
+    mapping = getattr(django_settings, "IMPORTER_CLASSES", {})
+    candidate = mapping.get(name, _DEFAULT_IMPORTERS[name])
+    try:
+        return import_string(candidate)
+    except Exception as e:
+        raise CommandError(
+            "Could not import importer '{}' from '{}': {}".format(name, candidate, e)
+        )
+
+
 class Command(BaseCommand):
     name = "update"
     help = "update pupa data"
@@ -218,20 +247,19 @@ class Command(BaseCommand):
 
     def do_import(self, juris, args):
         # import inside here because to avoid loading Django code unnecessarily
-        from pupa.importers import (
-            JurisdictionImporter,
-            OrganizationImporter,
-            PersonImporter,
-            PostImporter,
-            MembershipImporter,
-            BillImporter,
-            VoteEventImporter,
-            EventImporter,
-        )
         from pupa.reports import generate_session_report
         from pupa.models import SessionDataQualityReport
 
         datadir = os.path.join(settings.SCRAPED_DATA_DIR, args.module)
+
+        JurisdictionImporter = resolve_importer("JurisdictionImporter")
+        OrganizationImporter = resolve_importer("OrganizationImporter")
+        PersonImporter = resolve_importer("PersonImporter")
+        PostImporter = resolve_importer("PostImporter")
+        MembershipImporter = resolve_importer("MembershipImporter")
+        BillImporter = resolve_importer("BillImporter")
+        VoteEventImporter = resolve_importer("VoteEventImporter")
+        EventImporter = resolve_importer("EventImporter")
 
         juris_importer = JurisdictionImporter(juris.jurisdiction_id)
         org_importer = OrganizationImporter(juris.jurisdiction_id)
