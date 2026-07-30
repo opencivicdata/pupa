@@ -15,7 +15,7 @@ def get_subclasses(app_list, abstract_class):
         for model in apps.get_app_config(app).get_models():
             if issubclass(model, abstract_class) and model is not abstract_class:
                 result.append(model)
-        return result
+    return result
 
 
 class Command(BaseCommand):
@@ -50,17 +50,28 @@ class Command(BaseCommand):
             help="assumes an answer of 'yes' to all interactive prompts",
             default=False,
         )
+        self.add_argument(
+            "category",
+            choices=["all", "people"],
+            help="category of object to clean e.g. people, defaults to all",
+            nargs="?",
+            default="all",
+        )
 
-    def get_stale_objects(self, window):
+    def get_stale_objects(self, category, window):
         """
         Find all database objects that haven't seen been in {window} days.
         """
 
         from opencivicdata.core.models.base import OCDBase
+        from opencivicdata.core.models import Person
 
         ocd_apps = ["core", "legislative"]
-        # Check all subclasses of OCDBase
-        models = get_subclasses(ocd_apps, OCDBase)
+        if category == "all":
+            models = get_subclasses(ocd_apps, OCDBase)
+        elif category == "people":
+            # Deleting Person objects should also delete their associated memberships
+            models = [Person]
 
         for model in models:
             # Jurisdictions are protected from deletion
@@ -68,20 +79,20 @@ class Command(BaseCommand):
                 cutoff_date = datetime.now(tz=timezone.utc) - timedelta(days=window)
                 yield from model.objects.filter(last_seen__lte=cutoff_date).iterator()
 
-    def remove_stale_objects(self, window):
+    def remove_stale_objects(self, category, window):
         """
         Remove all database objects that haven't seen been in {window} days.
         """
 
-        for obj in self.get_stale_objects(window):
+        for obj in self.get_stale_objects(category, window):
             print(f"Deleting {obj}...")
             obj.delete()
 
-    def report_stale_objects(self, window):
+    def report_stale_objects(self, category, window):
         """
         Print all database objects that haven't seen been in {window} days.
         """
-        for obj in self.get_stale_objects(window):
+        for obj in self.get_stale_objects(category, window):
             print(obj)
 
     def handle(self, args, other):
@@ -92,39 +103,40 @@ class Command(BaseCommand):
                 "These objects have not been seen in a scrape within the last"
                 f" {args.window} days:"
             )
-            self.report_stale_objects()
-        else:
-            stale_objects = list(self.get_stale_objects(args.window))
-            num_stale_objects = len(stale_objects)
+            self.report_stale_objects(args.category, args.window)
+            return
 
-            if args.noinput and args.yes:
-                self.remove_stale_objects(args.window)
+        stale_objects = list(self.get_stale_objects(args.category, args.window))
+        num_stale_objects = len(stale_objects)
+
+        if args.noinput and args.yes:
+            self.remove_stale_objects(args.category, args.window)
+            sys.exit()
+
+        if args.noinput:
+            # Fail-safe to avoid deleting a large amount of objects
+            # without explicit confimation
+            if num_stale_objects > 10:
+                print(
+                    f"This command would delete {num_stale_objects} objects: "
+                    f"\n{stale_objects}"
+                    "\nIf you're sure, re-run without --noinput to provide confirmation."
+                    "\nOr re-run with --yes to assume a yes answer to all prompts."
+                )
+                sys.exit(1)
+        else:
+            print(
+                f"This will permanently delete"
+                f" {num_stale_objects} objects from your database"
+                f" that have not been scraped within the last {args.window}"
+                " days. Are you sure? (Y/N)"
+            )
+            resp = input()
+            if resp != "Y":
                 sys.exit()
 
-            if args.noinput:
-                # Fail-safe to avoid deleting a large amount of objects
-                # without explicit confimation
-                if num_stale_objects > 10:
-                    print(
-                        f"This command would delete {num_stale_objects} objects: "
-                        f"\n{stale_objects}"
-                        "\nIf you're sure, re-run without --noinput to provide confirmation."
-                        "\nOr re-run with --yes to assume a yes answer to all prompts."
-                    )
-                    sys.exit(1)
-            else:
-                print(
-                    f"This will permanently delete"
-                    f" {num_stale_objects} objects from your database"
-                    f" that have not been scraped within the last {args.window}"
-                    " days. Are you sure? (Y/N)"
-                )
-                resp = input()
-                if resp != "Y":
-                    sys.exit()
-
-            print(
-                "Removing objects that haven't been seen in a scrape within"
-                f" the last {args.window} days..."
-            )
-            self.remove_stale_objects(args.window)
+        print(
+            "Removing objects that haven't been seen in a scrape within"
+            f" the last {args.window} days..."
+        )
+        self.remove_stale_objects(args.category, args.window)
