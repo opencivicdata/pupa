@@ -1,5 +1,10 @@
 # pupa changelog
 
+## 0.12.0 - October 26, 2026
+
+* Add support for Django 6, drop support for Django <4.2
+* Add support for Python 3.11 through 3.14, drop support for Python <3.10
+
 ## 0.11.0 - April 3 2023
 
 Improvements:
