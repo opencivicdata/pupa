@@ -10,13 +10,13 @@ DATABASE_URL = os.environ.get(
 SECRET_KEY = "non-secret"
 INSTALLED_APPS = (
     "django.contrib.contenttypes",
+    "django.contrib.postgres",
     "opencivicdata.core.apps.BaseConfig",
     "opencivicdata.legislative.apps.BaseConfig",
     "pupa",
 )
 
 ALLOWED_HOSTS = ["localhost"]
-SILENCED_SYSTEM_CHECKS = ["fields.E904"]
 
 # scrape settings
 

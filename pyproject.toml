@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,21 +7,32 @@ name = "pupa"
 dynamic = ["version"]
 description = "scraping framework for muncipal data"
 authors = [{ name = "James Turk", email = "james@openstates.org" }]
-license = { text = "BSD" }
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: BSD License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
+    "Framework :: Django :: 6.1",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "Django>=2.2,<5",
-    "opencivicdata>=3.3.0",
+    "Django>=4.2,<6.2",
+    # TODO: Require the opencivicdata release that includes Django 6 support
+    # (opencivicdata/python-opencivicdata#157) once it is published
+    "opencivicdata>=3.4.0",
     "dj_database_url>=0.3.0",
     "scrapelib>=1.0",
     "jsonschema>=3.0.0",
@@ -37,7 +48,6 @@ dev = [
     "pytest-django",
     "freezegun",
     "coveralls",
-    "coverage<=6.5.0",
     "flake8",
 ]
 
