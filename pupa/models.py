@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from opencivicdata.core.models import Jurisdiction
@@ -88,6 +87,6 @@ class SessionDataQualityReport(models.Model):
     votes_with_bad_counts = models.PositiveIntegerField()
 
     # these fields store lists of names mapped to numbers of occurances
-    unmatched_sponsor_people = JSONField()
-    unmatched_sponsor_organizations = JSONField()
-    unmatched_voters = JSONField()
+    unmatched_sponsor_people = models.JSONField()
+    unmatched_sponsor_organizations = models.JSONField()
+    unmatched_voters = models.JSONField()

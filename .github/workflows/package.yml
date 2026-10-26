@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgis/postgis:10-2.5
+        image: postgis/postgis:17-3.6
         env:
           POSTGRES_USER: test
           POSTGRES_DB: test
@@ -27,19 +27,40 @@ jobs:
           - 5432:5432
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
-        django-series: ['2.2', '3.0']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
+        django-series: ['4.2', '5.2', '6.0', '6.1']
+        exclude:
+          - django-series: '4.2'
+            python-version: '3.13'
+          - django-series: '4.2'
+            python-version: '3.14'
+          - django-series: '4.2'
+            python-version: '3.15'
+          - django-series: '5.2'
+            python-version: '3.15'
+          - django-series: '6.0'
+            python-version: '3.10'
+          - django-series: '6.0'
+            python-version: '3.11'
+          - django-series: '6.0'
+            python-version: '3.15'
+          - django-series: '6.1'
+            python-version: '3.10'
+          - django-series: '6.1'
+            python-version: '3.11'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y gdal-bin
-        pip install .[dev] --pre Django==${{ matrix.django-series }}
+        # TODO: Drop the opencivicdata URL once it publishes a release with Django 6 support
+        pip install .[dev] "Django~=${{ matrix.django-series }}.0" \
+          "opencivicdata @ git+https://github.com/opencivicdata/python-opencivicdata.git@feature/django6-support"
     - name: Lint with flake8
       run: |
         flake8 pupa
@@ -57,15 +78,14 @@ jobs:
     name: Build package and upload to PyPI
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Build and publish
       if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
       run: |
-        pip install twine wheel
-        pip wheel -w dist --no-deps .
-        python setup.py sdist
+        pip install build twine
+        python -m build
         twine upload dist/*
       continue-on-error: true

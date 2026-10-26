@@ -3,6 +3,7 @@ import os
 
 SECRET_KEY = 'test'
 INSTALLED_APPS = ('django.contrib.contenttypes',
+                  'django.contrib.postgres',
                   'opencivicdata.core.apps.BaseConfig',
                   'opencivicdata.legislative.apps.BaseConfig',
                   'pupa')
