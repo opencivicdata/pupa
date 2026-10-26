@@ -64,8 +64,7 @@ jobs:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
       run: |
-        pip install twine wheel
-        pip wheel -w dist --no-deps .
-        python setup.py sdist
+        pip install build twine
+        python -m build
         twine upload dist/*
       continue-on-error: true
